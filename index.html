@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Walkthrough</title>
+<meta name="description" content="Tures — an AI concierge that books the trip you describe. A guided walkthrough of seven screens." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #2D1B2E;
+    --brass: #B8965A;
+    --brass-soft: #D4B989;
+    --clay: #F4EFE8;
+    --ink: #1C1816;
+    --slate: #7A7167;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; }
+  .hero-grad {
+    background:
+      linear-gradient(180deg, rgba(45,27,46,0.0) 0%, rgba(45,27,46,0.45) 75%, rgba(45,27,46,0.85) 100%),
+      linear-gradient(120deg, #3a2a48 0%, #5b3a3a 55%, #7a5a3a 100%);
+  }
+  .card {
+    background: #fff;
+    border: 1px solid rgba(45,27,46,0.08);
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
+  }
+  .card:active { transform: scale(0.99); }
+  @media (hover: hover) {
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -12px rgba(45,27,46,0.25); border-color: rgba(184,150,90,0.5); }
+  }
+  .card-feature { background: var(--aubergine); border-color: transparent; }
+  .num { font-variant-numeric: tabular-nums; }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10px; letter-spacing:0.07em; text-transform:uppercase; font-weight:600; }
+  .pill-brass { background: rgba(184,150,90,0.18); color: var(--brass); }
+  .divider { height:1px; background: rgba(45,27,46,0.1); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="relative hero-grad overflow-hidden">
+  <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 75% 25%, rgba(184,150,90,0.45), transparent 60%);"></div>
+  <div class="relative max-w-3xl mx-auto px-6 pt-16 pb-12 sm:pt-20 sm:pb-16 text-white">
+    <div class="caps text-xs text-brass mb-5">A guided walkthrough · 7 screens</div>
+    <a href="#" class="font-serif text-3xl tracking-wide block mb-6">Tures</a>
+    <h1 class="font-serif font-light text-4xl sm:text-5xl leading-[1.05] tracking-tight">
+      Describe a trip.<br/>We book it.
+    </h1>
+    <p class="mt-6 text-base sm:text-lg text-white/80 leading-relaxed max-w-xl">
+      An AI concierge with permissions. This is the product, screen by screen — built around a real trip a friend actually sent us. Tap any card to step through it.
+    </p>
+  </div>
+</header>
+
+<!-- HOW TO USE -->
+<section class="max-w-3xl mx-auto px-6 -mt-6 relative z-10">
+  <div class="card rounded-lg px-5 py-4 flex items-center gap-3 text-sm text-aubergine/80">
+    <span class="text-brass text-lg">↓</span>
+    <span>Best viewed in order — but jump to <a href="#feature" class="text-brass font-medium underline decoration-brass/40 underline-offset-2">the live execution dashboard</a> for the money shot.</span>
+  </div>
+</section>
+
+<!-- CARD GRID -->
+<main class="max-w-3xl mx-auto px-6 py-10 space-y-4">
+
+  <a href="01-landing.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">01</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">The pitch</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">The landing page — what Tures is, and a live look at Andy's eleven-day itinerary parsed into a structured plan.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <a href="02-paste-trip.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">02</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">Paste the trip</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">Drop in an email the way you'd brief a friend. Watch it become a structured, leg-by-leg plan.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <a href="03-connections.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">03</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">Grant the permissions</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">Card, loyalty numbers, calendar, inbox — the chain of access an agent needs to actually book.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <!-- FEATURE CARD — the money shot -->
+  <a id="feature" href="04-execution-dashboard.html" class="card card-feature rounded-lg p-6 block text-white scroll-mt-6">
+    <div class="flex items-center justify-between mb-3">
+      <span class="font-mono text-brass-soft text-sm num">04</span>
+      <span class="pill pill-brass">The money shot</span>
+    </div>
+    <span class="font-serif text-3xl leading-tight block">Watch it execute</span>
+    <span class="text-sm text-white/70 mt-2 block leading-relaxed">The live agent dashboard — Tures booking every leg in real time, surfacing trade-offs, never faking a confirmation. This is the part nobody else is building.</span>
+    <span class="mt-4 inline-flex items-center gap-2 text-brass-soft text-sm font-medium">Open the dashboard <span class="text-lg">→</span></span>
+  </a>
+
+  <a href="05-itinerary.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">05</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">The finished itinerary</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">Paris · Lapland · Copenhagen — every flight, hotel, and dinner confirmed, with the receipts to prove it.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <a href="06-notifications.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">06</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">While you sleep</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">Schedule changes, weather, a cancelled dinner — how Tures monitors, proposes, and handles it.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <a href="07-concierge-chat.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="font-mono text-brass text-sm num mt-0.5">07</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">In-trip concierge</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">Text Tures from Paris — <em>push my Friday dinner to 9pm</em> — and have it done before the apéritif.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+  <div class="divider my-2"></div>
+
+  <a href="about.html" class="card rounded-lg p-5 flex items-start gap-4 block">
+    <span class="text-brass text-sm mt-0.5">✦</span>
+    <span class="flex-1">
+      <span class="font-serif text-2xl text-aubergine leading-tight block">About Tures</span>
+      <span class="text-sm text-aubergine/65 mt-1 block">The strategic brief — who Andy is, the wedge, the business model, and the honest skepticism.</span>
+    </span>
+    <span class="text-aubergine/30 text-xl mt-1">→</span>
+  </a>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-aubergine text-white/60 py-12">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="font-serif text-2xl text-white">Tures</div>
+    <div class="text-sm mt-2">A trip booked is the only thing we ship.</div>
+    <div class="text-xs mt-6 text-white/40">Scaffold v1 · concept walkthrough</div>
+  </div>
+</footer>
+
+</body>
+</html>
