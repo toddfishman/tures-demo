@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Andy's Paris · Lapland · Copenhagen itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #1F3530;
+    --brass: #C68A3D;
+    --clay: #F7F5F1;
+    --ink: #1A1A1A;
+    --slate: #6E7A74;
+    --confirm: #2E6A53;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-serif { font-family: 'Fraunces', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .card { background: #fff; border: 1px solid rgba(31,53,48,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; letter-spacing:0.07em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(46,106,83,0.1); color: var(--confirm); }
+  .pill-neutral { background: rgba(31,53,48,0.06); color: var(--aubergine); }
+  .divider { height: 1px; background: rgba(31,53,48,0.1); }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(31,53,48,0.2); }
+  /* Photo blocks rendered as warm-toned gradients (placeholder for editorial photography) */
+  .photo {
+    background:
+      linear-gradient(180deg, rgba(31,53,48,0) 60%, rgba(31,53,48,0.55) 100%),
+      linear-gradient(135deg, #16302a 0%, #2c4f48 50%, #7fa6b8 100%);
+    background-size: cover; background-position: center;
+    color: white;
+  }
+  .photo-paris { background: linear-gradient(180deg, rgba(31,53,48,0) 50%, rgba(31,53,48,0.65) 100%), linear-gradient(135deg, #3a5650, #8aa9a0, #d4b989); }
+  .photo-lapland { background: linear-gradient(180deg, rgba(26,26,26,0) 50%, rgba(26,26,26,0.65) 100%), linear-gradient(135deg, #1b3a40, #5b8294, #cddde6); }
+  .photo-cph { background: linear-gradient(180deg, rgba(31,53,48,0) 50%, rgba(31,53,48,0.65) 100%), linear-gradient(135deg, #22403a, #5e7d76, #b9cdd6); }
+  .photo-sea { background: linear-gradient(180deg, rgba(26,26,26,0) 50%, rgba(26,26,26,0.65) 100%), linear-gradient(135deg, #1d3a34, #3e6e64, #92b3a8); }
+  .day-row { display: grid; grid-template-columns: 90px 1fr; gap: 24px; padding: 26px 0; border-bottom: 1px solid rgba(31,53,48,0.08); }
+  .day-row:last-child { border-bottom: 0; }
+  .meta { font-size: 12.5px; color: var(--slate); }
+  body, .font-serif { font-optical-sizing: auto; }
+  .rounded-md { border-radius: 4px !important; }
+  .rounded-lg { border-radius: 6px !important; }</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-aubergine/10 bg-clay/80 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <a href="01-landing.html" class="font-serif text-2xl text-aubergine">Tures</a>
+      <nav class="hidden md:flex gap-8 text-sm text-aubergine/70">
+        <a href="02-paste-trip.html">New trip</a>
+        <a href="04-execution-dashboard.html">In flight</a>
+        <a href="05-itinerary.html" class="text-aubergine">Past trips</a>
+        <a href="06-notifications.html">Notifications</a>
+        <a href="03-connections.html">Connections</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="caps text-xs text-slate-warm">Andy Rockwell</span>
+      <div class="w-9 h-9 rounded-full bg-aubergine text-brass flex items-center justify-center font-serif text-lg">A</div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="relative h-[65vh] min-h-[480px] photo-paris">
+  <div class="relative max-w-7xl mx-auto px-8 h-full flex flex-col justify-end pb-16 text-white">
+    <div class="tag text-brass caps text-xs mb-3">Trip · December 2026</div>
+    <h1 class="font-serif font-light text-7xl leading-[1.02] tracking-tight">Paris · Lapland · Copenhagen</h1>
+    <div class="mt-4 flex items-center gap-6 text-white/85">
+      <span>Dec 3 — Dec 13</span>
+      <span class="opacity-50">·</span>
+      <span class="font-mono">11 days</span>
+      <span class="opacity-50">·</span>
+      <span>1 traveler · Business</span>
+      <span class="opacity-50">·</span>
+      <span class="pill pill-confirm">All 7 bookings verified</span>
+    </div>
+  </div>
+</section>
+
+<!-- AT A GLANCE -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+  <div class="grid md:grid-cols-4 gap-6">
+    <div>
+      <div class="caps text-xs text-slate-warm mb-2">Cities</div>
+      <div class="font-serif text-3xl text-aubergine">3</div>
+      <div class="text-sm text-slate-warm mt-1">Paris · Saariselkä · Copenhagen</div>
+    </div>
+    <div>
+      <div class="caps text-xs text-slate-warm mb-2">Flights</div>
+      <div class="font-serif text-3xl text-aubergine">4</div>
+      <div class="text-sm text-slate-warm mt-1">Business · 2 direct · 2 one-stop</div>
+    </div>
+    <div>
+      <div class="caps text-xs text-slate-warm mb-2">Stays</div>
+      <div class="font-serif text-3xl text-aubergine">3</div>
+      <div class="text-sm text-slate-warm mt-1">Real Christine · Javri Lodge · Hotel Sanders</div>
+    </div>
+    <div>
+      <div class="caps text-xs text-slate-warm mb-2">Dinners</div>
+      <div class="font-serif text-3xl text-aubergine">9</div>
+      <div class="text-sm text-slate-warm mt-1">7 confirmed · 2 in concierge queue</div>
+    </div>
+  </div>
+</section>
+
+<!-- PARIS SEGMENT -->
+<section class="max-w-7xl mx-auto px-8 pb-12">
+  <div class="grid lg:grid-cols-12 gap-8 mb-8">
+    <div class="lg:col-span-4">
+      <div class="caps text-xs text-slate-warm mb-2">Segment one · Dec 3 — 7</div>
+      <h2 class="font-serif text-5xl text-aubergine leading-[1.05]">Paris</h2>
+      <p class="mt-4 text-aubergine/75 leading-relaxed">Four nights in the 6th, with a quiet courtyard suite at <strong>Real Christine</strong> as your base. December in Paris means low sun, fewer tourists, and the early stretch of the holiday windows on rue de Sèvres.</p>
+      <div class="mt-6 text-sm text-aubergine/80 space-y-2">
+        <div class="flex justify-between"><span>Weather</span><span class="font-mono">4–9°C · light rain</span></div>
+        <div class="flex justify-between"><span>Daylight</span><span class="font-mono">08:38 — 16:55</span></div>
+        <div class="flex justify-between"><span>Currency</span><span class="font-mono">EUR · 1 USD ≈ 0.92 €</span></div>
+      </div>
+    </div>
+    <div class="lg:col-span-8 h-[360px] photo-paris rounded-md relative">
+      <div class="absolute bottom-6 left-6 right-6 text-white">
+        <div class="font-serif text-3xl">Real Christine, 6e</div>
+        <div class="text-sm text-white/80 mt-1">Junior Suite · garden view · 3 nights</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card rounded-md px-8 pb-2">
+    <!-- Day 1 -->
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 1</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Thu 12/03</div>
+        <div class="meta mt-1">Travel day</div>
+      </div>
+      <div>
+        <div class="font-mono text-aubergine">AA 142 · SEA → CDG · Business · seat 5A · dep 18:45</div>
+        <p class="text-sm text-aubergine/75 mt-2 leading-relaxed">Lounge access at SEA Centurion (gate A14). Onboard Wi-Fi included on your AAdvantage fare. Sleep before service ends — Paris arrival in the late morning means a no-nap day to reset.</p>
+      </div>
+    </div>
+    <!-- Day 2 -->
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 2</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Fri 12/04</div>
+        <div class="meta mt-1">Arrive Paris</div>
+      </div>
+      <div>
+        <div class="text-aubergine">Arrive CDG · <span class="font-mono">13:25</span> · check in at Real Christine · early afternoon</div>
+        <p class="text-sm text-aubergine/75 mt-2 leading-relaxed">Pre-arranged car (G7 Premium) from CDG to 3 rue Christine. Late lunch at <strong>Le Comptoir du Relais</strong> — walkable, no reservation needed off-peak. Hold the evening light.</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <span class="pill pill-neutral">Dinner · Septime · 20:30</span>
+          <span class="pill pill-confirm">Resy confirmed · #R-8211</span>
+        </div>
+      </div>
+    </div>
+    <!-- Day 3 -->
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 3</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Sat 12/05</div>
+        <div class="meta mt-1">Paris</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Saturday is the strongest morning at the marché d'Aligre (closes 13:00). Afternoon: Musée Picasso (timed entry held for 14:30, your AmEx Platinum benefit applied). Quiet evening — your stated rhythm prefers a neighborhood second night.</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <span class="pill pill-neutral">Dinner · Le Bistrot Paul Bert · 20:00</span>
+          <span class="pill pill-confirm">Resy confirmed · #R-8212</span>
+        </div>
+      </div>
+    </div>
+    <!-- Day 4 -->
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 4</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Sun 12/06</div>
+        <div class="meta mt-1">Paris</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Sunday in the Marais. Holiday markets at Place des Vosges from 11:00. Most galleries closed — keep it walking-day. Café Charlot brunch is your speed; reservation held for 12:30.</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <span class="pill pill-neutral">Dinner · Frenchie · 20:00</span>
+          <span class="pill pill-confirm">Routed via concierge desk · confirmed by phone</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAPLAND SEGMENT -->
+<section class="max-w-7xl mx-auto px-8 py-12">
+  <div class="grid lg:grid-cols-12 gap-8 mb-8">
+    <div class="lg:col-span-8 h-[360px] photo-lapland rounded-md relative order-2 lg:order-1">
+      <div class="absolute bottom-6 left-6 right-6 text-white">
+        <div class="font-serif text-3xl">Javri Lodge, Saariselkä</div>
+        <div class="text-sm text-white/80 mt-1">Aurora Suite · 3 nights · breakfast + dinner included</div>
+      </div>
+    </div>
+    <div class="lg:col-span-4 order-1 lg:order-2">
+      <div class="caps text-xs text-slate-warm mb-2">Segment two · Dec 7 — 10</div>
+      <h2 class="font-serif text-5xl text-aubergine leading-[1.05]">Lapland</h2>
+      <p class="mt-4 text-aubergine/75 leading-relaxed">Three nights at <strong>Javri Lodge</strong> in Saariselkä, the high-end lodge above Ivalo. December puts you inside the polar night with aurora forecast at <span class="font-mono">KP 4–6</span> across your stay — well above the Saariselkä viewing threshold.</p>
+      <div class="mt-6 text-sm text-aubergine/80 space-y-2">
+        <div class="flex justify-between"><span>Weather</span><span class="font-mono">−14 to −22°C</span></div>
+        <div class="flex justify-between"><span>Daylight</span><span class="font-mono">~0h · polar night</span></div>
+        <div class="flex justify-between"><span>Aurora forecast</span><span class="font-mono">KP 4–6 nightly</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card rounded-md px-8 pb-2">
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 5</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Sun 12/07</div>
+        <div class="meta mt-1">Paris → Ivalo</div>
+      </div>
+      <div>
+        <div class="font-mono text-aubergine">AY 1574 · CDG → HEL → IVL · Business · dep 10:25 · arr 21:00</div>
+        <p class="text-sm text-aubergine/75 mt-2 leading-relaxed">HEL connection is 1h 50m on the Schengen side — no second immigration. Pre-booked Javri Lodge transfer waits at IVL arrivals; 45-minute drive on a plowed road. Dinner at the lodge on arrival; lodge will hold the kitchen.</p>
+      </div>
+    </div>
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 6</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Mon 12/08</div>
+        <div class="meta mt-1">Saariselkä</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Lodge sauna ritual mid-morning. Afternoon snowshoe led by the lodge (14:00). Aurora wake-call enabled at the front desk — they'll knock if KP forecast spikes after 22:00.</p>
+      </div>
+    </div>
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 7</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Tue 12/09</div>
+        <div class="meta mt-1">Saariselkä</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Reindeer farm visit with the Sámi family the lodge works with — held at 10:30. Free afternoon. Final dinner at the lodge tasting menu (7 courses) at 20:00.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COPENHAGEN SEGMENT -->
+<section class="max-w-7xl mx-auto px-8 py-12">
+  <div class="grid lg:grid-cols-12 gap-8 mb-8">
+    <div class="lg:col-span-4">
+      <div class="caps text-xs text-slate-warm mb-2">Segment three · Dec 10 — 13</div>
+      <h2 class="font-serif text-5xl text-aubergine leading-[1.05]">Copenhagen</h2>
+      <p class="mt-4 text-aubergine/75 leading-relaxed">Three nights at <strong>Hotel Sanders</strong>, four minutes from Nyhavn. Copenhagen in early December is hygge weather — Christmas lights on Strøget, glasses of glögg, the Tivoli holiday market still open.</p>
+      <div class="mt-6 text-sm text-aubergine/80 space-y-2">
+        <div class="flex justify-between"><span>Weather</span><span class="font-mono">1–5°C · grey</span></div>
+        <div class="flex justify-between"><span>Daylight</span><span class="font-mono">08:35 — 15:38</span></div>
+        <div class="flex justify-between"><span>Tivoli holiday market</span><span class="font-mono">open until 22:00</span></div>
+      </div>
+    </div>
+    <div class="lg:col-span-8 h-[360px] photo-cph rounded-md relative">
+      <div class="absolute bottom-6 left-6 right-6 text-white">
+        <div class="font-serif text-3xl">Hotel Sanders</div>
+        <div class="text-sm text-white/80 mt-1">Junior Suite · 4 min walk to Nyhavn · 3 nights</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card rounded-md px-8 pb-2">
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 8</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Wed 12/10</div>
+        <div class="meta mt-1">Ivalo → Copenhagen</div>
+      </div>
+      <div>
+        <div class="font-mono text-aubergine">AY 945 · IVL → HEL → CPH · Business · dep 14:20 · arr 19:15</div>
+        <p class="text-sm text-aubergine/75 mt-2 leading-relaxed">Lodge transfer 12:30. Sanders has your room ready at 21:00. Quiet first night — late dinner at the hotel's TATA bar.</p>
+      </div>
+    </div>
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 9</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Thu 12/11</div>
+        <div class="meta mt-1">Copenhagen</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Morning at SMK (Statens Museum for Kunst). Walk through Frederiksstaden. Tivoli holiday market opens at 11:00 — held 30 minutes before sunset for the lights coming on.</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <span class="pill pill-neutral">Dinner · Apollo Bar · 19:30</span>
+          <span class="pill pill-confirm">Resy confirmed · #R-8214</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 10</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Fri 12/12</div>
+        <div class="meta mt-1">Copenhagen</div>
+      </div>
+      <div>
+        <p class="text-sm text-aubergine/75 leading-relaxed">Refshaleøen by water bus — Reffen closed for winter, but the warehouse galleries are open. Coffee at Coffee Collective in Jægersborggade.</p>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <span class="pill pill-neutral">Dinner · Geranium · 20:00</span>
+          <span class="pill pill-confirm">Confirmed via concierge desk · 12/04</span>
+        </div>
+      </div>
+    </div>
+    <div class="day-row">
+      <div>
+        <div class="caps text-xs text-slate-warm">Day 11</div>
+        <div class="font-serif text-2xl text-aubergine mt-1">Sat 12/13</div>
+        <div class="meta mt-1">Copenhagen → Seattle</div>
+      </div>
+      <div>
+        <div class="font-mono text-aubergine">AF 1351 + AF 376 · CPH → CDG → SEA · Business · dep 10:35 · arr 17:10</div>
+        <p class="text-sm text-aubergine/75 mt-2 leading-relaxed">Hotel checkout 09:00, taxi at 08:30 (held). CDG layover 2h 35m in the AF lounge at terminal 2E. AF 376 is the non-stop CDG→SEA you specified.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKINGS DETAIL -->
+<section class="bg-aubergine text-white py-20 mt-12">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="caps text-xs text-brass mb-3">Confirmations</div>
+    <h2 class="font-serif text-4xl mb-10">Every booking, every number.</h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Flight 1</div>
+        <div class="font-serif text-lg">AA 142 · SEA → CDG</div>
+        <div class="text-white/70 mt-1">12/03 · 18:45 · seat 5A</div>
+        <div class="font-mono text-white/60 mt-2">PNR · LXJ7Q3</div>
+      </div>
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Stay 1</div>
+        <div class="font-serif text-lg">Real Christine, Paris</div>
+        <div class="text-white/70 mt-1">12/04–12/07 · Junior Suite</div>
+        <div class="font-mono text-white/60 mt-2">CONF · 8849-RCP</div>
+      </div>
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Flight 2</div>
+        <div class="font-serif text-lg">AY 1574 · CDG → IVL via HEL</div>
+        <div class="text-white/70 mt-1">12/07 · 10:25 · Business</div>
+        <div class="font-mono text-white/60 mt-2">PNR · MX29P0</div>
+      </div>
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Stay 2</div>
+        <div class="font-serif text-lg">Javri Lodge, Saariselkä</div>
+        <div class="text-white/70 mt-1">12/07–12/10 · Aurora Suite</div>
+        <div class="font-mono text-white/60 mt-2">CONF · JL-12041</div>
+      </div>
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Flight 3</div>
+        <div class="font-serif text-lg">AY 945 · IVL → CPH via HEL</div>
+        <div class="text-white/70 mt-1">12/10 · 14:20 · Business</div>
+        <div class="font-mono text-white/60 mt-2">PNR · TY81RQ</div>
+      </div>
+      <div class="bg-white/5 rounded p-5">
+        <div class="caps text-xs text-brass mb-2">Stay 3</div>
+        <div class="font-serif text-lg">Hotel Sanders, Copenhagen</div>
+        <div class="text-white/70 mt-1">12/10–12/13 · Junior Suite</div>
+        <div class="font-mono text-white/60 mt-2">CONF · HS-3304</div>
+      </div>
+      <div class="bg-white/5 rounded p-5 md:col-span-1 lg:col-span-2">
+        <div class="caps text-xs text-brass mb-2">Flight 4 · two-segment</div>
+        <div class="font-serif text-lg">AF 1351 + AF 376 · CPH → CDG → SEA</div>
+        <div class="text-white/70 mt-1">12/13 · 10:35 · Business</div>
+        <div class="font-mono text-white/60 mt-2">PNR · GH4M9K</div>
+      </div>
+      <div class="bg-brass text-aubergine rounded p-5">
+        <div class="caps text-xs mb-2">Authorized total</div>
+        <div class="font-serif text-3xl">$26,114</div>
+        <div class="text-xs mt-2 opacity-75">Charged to AmEx ··1004 · 7 transactions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHARE / EXPORT -->
+<section class="py-14 border-t border-aubergine/10">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-6">
+    <div>
+      <div class="caps text-xs text-slate-warm">Itinerary v3 · last updated <span class="font-mono">11/14 · 18:21</span></div>
+      <div class="font-serif text-xl text-aubergine mt-1">Take it with you.</div>
+    </div>
+    <div class="flex gap-3">
+      <button class="px-5 py-2.5 border border-aubergine/20 text-aubergine text-sm hover-lift">Add to calendar</button>
+      <button class="px-5 py-2.5 border border-aubergine/20 text-aubergine text-sm hover-lift">Download PDF</button>
+      <button class="px-5 py-2.5 border border-aubergine/20 text-aubergine text-sm hover-lift">Send to phone</button>
+      <a href="07-concierge-chat.html" class="px-5 py-2.5 bg-aubergine text-white text-sm hover-lift">Message Tures →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-aubergine/10 py-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-warm">
+    <span>Trip #T-2087 · monitored continuously through Dec 13</span>
+    <a href="#" class="hover:text-aubergine">Audit log →</a>
+  </div>
+</footer>
+
+</body>
+</html>

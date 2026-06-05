@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Notifications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #0F3D2E;
+    --brass: #E97A5E;
+    --clay: #F4EDDC;
+    --ink: #1A1A1A;
+    --slate: #6F7A66;
+    --confirm: #1F6E5A;
+    --pending: #B8860B;
+    --alert: #C75D43;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-serif { font-family: 'DM Serif Display', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .card { background: #fff; border: 1px solid rgba(15,61,46,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; letter-spacing:0.07em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(31,110,90,0.1); color: var(--confirm); }
+  .pill-pending { background: rgba(184,134,11,0.12); color: var(--pending); }
+  .pill-alert   { background: rgba(199,93,67,0.1);  color: var(--alert); }
+  .pill-neutral { background: rgba(15,61,46,0.06); color: var(--aubergine); }
+  .divider { height: 1px; background: rgba(15,61,46,0.1); }
+  .feed-item { display: grid; grid-template-columns: 56px 1fr 110px; gap: 18px; padding: 22px 24px; border-bottom: 1px solid rgba(15,61,46,0.07); align-items: start; }
+  .feed-item:last-child { border-bottom: 0; }
+  .icon-cell {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', Georgia, serif; font-size: 20px;
+  }
+  .ic-bg-amber { background: rgba(184,134,11,0.12); color: var(--pending); }
+  .ic-bg-green { background: rgba(31,110,90,0.1); color: var(--confirm); }
+  .ic-bg-alert { background: rgba(199,93,67,0.1); color: var(--alert); }
+  .ic-bg-brass { background: rgba(233,122,94,0.14); color: var(--brass); }
+  .ic-bg-aub   { background: rgba(15,61,46,0.08); color: var(--aubergine); }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(15,61,46,0.2); }
+  .ts { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: var(--slate); }
+  .filter-pill { padding: 6px 12px; border-radius: 999px; font-size: 12.5px; cursor: pointer; }
+  .filter-pill.active { background: var(--aubergine); color: white; }
+  .filter-pill.idle { background: rgba(15,61,46,0.06); color: var(--aubergine); }
+  .rounded-md { border-radius: 9px !important; }
+  .rounded-lg { border-radius: 12px !important; }</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-aubergine/10 bg-clay/80 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <a href="01-landing.html" class="font-serif text-2xl text-aubergine">Tures</a>
+      <nav class="hidden md:flex gap-8 text-sm text-aubergine/70">
+        <a href="02-paste-trip.html">New trip</a>
+        <a href="04-execution-dashboard.html">In flight</a>
+        <a href="05-itinerary.html">Past trips</a>
+        <a href="06-notifications.html" class="text-aubergine">Notifications</a>
+        <a href="03-connections.html">Connections</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="caps text-xs text-slate-warm">Andy Rockwell</span>
+      <div class="w-9 h-9 rounded-full bg-aubergine text-brass flex items-center justify-center font-serif text-lg">A</div>
+    </div>
+  </div>
+</header>
+
+<!-- TITLE -->
+<section class="max-w-5xl mx-auto px-8 pt-12 pb-6">
+  <div class="caps text-xs text-slate-warm mb-3">Updates · trip #T-2087 · last 7 days</div>
+  <div class="flex items-end justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="font-serif text-5xl text-aubergine leading-[1.05]">What we handled.</h1>
+      <p class="mt-3 text-aubergine/70 max-w-2xl">Tures monitors your trip continuously. Most issues we resolve ourselves; the ones that need your call sit at the top.</p>
+    </div>
+    <div class="flex gap-2">
+      <span class="filter-pill active">All · 14</span>
+      <span class="filter-pill idle">Needs you · 1</span>
+      <span class="filter-pill idle">Auto-handled · 9</span>
+      <span class="filter-pill idle">FYI · 4</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEED -->
+<section class="max-w-5xl mx-auto px-8 pb-24">
+  <div class="card rounded-md">
+
+    <!-- TODAY -->
+    <div class="px-6 py-3 bg-[#FBF4E4] border-b border-aubergine/10">
+      <div class="caps text-xs text-slate-warm">Today · Nov 18</div>
+    </div>
+
+    <!-- Needs you -->
+    <div class="feed-item" style="background: #FAF2DF;">
+      <div class="icon-cell ic-bg-alert">!</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-alert">Needs your call</span>
+          <span class="font-serif text-xl text-aubergine">Le Bistrot Paul Bert lost their 12/05 booking page</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Resy shows the restaurant as fully booked for Dec 5 — including the slot we held. The restaurant confirms by phone they're honoring the original confirmation (R-8212). I've requested a written email confirmation as a second source; if it doesn't arrive in 24h, I'll propose 3 alternatives in the neighborhood (Clamato, Le Servan, Le Châteaubriand).</p>
+        <div class="mt-3 flex gap-2">
+          <button class="px-3 py-1.5 bg-brass text-aubergine text-xs font-medium">Trust the phone confirmation</button>
+          <button class="px-3 py-1.5 border border-aubergine/20 text-aubergine text-xs">Move now to an alternative</button>
+        </div>
+      </div>
+      <div class="text-right ts">14:08 PT</div>
+    </div>
+
+    <!-- Auto handled — schedule change -->
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-amber">↔</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Handled for you</span>
+          <span class="font-serif text-xl text-aubergine">AY 1574 retimed by 25 minutes</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Finnair moved AY 1574 (CDG→HEL) from 10:25 to 10:50 dep. Your HEL connection compresses from 1h 50m to 1h 25m — still inside AY's minimum connection time at HEL Schengen. I held the booking, didn't rebook, and emailed AY to confirm protection if the connection misfires.</p>
+        <div class="mt-3 text-xs text-slate-warm">No action needed. Itinerary updated. <a href="05-itinerary.html" class="text-brass underline">View itinerary →</a></div>
+      </div>
+      <div class="text-right ts">11:22 PT</div>
+    </div>
+
+    <!-- Price drop -->
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-green">↓</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Handled for you</span>
+          <span class="font-serif text-xl text-aubergine">Hotel Sanders price dropped — credited back</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">The Junior Suite rate for your stay fell €110/night ($117) in the last 24 hours. I requested a rate adjustment under your rate-protect benefit; Sanders honored it. <span class="font-mono">$351</span> credited to AmEx ··1004.</p>
+      </div>
+      <div class="text-right ts">06:41 PT</div>
+    </div>
+
+    <!-- YESTERDAY -->
+    <div class="px-6 py-3 bg-[#FBF4E4] border-b border-t border-aubergine/10">
+      <div class="caps text-xs text-slate-warm">Yesterday · Nov 17</div>
+    </div>
+
+    <!-- Restaurant alt -->
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-brass">★</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Handled for you</span>
+          <span class="font-serif text-xl text-aubergine">Geranium confirmed by our concierge desk</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Geranium does not take online reservations for your travel dates. Our concierge desk reached the maître d' directly. 20:00 on 12/12 confirmed in your name. Deposit charged: <span class="font-mono">€400</span>, applied to your final bill.</p>
+      </div>
+      <div class="text-right ts">22:10 PT</div>
+    </div>
+
+    <!-- Weather alert -->
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-aub">❄</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-neutral">FYI</span>
+          <span class="font-serif text-xl text-aubergine">Lapland forecast firmed up</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Saariselkä is tracking 4°C below seasonal average for your stay (−22 to −14°C). I packed an updated cold-weather checklist into your phone briefing. Javri Lodge confirmed parkas + boots provisioning on arrival; their loaner sizing matches your noted measurements from your last winter trip.</p>
+      </div>
+      <div class="text-right ts">14:47 PT</div>
+    </div>
+
+    <!-- Loyalty -->
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-brass">✦</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">FYI</span>
+          <span class="font-serif text-xl text-aubergine">You'll hit OneWorld Emerald mid-trip</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Your AY 1574 CDG→HEL→IVL segment puts you at 86,200 Tier Points — Emerald qualification at 80,000. Status takes effect in your AY profile within 24 hours; lounge access at HEL upgrades from Finnair Lounge to Platinum Wing on this trip's return.</p>
+      </div>
+      <div class="text-right ts">10:02 PT</div>
+    </div>
+
+    <!-- 4 DAYS AGO -->
+    <div class="px-6 py-3 bg-[#FBF4E4] border-b border-t border-aubergine/10">
+      <div class="caps text-xs text-slate-warm">Earlier · Nov 14</div>
+    </div>
+
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-green">✓</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Booked</span>
+          <span class="font-serif text-xl text-aubergine">All 7 trip bookings verified twice</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">Each flight, hotel, and the dinners on Resy now confirmed against both provider receipts and inbox confirmations. <span class="font-mono">$26,114</span> authorized to AmEx ··1004. Trip status moved from "Executing" to "Monitored."</p>
+      </div>
+      <div class="text-right ts">18:21 PT</div>
+    </div>
+
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-aub">✎</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Handled for you</span>
+          <span class="font-serif text-xl text-aubergine">Virtuoso amenities applied at Real Christine</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">€100 F&amp;B credit + room upgrade subject to availability at check-in confirmed by the property's reservations team. We did not change your Junior Suite booking — upgrades are at the property's discretion.</p>
+      </div>
+      <div class="text-right ts">11:55 PT</div>
+    </div>
+
+    <div class="feed-item">
+      <div class="icon-cell ic-bg-amber">↻</div>
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="pill pill-confirm">Handled for you</span>
+          <span class="font-serif text-xl text-aubergine">Re-tried Hotel Sanders direct booking after API timeout</span>
+        </div>
+        <p class="mt-2 text-sm text-aubergine/80 leading-relaxed">The property API returned a 500 on first attempt for the Junior Suite tier. Re-tried at 30s, 90s, and 4min — booking confirmed on the third attempt. Confirmation email arrived at <span class="font-mono">11:51 PT</span> matching the provider response.</p>
+      </div>
+      <div class="text-right ts">11:48 PT</div>
+    </div>
+
+  </div>
+
+  <!-- AGGREGATE -->
+  <div class="mt-8 grid sm:grid-cols-3 gap-6">
+    <div class="card rounded-md p-5">
+      <div class="caps text-xs text-slate-warm">This trip</div>
+      <div class="font-serif text-3xl text-aubergine mt-1">14 events</div>
+      <div class="text-sm text-slate-warm mt-1">9 auto-handled · 4 FYI · 1 needs you</div>
+    </div>
+    <div class="card rounded-md p-5">
+      <div class="caps text-xs text-slate-warm">Money saved</div>
+      <div class="font-serif text-3xl text-aubergine mt-1">$351</div>
+      <div class="text-sm text-slate-warm mt-1">Rate adjustment · Hotel Sanders</div>
+    </div>
+    <div class="card rounded-md p-5">
+      <div class="caps text-xs text-slate-warm">Time saved (vs DIY)</div>
+      <div class="font-serif text-3xl text-aubergine mt-1">9h 40m</div>
+      <div class="text-sm text-slate-warm mt-1">Estimated · per industry baseline</div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-aubergine/10 py-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-warm">
+    <span>Tures · trip #T-2087</span>
+    <a href="#" class="hover:text-aubergine">Notification preferences →</a>
+  </div>
+</footer>
+
+</body>
+</html>
