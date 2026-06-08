@@ -38,6 +38,9 @@
     opacity:0; pointer-events:none; transition:opacity 650ms ease 250ms;
   }
   .opened .toc{ opacity:1; pointer-events:auto; }
+  /* arriving via a "Contents" link → show the contents page immediately, no cover flip */
+  .skip-cover .cover{ transition:none !important; }
+  .skip-cover .toc{ transition:none !important; }
   .chapter{ display:flex; align-items:baseline; gap:14px; padding:10px 2px; text-decoration:none; }
   .chapter:hover .ch-title{ color:var(--gold-deep); }
   .swipe-arrow{ animation:swipeHint 1.8s ease-in-out infinite; }
@@ -128,9 +131,11 @@
 
 <script>
   function openBook(){ document.body.classList.add('opened'); }
-  function closeBook(){ document.body.classList.remove('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); document.documentElement.classList.remove('skip-cover'); history.replaceState(null,'','index.html'); }
   // swipe-left on the cover also opens
   window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
+  // arriving from a "Contents" link → open straight to the table of contents
+  if(location.hash === '#contents'){ document.documentElement.classList.add('skip-cover'); openBook(); }
 </script>
   <script src="assets/pageturn.js"></script>
 </body>

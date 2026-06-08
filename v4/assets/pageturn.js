@@ -78,7 +78,12 @@
     if (!isInternal(a, href)) return;
     if (a.getAttribute('onclick')) return;   // let inline handlers (e.g. closeBook) run
     e.preventDefault();
-    exit(href, 'next');
+    // animate in the conceptual direction: earlier chapter → back, later → forward
+    var target = href.split('/').pop().split('?')[0].split('#')[0];
+    if (!/\.html?$/.test(target)) target = (target || 'index') + (target ? '.html' : '');
+    var ti = ORDER.indexOf(target), ci = ORDER.indexOf(current());
+    var dir = (ti !== -1 && ci !== -1 && ti < ci) ? 'prev' : 'next';
+    exit(href, dir);
   });
 
   document.addEventListener('keydown', function (e) {
