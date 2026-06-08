@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Colophon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .prose p{ line-height:1.75; }
+  .wedge{ border-left:3px solid var(--gold); }
+  table{ border-collapse:collapse; width:100%; }
+  th,td{ text-align:left; padding:10px 12px; vertical-align:top; font-size:13px; line-height:1.55; }
+  th{ background:rgba(200,162,74,0.08); color:var(--ink); font-weight:600; border-bottom:1px solid var(--canvas-line); }
+  td{ border-bottom:1px solid var(--canvas-line); color:var(--ink-soft); }
+  .num-list{ counter-reset:item; }
+  .num-list > li{ counter-increment:item; position:relative; padding-left:2.2rem; }
+  .num-list > li::before{ content:counter(item); position:absolute; left:0; top:0.05rem; font-family:'JetBrains Mono',monospace; color:var(--gold-deep); font-size:.85rem; }
+</style>
+</head>
+<body class="text-canvas antialiased">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="text-sm quiet flex items-center gap-2"><span>←</span> Contents</a>
+    <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-12">
+    <div class="caps text-[11px] text-gold/80 mb-4">Colophon · the strategic brief</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">An AI concierge that books the trip you describe.</h1>
+    <p class="mt-5 font-display italic text-2xl text-canvas/70">Not researches one for you.</p>
+  </div>
+</section>
+
+<main class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-3xl mx-auto px-6 py-14 prose">
+
+  <div class="wedge leaf rounded-r px-5 py-5 mb-10">
+    <div class="caps text-[11px] text-ink-faint mb-2">The wedge</div>
+    <p class="text-ink text-[15px] leading-relaxed">Tures is an <strong>executor, not a search engine</strong>. You describe the trip in plain English; it books every leg — flight by flight, hotel by hotel, dinner by dinner — to your exact specs, and tells you the truth when reality doesn't cooperate.</p>
+    <p class="mt-3 text-ink-soft text-sm">Every other "AI travel" product ends with a list of links the human still has to click. Tures ends with confirmation numbers in your inbox.</p>
+  </div>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">What's new in this edition</h2>
+  <p class="text-ink/80 text-[15px] mb-4">Two capabilities turn a booking bot into a concierge with judgment:</p>
+  <div class="grid sm:grid-cols-2 gap-4 not-prose">
+    <div class="leaf p-5">
+      <div class="caps text-[10px] text-ink-faint mb-1">Chapter II</div>
+      <div class="font-display text-2xl text-ink">The Taste Engine</div>
+      <p class="text-sm text-ink-soft mt-2 leading-relaxed">A per-traveler ML model that turns a few visual choices into a working Taste Print, then sharpens it after every trip from what you keep, swap, and skip. It's what makes "a hotel in Paris" resolve to <em>the room you'd have chosen yourself.</em></p>
+      <a href="02-taste-engine.html" class="text-xs text-gold-deep hover:underline quiet">Calibrate yours →</a>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[10px] text-ink-faint mb-1">Chapter VI</div>
+      <div class="font-display text-2xl text-ink">The Hiccup Handler</div>
+      <p class="text-sm text-ink-soft mt-2 leading-relaxed">An always-on monitor that scores the world's signals — news, social, airline ops, weather, labor action, venue channels — against your itinerary, and <em>pre-stages the fix before the disruption reaches you.</em> Predict, don't react; staged, not autonomous.</p>
+      <a href="06-hiccup-handler.html" class="text-xs text-gold-deep hover:underline quiet">See it watch →</a>
+    </div>
+  </div>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">Who is Andy Rockwell?</h2>
+  <p class="text-ink/80 text-[15px]">Not "the luxury traveler" — that's a marketing segment. Andy is a specific person:</p>
+  <ul class="mt-4 space-y-3 text-ink/80 text-[15px]">
+    <li><strong>Mid-to-late 30s, $300K+ HHI</strong>, in finance, tech, law, or healthcare. 12–25 personal travel nights a year, plus business.</li>
+    <li><strong>Knows hotels by name.</strong> He didn't ask for "a boutique hotel in Paris." He asked for Real Christine. He built the Lapland leg around Javri Lodge.</li>
+    <li><strong>Status traveler.</strong> Airline status, Amex Platinum or Centurion, maybe a Virtuoso advisor he tolerates more than likes.</li>
+    <li><strong>Friction-allergic.</strong> Wants to spend eleven minutes describing the trip and never think about logistics again until he's in the lounge.</li>
+    <li><strong>High-trust if earned.</strong> Will hand Tures his card, loyalty numbers, calendar — and fire it in 30 seconds if it fakes a confirmation or misses a non-stop he asked for.</li>
+  </ul>
+  <p class="mt-5 text-ink/80 text-[15px]">The conversion thesis: <strong>Andy isn't a price shopper. He's a time-and-cognition shopper.</strong> Charge him for the time and he'll pay it.</p>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">Jobs to be done</h2>
+  <ol class="num-list space-y-4 text-ink/80 text-[15px]">
+    <li><strong>Book exactly what I told you.</strong> If I name the hotel, you book that hotel. No "we found something close."</li>
+    <li><strong>Find the cleanest feasible alternative when my ask is impossible — and ask before committing.</strong> Default on uncertainty: pause and ask, don't autopilot.</li>
+    <li><strong>Handle the chain of permissions.</strong> Use my Amex, credit my Finnair number, apply my status — and tell me what you did.</li>
+    <li><strong>Coordinate dinner reservations</strong> — including the ones without a public API.</li>
+    <li><strong>Take care of things while I sleep.</strong> Schedule change, dinner cancellation, weather, a strike three days out — handle it and tell me what you did.</li>
+  </ol>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">Competitive landscape</h2>
+  <div class="overflow-x-auto leaf rounded my-4 not-prose">
+    <table>
+      <thead><tr><th>Tier</th><th>Players</th><th>Where they fail Andy</th></tr></thead>
+      <tbody>
+        <tr><td>Mass-market OTA</td><td>Expedia, Booking, Kayak, Hopper</td><td>Generic inventory, chaotic UX, no execution layer, no taste</td></tr>
+        <tr><td>Curated luxury inventory</td><td>Inspirato, Plum Guide, Mr&nbsp;&amp;&nbsp;Mrs Smith</td><td>Inventory only — Andy still does the work; no flights</td></tr>
+        <tr><td>AI travel research</td><td>Mindtrip, Layla, Vacay</td><td>Beautiful slideshows that end with "now go book it yourself"</td></tr>
+        <tr><td>Human concierge</td><td>Quintessentially, Ten, Virtuoso, Centurion</td><td>Slow 24–72hr loops, email-bound, $5K–$20K/yr, gatekept</td></tr>
+        <tr><td>Corporate travel</td><td>Navan, AmEx GBT</td><td>Built for business policy, not luxury leisure</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text-ink/80 text-[15px]"><strong>Where Tures sits:</strong> the empty quadrant — <em>executor-grade automation at concierge-grade taste.</em> The defensibility isn't the LLM; it's the integration surface (Duffel + Booking partners + Resy + concierge inventory + card vault + loyalty graph), the <strong>Taste Engine</strong>'s per-user model, and the <strong>trust UX</strong> — the live dashboard and the Hiccup Handler that let Andy <em>see</em> Tures reason before he believes it.</p>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">Business model</h2>
+  <p class="text-ink/80 text-[15px]"><strong>Hybrid.</strong> $1,800/year for unlimited trips + transparent supplier commissions disclosed in the receipt. No hidden markup; often <em>saves</em> money vs. retail. Slots between Amex Platinum ($695/yr) and a working relationship with a top Virtuoso advisor.</p>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">Honest skepticism</h2>
+  <ul class="space-y-4 text-ink/80 text-[15px]">
+    <li><strong>Top-end restaurant inventory isn't solvable by software alone.</strong> Resy + OpenTable + SevenRooms cover maybe 60% of the urban dining graph. Be honest about autobook vs. request-and-confirm.</li>
+    <li><strong>Anti-bot defenses on luxury hotel sites.</strong> Direct bookings mean browser automation against Cloudflare and friends. Plan for it; don't promise full coverage day one.</li>
+    <li><strong>Card-on-file is PCI-DSS scope.</strong> Tokenization vault (Stripe-as-vault) is a week-1 decision.</li>
+    <li><strong>The Hiccup Handler must never cry wolf.</strong> Acting on probability is the whole point — and the whole risk. It surfaces a held fix; it executes on a real trigger; it explains itself every time.</li>
+    <li><strong>Trust collapses on a single visible failure.</strong> Never confirm what you can't verify in two places. No fake success states — ever.</li>
+    <li><strong>The LLM never books anything itself.</strong> It produces a structured plan; a deterministic executor validates and submits. The model parses and explains; it doesn't book.</li>
+  </ul>
+
+  <h2 class="font-display text-3xl text-ink mt-12 mb-4">What winning looks like in year one</h2>
+  <ul class="space-y-2 text-ink/80 text-[15px]">
+    <li>· 500 paying subscribers at $1,800/yr = <strong>$900K ARR</strong></li>
+    <li>· 80%+ retention after the first trip</li>
+    <li>· NPS &gt; 60, with 30%+ of signups from referrals</li>
+    <li>· <strong>Zero brand-killing confirmation failures.</strong> Acceptable: "we couldn't get this — here's why." Never: "we got it!" when we didn't.</li>
+  </ul>
+
+  <div class="rule-gold my-12"></div>
+  <a href="index.html" class="inline-flex items-center gap-2 text-gold-deep font-medium text-sm quiet">← Back to the edition</a>
+ </div>
+</main>
+
+<footer class="bg-obsidian border-t border-gold/15 py-12 text-center">
+  <div class="wordmark foil text-2xl">t<span class="spark">✦</span>ures</div>
+  <div class="text-canvas/50 text-sm mt-2">A trip booked is the only thing we ship.</div>
+</footer>
+</body>
+</html>

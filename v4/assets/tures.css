@@ -1,0 +1,242 @@
+/* ============================================================
+   TURES v4 — "The Bound Edition"
+   Dark leather covers · canvas pages · gold foil
+   ============================================================ */
+
+:root{
+  /* Leather (covers / chrome) */
+  --leather:       #1b130c;
+  --leather-deep:  #0e0a06;
+  --leather-edge:  #2c1f13;
+  --leather-hi:    #3a2a19;
+  --obsidian:      #0b0b0d;
+  --midnight:      #0f1b2d;
+
+  /* Canvas (pages) */
+  --canvas:        #ece3d0;
+  --canvas-warm:   #f2ead8;
+  --canvas-deep:   #e2d6bd;
+  --canvas-line:   rgba(43,36,28,0.12);
+
+  /* Ink */
+  --ink:           #2a2118;
+  --ink-soft:      #6b5d49;
+  --ink-faint:     #97886f;
+
+  /* Gold foil */
+  --gold:          #c8a24a;
+  --gold-bright:   #e6c873;
+  --gold-deep:     #9c7a2e;
+
+  /* Status — muted, leather-bound register */
+  --confirm:       #5f7d4f;
+  --pending:       #b88a2e;
+  --alert:         #b5543a;
+  --info:          #4a6b86;
+}
+
+/* ---------- type ---------- */
+.font-display{ font-family:'Cormorant Garamond', Georgia, serif; }
+.font-serif  { font-family:'DM Serif Display', Georgia, serif; }
+.font-body   { font-family:'Inter', system-ui, sans-serif; }
+.font-mono   { font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+body{ font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+
+.caps{ letter-spacing:0.16em; text-transform:uppercase; }
+.caps-sm{ letter-spacing:0.12em; text-transform:uppercase; }
+
+/* ---------- color helpers ---------- */
+.text-gold{ color:var(--gold); }
+.text-gold-bright{ color:var(--gold-bright); }
+.text-ink{ color:var(--ink); }
+.text-ink-soft{ color:var(--ink-soft); }
+.text-ink-faint{ color:var(--ink-faint); }
+.text-canvas{ color:var(--canvas-warm); }
+.bg-leather{ background:var(--leather); }
+.bg-obsidian{ background:var(--obsidian); }
+.bg-midnight{ background:var(--midnight); }
+
+/* ============================================================
+   TEXTURES
+   ============================================================ */
+
+/* fine grain used everywhere */
+.grain::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  opacity:0.5; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* dark leather surface */
+.leather-surface{
+  position:relative;
+  background:
+    radial-gradient(120% 90% at 25% 12%, rgba(255,228,170,0.06), transparent 55%),
+    radial-gradient(140% 120% at 85% 120%, rgba(0,0,0,0.55), transparent 60%),
+    linear-gradient(155deg, #241910 0%, #1b130c 45%, #120c07 100%);
+}
+.leather-surface::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:0.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
+  mix-blend-mode:soft-light;
+}
+
+/* canvas / paper page */
+.canvas-surface{
+  position:relative;
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
+    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
+}
+.canvas-surface::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:0.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+.canvas-surface > *{ position:relative; z-index:1; }
+
+/* ============================================================
+   GOLD FOIL
+   ============================================================ */
+.foil{
+  background:linear-gradient(92deg, #9c7a2e 0%, #e6c873 28%, #fff3c8 46%, #c8a24a 60%, #e6c873 78%, #8a6a26 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foil-line{ height:1px; border:0;
+  background:linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-bright), var(--gold-deep), transparent); }
+
+/* wordmark */
+.wordmark{ font-family:'Cormorant Garamond', Georgia, serif; font-weight:600; letter-spacing:0.02em; position:relative; }
+.wordmark .spark{ font-size:0.5em; vertical-align:super; }
+
+/* ============================================================
+   BOOK COVER
+   ============================================================ */
+.book{
+  position:relative; border-radius:6px 14px 14px 6px;
+  box-shadow:
+    -10px 0 0 -2px #0a0703,            /* spine shadow */
+    0 30px 80px -28px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(0,0,0,0.6);
+}
+.book::before{ /* spine band */
+  content:""; position:absolute; top:0; bottom:0; left:0; width:30px;
+  background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%);
+  border-right:1px solid rgba(255,220,150,0.06);
+  border-radius:6px 0 0 6px;
+}
+.cover-frame{ /* embossed gold rule */
+  position:absolute; inset:22px;
+  border:1px solid rgba(200,162,74,0.45);
+  border-radius:3px;
+  box-shadow:inset 0 0 0 4px rgba(0,0,0,0.25), 0 1px 0 rgba(255,230,160,0.08);
+}
+.cover-frame.dashed{ border-style:dashed; inset:30px; opacity:0.5; }
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+
+/* page card on canvas */
+.leaf{
+  background:rgba(255,252,244,0.62);
+  border:1px solid var(--canvas-line);
+  box-shadow:0 1px 0 rgba(255,255,255,0.5) inset, 0 14px 34px -22px rgba(43,33,20,0.5);
+  border-radius:4px;
+}
+.leaf-tab{
+  background:linear-gradient(180deg, rgba(255,253,247,0.8), rgba(243,235,219,0.6));
+  border:1px solid var(--canvas-line);
+}
+
+/* dark card on leather */
+.plate{
+  background:linear-gradient(160deg, rgba(38,28,17,0.9), rgba(20,14,8,0.92));
+  border:1px solid rgba(200,162,74,0.18);
+  border-radius:6px;
+  box-shadow:0 20px 50px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,220,150,0.05);
+}
+
+/* gold button */
+.btn-gold{
+  background:linear-gradient(180deg, #e6c873, #c8a24a 55%, #a8842f);
+  color:#241a0c; font-weight:600; border:1px solid #8a6a26;
+  box-shadow:0 1px 0 rgba(255,240,200,0.6) inset, 0 8px 20px -10px rgba(200,162,74,0.6);
+  transition:transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+.btn-gold:hover{ transform:translateY(-1px); filter:brightness(1.05); box-shadow:0 12px 26px -10px rgba(200,162,74,0.75); }
+.btn-ghost{
+  border:1px solid rgba(200,162,74,0.4); color:var(--gold-bright); background:transparent;
+  transition:border-color 140ms ease, background 140ms ease;
+}
+.btn-ghost:hover{ border-color:var(--gold-bright); background:rgba(200,162,74,0.08); }
+.btn-ink{
+  border:1px solid var(--canvas-line); color:var(--ink); background:rgba(255,253,247,0.5);
+  transition:background 140ms ease, transform 140ms ease;
+}
+.btn-ink:hover{ background:#fff; transform:translateY(-1px); }
+
+/* pills */
+.pill{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px;
+  font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600; }
+.pill-confirm{ background:rgba(95,125,79,0.16); color:#43603a; }
+.pill-pending{ background:rgba(184,138,46,0.18); color:#8a6a26; }
+.pill-alert  { background:rgba(181,84,58,0.16); color:#8f3f2b; }
+.pill-info   { background:rgba(74,107,134,0.16); color:#3c5a72; }
+.pill-gold   { background:rgba(200,162,74,0.16); color:#8a6a26; border:1px solid rgba(200,162,74,0.35); }
+/* dark variants for leather backgrounds */
+.pill-d-confirm{ background:rgba(95,125,79,0.2); color:#a7c293; }
+.pill-d-pending{ background:rgba(184,138,46,0.2); color:#e6c873; }
+.pill-d-alert  { background:rgba(181,84,58,0.22); color:#e39179; }
+.pill-d-gold   { background:rgba(200,162,74,0.14); color:#e6c873; border:1px solid rgba(200,162,74,0.3); }
+
+/* dots */
+.dot{ width:8px; height:8px; border-radius:99px; display:inline-block; flex-shrink:0; }
+.dot-gold{ background:var(--gold); } .dot-green{ background:var(--confirm); }
+.dot-amber{ background:var(--pending); } .dot-alert{ background:var(--alert); }
+.dot-info{ background:var(--info); }
+
+/* dividers */
+.rule-ink{ height:1px; background:var(--canvas-line); }
+.rule-gold{ height:1px; background:linear-gradient(90deg, transparent, rgba(200,162,74,0.5), transparent); }
+
+/* hover lift */
+.lift{ transition:transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+.lift:hover{ transform:translateY(-3px); }
+
+/* pulse */
+.pulse{ animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:0.35} }
+.breathe{ animation:breathe 3.5s ease-in-out infinite; }
+@keyframes breathe{ 0%,100%{transform:scale(1);opacity:0.9} 50%{transform:scale(1.04);opacity:1} }
+
+/* fade-rise utility for JS reveals */
+.rise{ opacity:0; transform:translateY(10px); transition:opacity 500ms ease, transform 500ms ease; }
+.rise.in{ opacity:1; transform:none; }
+
+/* details chevron */
+details > summary{ list-style:none; cursor:pointer; }
+details > summary::-webkit-details-marker{ display:none; }
+.chev{ display:inline-block; transition:transform 150ms; }
+details[open] .chev{ transform:rotate(90deg); }
+
+/* progress */
+.track{ height:5px; background:rgba(43,33,20,0.12); border-radius:99px; overflow:hidden; }
+.track .fill{ height:100%; background:linear-gradient(90deg,#a8842f,#e6c873); transition:width 500ms ease; }
+
+::selection{ background:rgba(200,162,74,0.35); color:#1b130c; }
+
+/* shared chrome nav */
+.chrome{
+  background:linear-gradient(180deg, rgba(20,14,8,0.96), rgba(14,10,6,0.92));
+  border-bottom:1px solid rgba(200,162,74,0.22);
+  backdrop-filter:blur(8px);
+}
+.chrome a{ color:rgba(236,227,208,0.72); transition:color 140ms; }
+.chrome a:hover, .chrome a.active{ color:var(--gold-bright); }
+
+a.quiet{ text-decoration:none; }
+
+/* grid children must be allowed to shrink, or long content blows out the page width on mobile */
+[class*="col-span"]{ min-width:0; }

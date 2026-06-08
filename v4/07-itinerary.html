@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — The finished itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .day-rail{ position:relative; padding-left:30px; }
+  .day-rail::before{ content:""; position:absolute; left:7px; top:6px; bottom:0; width:1px; background:rgba(200,162,74,0.3); }
+  .day-dot{ position:absolute; left:0; top:4px; width:15px; height:15px; border-radius:99px; background:var(--canvas-warm); border:2px solid var(--gold); }
+  .entry{ display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--canvas-line); }
+  .entry:last-child{ border-bottom:0; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="05-execution.html">In flight</a>
+      <a href="07-itinerary.html" class="active">Itinerary</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="08-concierge.html">Concierge</a>
+      <a href="index.html" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10 flex items-end justify-between flex-wrap gap-5">
+  <div>
+   <div class="caps text-[11px] text-gold/70 mb-3">Chapter VII · Confirmed</div>
+   <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Eleven days, fully booked.</h1>
+   <div class="text-canvas/70 mt-2">Paris · Saariselkä · Copenhagen · Dec 3 – 13, 2026</div>
+  </div>
+  <div class="flex gap-3">
+    <span class="pill pill-d-confirm">All 7 legs verified ×2</span>
+    <span class="pill pill-d-gold">9 dinners</span>
+  </div>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8">
+
+  <!-- ITINERARY DOC -->
+  <div class="lg:col-span-8">
+   <div class="leaf p-7 sm:p-9">
+    <div class="flex items-center justify-between mb-7">
+      <div class="wordmark foil text-2xl">t<span class="spark">✦</span>ures</div>
+      <div class="text-right text-xs text-ink-faint"><div class="caps">Trip #T-2087</div><div class="font-mono">Andy Rockwell · 1 traveler</div></div>
+    </div>
+    <div class="foil-line mb-7"></div>
+
+    <!-- Dec 3-4 -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Thu Dec 3 – Fri Dec 4 · Departure</div>
+      <div class="entry"><span class="font-mono text-sm text-ink w-24 shrink-0">18:45→13:25</span>
+        <div><div class="font-display text-lg text-ink">AA 142 · SEA → CDG</div><div class="text-sm text-ink-soft">Business · seat 5A · non-stop · <span class="font-mono">PNR LXJ7Q3</span></div></div></div>
+    </div>
+
+    <!-- Paris -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Dec 4 – 7 · Paris</div>
+      <div class="entry"><span class="text-gold text-lg w-24 shrink-0 text-center">⌂</span>
+        <div><div class="font-display text-lg text-ink">Real Christine</div><div class="text-sm text-ink-soft">Junior Suite · garden view · breakfast · <span class="font-mono">CONF 8849-RCP</span><br>Virtuoso: €100 F&amp;B credit + upgrade at check-in</div></div></div>
+      <div class="entry"><span class="text-gold text-lg w-24 shrink-0 text-center">✦</span>
+        <div><div class="font-display text-lg text-ink">Dinners</div><div class="text-sm text-ink-soft">Septime (12/4) · Le Bistrot Paul Bert (12/5) · Frenchie (12/6) — Resy confirmed</div></div></div>
+    </div>
+
+    <!-- to Lapland -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Sun Dec 7 · To Lapland</div>
+      <div class="entry"><span class="font-mono text-sm text-ink w-24 shrink-0">10:25→21:00</span>
+        <div><div class="font-display text-lg text-ink">AY 1574 · CDG → HEL → IVL</div><div class="text-sm text-ink-soft">Business · 1h 50m HEL connection · <span class="font-mono">approved alternative</span> · 4,300 tier pts</div></div></div>
+    </div>
+
+    <!-- Lapland -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Dec 7 – 10 · Saariselkä</div>
+      <div class="entry"><span class="text-gold text-lg w-24 shrink-0 text-center">⌂</span>
+        <div><div class="font-display text-lg text-ink">Javri Lodge</div><div class="text-sm text-ink-soft">Aurora Suite · private terrace · half-board · airport transfer · <span class="font-mono">CONF JL-12041</span></div></div></div>
+    </div>
+
+    <!-- to CPH -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Wed Dec 10 · To Copenhagen</div>
+      <div class="entry"><span class="font-mono text-sm text-ink w-24 shrink-0">14:20→19:15</span>
+        <div><div class="font-display text-lg text-ink">AY 945 · IVL → HEL → CPH</div><div class="text-sm text-ink-soft">Business · refundable fare D</div></div></div>
+    </div>
+
+    <!-- Copenhagen -->
+    <div class="day-rail mb-7">
+      <div class="day-dot"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Dec 10 – 13 · Copenhagen</div>
+      <div class="entry"><span class="text-gold text-lg w-24 shrink-0 text-center">⌂</span>
+        <div><div class="font-display text-lg text-ink">Hotel Sanders</div><div class="text-sm text-ink-soft">Junior Suite · booked direct · <span class="font-mono">rate-protected −$351</span></div></div></div>
+      <div class="entry"><span class="text-gold text-lg w-24 shrink-0 text-center">✦</span>
+        <div><div class="font-display text-lg text-ink">Dinners</div><div class="text-sm text-ink-soft">Geranium 20:00 (12/12, concierge desk) · Apollo Bar · Kadeau</div></div></div>
+    </div>
+
+    <!-- return -->
+    <div class="day-rail">
+      <div class="day-dot" style="border-color:var(--confirm)"></div>
+      <div class="caps text-[11px] text-ink-faint mb-1">Sun Dec 13 · Home <span class="pill pill-confirm ml-1">Rerouted by Hiccup Handler</span></div>
+      <div class="entry"><span class="font-mono text-sm text-ink w-24 shrink-0">11:05→17:40</span>
+        <div><div class="font-display text-lg text-ink">KL 1130 + DL 9302 · CPH → AMS → SEA</div><div class="text-sm text-ink-soft">Business · re-routed around the CDG ATC strike · fare protected · <span class="font-mono">PNR 7QZ2RB</span></div></div></div>
+    </div>
+   </div>
+  </div>
+
+  <!-- RECEIPTS -->
+  <aside class="lg:col-span-4 space-y-4">
+    <div class="leaf p-6">
+      <div class="caps text-[11px] text-ink-faint mb-3">Authorized total</div>
+      <div class="font-display text-4xl text-ink">$25,763</div>
+      <div class="text-sm text-ink-soft mt-1">AmEx ··1004 · itemized</div>
+      <div class="rule-ink my-4"></div>
+      <ul class="space-y-2 text-sm text-ink/85">
+        <li class="flex justify-between"><span>Flights (4 segments)</span><span class="font-mono">$14,980</span></li>
+        <li class="flex justify-between"><span>Hotels (9 nights)</span><span class="font-mono">$9,140</span></li>
+        <li class="flex justify-between"><span>Dinners &amp; deposits</span><span class="font-mono">$1,643</span></li>
+        <li class="flex justify-between text-confirm" style="color:var(--confirm)"><span>Rate-protect credit</span><span class="font-mono">−$351</span></li>
+        <li class="flex justify-between text-confirm" style="color:var(--confirm)"><span>ATC reroute change fee</span><span class="font-mono">$0</span></li>
+      </ul>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-2">Handled while you traveled</div>
+      <div class="flex items-baseline gap-2"><span class="font-display text-3xl text-ink">3</span><span class="text-sm text-ink-soft">disruptions pre-empted</span></div>
+      <a href="06-hiccup-handler.html" class="text-xs text-gold-deep hover:underline quiet">See the watch log →</a>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-2">Loyalty earned</div>
+      <div class="text-sm text-ink/85">OneWorld <strong>Emerald</strong> reached mid-trip · 86,200 tier pts · Flying Blue + AAdvantage credited.</div>
+    </div>
+    <a href="08-concierge.html" class="btn-gold w-full text-center px-5 py-3 rounded-sm block quiet">Text the concierge →</a>
+  </aside>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter VII · The finished itinerary</div>
+</footer>
+</body>
+</html>

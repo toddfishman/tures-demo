@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Describe a trip. We book it.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+</style>
+</head>
+<body class="text-canvas antialiased">
+
+<!-- CHROME -->
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="about.html">About</a>
+      <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Request access</a>
+    </div>
+    <a href="index.html" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="leather-surface grain relative overflow-hidden">
+  <div class="absolute inset-0 opacity-40" style="background-image:radial-gradient(circle at 72% 28%, rgba(200,162,74,0.22), transparent 55%);"></div>
+  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-24 sm:pt-28 sm:pb-32">
+    <div class="caps text-[11px] text-gold/80 mb-6">A travel agent that ships</div>
+    <h1 class="font-display font-light text-6xl sm:text-7xl md:text-8xl leading-[0.98] tracking-tight">
+      Describe a trip.<br><span class="foil">We book it.</span>
+    </h1>
+    <p class="mt-9 text-lg sm:text-xl text-canvas/75 max-w-2xl leading-relaxed">
+      Tures is an AI concierge with permissions. Brief it the way you'd brief a friend — by message, voice memo, or a forwarded email. It books every leg to your exact specifications, learns your taste, and watches the world so your trip survives contact with reality.
+    </p>
+    <div class="mt-11 flex flex-wrap items-center gap-4">
+      <a href="05-execution.html" class="btn-gold px-7 py-3.5 rounded-sm quiet">See it book Andy's trip →</a>
+      <a href="02-taste-engine.html" class="btn-ghost px-7 py-3.5 rounded-sm quiet">Calibrate my taste</a>
+    </div>
+
+    <!-- three pillars -->
+    <div class="mt-20 grid sm:grid-cols-3 gap-5">
+      <div class="plate p-6">
+        <div class="text-gold text-2xl mb-3">▤</div>
+        <div class="font-display text-2xl text-canvas">Books the impossible</div>
+        <p class="text-sm text-canvas/65 mt-2 leading-relaxed">Sold-out suites, no-API restaurants, non-stops that don't exist on paper. We work the channels a search box can't reach.</p>
+      </div>
+      <div class="plate p-6">
+        <div class="text-gold text-2xl mb-3">◉</div>
+        <div class="font-display text-2xl text-canvas">Watches everything</div>
+        <p class="text-sm text-canvas/65 mt-2 leading-relaxed">Strikes, weather, breaking news, a restaurant that quietly lost your booking page. Monitored continuously, before it becomes your problem.</p>
+      </div>
+      <div class="plate p-6">
+        <div class="text-gold text-2xl mb-3">⟲</div>
+        <div class="font-display text-2xl text-canvas">Rebooks before you notice</div>
+        <p class="text-sm text-canvas/65 mt-2 leading-relaxed">Contingencies pre-staged. When a signal trips, the fix is already drafted — often resolved before the airline emails you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHANNELS -->
+<section class="canvas-surface text-ink">
+  <div class="relative z-10 max-w-6xl mx-auto px-6 py-24">
+    <div class="grid lg:grid-cols-12 gap-12 items-start">
+      <div class="lg:col-span-5">
+        <div class="caps text-[11px] text-ink-faint mb-3">One concierge, every doorway</div>
+        <h2 class="font-display text-5xl leading-[1.02]">The tip of the spear<br>is a text message.</h2>
+        <p class="mt-6 text-ink-soft leading-relaxed">
+          Most of the relationship lives in a chat thread you already use. The web app and native app are the deep workspace — the Taste Engine, the live execution view, the audit log of everything we touched on your behalf.
+        </p>
+        <div class="mt-8 space-y-3">
+          <div class="flex items-start gap-3"><span class="dot dot-gold mt-2"></span><span class="text-sm text-ink-soft"><strong class="text-ink">WhatsApp &amp; Telegram</strong> — the daily channel. "Push Friday dinner to 9." Done before the apéritif.</span></div>
+          <div class="flex items-start gap-3"><span class="dot dot-gold mt-2"></span><span class="text-sm text-ink-soft"><strong class="text-ink">The app</strong> — your bound edition: taste profile, itinerary, receipts, the live monitor.</span></div>
+          <div class="flex items-start gap-3"><span class="dot dot-gold mt-2"></span><span class="text-sm text-ink-soft"><strong class="text-ink">The web</strong> — onboarding, permissions, and sharing a trip with the people you travel with.</span></div>
+        </div>
+      </div>
+
+      <!-- phone mock -->
+      <div class="lg:col-span-7 flex justify-center">
+        <div class="leather-surface grain relative rounded-[34px] p-3 shadow-2xl" style="width:300px;">
+          <div class="relative z-10 rounded-[26px] overflow-hidden" style="background:#0c1116;">
+            <div class="flex items-center justify-between px-4 py-2.5 text-[11px] text-canvas/60 font-mono">
+              <span>9:41</span><span class="text-gold">Tures · WhatsApp</span><span>▮▮▮</span>
+            </div>
+            <div class="px-3 pb-4 space-y-2.5 text-[12.5px]">
+              <div class="max-w-[80%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2" style="background:#1f6e5a;color:#eafff5;">Land in Ivalo at 9pm. Anything I should worry about tonight?</div>
+              <div class="max-w-[86%] rounded-2xl rounded-tl-sm px-3 py-2" style="background:#14201a;color:#dfe9e2;">Forecast firmed up — −19°C and clear. Aurora KP index hit 5 an hour ago. Javri has your transfer at arrivals (driver Tomi, plate FIN-204). I held a 9:45 sauna slot. Want it?</div>
+              <div class="max-w-[60%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2" style="background:#1f6e5a;color:#eafff5;">Yes please 🙏</div>
+              <div class="max-w-[86%] rounded-2xl rounded-tl-sm px-3 py-2" style="background:#14201a;color:#dfe9e2;">Booked. And heads up — I'm watching a small AY schedule wobble for your Wed flight. Nothing to do yet; I'll handle it.</div>
+            </div>
+            <div class="px-3 py-2 flex items-center gap-2 border-t border-white/5">
+              <div class="flex-1 rounded-full px-3 py-1.5 text-[12px] text-canvas/40" style="background:#10171c;">Message Tures…</div>
+              <div class="w-7 h-7 rounded-full btn-gold grid place-items-center text-xs">↑</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENCE -->
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-6xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16">
+    <div>
+      <div class="caps text-[11px] text-gold/80 mb-4">The difference</div>
+      <h2 class="font-display text-5xl leading-[1.04]">Most AI travel tools end with a list of links.<br><span class="foil">Tures ends with confirmation numbers.</span></h2>
+    </div>
+    <div class="space-y-8 text-canvas/75">
+      <div><div class="caps text-[10px] text-gold/70 mb-2">Spec-match over price-shop</div><p class="leading-relaxed">You named Real Christine. We book Real Christine — not the comparable Marais boutique because it's $40 cheaper.</p></div>
+      <div><div class="caps text-[10px] text-gold/70 mb-2">Transparent, never autonomous on uncertainty</div><p class="leading-relaxed">When the non-stop doesn't exist, we surface the two cleanest alternatives and their trade-offs. We never rebook into something you didn't approve.</p></div>
+      <div><div class="caps text-[10px] text-gold/70 mb-2">Verified twice before "Booked."</div><p class="leading-relaxed">Every booking is checked against both the provider receipt and the email confirmation in your inbox. We don't say "Booked" until both agree.</p></div>
+      <div><div class="caps text-[10px] text-gold/70 mb-2">It knows your taste</div><p class="leading-relaxed">The Taste Engine turns a few choices into a working model of how you travel — and sharpens it after every trip.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-obsidian border-t border-gold/15 py-14">
+  <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+    <div>
+      <div class="wordmark foil text-2xl">t<span class="spark">✦</span>ures</div>
+      <div class="text-canvas/50 text-sm mt-2">A trip booked is the only thing we ship.</div>
+    </div>
+    <div class="flex flex-wrap gap-6 text-sm text-canvas/55">
+      <a href="index.html" class="quiet hover:text-gold-bright">Contents</a>
+      <a href="02-taste-engine.html" class="quiet hover:text-gold-bright">Taste Engine</a>
+      <a href="06-hiccup-handler.html" class="quiet hover:text-gold-bright">Hiccup Handler</a>
+      <a href="about.html" class="quiet hover:text-gold-bright">About</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

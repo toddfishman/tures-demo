@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Grant permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian);}
+  .switch{ width:42px; height:24px; border-radius:99px; background:rgba(95,125,79,0.9); position:relative; flex-shrink:0; }
+  .switch.off{ background:rgba(43,33,20,0.25);}
+  .knob{ position:absolute; top:2px; left:20px; width:20px; height:20px; border-radius:99px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left 160ms;}
+  .switch.off .knob{ left:2px;}
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="04-connections.html" class="active">Connections</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-10">
+    <div class="caps text-[11px] text-gold/80 mb-3">Chapter IV · Connect</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">The chain of access<br>an agent needs to actually book.</h1>
+    <p class="mt-5 max-w-2xl text-canvas/75 leading-relaxed">Scoped, revocable, and logged. We ask for exactly what's required to book and watch your trip — nothing speculative. You see every grant, and you can pull any of them in one tap.</p>
+  </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
+
+  <div class="lg:col-span-2 space-y-4">
+    <div class="leaf p-5 flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">▦</div>
+      <div class="flex-1">
+        <div class="font-display text-xl text-ink">Payment · AmEx ··1004</div>
+        <div class="text-sm text-ink-soft">Per-trip authorization with a cap you set. Every charge itemized and pushed to you.</div>
+      </div>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="leaf p-5 flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">✦</div>
+      <div class="flex-1">
+        <div class="font-display text-xl text-ink">Loyalty & status</div>
+        <div class="text-sm text-ink-soft">AAdvantage · Flying Blue · Finnair Plus · Virtuoso. Applied automatically; status chased mid-trip.</div>
+      </div>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="leaf p-5 flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
+      <div class="flex-1">
+        <div class="font-display text-xl text-ink">Inbox · read confirmations</div>
+        <div class="text-sm text-ink-soft">Scoped to travel senders only. Used as the second source to verify every booking. Never marketing, never your personal mail.</div>
+      </div>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="leaf p-5 flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
+      <div class="flex-1">
+        <div class="font-display text-xl text-ink">Calendar</div>
+        <div class="text-sm text-ink-soft">So we route around what's already on your plate and write the trip back in with confirmations attached.</div>
+      </div>
+      <div class="switch"><div class="knob"></div></div>
+    </div>
+
+    <div class="leaf p-5 flex items-center gap-4 opacity-90">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
+      <div class="flex-1">
+        <div class="font-display text-xl text-ink">Messaging · WhatsApp / Telegram</div>
+        <div class="text-sm text-ink-soft">The daily channel. Where the concierge actually lives once you're moving.</div>
+      </div>
+      <div class="switch off"><div class="knob"></div></div>
+    </div>
+  </div>
+
+  <aside class="space-y-4">
+    <div class="leaf p-6">
+      <div class="caps text-[11px] text-ink-faint mb-3">Your guarantees</div>
+      <ul class="space-y-3 text-sm text-ink/85">
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged without an authorization you set.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Read-only inbox scope, travel senders only.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Every action written to an audit log you can export.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Revoke any grant in one tap — bookings already made stay yours.</li>
+      </ul>
+      <a href="05-execution.html" class="btn-gold w-full text-center px-5 py-3 rounded-sm mt-6 block quiet">Begin execution →</a>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-2">Status</div>
+      <div class="flex items-center gap-2 text-sm"><span class="dot dot-green"></span> 4 of 5 connected · ready to book</div>
+    </div>
+  </aside>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter IV · Grant permissions</div>
+</footer>
+</body>
+</html>

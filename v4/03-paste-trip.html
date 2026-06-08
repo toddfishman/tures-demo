@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Describe the trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style> body{ background:var(--obsidian);} </style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="03-paste-trip.html" class="active">New trip</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10">
+    <div class="caps text-[11px] text-gold/80 mb-3">Chapter III · Parse</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Describe it like you'd brief a friend.</h1>
+    <p class="mt-5 max-w-2xl text-canvas/75 leading-relaxed">Paste an email, forward a thread, or send a voice memo. Tures turns prose into a structured, leg-by-leg plan — and flags the one thing reality won't allow before you waste a minute on it.</p>
+  </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-7 items-start">
+
+  <!-- the email -->
+  <div class="leaf overflow-hidden">
+    <div class="leaf-tab px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2 text-xs"><span class="dot dot-gold"></span><span class="caps-sm text-ink-faint">From andy@rockwell.io → trip@tures.app</span></div>
+      <span class="pill pill-gold">Inbound</span>
+    </div>
+    <div class="p-6 text-[14px] leading-relaxed text-ink/85">
+      <p class="mb-4 italic text-ink-soft">"Show me this can be done and my mind is officially blown. More curious if it can be done with the room types I want, flight schedules, etc."</p>
+      <p class="mb-3"><strong>Leave Thursday December 3rd</strong> — fly direct into Paris, arrive the 4th. Business.</p>
+      <p class="mb-3"><strong>Paris</strong> the 4–5–6th at Real Christine.</p>
+      <p class="mb-3"><strong>Paris → Ivalo</strong> on the 7th. Should be non-stop on Finnair?</p>
+      <p class="mb-3"><strong>Javri Lodge</strong> the 7–8–9th.</p>
+      <p class="mb-3"><strong>Ivalo → Copenhagen</strong> on the 10th.</p>
+      <p class="mb-3"><strong>Hotel Sanders</strong> the 10–11–12.</p>
+      <p><strong>Home the 13th</strong> — probably through Paris to keep both ways non-stop on business.</p>
+    </div>
+  </div>
+
+  <!-- parsed -->
+  <div class="leaf overflow-hidden">
+    <div class="leaf-tab px-5 py-3 flex items-center justify-between">
+      <div class="caps-sm text-ink-faint text-xs">Structured plan · 7 legs · 9 dinners</div>
+      <span class="pill pill-confirm">Parsed</span>
+    </div>
+    <div class="p-6 text-[13.5px]">
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between"><span class="font-mono text-ink">SEA → CDG</span><span class="text-ink-faint">12/03 · Biz · non-stop</span></div>
+        <div class="flex items-center justify-between"><span class="font-display text-lg text-ink">Real Christine, Paris</span><span class="text-ink-faint">12/04–07</span></div>
+        <div class="flex items-center justify-between"><span class="font-mono text-ink">CDG → IVL</span><span class="text-ink-faint">12/07 · AY · prefer non-stop</span></div>
+        <div class="flex items-center justify-between"><span class="font-display text-lg text-ink">Javri Lodge, Saariselkä</span><span class="text-ink-faint">12/07–10</span></div>
+        <div class="flex items-center justify-between"><span class="font-mono text-ink">IVL → CPH</span><span class="text-ink-faint">12/10</span></div>
+        <div class="flex items-center justify-between"><span class="font-display text-lg text-ink">Hotel Sanders, Copenhagen</span><span class="text-ink-faint">12/10–13</span></div>
+        <div class="flex items-center justify-between"><span class="font-mono text-ink">CPH → SEA</span><span class="text-ink-faint">12/13 · via CDG · Biz</span></div>
+      </div>
+      <div class="rule-gold my-5"></div>
+      <div class="flex items-start gap-3 text-[13px]">
+        <span class="pill pill-pending shrink-0 mt-0.5">Verify</span>
+        <p class="text-ink/85 leading-relaxed">Finnair does <strong>not</strong> fly non-stop CDG→IVL in December. Two clean alternatives staged for your approval — Tures won't book this leg until you choose. <span class="text-ink-faint">Your Taste Print already favors the same-airline routing for the tier points.</span></p>
+      </div>
+      <div class="mt-6 flex items-center justify-between">
+        <span class="text-sm text-ink-soft">Ready to stage 7 bookings · est. <span class="font-mono">8 min</span></span>
+        <a href="04-connections.html" class="btn-gold px-5 py-2.5 rounded-sm quiet">Grant access →</a>
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter III · Describe the trip</div>
+</footer>
+</body>
+</html>
