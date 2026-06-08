@@ -227,14 +227,46 @@ details[open] .chev{ transform:rotate(90deg); }
 
 ::selection{ background:rgba(200,162,74,0.35); color:#1b130c; }
 
-/* shared chrome nav */
+/* shared chrome nav — full bleed: transparent, borderless, floats over the leather hero */
 .chrome{
-  background:linear-gradient(180deg, rgba(20,14,8,0.96), rgba(14,10,6,0.92));
-  border-bottom:1px solid rgba(200,162,74,0.22);
-  backdrop-filter:blur(8px);
+  background:transparent;
+  border-bottom:0;
+  backdrop-filter:none;
+  position:absolute !important; top:0; left:0; right:0;
 }
-.chrome a{ color:rgba(236,227,208,0.72); transition:color 140ms; }
+/* give the hero room to clear the floating nav */
+.chrome + section{ padding-top:6.25rem; }
+.chrome a{ color:rgba(236,227,208,0.78); transition:color 140ms; text-shadow:0 1px 12px rgba(0,0,0,0.4); }
 .chrome a:hover, .chrome a.active{ color:var(--gold-bright); }
+
+/* ============================================================
+   PAGE TURN — a leather leaf swings over the spine between pages
+   ============================================================ */
+#pt-wrap{ position:fixed; inset:0; z-index:9999; perspective:2200px; pointer-events:none; }
+#pt-leaf{
+  position:absolute; inset:0; transform-origin:left center; transform-style:preserve-3d;
+  backface-visibility:hidden; will-change:transform,opacity;
+  background:
+    linear-gradient(105deg, rgba(255,228,170,0.05), transparent 30%),
+    radial-gradient(120% 100% at 0% 50%, rgba(0,0,0,0.5), transparent 60%),
+    linear-gradient(155deg,#241910,#1b130c 45%,#120c07);
+  box-shadow:30px 0 70px -10px rgba(0,0,0,0.6);
+}
+#pt-leaf::before{ /* grain */
+  content:""; position:absolute; inset:0; opacity:0.32; mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='lt'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23lt)'/%3E%3C/svg%3E");
+}
+#pt-leaf::after{ /* gilt page edge catching light on the turning side */
+  content:""; position:absolute; top:0; bottom:0; right:0; width:16px;
+  background:linear-gradient(90deg, transparent, rgba(230,200,115,0.28));
+}
+#pt-leaf.cover{ transform:rotateY(0deg); opacity:1; }
+#pt-leaf.turn-out{ transform:rotateY(-122deg); opacity:0;
+  transition:transform 760ms cubic-bezier(.62,.04,.24,1), opacity 760ms ease; }
+#pt-leaf.incoming{ transform:rotateY(118deg); opacity:0; }
+#pt-leaf.turn-in{ transform:rotateY(0deg); opacity:1;
+  transition:transform 560ms cubic-bezier(.5,0,.3,1), opacity 220ms ease; }
+@media (prefers-reduced-motion: reduce){ #pt-wrap{ display:none !important; } }
 
 a.quiet{ text-decoration:none; }
 
