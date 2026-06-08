@@ -266,6 +266,10 @@ details[open] .chev{ transform:rotate(90deg); }
 #pt-leaf.incoming{ transform:rotateY(118deg); opacity:0; }
 #pt-leaf.turn-in{ transform:rotateY(0deg); opacity:1;
   transition:transform 560ms cubic-bezier(.5,0,.3,1), opacity 220ms ease; }
+/* reverse (swipe right / previous): hinge on the right edge, leaf enters from the left */
+#pt-leaf.rev{ transform-origin:right center; }
+#pt-leaf.rev.incoming{ transform:rotateY(-118deg); }
+#pt-leaf.rev::after{ left:0; right:auto; background:linear-gradient(270deg, transparent, rgba(230,200,115,0.28)); }
 @media (prefers-reduced-motion: reduce){ #pt-wrap{ display:none !important; } }
 
 a.quiet{ text-decoration:none; }
