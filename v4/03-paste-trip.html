@@ -27,6 +27,11 @@
   @keyframes sh{ to{ background-position:-200% 0; } }
   .reveal{ opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
   .reveal.in{ opacity:1; transform:none; }
+  /* sentiment chips */
+  .chip{ padding:7px 14px; border-radius:999px; font-size:13px; cursor:pointer; border:1px solid var(--canvas-line);
+    color:var(--ink-soft); background:rgba(255,253,247,0.5); transition:all 140ms; user-select:none; }
+  .chip:hover{ border-color:rgba(200,162,74,0.5); color:var(--ink); }
+  .chip.on{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -49,12 +54,11 @@
   <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-10">
     <div class="caps text-[11px] text-gold/80 mb-3">Chapter III · Describe &amp; book</div>
     <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">This is all you do to book a trip.</h1>
-    <p class="mt-5 max-w-2xl text-canvas/75 leading-relaxed">Brief Tures the way you'd brief a friend. Edit Andy's note below — or paste your own — then hit <em>Plan this trip</em>. Watch prose become a structured, leg-by-leg plan you can book in one tap.</p>
-    <!-- stepper -->
+    <p class="mt-5 max-w-2xl text-canvas/75 leading-relaxed">Brief Tures the way you'd brief a friend. Edit Andy's note below — or paste your own — then hit <em>Plan this trip</em>. Watch prose become a structured plan, tell us how you're feeling about <em>this</em> trip, and book it in one tap.</p>
     <div class="mt-7 flex items-center gap-3">
       <div class="step on" id="stp1"><span class="num">1</span><span class="lbl">Describe</span></div>
       <div class="step-sep"></div>
-      <div class="step" id="stp2"><span class="num">2</span><span class="lbl">Approve</span></div>
+      <div class="step" id="stp2"><span class="num">2</span><span class="lbl">This trip</span></div>
       <div class="step-sep"></div>
       <div class="step" id="stp3"><span class="num">3</span><span class="lbl">Book</span></div>
     </div>
@@ -62,10 +66,11 @@
 </section>
 
 <section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-7 items-start">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 space-y-7">
 
-  <!-- compose -->
-  <div class="leaf overflow-hidden">
+  <div class="grid lg:grid-cols-2 gap-7 items-start">
+   <!-- compose -->
+   <div class="leaf overflow-hidden">
     <div class="leaf-tab px-5 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2 text-xs"><span class="dot dot-gold"></span><span class="caps-sm text-ink-faint">Your brief → trip@tures.app</span></div>
       <button onclick="resetEmail()" class="text-[11px] text-gold-deep hover:underline">↺ Andy's example</button>
@@ -73,36 +78,28 @@
     <div class="p-5">
       <textarea id="brief" class="compose font-body" spellcheck="false"></textarea>
       <div class="mt-4 flex items-center justify-between gap-3">
-        <span class="text-xs text-ink-faint">Plain English. Name hotels, dates, cabins — whatever matters to you.</span>
+        <span class="text-xs text-ink-faint">Plain English. Name hotels, dates, cabins — whatever matters.</span>
         <button id="planBtn" onclick="planTrip()" class="btn-gold px-6 py-3 rounded-sm shrink-0">Plan this trip →</button>
       </div>
     </div>
-  </div>
+   </div>
 
-  <!-- result -->
-  <div class="leaf overflow-hidden">
+   <!-- result -->
+   <div class="leaf overflow-hidden">
     <div class="leaf-tab px-5 py-3 flex items-center justify-between">
       <div class="caps-sm text-ink-faint text-xs" id="resHead">Structured plan</div>
       <span class="pill pill-gold" id="resPill">Waiting</span>
     </div>
     <div class="p-5">
-      <!-- placeholder -->
       <div id="placeholder" class="text-center text-ink-faint py-16">
         <div class="text-4xl mb-3 text-gold-deep">❧</div>
         <p class="text-sm">Your leg-by-leg plan appears here<br>once you hit <span class="text-ink">Plan this trip</span>.</p>
       </div>
-
-      <!-- parsing -->
       <div id="parsing" class="hidden space-y-3 py-2">
         <div class="caps text-[11px] text-ink-faint mb-2 flex items-center gap-2"><span class="dot dot-gold pulse"></span> Reading your brief…</div>
-        <div class="shimmer h-6 w-2/3"></div>
-        <div class="shimmer h-6 w-full"></div>
-        <div class="shimmer h-6 w-5/6"></div>
-        <div class="shimmer h-6 w-3/4"></div>
-        <div class="shimmer h-6 w-full"></div>
+        <div class="shimmer h-6 w-2/3"></div><div class="shimmer h-6 w-full"></div>
+        <div class="shimmer h-6 w-5/6"></div><div class="shimmer h-6 w-3/4"></div><div class="shimmer h-6 w-full"></div>
       </div>
-
-      <!-- plan -->
       <div id="plan" class="reveal hidden text-[13.5px]">
         <div class="space-y-2.5">
           <div class="flex items-center justify-between"><span class="font-mono text-ink">SEA → CDG</span><span class="text-ink-faint">12/03 · Biz · non-stop</span></div>
@@ -116,15 +113,90 @@
         <div class="rule-gold my-5"></div>
         <div class="flex items-start gap-3 text-[13px]">
           <span class="pill pill-pending shrink-0 mt-0.5">Verify</span>
-          <p class="text-ink/85 leading-relaxed">Finnair does <strong>not</strong> fly non-stop CDG→IVL in December. Two clean alternatives staged for your approval — Tures won't book this leg until you choose. <span class="text-ink-faint">Your Taste Print favors the same-airline routing for the tier points.</span></p>
+          <p class="text-ink/85 leading-relaxed">Finnair does <strong>not</strong> fly non-stop CDG→IVL in December. Two clean alternatives staged — Tures won't book this leg until you choose.</p>
         </div>
-        <div class="mt-6 flex items-center justify-between gap-3 flex-wrap">
-          <span class="text-sm text-ink-soft">7 legs · 9 dinners · est. <span class="font-mono">8 min</span> to book</span>
-          <a href="04-connections.html" class="btn-gold px-5 py-3 rounded-sm quiet">Approve &amp; book 7 legs →</a>
-        </div>
+        <div class="mt-5 text-sm text-ink-soft">7 legs · 9 dinners · <span class="font-mono">↓ one more thing before we book</span></div>
       </div>
     </div>
+   </div>
   </div>
+
+  <!-- ===== THIS TRIP, SPECIFICALLY ===== -->
+  <div id="sentiment" class="reveal hidden leaf p-6 sm:p-8">
+    <div class="grid lg:grid-cols-12 gap-8">
+      <div class="lg:col-span-7">
+        <div class="caps text-[11px] text-ink-faint mb-2">Before we book</div>
+        <h2 class="font-display text-3xl sm:text-4xl text-ink leading-tight">How are you feeling about <em>this</em> trip?</h2>
+        <p class="mt-3 text-ink-soft text-sm leading-relaxed max-w-xl">Your <a href="02-taste-engine.html" class="text-gold-deep underline quiet">Taste Print</a> is who you are. This is who you are <em>this week</em> — the same traveler can want a blowout in June and total silence in December. We book to both.</p>
+
+        <div class="mt-7 space-y-6">
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">What's this trip <em>for</em>? <span class="normal-case tracking-normal text-ink-faint/70">· pick any</span></div>
+            <div class="flex flex-wrap gap-2" data-group="purpose" data-mode="multi">
+              <span class="chip" data-v="celebrate">Celebrate</span>
+              <span class="chip" data-v="decompress">Decompress</span>
+              <span class="chip" data-v="adventure">Adventure</span>
+              <span class="chip" data-v="romance">Romance</span>
+              <span class="chip" data-v="reconnect">Reconnect</span>
+              <span class="chip" data-v="work">Work-adjacent</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Pace, this time <span class="normal-case tracking-normal text-ink-faint/70">· pick one</span></div>
+            <div class="flex flex-wrap gap-2" data-group="pace" data-mode="single">
+              <span class="chip" data-v="easy">Easy — protect the downtime</span>
+              <span class="chip" data-v="balanced">Balanced</span>
+              <span class="chip" data-v="full">Full — don't waste a minute</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Each city, right now</div>
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-3 flex-wrap"><span class="font-display text-lg text-ink w-28">Paris</span>
+                <div class="flex flex-wrap gap-2" data-group="paris" data-mode="single">
+                  <span class="chip" data-v="classics">Hit the classics</span>
+                  <span class="chip" data-v="deeper">I know it — go deeper</span>
+                </div></div>
+              <div class="flex items-center gap-3 flex-wrap"><span class="font-display text-lg text-ink w-28">Lapland</span>
+                <div class="flex flex-wrap gap-2" data-group="lapland" data-mode="single">
+                  <span class="chip" data-v="big">Go big — bucket list</span>
+                  <span class="chip" data-v="calm">Keep it calm</span>
+                </div></div>
+              <div class="flex items-center gap-3 flex-wrap"><span class="font-display text-lg text-ink w-28">Copenhagen</span>
+                <div class="flex flex-wrap gap-2" data-group="copenhagen" data-mode="single">
+                  <span class="chip" data-v="lowkey">Low-key</span>
+                  <span class="chip" data-v="food">Food deep-dive</span>
+                </div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Not feeling this time <span class="normal-case tracking-normal text-ink-faint/70">· pick any</span></div>
+            <div class="flex flex-wrap gap-2" data-group="avoid" data-mode="multi">
+              <span class="chip" data-v="late nights">Late nights</span>
+              <span class="chip" data-v="long days">Long days</span>
+              <span class="chip" data-v="touristy spots">Touristy spots</span>
+              <span class="chip" data-v="big crowds">Big crowds</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- live read-back + book -->
+      <aside class="lg:col-span-5">
+        <div class="rounded p-5 sticky top-24" style="background:rgba(200,162,74,0.08); border:1px solid rgba(200,162,74,0.28)">
+          <div class="caps text-[11px] text-ink-faint mb-2">For this trip, Tures will</div>
+          <p id="tripSummary" class="text-ink leading-relaxed text-[15px]">Pick a few above and I'll read it back — then adjust the plan before anything is booked.</p>
+          <div class="rule-gold my-4"></div>
+          <div class="text-xs text-ink-soft mb-4" id="tripTag">This sits on top of your standing Taste Print — just for trip #T-2087.</div>
+          <a href="04-connections.html" class="btn-gold w-full text-center px-5 py-3 rounded-sm block quiet">Approve &amp; book 7 legs →</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+
  </div>
 </section>
 
@@ -143,13 +215,10 @@ Javri Lodge the 7–8–9th.
 Ivalo → Copenhagen on the 10th.
 Hotel Sanders the 10–11–12.
 Home the 13th — probably through Paris to keep both ways non-stop on business.`;
-
 function resetEmail(){ document.getElementById('brief').value = ANDY; }
 resetEmail();
 
-function setStep(n){
-  ['stp1','stp2','stp3'].forEach(function(id,i){ document.getElementById(id).classList.toggle('on', i < n); });
-}
+function setStep(n){ ['stp1','stp2','stp3'].forEach(function(id,i){ document.getElementById(id).classList.toggle('on', i < n); }); }
 
 function planTrip(){
   document.getElementById('placeholder').classList.add('hidden');
@@ -160,18 +229,69 @@ function planTrip(){
   document.getElementById('resPill').textContent = 'Parsing…';
   var btn = document.getElementById('planBtn'); btn.textContent = 'Planning…'; btn.disabled = true; btn.style.opacity = .7;
   setStep(1);
-
   setTimeout(function(){
     parsing.classList.add('hidden');
     var plan = document.getElementById('plan');
-    plan.classList.remove('hidden');
-    requestAnimationFrame(function(){ plan.classList.add('in'); });
+    plan.classList.remove('hidden'); requestAnimationFrame(function(){ plan.classList.add('in'); });
     document.getElementById('resHead').textContent = 'Structured plan · 7 legs · 9 dinners';
-    document.getElementById('resPill').textContent = 'Parsed';
-    document.getElementById('resPill').className = 'pill pill-confirm';
+    var pill = document.getElementById('resPill'); pill.textContent = 'Parsed'; pill.className = 'pill pill-confirm';
     btn.textContent = 'Re-plan'; btn.disabled = false; btn.style.opacity = 1;
+    // reveal the trip-sentiment step
+    var s = document.getElementById('sentiment'); s.classList.remove('hidden'); requestAnimationFrame(function(){ s.classList.add('in'); });
     setStep(2);
+    s.scrollIntoView({behavior:'smooth', block:'center'});
   }, 1200);
+}
+
+/* ---- trip-time sentiment ---- */
+var state = { purpose:[], pace:null, paris:null, lapland:null, copenhagen:null, avoid:[] };
+document.querySelectorAll('[data-group]').forEach(function(group){
+  var mode = group.getAttribute('data-mode'); var key = group.getAttribute('data-group');
+  group.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var v = chip.getAttribute('data-v');
+      if(mode === 'single'){
+        var was = chip.classList.contains('on');
+        group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+        if(!was){ chip.classList.add('on'); state[key] = v; } else { state[key] = null; }
+      } else {
+        chip.classList.toggle('on');
+        state[key] = Array.from(group.querySelectorAll('.chip.on')).map(function(c){ return c.getAttribute('data-v'); });
+      }
+      render();
+      setStep(state.pace || state.purpose.length ? 3 : 2);
+    });
+  });
+});
+
+function list(arr){ if(arr.length===1) return arr[0]; if(arr.length===2) return arr[0]+' and '+arr[1]; return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1]; }
+
+function render(){
+  var s = state, out = [];
+  // purpose + pace
+  if(s.purpose.length || s.pace){
+    var lead = 'This is ';
+    lead += s.purpose.length ? 'a '+list(s.purpose)+' trip' : 'this trip';
+    if(s.pace==='easy') lead += ' at an easy pace — I\'ll hold your mornings and protect the downtime';
+    else if(s.pace==='full') lead += ' run full — earliest sensible reservations, nothing missed';
+    else if(s.pace==='balanced') lead += ' kept balanced';
+    out.push(lead + '.');
+  }
+  // cities
+  var cityBits = [];
+  if(s.paris==='classics') cityBits.push('Paris leans to the icons — Eiffel-view table, the landmark museums booked ahead');
+  if(s.paris==='deeper') cityBits.push('in Paris I\'ll skip the postcards and go deeper — neighborhood tables, lesser-known rooms');
+  if(s.lapland==='big') cityBits.push('Lapland goes big — aurora hunt, husky run, the glass-roof splurge');
+  if(s.lapland==='calm') cityBits.push('Lapland stays calm — sauna, slow nights, no packed schedule');
+  if(s.copenhagen==='lowkey') cityBits.push('Copenhagen kept low-key');
+  if(s.copenhagen==='food') cityBits.push('Copenhagen leans into the food — I\'ll push harder on Geranium and the new-Nordic tables');
+  if(cityBits.length) out.push(cityBits.join('; ').replace(/^(.)/, function(m){return m.toUpperCase();}) + '.');
+  // avoid
+  if(s.avoid.length) out.push('And I\'ll keep '+list(s.avoid)+' off the table.');
+
+  var el = document.getElementById('tripSummary');
+  if(!out.length){ el.textContent = 'Pick a few above and I\'ll read it back — then adjust the plan before anything is booked.'; return; }
+  el.textContent = out.join(' ');
 }
 </script>
   <script src="assets/pageturn.js"></script>

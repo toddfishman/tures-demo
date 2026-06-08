@@ -256,20 +256,31 @@ details[open] .chev{ transform:rotate(90deg); }
   content:""; position:absolute; inset:0; opacity:0.32; mix-blend-mode:soft-light;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='lt'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23lt)'/%3E%3C/svg%3E");
 }
-#pt-leaf::after{ /* gilt page edge catching light on the turning side */
-  content:""; position:absolute; top:0; bottom:0; right:0; width:16px;
-  background:linear-gradient(90deg, transparent, rgba(230,200,115,0.28));
+#pt-leaf::after{ /* gilt page edges catching light */
+  content:""; position:absolute; top:0; bottom:0; left:0; right:0;
+  background:linear-gradient(90deg, rgba(230,200,115,0.20), transparent 12%, transparent 88%, rgba(230,200,115,0.20));
 }
-#pt-leaf.cover{ transform:rotateY(0deg); opacity:1; }
-#pt-leaf.turn-out{ transform:rotateY(-122deg); opacity:0;
-  transition:transform 760ms cubic-bezier(.62,.04,.24,1), opacity 760ms ease; }
-#pt-leaf.incoming{ transform:rotateY(118deg); opacity:0; }
-#pt-leaf.turn-in{ transform:rotateY(0deg); opacity:1;
+
+/* FORWARD (next): page turns right-to-left.
+   exit — covering leaf sweeps in from the right; enter — peels away to the left. */
+#pt-leaf.in-next{ transform-origin:right center; }
+#pt-leaf.in-next.start{ transform:rotateY(108deg); opacity:0; }
+#pt-leaf.in-next.go{ transform:rotateY(0deg); opacity:1;
   transition:transform 560ms cubic-bezier(.5,0,.3,1), opacity 220ms ease; }
-/* reverse (swipe right / previous): hinge on the right edge, leaf enters from the left */
-#pt-leaf.rev{ transform-origin:right center; }
-#pt-leaf.rev.incoming{ transform:rotateY(-118deg); }
-#pt-leaf.rev::after{ left:0; right:auto; background:linear-gradient(270deg, transparent, rgba(230,200,115,0.28)); }
+#pt-leaf.out-next{ transform-origin:left center; }
+#pt-leaf.out-next.start{ transform:rotateY(0deg); opacity:1; }
+#pt-leaf.out-next.go{ transform:rotateY(-122deg); opacity:0;
+  transition:transform 760ms cubic-bezier(.62,.04,.24,1), opacity 760ms ease; }
+
+/* BACK (prev): page turns left-to-right — mirror image. */
+#pt-leaf.in-prev{ transform-origin:left center; }
+#pt-leaf.in-prev.start{ transform:rotateY(-108deg); opacity:0; }
+#pt-leaf.in-prev.go{ transform:rotateY(0deg); opacity:1;
+  transition:transform 560ms cubic-bezier(.5,0,.3,1), opacity 220ms ease; }
+#pt-leaf.out-prev{ transform-origin:right center; }
+#pt-leaf.out-prev.start{ transform:rotateY(0deg); opacity:1; }
+#pt-leaf.out-prev.go{ transform:rotateY(122deg); opacity:0;
+  transition:transform 760ms cubic-bezier(.62,.04,.24,1), opacity 760ms ease; }
 @media (prefers-reduced-motion: reduce){ #pt-wrap{ display:none !important; } }
 
 a.quiet{ text-decoration:none; }

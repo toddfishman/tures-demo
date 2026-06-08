@@ -38,12 +38,10 @@
     opacity:0; pointer-events:none; transition:opacity 650ms ease 250ms;
   }
   .opened .toc{ opacity:1; pointer-events:auto; }
-  .chapter{ display:flex; align-items:baseline; gap:14px; padding:9px 2px;
-    border-bottom:1px solid var(--canvas-line); text-decoration:none; }
+  .chapter{ display:flex; align-items:baseline; gap:14px; padding:10px 2px; text-decoration:none; }
   .chapter:hover .ch-title{ color:var(--gold-deep); }
-  .leader{ flex:1; border-bottom:1px dotted rgba(156,122,46,0.5); transform:translateY(-4px); }
-  .open-hint{ animation:floaty 2.4s ease-in-out infinite; }
-  @keyframes floaty{ 0%,100%{transform:translateY(0);opacity:.7} 50%{transform:translateY(5px);opacity:1} }
+  .swipe-arrow{ animation:swipeHint 1.8s ease-in-out infinite; }
+  @keyframes swipeHint{ 0%,100%{transform:translateX(0);opacity:.55} 50%{transform:translateX(-9px);opacity:1} }
   /* keep the contents on one screenful on phones */
   @media (max-width:640px){
     .toc .ch-title{ font-size:1.15rem; line-height:1.2; }
@@ -67,8 +65,9 @@
       <p class="font-display italic text-2xl text-canvas/80 leading-snug">
         Books the impossible.<br>Watches everything.<br>Rebooks before you notice.
       </p>
-      <div class="mt-14 open-hint flex flex-col items-center gap-2 text-gold/80">
-        <span class="caps text-[10px]">Open the edition</span><span class="text-lg">⌄</span>
+      <div class="mt-14 flex items-center gap-3 text-gold/80">
+        <span class="swipe-arrow text-2xl">←</span>
+        <span class="caps text-[10px]">Swipe to open</span>
       </div>
     </div>
     <div class="absolute bottom-7 inset-x-0 text-center caps text-[9px] text-gold/40 z-10">First Edition · MMXXVI</div>
@@ -81,44 +80,42 @@
         <a class="wordmark text-2xl quiet" style="color:var(--gold-deep)" href="#" onclick="closeBook();return false;">t<span class="spark">✦</span>ures</a>
         <div id="tocHeading" class="font-display text-4xl text-ink leading-none mt-1">Table of Contents</div>
       </div>
-      <div class="rule-gold mb-3"></div>
-
       <a class="chapter" href="01-landing.html">
         <span class="font-mono text-gold-deep text-sm w-7">I</span>
-        <span class="ch-title font-display text-2xl text-ink">The Pitch</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Open</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Pitch</span>
+        <span class="text-ink-faint text-[10px] caps">Open</span></a>
       <a class="chapter" href="02-taste-engine.html">
         <span class="font-mono text-gold-deep text-sm w-7">II</span>
-        <span class="ch-title font-display text-2xl text-ink">The Taste Engine <span class="pill pill-gold align-middle ml-1">New</span></span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Calibrate</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Taste Engine</span>
+        <span class="text-ink-faint text-[10px] caps">Calibrate</span></a>
       <a class="chapter" href="03-paste-trip.html">
         <span class="font-mono text-gold-deep text-sm w-7">III</span>
-        <span class="ch-title font-display text-2xl text-ink">Describe &amp; Book a Trip</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Parse</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Describe &amp; Book a Trip</span>
+        <span class="text-ink-faint text-[10px] caps">Parse</span></a>
       <a class="chapter" href="04-connections.html">
         <span class="font-mono text-gold-deep text-sm w-7">IV</span>
-        <span class="ch-title font-display text-2xl text-ink">Grant Permissions</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Connect</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Grant Permissions</span>
+        <span class="text-ink-faint text-[10px] caps">Connect</span></a>
       <a class="chapter" href="05-execution.html">
         <span class="font-mono text-gold-deep text-sm w-7">V</span>
-        <span class="ch-title font-display text-2xl text-ink">Watch It Execute <span class="pill pill-gold align-middle ml-1">Money shot</span></span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Live</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Watch It Execute</span>
+        <span class="text-ink-faint text-[10px] caps">Live</span></a>
       <a class="chapter" href="06-hiccup-handler.html">
         <span class="font-mono text-gold-deep text-sm w-7">VI</span>
-        <span class="ch-title font-display text-2xl text-ink">The Hiccup Handler <span class="pill pill-gold align-middle ml-1">New</span></span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Monitor</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Hiccup Handler</span>
+        <span class="text-ink-faint text-[10px] caps">Monitor</span></a>
       <a class="chapter" href="07-itinerary.html">
         <span class="font-mono text-gold-deep text-sm w-7">VII</span>
-        <span class="ch-title font-display text-2xl text-ink">The Finished Itinerary</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Review</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Finished Itinerary</span>
+        <span class="text-ink-faint text-[10px] caps">Review</span></a>
       <a class="chapter" href="08-concierge.html">
         <span class="font-mono text-gold-deep text-sm w-7">VIII</span>
-        <span class="ch-title font-display text-2xl text-ink">In-Trip Concierge</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Text us</span></a>
-      <a class="chapter" href="about.html" style="border-bottom:0;">
+        <span class="ch-title font-display text-2xl text-ink flex-1">In-Trip Concierge</span>
+        <span class="text-ink-faint text-[10px] caps">Text us</span></a>
+      <a class="chapter" href="about.html">
         <span class="text-gold-deep text-sm w-7">✦</span>
-        <span class="ch-title font-display text-2xl text-ink">Colophon — About Tures</span>
-        <span class="leader"></span><span class="text-ink-faint text-[10px] caps">Brief</span></a>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Colophon — About Tures</span>
+        <span class="text-ink-faint text-[10px] caps">Brief</span></a>
 
       <div class="mt-5 flex items-center justify-center gap-2 text-[11px] text-ink-faint">
         <span class="caps">Reach us on</span>
