@@ -1,7 +1,7 @@
 // The vault — connect, list, revoke, and grant checks for connected services. Secrets are
 // encrypted at rest (crypto.ts) and only decrypted by trusted internal callers (the payment
 // provider). In-memory store; swaps to Prisma at Chunk 6 behind this same API.
-import { encrypt, decrypt } from "./crypto.ts";
+import { secretStore } from "./secretstore.ts";
 import { DEFAULT_SCOPES, redact } from "./types.ts";
 import type { Connection, ConnectionKind, RedactedConnection } from "./types.ts";
 import { Collection } from "../db/persist.ts";
@@ -22,8 +22,11 @@ export interface ConnectInput {
   meta?: Record<string, unknown>;
 }
 
-export function connect(input: ConnectInput): RedactedConnection {
+export async function connect(input: ConnectInput): Promise<RedactedConnection> {
   const accountId = input.accountId ?? "demo";
+  // Tokenize/encrypt the secret through the configured store (VGS or local AES) before it lands
+  // in our storage — only the token/ciphertext is ever persisted.
+  const secretCipher = await secretStore().store(JSON.stringify(input.secret));
   const conn: Connection = {
     id: `conn_${Date.now().toString(36)}_${counter++}`,
     accountId,
@@ -32,11 +35,11 @@ export function connect(input: ConnectInput): RedactedConnection {
     scopes: input.scopes ?? DEFAULT_SCOPES[input.kind],
     status: "connected",
     meta: input.meta ?? {},
-    secretCipher: encrypt(JSON.stringify(input.secret)),
+    secretCipher,
     createdAt: new Date().toISOString(),
   };
   byId.set(conn.id, conn);
-  log.info("vault: connected service", { accountId, kind: conn.kind, scopes: conn.scopes });
+  log.info("vault: connected service", { accountId, kind: conn.kind, scopes: conn.scopes, store: secretStore().mode });
   return redact(conn);
 }
 
@@ -80,7 +83,7 @@ export function hasScope(accountId: string, scope: string): boolean {
   );
 }
 
-/** Decrypt a connection's credential. INTERNAL — only the payment provider should call this. */
-export function reveal(conn: Connection): Record<string, unknown> {
-  return JSON.parse(decrypt(conn.secretCipher));
+/** Resolve a connection's credential (detokenize/decrypt). INTERNAL — booking/payment use only. */
+export async function reveal(conn: Connection): Promise<Record<string, unknown>> {
+  return JSON.parse(await secretStore().reveal(conn.secretCipher));
 }

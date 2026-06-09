@@ -64,7 +64,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     components,
     charges: [],
     feeUsd: input.feeUsd && input.feeUsd > 0 ? input.feeUsd : undefined,
-    passenger: passengerSummary(accountId),
+    passenger: await passengerSummary(accountId),
     violations,
     audit: [],
     idempotencyKey: input.idempotencyKey,

@@ -32,6 +32,11 @@ const Env = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   // Public base URL of the demo, for Stripe Checkout success/cancel redirects.
   PUBLIC_BASE_URL: z.string().optional(),
+  // VGS (Very Good Security) PII vault. When all three are set, sensitive data is tokenized into
+  // VGS and only aliases touch our storage. Unset → self-managed AES-256-GCM at rest.
+  VGS_VAULT_URL: z.string().optional(), // e.g. https://api.sandbox.verygoodvault.com
+  VGS_USERNAME: z.string().optional(),
+  VGS_PASSWORD: z.string().optional(),
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
@@ -57,6 +62,14 @@ export const config = {
   stripePriceSubscription: parsed.STRIPE_PRICE_SUBSCRIPTION,
   stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
   publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v5",
+  vgs: {
+    url: parsed.VGS_VAULT_URL?.replace(/\/$/, ""),
+    username: parsed.VGS_USERNAME,
+    password: parsed.VGS_PASSWORD,
+    get enabled(): boolean {
+      return !!(parsed.VGS_VAULT_URL && parsed.VGS_USERNAME && parsed.VGS_PASSWORD);
+    },
+  },
   /** Read live from the env so tests can toggle auth without a fresh import. */
   get apiKey(): string | undefined {
     return process.env.ENGINE_API_KEY || undefined;

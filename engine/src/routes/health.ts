@@ -22,6 +22,7 @@ export async function healthRoutes(app: FastifyInstance) {
       billingLive: !!config.stripeKey && !!config.stripePriceSubscription, // real Stripe subscriptions
     },
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts
+    piiVault: config.vgs.enabled ? "vgs" : "local-aes", // where passport/KTN/etc. are stored
     auth: !!config.apiKey, // Chunk 6 — true when an API key is required
   }));
 }

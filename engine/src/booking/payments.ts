@@ -61,7 +61,7 @@ class StripePayments implements PaymentProvider {
     const conn = resolvePaymentConnection(ctx);
 
     // The vault holds the Stripe Customer + PaymentMethod created via the connect flow (SetupIntent).
-    const cred = reveal(conn) as { customerId?: string; paymentMethodId?: string };
+    const cred = (await reveal(conn)) as { customerId?: string; paymentMethodId?: string };
     if (!cred.customerId || !cred.paymentMethodId) {
       throw new Error("payment_connection_incomplete: missing Stripe customer/payment_method");
     }

@@ -34,7 +34,7 @@ function mask(v: string | undefined): string | undefined {
 }
 
 /** Save (replace) the traveler profile for an account. Returns the redacted connection. */
-export function setTravelerProfile(accountId: string, profile: TravelerProfile): RedactedConnection {
+export async function setTravelerProfile(accountId: string, profile: TravelerProfile): Promise<RedactedConnection> {
   const meta = {
     hasPassport: !!profile.passport,
     passportMasked: mask(profile.passport?.number),
@@ -45,11 +45,11 @@ export function setTravelerProfile(accountId: string, profile: TravelerProfile):
   return connect({ accountId, kind: "traveler_profile", label: profile.fullName ?? "Traveler", secret: profile, meta });
 }
 
-/** Decrypt the full profile (internal — for booking/passenger details). */
-export function getTravelerProfile(accountId: string): TravelerProfile | null {
+/** Resolve the full profile (internal — for booking/passenger details). */
+export async function getTravelerProfile(accountId: string): Promise<TravelerProfile | null> {
   const conn = activeConnection(accountId, "traveler_profile");
   if (!conn) return null;
-  return reveal(conn) as TravelerProfile;
+  return (await reveal(conn)) as TravelerProfile;
 }
 
 /** Redacted profile connection for API responses. */
@@ -59,8 +59,8 @@ export function getTravelerProfileRedacted(accountId: string): RedactedConnectio
 }
 
 /** What the booking flow attaches to a reservation, with audit-friendly notes. */
-export function passengerSummary(accountId: string): { note: string; ktnApplied: boolean; passportOnFile: boolean; loyaltyCredited: string[] } {
-  const p = getTravelerProfile(accountId);
+export async function passengerSummary(accountId: string): Promise<{ note: string; ktnApplied: boolean; passportOnFile: boolean; loyaltyCredited: string[] }> {
+  const p = await getTravelerProfile(accountId);
   if (!p) return { note: "no traveler profile on file", ktnApplied: false, passportOnFile: false, loyaltyCredited: [] };
   const loyaltyCredited = p.memberships.map((m) => m.program);
   const bits = [
