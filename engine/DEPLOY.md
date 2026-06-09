@@ -44,9 +44,13 @@ fly secrets set ALLOW_LIVE_BOOKING=true
 ## Deploy
 
 ```bash
-fly deploy
-fly open /health      # confirm it's up; shows which capabilities are live
+fly deploy --ha=false   # single machine — in-memory stores aren't shared across machines yet
+fly open /health        # confirm it's up; shows which capabilities are live
 ```
+
+> **Single machine for now.** The vault, bookings, and event stream are in-memory per process
+> (Postgres/Redis is Chunk 6). Running more than one machine splits that state. If a deploy adds
+> a second machine, run `fly scale count 1`.
 
 `/health` reports exactly what's active given the secrets present:
 

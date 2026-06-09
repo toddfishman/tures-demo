@@ -55,8 +55,13 @@ GitHub Pages origin is already in `fly.toml`.
 ## 3. Deploy
 
 ```powershell
-flyctl deploy --app $APP
+flyctl deploy --ha=false --app $APP
 ```
+
+`--ha=false` runs a **single** machine. The vault/booking/event stores are in-memory per
+process, so multiple machines would split state (a payment connected on one wouldn't be seen by
+another). Keep it single-machine until Postgres/Redis lands (Chunk 6). If a deploy ever spins up
+a second machine, run `flyctl scale count 1 --app $APP`.
 
 ## 4. Verify the live engine
 
