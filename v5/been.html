@@ -69,9 +69,15 @@ var WORLD = {
 
 var state = {};   // name → { been, rating }
 
+var saveTimers = {};
 function save(name, region){
-  var s = state[name] || {};
-  tures.places.upsert({ kind:'country', name:name, region:region, been: !!s.been, rating: s.rating }).catch(function(){});
+  // Debounce per place so a quick mark-then-rate collapses into ONE write with the final state
+  // (two racing upserts could otherwise reorder and clobber the rating).
+  clearTimeout(saveTimers[name]);
+  saveTimers[name] = setTimeout(function(){
+    var s = state[name] || {};
+    tures.places.upsert({ kind:'country', name:name, region:region, been: !!s.been, rating: s.rating }).catch(function(){});
+  }, 350);
 }
 function renderSummary(){
   var been = Object.keys(state).filter(function(n){ return state[n].been; });
