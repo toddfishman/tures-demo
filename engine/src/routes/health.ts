@@ -26,6 +26,8 @@ export async function healthRoutes(app: FastifyInstance) {
     },
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts
     piiVault: config.vgs.enabled ? "vgs" : "local-aes", // where passport/KTN/etc. are stored
+    stripePublishableKey: config.stripePublishableKey, // pk_… for Stripe.js card forms (public)
+    chargeCards: config.payments === "stripe", // true once real card charging is on
     auth: !!config.apiKey, // Chunk 6 — true when an API key is required
   }));
 }

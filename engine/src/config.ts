@@ -28,6 +28,7 @@ const Env = z.object({
   // Secret for signing session tokens (JWT HS256). Unset → ephemeral (sessions drop on restart).
   AUTH_SECRET: z.string().optional(),
   // Stripe billing (Chunk: real money). Price IDs for the subscription + the per-trip fee.
+  STRIPE_PUBLISHABLE_KEY: z.string().optional(), // pk_… — safe to expose; used by Stripe.js
   STRIPE_PRICE_SUBSCRIPTION: z.string().optional(),
   STRIPE_PRICE_PER_TRIP: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
@@ -70,6 +71,7 @@ export const config = {
   stripePriceSubscription: parsed.STRIPE_PRICE_SUBSCRIPTION,
   stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
   stripePricePerTrip: parsed.STRIPE_PRICE_PER_TRIP,
+  stripePublishableKey: parsed.STRIPE_PUBLISHABLE_KEY,
   publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v5",
   vgs: {
     url: parsed.VGS_VAULT_URL?.replace(/\/$/, ""),

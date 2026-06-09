@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <link rel="stylesheet" href="assets/tures.css">
 <style>
   body{ background:var(--obsidian); }
@@ -63,6 +64,14 @@
     <div id="addCardRow" class="flex gap-2 mb-5">
       <select id="cardPick" class="fld flex-1"></select>
       <button id="addCard" class="btn-ink px-4 rounded-lg text-sm press">Add card</button>
+    </div>
+    <!-- real card via Stripe Elements (shown when the engine has a publishable key) -->
+    <div id="realCardRow" class="mb-5" style="display:none">
+      <select id="cardPickReal" class="fld w-full mb-2" title="Card type — for picking the best rewards"></select>
+      <div id="cardElement" class="fld" style="padding:13px 14px"></div>
+      <button id="saveCardBtn" class="btn-ink px-4 py-2.5 rounded-lg text-sm press mt-2 w-full">Save card</button>
+      <div id="cardErr" class="text-[12px] mt-1" style="color:var(--alert)"></div>
+      <div class="text-[11px] text-ink-faint mt-1">Test card: 4242 4242 4242 4242 · any future date · any CVC · any ZIP</div>
     </div>
 
     <div class="flex justify-between items-baseline mb-4">
@@ -142,6 +151,31 @@ if(addCard) addCard.onclick = function(){
   tures.connections.connect({ kind:'payment', label:name, secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key}, meta:{cardKey:key, last4:'0000'} }).then(refreshCards);
 };
 
+// Real card via Stripe Elements — used when the engine exposes a publishable key.
+var stripe, cardElement;
+function initRealCard(){
+  if(!(window.tures && tures.configured) || !window.Stripe) return;
+  tures.health().then(function(h){
+    var pk = h && h.stripePublishableKey;
+    if(!pk) return; // mock mode — keep the demo picker
+    document.getElementById('addCardRow').style.display='none';
+    document.getElementById('realCardRow').style.display='';
+    tures.wallet.catalog().then(function(cat){ var p=document.getElementById('cardPickReal'); p.innerHTML=''; (cat.cards||[]).forEach(function(c){ if(c.key==='generic_cashback') return; var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; p.appendChild(o); }); }).catch(function(){});
+    stripe = Stripe(pk);
+    cardElement = stripe.elements().create('card', { style:{ base:{ fontSize:'15px', color:'#2a201a' } } });
+    cardElement.mount('#cardElement');
+    document.getElementById('saveCardBtn').onclick = function(){
+      var btn=this; btn.disabled=true; btn.textContent='Saving…'; document.getElementById('cardErr').textContent='';
+      tures.billing.setupIntent()
+        .then(function(si){ return stripe.confirmCardSetup(si.clientSecret, { payment_method:{ card: cardElement } }); })
+        .then(function(r){ if(r.error) throw new Error(r.error.message); var sel=document.getElementById('cardPickReal');
+          return tures.billing.saveCard({ paymentMethodId: r.setupIntent.payment_method, label: sel.options[sel.selectedIndex].textContent, cardKey: sel.value }); })
+        .then(function(){ btn.disabled=false; btn.textContent='Save card'; cardElement.clear(); refreshCards(); })
+        .catch(function(e){ btn.disabled=false; btn.textContent='Save card'; document.getElementById('cardErr').textContent=(e&&e.message)||'Could not save card.'; });
+    };
+  }).catch(function(){});
+}
+
 document.getElementById('payBtn').addEventListener('click', function(){
   var btn=this; btn.textContent='Booking…'; btn.disabled=true; btn.style.opacity=.7;
 
@@ -172,7 +206,7 @@ document.getElementById('payBtn').addEventListener('click', function(){
   }
 });
 
-if(gate()){ renderFee(); renderItin(); refreshCards(); }
+if(gate()){ renderFee(); renderItin(); refreshCards(); initRealCard(); }
 </script>
 </body>
 </html>

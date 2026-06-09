@@ -90,6 +90,8 @@
     },
     billing: {
       checkout: function () { return api("/billing/checkout", { method: "POST", body: JSON.stringify({ accountId: acctId() }) }); },
+      setupIntent: function () { return api("/billing/setup-intent", { method: "POST" }); },
+      saveCard: function (body) { return api("/billing/save-card", { method: "POST", body: JSON.stringify(body) }); },
     },
     travelers: {
       add: function (t) { return api("/travelers", { method: "POST", body: JSON.stringify({ traveler: t }) }); },
