@@ -83,7 +83,7 @@ if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
 var a = tures.account || {};
 document.getElementById('name').textContent = a.name || 'Traveler';
 document.getElementById('email').textContent = a.email || '';
-document.getElementById('planPill').textContent = a.plan === 'subscribe' ? 'Concierge · $29/mo' : (a.plan === 'per_trip' ? 'Pay per trip' : 'Free');
+document.getElementById('planPill').textContent = a.plan === 'subscribe' ? 'Concierge · $99/mo' : (a.plan === 'per_trip' ? 'Pay per trip' : 'Free');
 document.getElementById('signOut').onclick = function(e){ e.preventDefault(); tures.signOut(); location.href='index.html'; };
 
 function money(n){ return '$' + Math.round(n||0).toLocaleString(); }

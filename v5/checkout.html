@@ -56,13 +56,13 @@
     <!-- tures plan -->
     <div class="caps text-[11px] text-ink-faint mb-3">How you'll pay Tures</div>
     <div class="space-y-2 mb-5">
-      <div class="opt on flex items-center gap-3" data-plan="per_trip" data-fee="49">
+      <div class="opt on flex items-center gap-3" data-plan="per_trip" data-fee="99">
         <span class="tick"></span>
-        <span class="flex-1"><span class="text-ink font-medium">Pay per trip</span><span class="text-ink-soft text-sm block">$49 concierge fee on this booking. No commitment.</span></span>
+        <span class="flex-1"><span class="text-ink font-medium">Pay per trip</span><span class="text-ink-soft text-sm block">$99 concierge fee on this booking. No commitment.</span></span>
       </div>
       <div class="opt flex items-center gap-3" data-plan="subscribe" data-fee="0">
         <span class="tick"></span>
-        <span class="flex-1"><span class="text-ink font-medium">Subscribe — $29/mo</span><span class="text-ink-soft text-sm block">No per-trip fee, unlimited planning &amp; the Hiccup Handler watching every trip.</span></span>
+        <span class="flex-1"><span class="text-ink font-medium">Subscribe — $99/mo</span><span class="text-ink-soft text-sm block">No per-trip fee, unlimited planning &amp; the Hiccup Handler watching every trip.</span></span>
       </div>
     </div>
 
@@ -100,7 +100,9 @@ var pending = null;
 try { pending = JSON.parse(localStorage.getItem('tures.pendingTrip') || 'null'); } catch(e){}
 
 function money(n){ return '$' + Math.round(n).toLocaleString(); }
-var plan = 'per_trip', fee = 49;
+var _sel0 = document.querySelector('.opt.on');
+var plan = _sel0 ? _sel0.getAttribute('data-plan') : 'per_trip';
+var fee = _sel0 ? Number(_sel0.getAttribute('data-fee')) : 99;
 
 function gate(){
   if(!pending){ document.getElementById('needPlan').style.display=''; return false; }
