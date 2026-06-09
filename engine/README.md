@@ -3,7 +3,7 @@
 The agentic booking engine behind the Tures demo. See [`PLAN.md`](./PLAN.md) for the full
 architecture and the chunk-by-chunk roadmap.
 
-**Status:** 0 foundation ✅ · 1 deal search ✅ · 2 agent loop ✅ · 3 booking + confirm gate ✅ · 4 vault + permissions + Stripe ✅ · 4.5 wallet + traveler profile ✅. Deployed: see [`DEPLOY.md`](./DEPLOY.md) / [`RUNBOOK.md`](./RUNBOOK.md).
+**Status:** 0 foundation ✅ · 1 deal search ✅ · 2 agent loop ✅ · 3 booking + confirm gate ✅ · 4 vault + permissions + Stripe ✅ · 4.5 wallet + traveler profile ✅ · 5 Hiccup Handler ✅ · 6 hardening (auth/rate-limit/metrics) ✅. Remaining: 6b durable/multi-machine state (see [`PLAN.md`](./PLAN.md)). Deployed: [`DEPLOY.md`](./DEPLOY.md) / [`RUNBOOK.md`](./RUNBOOK.md).
 
 ## Run it
 
@@ -36,7 +36,10 @@ npm run typecheck        # tsc --noEmit
 | GET | `/wallet/catalog` | Curated card types for the wallet picker. |
 | GET | `/wallet/recommend?category=&amount=` | Which connected card the engine would charge, and why. |
 | POST | `/disruptions` | Report a disruption on a booked trip → Hiccup Handler auto-rebooks within standing authority or proposes. |
+| GET | `/metrics` | Uptime, request counts by status class, error count, avg latency, RSS. |
 | GET | `/stream/:tripId` | Server-Sent Events: the live execution stream for a trip. |
+
+**Auth:** set `ENGINE_API_KEY` and every route except `/health` requires `Authorization: Bearer <key>` (SSE uses `?token=<key>`). The demo client sends it automatically when configured via `?key=` or `tures.use(url, key)`.
 
 Example:
 

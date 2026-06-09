@@ -9,6 +9,7 @@
  */
 (function () {
   var KEY = "tures.engineUrl";
+  var AUTH = "tures.engineKey";
 
   // Resolve the engine URL: ?engine= wins (and is remembered), else localStorage.
   var qs = new URLSearchParams(location.search);
@@ -17,10 +18,25 @@
     if (fromQuery) localStorage.setItem(KEY, fromQuery.replace(/\/$/, ""));
     else localStorage.removeItem(KEY); // ?engine= (empty) clears it
   }
+  // Optional API key (?key= persists, or tures.use(url, key)).
+  var fromKey = qs.get("key");
+  if (fromKey !== null) {
+    if (fromKey) localStorage.setItem(AUTH, fromKey);
+    else localStorage.removeItem(AUTH);
+  }
   var url = localStorage.getItem(KEY) || "";
+  var apiKey = localStorage.getItem(AUTH) || "";
+
+  function headers() {
+    var h = { "Content-Type": "application/json" };
+    if (apiKey) h["Authorization"] = "Bearer " + apiKey;
+    return h;
+  }
 
   function api(path, opts) {
-    return fetch(url + path, Object.assign({ headers: { "Content-Type": "application/json" } }, opts))
+    opts = opts || {};
+    opts.headers = Object.assign(headers(), opts.headers || {});
+    return fetch(url + path, opts)
       .then(function (r) {
         return r.json().then(function (body) {
           if (!r.ok) throw Object.assign(new Error(body.error || r.status), { status: r.status, body: body });
@@ -33,8 +49,8 @@
     get url() { return url; },
     get configured() { return !!url; },
 
-    use: function (u) { url = (u || "").replace(/\/$/, ""); localStorage.setItem(KEY, url); return url; },
-    forget: function () { url = ""; localStorage.removeItem(KEY); },
+    use: function (u, k) { url = (u || "").replace(/\/$/, ""); localStorage.setItem(KEY, url); if (k !== undefined) { apiKey = k || ""; if (apiKey) localStorage.setItem(AUTH, apiKey); else localStorage.removeItem(AUTH); } return url; },
+    forget: function () { url = ""; apiKey = ""; localStorage.removeItem(KEY); localStorage.removeItem(AUTH); },
 
     health: function () { return api("/health"); },
     parse: function (text) { return api("/parse", { method: "POST", body: JSON.stringify({ text: text }) }); },
@@ -48,9 +64,11 @@
       revoke: function (id) { return api("/connections/" + id + "/revoke", { method: "POST" }); },
     },
 
-    /* Open the live execution stream. Returns the EventSource so callers can close it. */
+    /* Open the live execution stream. Returns the EventSource so callers can close it.
+       EventSource can't send headers, so the key (if any) rides as ?token=. */
     stream: function (tripId, onEvent) {
-      var es = new EventSource(url + "/stream/" + tripId);
+      var src = url + "/stream/" + tripId + (apiKey ? "?token=" + encodeURIComponent(apiKey) : "");
+      var es = new EventSource(src);
       es.onmessage = function (e) {
         try { onEvent(JSON.parse(e.data)); } catch (_) {}
       };

@@ -97,7 +97,23 @@ and a real Pause/Resume that halts the agent mid-loop (the demo's Pause button, 
 | 4 | **Connected services & permissions** | Encrypted vault (AES-256-GCM), scoped grants matching the demo's toggles (payment/email/calendar/loyalty), revocation; booking now requires a `payment:charge` grant; real Stripe charge path (vault PaymentMethod/Customer, off_session confirm) wired behind the key. Gmail/calendar OAuth providers still deferred. | ✅ core done |
 | 4.5 | **Wallet + traveler profile** | Structured traveler profile (passport/KTN/Redress/DOB + airline/hotel/AAA memberships, encrypted + masked); multi-card wallet with a curated reward catalog + per-charge card selector wired into booking (flight→best airfare card, hotel→best hotel card), reasoning in the audit log. `/profile`, `/wallet/catalog`, `/wallet/recommend`. | ✅ done |
 | 5 | **Hiccup Handler** | Disruption detection + autonomous rebooking within the brief's standing authority (`rebooking.mode`/`maxUpchargeUsd`); composes search→policy→wallet→book→notify, or proposes. `POST /disruptions`. | ✅ done |
-| 6 | **Hardening + prod deploy** | Auth (API key), rate limits, observability/metrics, shared-state path (Redis) so it can run multi-machine. Demo already wired (`03-paste-trip`, `04`, `05`). | → in progress |
+| 6 | **Hardening** | API-key auth (opt-in, `/health` open, SSE via `?token=`), per-IP rate limiting, request logging + `/metrics`, central error/404 handlers, graceful shutdown. Demo client sends the key. | ✅ done |
+| 6b | **Durable / multi-machine state** | Move the in-memory vault/booking/event stores to Postgres or Redis so the engine can run >1 machine (today: single-machine via `--ha=false`, which is fine + cheap for the demo). Needs a provisioning decision — see below. | follow-up |
+
+### Chunk 6b — persistence (the one remaining piece, scoped honestly)
+
+The vault, bookings, and event bus are **in-memory per process**. That's why we run a single Fly
+machine (`--ha=false`): state can't span machines, and it resets on restart. Making it durable +
+multi-machine needs an external datastore + provisioning, so it's intentionally deferred rather
+than shipped untested. Options, easiest→most robust:
+- **SQLite on a Fly volume** — durable across restarts, no async refactor (better-sqlite3 is sync),
+  but still single-machine. Smallest step to "survives restart."
+- **Redis (Upstash)** — KV for vault/bookings + pub/sub for the SSE event bus → true multi-machine.
+  Todd already has Upstash Redis in the Fly account. Recommended for multi-machine.
+- **Postgres** — relational store for bookings/audit with real queries/reporting; best long-term,
+  most setup. Pair with Redis pub/sub for SSE.
+
+All three sit behind a small repository seam; the choice is a provisioning call, not a rewrite.
 
 Each chunk is independently runnable and leaves the engine in a working state.
 

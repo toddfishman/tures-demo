@@ -266,5 +266,32 @@ let bookingId = "";
   ok("revoking all payment methods immediately blocks new bookings");
 }
 
+// 15. /metrics reports counts + uptime
+{
+  const res = await app.inject({ method: "GET", url: "/metrics" });
+  assert.equal(res.statusCode, 200);
+  const m = res.json();
+  assert.ok(m.requests > 0 && typeof m.uptimeSec === "number", "metrics populated");
+  assert.ok(m.byClass && typeof m.byClass["2xx"] === "number", "status-class buckets present");
+  ok("/metrics reports request counts + uptime");
+}
+
 await app.close();
+
+// 16. API-key auth: blocks without key, allows with, /health stays open
+{
+  process.env.ENGINE_API_KEY = "secret-test-key";
+  const secured = await build();
+  const noKey = await secured.inject({ method: "POST", url: "/search", payload: brief });
+  assert.equal(noKey.statusCode, 401, "blocked without key");
+  const withKey = await secured.inject({ method: "POST", url: "/search", payload: brief, headers: { authorization: "Bearer secret-test-key" } });
+  assert.equal(withKey.statusCode, 200, "allowed with key");
+  const health = await secured.inject({ method: "GET", url: "/health" });
+  assert.equal(health.statusCode, 200, "health stays open");
+  assert.equal(health.json().auth, true, "health reports auth on");
+  await secured.close();
+  delete process.env.ENGINE_API_KEY;
+  ok("API-key auth blocks without key, allows with, /health stays open");
+}
+
 console.log(`\n${passed} checks passed.`);

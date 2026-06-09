@@ -29,6 +29,10 @@ fly secrets set STRIPE_SECRET_KEY=sk_test_xxx
 # Vault encryption key (32 bytes). Without it the vault uses an ephemeral key and connected
 # credentials are lost on restart — set this in any real deploy.
 fly secrets set VAULT_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# API key (Chunk 6). When set, all routes except /health require Authorization: Bearer <key>.
+# The demo activates with it via ?key=… (or tures.use(url, key)).
+fly secrets set ENGINE_API_KEY=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
 ```
 
 ### The real-money safety switch

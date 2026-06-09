@@ -19,5 +19,6 @@ export async function healthRoutes(app: FastifyInstance) {
       travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
     },
+    auth: !!config.apiKey, // Chunk 6 — true when an API key is required
   }));
 }
