@@ -60,14 +60,18 @@ fly deploy --app $APP
 
 ## 4. Verify the live engine
 
+Use `curl.exe` (not `curl` — in Windows PowerShell that's an alias for Invoke-WebRequest):
+
 ```powershell
 # Health — shows which capabilities are live given your secrets
-curl https://$APP.fly.dev/health
+curl.exe https://$APP.fly.dev/health
 
 # Prose → structured brief (real Claude extraction if ANTHROPIC_API_KEY is set)
-curl -X POST https://$APP.fly.dev/parse -H "content-type: application/json" `
+curl.exe -X POST "https://$APP.fly.dev/parse" -H "content-type: application/json" `
   -d '{\"text\":\"a long weekend in Lisbon for two, business class, a design hotel\"}'
 ```
+
+(Or PowerShell-native: `Invoke-RestMethod https://$APP.fly.dev/health`.)
 
 `/health` should report `"supplier":"duffel"` (if Duffel token set), `"agentLoop":true`,
 `"vault":true`. If something's off, `fly logs --app $APP`.
