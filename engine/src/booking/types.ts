@@ -16,6 +16,9 @@ export interface BookedComponent {
   amountUsd: number;
   confirmation?: string; // PNR / booking ref once booked
   status: "pending" | "confirmed" | "failed";
+  /** Which card the wallet selector chose for this charge, and why. */
+  card?: { connectionId: string; key: string; name: string; last4?: string; reason: string };
+  payment?: PaymentRecord;
 }
 
 export interface PaymentRecord {
@@ -43,7 +46,10 @@ export interface Booking {
   totalUsd: number;
   currency: string;
   components: BookedComponent[];
-  payment?: PaymentRecord;
+  /** All charges across components (one per card used). */
+  charges: PaymentRecord[];
+  /** Passenger/traveler details applied from the profile (audit-friendly, no raw PII). */
+  passenger?: { note: string; ktnApplied: boolean; passportOnFile: boolean; loyaltyCredited: string[] };
   /** Why the gate is open / why it failed — surfaced to the client. */
   violations: string[];
   audit: AuditEntry[];

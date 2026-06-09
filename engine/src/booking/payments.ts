@@ -3,10 +3,22 @@
 // card the user never connected.
 import type { PaymentRecord } from "./types.ts";
 import { config } from "../config.ts";
-import { activeConnection, reveal } from "../vault/index.ts";
+import { activeConnection, connectionById, reveal } from "../vault/index.ts";
 
 export interface ChargeContext {
   accountId: string;
+  /** Specific card connection to charge (chosen by the wallet selector). Falls back to any
+   *  connected payment method if omitted. */
+  connectionId?: string;
+}
+
+/** Resolve the card connection to charge: the chosen one, or any connected payment method. */
+function resolvePaymentConnection(ctx: ChargeContext) {
+  const conn = ctx.connectionId ? connectionById(ctx.connectionId) : activeConnection(ctx.accountId, "payment");
+  if (!conn || conn.kind !== "payment" || conn.status !== "connected") {
+    throw new Error("no_payment_method: connect a payment method before booking");
+  }
+  return conn;
 }
 
 export interface PaymentProvider {
@@ -30,9 +42,7 @@ class MockPayments implements PaymentProvider {
   readonly live = false;
   async charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord> {
     // Even in mock mode, a payment method must be connected — mirrors the real authorization rule.
-    if (!activeConnection(ctx.accountId, "payment")) {
-      throw new Error("no_payment_method: connect a payment method before booking");
-    }
+    resolvePaymentConnection(ctx);
     return {
       provider: "mock",
       intentId: `pi_mock_${hash(idempotencyKey)}`,
@@ -48,8 +58,7 @@ class StripePayments implements PaymentProvider {
   readonly provider = "stripe" as const;
   readonly live = true;
   async charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord> {
-    const conn = activeConnection(ctx.accountId, "payment");
-    if (!conn) throw new Error("no_payment_method: connect a payment method before booking");
+    const conn = resolvePaymentConnection(ctx);
 
     // The vault holds the Stripe Customer + PaymentMethod created via the connect flow (SetupIntent).
     const cred = reveal(conn) as { customerId?: string; paymentMethodId?: string };

@@ -97,27 +97,54 @@ let tripId = "";
   ok("vault crypto: AES-256-GCM round-trip + tamper detection");
 }
 
-// 5b. vault: connecting a service redacts the secret and grants scopes
-let paymentConnId = "";
-{
+// 5b. vault: connect two cards (a wallet) — redacted, grants payment:charge
+let platConnId = "";
+let csrConnId = "";
+async function connectCard(label: string, cardKey: string, last4: string) {
   const res = await app.inject({
     method: "POST",
     url: "/connections",
-    payload: { kind: "payment", label: "AmEx ··1004", secret: { customerId: "cus_x", paymentMethodId: "pm_x" }, meta: { last4: "1004" } },
+    payload: { kind: "payment", label, secret: { customerId: "cus_x", paymentMethodId: "pm_" + cardKey }, meta: { last4, cardKey } },
   });
   assert.equal(res.statusCode, 200);
-  const c = res.json();
-  paymentConnId = c.id;
-  assert.equal(c.secretCipher, undefined, "secret never returned to client");
-  assert.ok(c.scopes.includes("payment:charge"), "payment grant present");
+  return res.json();
+}
+{
+  const plat = await connectCard("Amex Platinum", "amex_platinum", "1004");
+  const csr = await connectCard("Chase Sapphire Reserve", "chase_sapphire_reserve", "7788");
+  platConnId = plat.id;
+  csrConnId = csr.id;
+  assert.equal(plat.secretCipher, undefined, "secret never returned to client");
+  assert.ok(plat.scopes.includes("payment:charge"), "payment grant present");
   const listed = (await (await app.inject({ method: "GET", url: "/connections" })).json()).connections;
   assert.ok(listed.every((x: any) => x.secretCipher === undefined), "list is redacted");
-  ok("vault connects a payment method (redacted) and grants payment:charge");
+  ok("vault connects two cards (redacted) and grants payment:charge");
 }
 
-// 5c. without a payment grant, booking is blocked (prove the grant gate before connecting above
-//     would have failed — here we confirm the positive path needs the connection)
-//     handled implicitly: tests 6–11 only pass because the payment method is connected.
+// 5c. wallet: best card differs by charge category (airfare → Platinum 5×, hotel → CSR 3×)
+{
+  const air = (await app.inject({ method: "GET", url: "/wallet/recommend?category=airfare&amount=5000" })).json();
+  const hotel = (await app.inject({ method: "GET", url: "/wallet/recommend?category=hotel&amount=2000" })).json();
+  assert.equal(air.name, "Amex Platinum", "Platinum wins airfare");
+  assert.equal(hotel.name, "Chase Sapphire Reserve", "CSR wins hotel");
+  ok("wallet picks the best card per category (airfare→Platinum, hotel→CSR)");
+}
+
+// 5d. traveler profile: save + read back masked, never leaking raw passport/KTN
+{
+  const save = await app.inject({
+    method: "POST",
+    url: "/profile",
+    payload: { profile: { fullName: "Andy Traveler", passport: { number: "X1234567", country: "US" }, knownTravelerNumber: "TT12345678", memberships: [{ kind: "airline", program: "Finnair Plus", number: "FP998877", status: "Gold" }] } },
+  });
+  assert.equal(save.statusCode, 200);
+  const c = save.json();
+  assert.equal(c.secretCipher, undefined, "profile secret not returned");
+  assert.ok(!JSON.stringify(c).includes("X1234567"), "raw passport never leaves the vault");
+  assert.equal(c.meta.passportMasked, "••••4567", "passport is masked");
+  assert.ok(c.meta.ktnOnFile, "KTN recorded");
+  ok("traveler profile saves passport/KTN/memberships encrypted + masked");
+}
 
 // 6. booking gate: confirm_each opens the gate and charges NOTHING
 let bookingId = "";
@@ -127,32 +154,38 @@ let bookingId = "";
   const b = res.json();
   bookingId = b.id;
   assert.equal(b.status, "confirmation_required", "gate is open");
-  assert.equal(b.payment, undefined, "no payment before confirm");
+  assert.equal(b.charges.length, 0, "no charges before confirm");
   assert.ok(b.components.length >= 1, "has components staged");
+  assert.ok(b.passenger && b.passenger.passportOnFile && b.passenger.ktnApplied, "passenger details attached from profile");
   assert.ok(b.audit.some((a: any) => a.action === "awaiting_confirmation"), "audit records the gate");
-  ok("POST /book opens the confirm gate with no charge");
+  ok("POST /book opens the confirm gate with no charge (passenger attached)");
 }
 
-// 7. confirm executes: payment + PNRs + booked
+// 7. confirm executes: per-card charges + PNRs + booked, with the wallet choosing per category
 {
   const res = await app.inject({ method: "POST", url: `/book/${bookingId}/confirm` });
   assert.equal(res.statusCode, 200);
   const b = res.json();
   assert.equal(b.status, "booked");
-  assert.ok(b.payment && b.payment.status === "succeeded", "payment succeeded");
-  assert.ok(b.components.every((c: any) => c.status === "confirmed" && c.confirmation), "every component has a confirmation");
-  assert.ok(b.audit.some((a: any) => a.action === "payment_charged"), "audit records the charge");
+  assert.equal(b.charges.length, 2, "one charge per component");
+  assert.ok(b.charges.every((p: any) => p.status === "succeeded"), "all charges succeeded");
+  const flight = b.components.find((c: any) => c.kind === "flight");
+  const stay = b.components.find((c: any) => c.kind === "stay");
+  assert.equal(flight.card.name, "Amex Platinum", "flight charged on the best airfare card");
+  assert.equal(stay.card.name, "Chase Sapphire Reserve", "stay charged on the best hotel card");
+  assert.ok(b.components.every((c: any) => c.status === "confirmed" && c.confirmation), "every component confirmed");
+  assert.ok(b.audit.some((a: any) => a.action === "card_selected"), "audit records card selection");
   assert.ok(b.audit.some((a: any) => a.action === "booked"), "audit records booked");
-  ok("confirm charges once, books each component, writes the audit trail");
+  ok("confirm picks the best card per charge, books each component, writes the audit trail");
 }
 
-// 8. confirm is idempotent — same payment intent, no second charge
+// 8. confirm is idempotent — same charges, no double charge
 {
-  const before = (await (await app.inject({ method: "GET", url: `/book/${bookingId}` })).json()).payment.intentId;
+  const before = (await (await app.inject({ method: "GET", url: `/book/${bookingId}` })).json()).charges.map((p: any) => p.intentId).sort();
   const res = await app.inject({ method: "POST", url: `/book/${bookingId}/confirm` });
   const after = res.json();
   assert.equal(after.status, "booked");
-  assert.equal(after.payment.intentId, before, "same intent — not re-charged");
+  assert.deepEqual(after.charges.map((p: any) => p.intentId).sort(), before, "same intents — not re-charged");
   ok("re-confirming a booked trip is idempotent (no double charge)");
 }
 
@@ -164,7 +197,7 @@ let bookingId = "";
   const b = res.json();
   assert.equal(b.status, "failed");
   assert.ok(b.violations.some((v: string) => /budget/.test(v)), "violation cites budget");
-  assert.equal(b.payment, undefined, "nothing charged on a blocked booking");
+  assert.equal(b.charges.length, 0, "nothing charged on a blocked booking");
   ok("over-budget booking blocked at the policy gate (409, no charge)");
 }
 
@@ -188,14 +221,15 @@ let bookingId = "";
   ok("duplicate /book with same idempotencyKey is deduped");
 }
 
-// 12. revoking the payment method blocks new bookings at the policy gate
+// 12. revoking all payment methods blocks new bookings at the policy gate
 {
-  const rev = await app.inject({ method: "POST", url: `/connections/${paymentConnId}/revoke` });
+  await app.inject({ method: "POST", url: `/connections/${platConnId}/revoke` });
+  const rev = await app.inject({ method: "POST", url: `/connections/${csrConnId}/revoke` });
   assert.equal(rev.json().status, "revoked");
   const res = await app.inject({ method: "POST", url: "/book", payload: { brief } });
   assert.equal(res.statusCode, 409, "no payment method → blocked");
   assert.ok(res.json().violations.some((v: string) => /payment method/.test(v)), "violation cites payment method");
-  ok("revoking the payment method immediately blocks new bookings");
+  ok("revoking all payment methods immediately blocks new bookings");
 }
 
 await app.close();

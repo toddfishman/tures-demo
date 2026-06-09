@@ -58,6 +58,18 @@ export function activeConnection(accountId: string, kind: ConnectionKind): Conne
   );
 }
 
+/** All active connections of a kind for an account (e.g. every card in the wallet). */
+export function connectionsByKind(accountId: string, kind: ConnectionKind): Connection[] {
+  return [...byId.values()].filter(
+    (c) => c.accountId === accountId && c.kind === kind && c.status === "connected",
+  );
+}
+
+/** Look up a single connection by id (internal — used to charge a specific chosen card). */
+export function connectionById(id: string): Connection | undefined {
+  return byId.get(id);
+}
+
 /** Does the account hold a live grant for this scope? The authorization check the engine uses. */
 export function hasScope(accountId: string, scope: string): boolean {
   return [...byId.values()].some(

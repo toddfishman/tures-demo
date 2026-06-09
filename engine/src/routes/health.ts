@@ -15,6 +15,8 @@ export async function healthRoutes(app: FastifyInstance) {
       paymentProvider: config.payments, // "mock" until a Stripe key is set
       liveBookingAllowed: config.allowLiveBooking, // hard safety switch
       vault: true, // Chunk 4 — connected services + scoped grants
+      wallet: true, // Chunk 4.5 — multi-card selection by reward value
+      travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
     },
   }));
 }

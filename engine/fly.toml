@@ -1,5 +1,5 @@
-# Fly.io config for the Tures Engine. Rename `app` to your Fly app, then `fly deploy`.
-app = "tures-engine"
+# Fly.io config for the Tures Engine. Set `app` to your Fly app, then `flyctl deploy`.
+app = "tures-engine-tf"
 primary_region = "sjc"
 
 [build]
@@ -15,7 +15,7 @@ primary_region = "sjc"
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1   # keep one warm so the SSE execution stream stays connected
+  min_machines_running = 1
 
   [[http_service.checks]]
     method = "GET"
@@ -23,5 +23,5 @@ primary_region = "sjc"
     interval = "15s"
     timeout = "3s"
 
-# Secrets are NOT set here — use `fly secrets set` (see DEPLOY.md):
+# Secrets are NOT set here - use `flyctl secrets set` (see DEPLOY.md):
 #   DUFFEL_API_TOKEN, ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, ALLOW_LIVE_BOOKING

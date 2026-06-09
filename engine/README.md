@@ -3,7 +3,7 @@
 The agentic booking engine behind the Tures demo. See [`PLAN.md`](./PLAN.md) for the full
 architecture and the chunk-by-chunk roadmap.
 
-**Status:** Chunk 0 foundation ✅ · 1 deal search ✅ · 2 agent loop (Claude tool-use) ✅ · 3 booking + confirm gate ✅ · 4 vault + scoped permissions + Stripe charge path ✅ core. Deploy: see [`DEPLOY.md`](./DEPLOY.md).
+**Status:** 0 foundation ✅ · 1 deal search ✅ · 2 agent loop ✅ · 3 booking + confirm gate ✅ · 4 vault + permissions + Stripe ✅ · 4.5 wallet + traveler profile ✅. Deployed: see [`DEPLOY.md`](./DEPLOY.md) / [`RUNBOOK.md`](./RUNBOOK.md).
 
 ## Run it
 
@@ -28,9 +28,13 @@ npm run typecheck        # tsc --noEmit
 | POST | `/book` | Open a booking. Default opens the **confirm gate** (charges nothing); `auto_within_brief` books immediately. Over-budget → 409. |
 | POST | `/book/:id/confirm` | The human-confirm gate. Charges once + books each component. Idempotent. |
 | GET | `/book/:id` | Booking status + full audit trail. |
-| POST | `/connections` | Connect a service (payment/email/calendar/loyalty). Secret encrypted at rest; response redacted. |
+| POST | `/connections` | Connect a service (payment/email/calendar/loyalty). Payment `meta.cardKey` sets the reward profile. Secret encrypted at rest; response redacted. |
 | GET | `/connections` | List connected services (redacted, no secrets). |
 | POST | `/connections/:id/revoke` | Revoke a grant — immediate for new actions. |
+| POST | `/profile` | Save traveler profile (passport/KTN/memberships) — encrypted; response masked. |
+| GET | `/profile` | Redacted traveler profile. |
+| GET | `/wallet/catalog` | Curated card types for the wallet picker. |
+| GET | `/wallet/recommend?category=&amount=` | Which connected card the engine would charge, and why. |
 | GET | `/stream/:tripId` | Server-Sent Events: the live execution stream for a trip. |
 
 Example:

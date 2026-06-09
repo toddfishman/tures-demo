@@ -11,6 +11,8 @@ import { getSupplier } from "../suppliers/index.ts";
 import { runSearch } from "../search/service.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
+import { chooseCard, categoryForKind } from "../wallet/cards.ts";
+import { passengerSummary } from "../profile/index.ts";
 
 // Resolved Offer objects kept out of the serialized Booking (supplier.book needs the full offer).
 const offerCache = new Map<string, { flight?: Offer; stay?: Offer }>();
@@ -58,6 +60,8 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     totalUsd,
     currency,
     components,
+    charges: [],
+    passenger: passengerSummary(accountId),
     violations,
     audit: [],
     idempotencyKey: input.idempotencyKey,
@@ -108,16 +112,28 @@ async function execute(booking: Booking): Promise<Booking> {
   const offers = offerCache.get(booking.id) ?? {};
 
   try {
-    // 1. Charge — idempotency key bound to the booking so a retry never double-charges.
-    const idemKey = booking.idempotencyKey ?? booking.id;
-    booking.payment = await payments.charge(booking.totalUsd, booking.currency, idemKey, { accountId: booking.accountId });
-    audit(booking, "system", "payment_charged", `${booking.payment.provider} ${booking.payment.intentId} · $${booking.totalUsd.toLocaleString()} · ${booking.payment.status}`);
-    emitEvent(booking.tripId, "book", "Payment authorized", { detail: `${booking.payment.provider} · $${booking.totalUsd.toLocaleString()}`, data: { bookingId: booking.id } });
+    const baseIdem = booking.idempotencyKey ?? booking.id;
 
-    // 2. Commit each component with the supplier.
+    // For each component: pick the best card for that charge type, charge it, then book it.
     for (const c of booking.components) {
       const offer = c.kind === "flight" ? offers.flight : offers.stay;
       if (!offer || !supplier.book) throw new Error(`cannot book ${c.kind} (${c.offerId})`);
+
+      // 1. Wallet: choose the best card for this charge category (airfare vs hotel earn differently).
+      const choice = chooseCard(booking.accountId, { category: categoryForKind(c.kind), amountUsd: c.amountUsd });
+      if (choice) {
+        c.card = { connectionId: choice.connectionId, key: choice.key, name: choice.name, last4: choice.last4, reason: choice.reason };
+        audit(booking, "agent", "card_selected", `${c.title}: ${choice.reason}`);
+      }
+
+      // 2. Charge that card (per-component idempotency key → no double charge on retry).
+      const pay = await payments.charge(c.amountUsd, booking.currency, `${baseIdem}:${c.kind}`, { accountId: booking.accountId, connectionId: choice?.connectionId });
+      c.payment = pay;
+      booking.charges.push(pay);
+      audit(booking, "system", "payment_charged", `${c.title}: ${pay.provider} ${pay.intentId} · $${c.amountUsd.toLocaleString()}${c.card ? ` on ${c.card.name}` : ""}`);
+      emitEvent(booking.tripId, "book", `Charged $${c.amountUsd.toLocaleString()} for ${c.title}`, { detail: c.card ? c.card.reason : pay.provider, data: { bookingId: booking.id } });
+
+      // 3. Commit with the supplier.
       const { confirmation } = await supplier.book(offer);
       c.confirmation = confirmation;
       c.status = "confirmed";
