@@ -21,6 +21,7 @@
   <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
     <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
     <div class="flex items-center gap-5 text-sm">
+      <a href="been.html" class="quiet">Where you've been</a>
       <a href="03-paste-trip.html" class="quiet">Plan a trip</a>
       <a href="#" id="signOut" class="text-canvas/60 quiet">Sign out</a>
     </div>
@@ -67,6 +68,24 @@
       <div class="caps text-[11px] text-ink-faint mb-4">Connected services</div>
       <div id="services" class="space-y-2"><div class="text-sm text-ink-faint">—</div></div>
     </div>
+  </div>
+
+  <!-- TRAVELERS (family / companions) -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <div class="caps text-[11px] text-ink-faint">Travelers on your account</div>
+      <button id="addTravelerToggle" class="text-[13px] text-gold-deep quiet">+ Add traveler</button>
+    </div>
+    <div id="travelers" class="grid sm:grid-cols-2 gap-3 mb-3"></div>
+    <form id="travelerForm" class="card p-4 grid sm:grid-cols-2 gap-2.5" style="display:none">
+      <input id="tvName" class="rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" placeholder="Full name" />
+      <select id="tvRel" class="rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)">
+        <option value="spouse">Spouse</option><option value="partner">Partner</option><option value="child">Child</option><option value="parent">Parent</option><option value="companion">Companion</option>
+      </select>
+      <input id="tvPass" class="rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" placeholder="Passport number (optional)" />
+      <input id="tvKtn" class="rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" placeholder="Known Traveler # (optional)" />
+      <button class="btn-gold px-5 py-2.5 rounded-lg text-sm press sm:col-span-2">Add traveler</button>
+    </form>
   </div>
 
  </div>
@@ -156,6 +175,31 @@ if(tures.configured){
     }
   }).catch(function(){});
 }
+
+// travelers (family / companions)
+function renderTravelers(){
+  tures.travelers.list().then(function(res){
+    var el = document.getElementById('travelers'); var list = res.travelers || [];
+    el.innerHTML = list.length ? '' : '<div class="text-sm text-ink-faint">Just you so far.</div>';
+    list.forEach(function(t){
+      var m = t.meta || {};
+      var card = document.createElement('div'); card.className='card p-3 flex items-center justify-between';
+      card.innerHTML = '<div><div class="text-ink text-sm font-medium">'+(m.fullName||t.label)+'</div><div class="text-ink-faint text-[12px]">'+(m.relationship||'')+(m.passportMasked?' · passport '+m.passportMasked:'')+'</div></div><button class="text-[12px] text-gold-deep" data-rm="'+t.id+'">remove</button>';
+      el.appendChild(card);
+    });
+    el.querySelectorAll('[data-rm]').forEach(function(b){ b.onclick=function(){ tures.travelers.remove(b.getAttribute('data-rm')).then(renderTravelers); }; });
+  }).catch(function(){});
+}
+document.getElementById('addTravelerToggle').onclick=function(){ var f=document.getElementById('travelerForm'); f.style.display = f.style.display==='none'?'':'none'; };
+document.getElementById('travelerForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var t = { fullName: document.getElementById('tvName').value.trim(), relationship: document.getElementById('tvRel').value,
+    passport: document.getElementById('tvPass').value.trim()? { number: document.getElementById('tvPass').value.trim(), country:'US' } : undefined,
+    knownTravelerNumber: document.getElementById('tvKtn').value.trim()||undefined, memberships: [] };
+  if(!t.fullName) return;
+  tures.travelers.add(t).then(function(){ e.target.reset(); document.getElementById('travelerForm').style.display='none'; renderTravelers(); }).catch(function(){});
+});
+if(tures.configured && tures.signedIn) renderTravelers();
 </script>
 </body>
 </html>

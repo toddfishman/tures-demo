@@ -311,6 +311,32 @@ let bookingId = "";
   ok("auth: login succeeds, bad password + duplicate email rejected");
 }
 
+// 14.5 travelers (family) + places ("where you've been")
+{
+  const su = await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "fam@b.com", name: "Fam", password: "password123" } });
+  const auth = { authorization: "Bearer " + su.json().token };
+
+  // add a companion — PII masked, never returned raw
+  const t = await app.inject({ method: "POST", url: "/travelers", headers: auth, payload: { fullName: "Kid One", relationship: "child", passport: { number: "K9999999" }, memberships: [] } });
+  assert.equal(t.statusCode, 200);
+  assert.equal(t.json().secretCipher, undefined, "traveler secret not returned");
+  assert.ok(!JSON.stringify(t.json()).includes("K9999999"), "raw passport not leaked");
+  const list = (await (await app.inject({ method: "GET", url: "/travelers", headers: auth })).json()).travelers;
+  assert.equal(list.length, 1, "companion listed");
+  assert.equal(list[0].meta.relationship, "child");
+  ok("travelers: add a companion (PII masked) and list it");
+
+  // where you've been + taste signal
+  await app.inject({ method: "POST", url: "/places", headers: auth, payload: { kind: "city", name: "Lisbon", region: "Portugal", rating: 9, tags: ["food", "design"] } });
+  await app.inject({ method: "POST", url: "/places", headers: auth, payload: { kind: "city", name: "Dubai", rating: 4, tags: ["luxury"] } });
+  const res = (await (await app.inject({ method: "GET", url: "/places", headers: auth })).json());
+  assert.equal(res.places.length, 2, "two places stored");
+  assert.equal(res.places[0].name, "Lisbon", "sorted best-rated first");
+  assert.ok(res.taste.lovedPlaces.includes("Lisbon") && !res.taste.lovedPlaces.includes("Dubai"), "taste signal = highly-rated only");
+  assert.ok(res.taste.favoriteTags.includes("food"), "favorite tags derived from loved places");
+  ok("places: rate where you've been → derives a taste signal for the planner");
+}
+
 // 15. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });

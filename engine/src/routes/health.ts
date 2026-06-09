@@ -19,6 +19,8 @@ export async function healthRoutes(app: FastifyInstance) {
       travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
       accounts: true, // email+password logins with sessions
+      travelers: true, // family/companion travelers on the account
+      placesGraph: true, // "where you've been" personalization signal
       billingLive: !!config.stripeKey && !!config.stripePriceSubscription, // real Stripe subscriptions
     },
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts

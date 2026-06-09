@@ -17,6 +17,8 @@ import { connectionRoutes } from "./routes/connections.ts";
 import { profileRoutes } from "./routes/profile.ts";
 import { walletRoutes } from "./routes/wallet.ts";
 import { disruptionRoutes } from "./routes/disruptions.ts";
+import { travelerRoutes } from "./routes/travelers.ts";
+import { placeRoutes } from "./routes/places.ts";
 import { waitlistRoutes } from "./routes/waitlist.ts";
 import { streamRoutes } from "./routes/stream.ts";
 
@@ -66,6 +68,8 @@ export async function build() {
   await app.register(profileRoutes);
   await app.register(walletRoutes);
   await app.register(disruptionRoutes);
+  await app.register(travelerRoutes);
+  await app.register(placeRoutes);
   await app.register(waitlistRoutes);
   await app.register(streamRoutes);
 

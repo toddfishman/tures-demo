@@ -3,7 +3,7 @@
 // ENCRYPTED in the vault as a `traveler_profile` connection; the secret holds the sensitive
 // fields, meta holds masked, safe-to-return display values.
 import { z } from "zod";
-import { connect, activeConnection, reveal } from "../vault/index.ts";
+import { connect, activeConnection, connectionsByKind, connectionById, revoke, reveal } from "../vault/index.ts";
 import { redact } from "../vault/types.ts";
 import type { RedactedConnection } from "../vault/types.ts";
 
@@ -56,6 +56,38 @@ export async function getTravelerProfile(accountId: string): Promise<TravelerPro
 export function getTravelerProfileRedacted(accountId: string): RedactedConnection | null {
   const conn = activeConnection(accountId, "traveler_profile");
   return conn ? redact(conn) : null;
+}
+
+// ---- additional travelers (family / companions on the account) ----
+export const CompanionSchema = TravelerProfileSchema.extend({
+  fullName: z.string(),
+  relationship: z.enum(["spouse", "partner", "child", "parent", "companion"]).default("companion"),
+});
+export type Companion = z.infer<typeof CompanionSchema>;
+
+/** Add a traveler (spouse/child/companion). PII is VGS-tokenized like the account holder's. */
+export async function addTraveler(accountId: string, c: Companion): Promise<RedactedConnection> {
+  const meta = {
+    fullName: c.fullName,
+    relationship: c.relationship,
+    hasPassport: !!c.passport,
+    passportMasked: mask(c.passport?.number),
+    ktnOnFile: !!c.knownTravelerNumber,
+    memberships: c.memberships.map((m) => ({ kind: m.kind, program: m.program, numberMasked: mask(m.number) })),
+  };
+  return connect({ accountId, kind: "traveler", label: c.fullName, secret: c, meta });
+}
+
+/** List the account's additional travelers (redacted/masked). */
+export function listTravelers(accountId: string): RedactedConnection[] {
+  return connectionsByKind(accountId, "traveler").map(redact);
+}
+
+/** Remove a traveler by connection id (must belong to the account). */
+export function removeTraveler(accountId: string, id: string): boolean {
+  const conn = connectionById(id);
+  if (!conn || conn.accountId !== accountId || conn.kind !== "traveler") return false;
+  return !!revoke(id);
 }
 
 /** What the booking flow attaches to a reservation, with audit-friendly notes. */

@@ -91,6 +91,16 @@
     billing: {
       checkout: function () { return api("/billing/checkout", { method: "POST", body: JSON.stringify({ accountId: acctId() }) }); },
     },
+    travelers: {
+      add: function (t) { return api("/travelers", { method: "POST", body: JSON.stringify({ traveler: t }) }); },
+      list: function () { return api("/travelers"); },
+      remove: function (id) { return api("/travelers/" + id, { method: "DELETE" }); },
+    },
+    places: {
+      upsert: function (p) { return api("/places", { method: "POST", body: JSON.stringify({ place: p }) }); },
+      list: function () { return api("/places"); },
+      remove: function (name) { return api("/places/" + encodeURIComponent(name), { method: "DELETE" }); },
+    },
 
     stream: function (tripId, onEvent) {
       var es = new EventSource(url + "/stream/" + tripId + (token ? "?token=" + encodeURIComponent(token) : ""));
