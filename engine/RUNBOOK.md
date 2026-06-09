@@ -13,8 +13,8 @@ iwr https://fly.io/install.ps1 -useb | iex
 # Add it to PATH for THIS shell (the installer only updates new shells):
 $env:Path += ";$HOME\.fly\bin"
 
-fly version          # confirm it installed
-fly auth login       # opens a browser — sign in / create a Fly account
+flyctl version          # confirm it installed
+flyctl auth login       # opens a browser — sign in / create a Fly account
 ```
 
 ## 1. Create the app
@@ -24,7 +24,7 @@ The name must be globally unique. Pick one and use it everywhere below.
 ```powershell
 cd C:\Users\toddf\tures-demo\engine
 $APP = "tures-engine-tf"          # <- change if taken
-fly apps create $APP
+flyctl apps create $APP
 ```
 
 Then set that name in `fly.toml` (the `app = "..."` line at the top):
@@ -37,16 +37,16 @@ Then set that name in `fly.toml` (the `app = "..."` line at the top):
 
 ```powershell
 # Vault encryption key (32 bytes) — without it, connected creds are lost on restart
-fly secrets set VAULT_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))") --app $APP
+flyctl secrets set VAULT_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))") --app $APP
 
 # Real flight search (Duffel TEST token — test-mode, no real money). Get it at app.duffel.com
-fly secrets set DUFFEL_API_TOKEN=duffel_test_xxxxx --app $APP
+flyctl secrets set DUFFEL_API_TOKEN=duffel_test_xxxxx --app $APP
 
 # Real agent loop (Claude tool-use planning). Get it at console.anthropic.com
-fly secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx --app $APP
+flyctl secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx --app $APP
 
 # OPTIONAL — payments. Needs a PaymentMethod connected via /connections to actually charge.
-# fly secrets set STRIPE_SECRET_KEY=sk_test_xxxxx --app $APP
+# flyctl secrets set STRIPE_SECRET_KEY=sk_test_xxxxx --app $APP
 ```
 
 `ALLOW_LIVE_BOOKING` stays unset (false) — real-money bookings are refused. CORS for the demo's
@@ -55,7 +55,7 @@ GitHub Pages origin is already in `fly.toml`.
 ## 3. Deploy
 
 ```powershell
-fly deploy --app $APP
+flyctl deploy --app $APP
 ```
 
 ## 4. Verify the live engine
@@ -74,7 +74,7 @@ curl.exe -X POST "https://$APP.fly.dev/parse" -H "content-type: application/json
 (Or PowerShell-native: `Invoke-RestMethod https://$APP.fly.dev/health`.)
 
 `/health` should report `"supplier":"duffel"` (if Duffel token set), `"agentLoop":true`,
-`"vault":true`. If something's off, `fly logs --app $APP`.
+`"vault":true`. If something's off, `flyctl logs --app $APP`.
 
 ## 5. Point the demo at it
 
@@ -92,5 +92,5 @@ Then try `04-connections.html?engine=…` (toggles create real vault grants) and
 `05-execution.html?trip=<tripId>&engine=…` (streams real execution events).
 
 ## Report back
-The `https://<app>.fly.dev` URL + the output of `/health`, and anything from `fly logs` if a step
+The `https://<app>.fly.dev` URL + the output of `/health`, and anything from `flyctl logs` if a step
 failed. I'll debug from there.
