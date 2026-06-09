@@ -286,12 +286,11 @@ update();
 
   var pick = document.getElementById('cardPick');
   // populate card types from the engine catalog
-  tures.connections && tures.health().then(function(){ return fetch(tures.url + '/wallet/catalog').then(function(r){return r.json();}); })
-    .then(function(cat){
-      (cat.cards || []).forEach(function(c){
-        var o = document.createElement('option'); o.value = c.key; o.textContent = c.name; pick.appendChild(o);
-      });
-    }).catch(function(){});
+  tures.wallet.catalog().then(function(cat){
+    (cat.cards || []).forEach(function(c){
+      var o = document.createElement('option'); o.value = c.key; o.textContent = c.name; pick.appendChild(o);
+    });
+  }).catch(function(){});
 
   function refresh(){
     tures.connections.list().then(function(res){
@@ -311,8 +310,8 @@ update();
       // recommend preview: who wins airfare vs hotel
       if(cards.length){
         Promise.all([
-          fetch(tures.url + '/wallet/recommend?category=airfare&amount=5000').then(function(r){return r.json();}),
-          fetch(tures.url + '/wallet/recommend?category=hotel&amount=2000').then(function(r){return r.json();})
+          tures.wallet.recommend('airfare', 5000),
+          tures.wallet.recommend('hotel', 2000)
         ]).then(function(rs){
           var rec = document.getElementById('walletRec');
           rec.style.display = '';
@@ -336,8 +335,7 @@ update();
       knownTravelerNumber: document.getElementById('pfKtn').value || undefined,
       memberships: document.getElementById('pfProgram').value ? [{ kind:'airline', program: document.getElementById('pfProgram').value, number: document.getElementById('pfNumber').value }] : []
     };
-    tures.parse && fetch(tures.url + '/profile', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ profile: profile }) })
-      .then(function(r){ return r.json(); })
+    tures.profile.set(profile)
       .then(function(c){
         document.getElementById('profileStatus').innerHTML = '✓ Saved · passport ' + (c.meta && c.meta.passportMasked || '—') + (c.meta && c.meta.ktnOnFile ? ' · KTN on file' : '');
       }).catch(function(e){ document.getElementById('profileStatus').textContent = 'Save failed: ' + e; });

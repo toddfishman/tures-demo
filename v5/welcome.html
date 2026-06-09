@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Get set up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .setup{ display:block; transition:all .14s; }
+  .setup:hover{ border-color:rgba(200,162,74,0.5); transform:translateY(-1px); }
+  .num{ width:30px;height:30px;border-radius:99px;display:grid;place-items:center;font-size:13px;
+        font-family:'JetBrains Mono',monospace; border:1px solid var(--canvas-line); color:var(--ink-faint); }
+  .done .num{ background:var(--gold); color:#241a0c; border-color:var(--gold); }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <span id="who" class="text-sm text-canvas/60"></span>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-8 right-2 text-[20vw] z-0" data-parallax="0.12">✦</div>
+ <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
+  <div class="caps text-[11px] text-gold/80 mb-3">Getting started</div>
+  <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]" id="greeting">Welcome.</h1>
+  <p class="mt-4 max-w-lg text-canvas/70 leading-relaxed">You can start planning right now — setup is optional and you'll only need a card the moment you actually book. Do as much or as little as you like.</p>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="max-w-3xl mx-auto px-6 py-12">
+
+  <a href="03-paste-trip.html" class="btn-gold w-full text-center px-6 py-4 rounded-xl quiet font-semibold block mb-8 text-lg">Plan a trip now — it's free →</a>
+
+  <div class="caps text-[11px] text-ink-faint mb-4">Or set things up first (you can do any of this later)</div>
+  <div class="space-y-3">
+    <a href="02-taste-engine.html" class="setup leaf p-5 flex items-center gap-4" id="s-taste">
+      <span class="num">1</span>
+      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Your taste</span><span class="text-sm text-ink-soft">How you like to fly and stay — so every trip starts as <em>you</em>.</span></span>
+      <span class="text-gold-deep">›</span>
+    </a>
+    <a href="04-connections.html" class="setup leaf p-5 flex items-center gap-4" id="s-wallet">
+      <span class="num">2</span>
+      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Wallet &amp; travel docs</span><span class="text-sm text-ink-soft">Add cards (we pick the best per charge) and your passport / Known Traveler / loyalty.</span></span>
+      <span class="text-gold-deep">›</span>
+    </a>
+    <a href="04-connections.html" class="setup leaf p-5 flex items-center gap-4" id="s-perms">
+      <span class="num">3</span>
+      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Connected services</span><span class="text-sm text-ink-soft">Travel inbox, calendar, loyalty — a permission gradient, granted only as a trip needs it.</span></span>
+      <span class="text-gold-deep">›</span>
+    </a>
+  </div>
+
+  <div class="rule-gold my-8"></div>
+  <p class="text-center text-sm text-ink-soft">The promise: <strong class="text-ink">plan free, pay only when Tures books.</strong> Nothing is charged without your approval.</p>
+ </div>
+</section>
+
+<script src="assets/engine.js"></script>
+<script>
+if(window.tures && tures.account){
+  document.getElementById('greeting').textContent = 'Welcome, ' + (tures.account.name || 'traveler') + '.';
+  document.getElementById('who').textContent = tures.account.email || '';
+}
+// mark a step done if the account already has it (best-effort, only when engine configured)
+if(window.tures && tures.configured){
+  tures.connections.list().then(function(res){
+    var kinds = (res.connections||[]).map(function(c){return c.kind;});
+    if(kinds.indexOf('payment')>=0) document.getElementById('s-wallet').classList.add('done');
+    if(kinds.indexOf('email')>=0 || kinds.indexOf('calendar')>=0) document.getElementById('s-perms').classList.add('done');
+  }).catch(function(){});
+}
+</script>
+</body>
+</html>

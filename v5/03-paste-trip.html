@@ -395,7 +395,22 @@ function realFlow(text){
       chat.appendChild(wrap);
       requestAnimationFrame(function(){ wrap.classList.add('in'); [].forEach.call(wrap.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); });
       wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
-      var cta = document.querySelector('#ctaBar a'); if(cta) cta.textContent = 'Approve & book →';
+      // hand the plan to checkout — pay only happens there, only if they book
+      var cta = document.querySelector('#ctaBar a');
+      if(cta){
+        cta.textContent = 'Approve & book →';
+        cta.href = 'checkout.html';
+        cta.onclick = function(e){
+          e.preventDefault();
+          localStorage.setItem('tures.pendingTrip', JSON.stringify({
+            brief: b,
+            flightId: plan.flight && plan.flight.id, stayId: plan.stay && plan.stay.id,
+            flightTitle: plan.flight && plan.flight.title, stayTitle: plan.stay && plan.stay.title,
+            totalUsd: plan.totalUsd, currency: (plan.flight && plan.flight.currency) || 'USD'
+          }));
+          location.href = (window.tures && tures.signedIn) ? 'checkout.html' : 'signup.html';
+        };
+      }
       setStep(2);
       setTimeout(function(){
         addMsg('Before I book, how are you feeling about <em>this</em> trip?', 't');

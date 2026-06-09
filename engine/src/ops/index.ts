@@ -18,6 +18,7 @@ export function registerOps(app: FastifyInstance) {
     if (!key) return;
     if (req.method === "OPTIONS") return; // never block CORS preflight
     if (req.url === "/health" || req.url.startsWith("/health?")) return;
+    if (req.url === "/waitlist" || req.url.startsWith("/waitlist")) return; // public early-access capture
 
     const auth = req.headers["authorization"];
     const bearer = typeof auth === "string" && auth.startsWith("Bearer ") ? auth.slice(7) : undefined;

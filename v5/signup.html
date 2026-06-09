@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Start planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .fld{ width:100%; border-radius:12px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.75);
+        padding:12px 14px; font-size:15px; color:var(--ink); outline:none; transition:all .14s; }
+  .fld:focus{ border-color:rgba(200,162,74,0.6); box-shadow:0 0 0 3px rgba(200,162,74,0.14); }
+  .tab{ flex:1; text-align:center; padding:10px; font-size:13px; cursor:pointer; color:var(--ink-soft);
+        border-bottom:2px solid transparent; letter-spacing:.04em; }
+  .tab.on{ color:var(--ink); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <a href="index.html" class="text-sm text-canvas/70 quiet">← Back</a>
+  </nav>
+</header>
+
+<main class="leather-surface grain relative overflow-hidden min-h-[88vh] flex items-center">
+ <div class="ghost-num absolute -top-10 right-2 text-[22vw] z-0" data-parallax="0.12">✦</div>
+ <div class="relative z-10 max-w-md w-full mx-auto px-6 py-12">
+  <div class="leaf p-7 sm:p-9">
+    <div class="caps text-[11px] text-gold-deep mb-2">Welcome aboard</div>
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Plan your first trip.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">It's free to plan. You only pay when Tures actually books — and never without your say-so.</p>
+
+    <div class="flex border-b mb-6" style="border-color:var(--canvas-line)">
+      <div class="tab on" data-tab="signup" id="tabSignup">Create account</div>
+      <div class="tab" data-tab="waitlist" id="tabWaitlist">Early access</div>
+    </div>
+
+    <!-- SIGN UP -->
+    <form id="signupForm" class="space-y-3">
+      <input id="suName" class="fld" placeholder="Your name" autocomplete="name" />
+      <input id="suEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <button class="btn-gold w-full px-6 py-3 rounded-xl quiet font-semibold mt-1">Start planning — free →</button>
+      <p class="text-[12px] text-ink-faint text-center pt-1">No card required to start. Plan all you like.</p>
+    </form>
+
+    <!-- WAITLIST -->
+    <form id="waitlistForm" class="space-y-3" style="display:none">
+      <p class="text-sm text-ink-soft leading-relaxed">Not ready to dive in? Get an invite as we open the doors.</p>
+      <input id="wlName" class="fld" placeholder="Your name (optional)" autocomplete="name" />
+      <input id="wlEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <button class="btn-ink w-full px-6 py-3 rounded-xl quiet font-semibold mt-1">Request an invite →</button>
+      <div id="wlMsg" class="text-[13px] text-center pt-1"></div>
+    </form>
+  </div>
+
+  <p class="text-center text-canvas/45 text-xs mt-5">Already exploring? <a href="03-paste-trip.html" class="text-gold quiet underline">Jump to planning</a></p>
+ </div>
+</main>
+
+<script src="assets/engine.js"></script>
+<script>
+function showTab(which){
+  document.getElementById('tabSignup').classList.toggle('on', which==='signup');
+  document.getElementById('tabWaitlist').classList.toggle('on', which==='waitlist');
+  document.getElementById('signupForm').style.display = which==='signup' ? '' : 'none';
+  document.getElementById('waitlistForm').style.display = which==='waitlist' ? '' : 'none';
+}
+document.getElementById('tabSignup').onclick = function(){ showTab('signup'); };
+document.getElementById('tabWaitlist').onclick = function(){ showTab('waitlist'); };
+if(location.hash === '#waitlist') showTab('waitlist');
+
+document.getElementById('signupForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('suName').value.trim();
+  var email = document.getElementById('suEmail').value.trim();
+  if(!email) return;
+  if(window.tures) tures.signUp(name, email);   // per-browser account (works with or without engine)
+  location.href = 'welcome.html';
+});
+
+document.getElementById('waitlistForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('wlEmail').value.trim();
+  var name = document.getElementById('wlName').value.trim();
+  if(!email) return;
+  var msg = document.getElementById('wlMsg');
+  function done(extra){ msg.style.color='var(--confirm)'; msg.innerHTML = "✓ You're on the list." + (extra||''); }
+  if(window.tures && tures.configured){
+    tures.waitlist(email, name).then(function(r){ done(r && r.position ? ' You\'re #' + r.position + '.' : ''); })
+      .catch(function(){ done(''); });
+  } else { done(''); }   // graceful when no engine configured
+  e.target.querySelector('button').textContent = 'Added ✓';
+});
+</script>
+</body>
+</html>
