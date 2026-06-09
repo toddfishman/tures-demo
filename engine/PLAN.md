@@ -96,8 +96,8 @@ and a real Pause/Resume that halts the agent mid-loop (the demo's Pause button, 
 | 3 | **Booking + payment** | Booking state machine, **human-confirm gate**, idempotency, audit log, policy/budget enforcement, mock payment + mock supplier `book()` end-to-end. Stripe charge + Duffel order are deploy-time leaves. Deploy scaffolding (Dockerfile/fly.toml/DEPLOY.md) shipped. | ✅ core done |
 | 4 | **Connected services & permissions** | Encrypted vault (AES-256-GCM), scoped grants matching the demo's toggles (payment/email/calendar/loyalty), revocation; booking now requires a `payment:charge` grant; real Stripe charge path (vault PaymentMethod/Customer, off_session confirm) wired behind the key. Gmail/calendar OAuth providers still deferred. | ✅ core done |
 | 4.5 | **Wallet + traveler profile** | Structured traveler profile (passport/KTN/Redress/DOB + airline/hotel/AAA memberships, encrypted + masked); multi-card wallet with a curated reward catalog + per-charge card selector wired into booking (flight→best airfare card, hotel→best hotel card), reasoning in the audit log. `/profile`, `/wallet/catalog`, `/wallet/recommend`. | ✅ done |
-| 5 | **Hiccup Handler** | Disruption detection + autonomous rebooking within standing instructions. | |
-| 6 | **Hardening + prod deploy** | Postgres (persist bookings/audit), auth, rate limits, observability, `fly deploy`. Wire `v5/05-execution` to the live stream + `03-paste-trip` to `/plan`+`/book`. | |
+| 5 | **Hiccup Handler** | Disruption detection + autonomous rebooking within the brief's standing authority (`rebooking.mode`/`maxUpchargeUsd`); composes search→policy→wallet→book→notify, or proposes. `POST /disruptions`. | ✅ done |
+| 6 | **Hardening + prod deploy** | Auth (API key), rate limits, observability/metrics, shared-state path (Redis) so it can run multi-machine. Demo already wired (`03-paste-trip`, `04`, `05`). | → in progress |
 
 Each chunk is independently runnable and leaves the engine in a working state.
 

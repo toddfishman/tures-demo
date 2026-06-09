@@ -17,6 +17,14 @@ export const BriefSchema = z.object({
   cabin: z.enum(["economy", "premium_economy", "business", "first"]).default("economy"),
   /** Governs how far the agent may go on its own. */
   bookingMode: z.enum(["propose_only", "confirm_each", "auto_within_brief"]).default("confirm_each"),
+  /** Standing authority for the Hiccup Handler: may it auto-rebook on a disruption, and up to
+   *  what fare difference, without asking? Defaults to propose-only. */
+  rebooking: z
+    .object({
+      mode: z.enum(["auto", "propose"]).default("propose"),
+      maxUpchargeUsd: z.number().nonnegative().optional(),
+    })
+    .default({ mode: "propose" }),
 });
 export type Brief = z.infer<typeof BriefSchema>;
 
@@ -54,7 +62,7 @@ export interface SearchResult {
 export interface ExecutionEvent {
   ts: string;
   tripId: string;
-  kind: "search" | "score" | "propose" | "confirm" | "book" | "notify" | "error" | "status";
+  kind: "search" | "score" | "propose" | "confirm" | "book" | "notify" | "error" | "status" | "hiccup";
   label: string;
   detail?: string;
   data?: Record<string, unknown>;

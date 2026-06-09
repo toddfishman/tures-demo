@@ -35,6 +35,7 @@ npm run typecheck        # tsc --noEmit
 | GET | `/profile` | Redacted traveler profile. |
 | GET | `/wallet/catalog` | Curated card types for the wallet picker. |
 | GET | `/wallet/recommend?category=&amount=` | Which connected card the engine would charge, and why. |
+| POST | `/disruptions` | Report a disruption on a booked trip → Hiccup Handler auto-rebooks within standing authority or proposes. |
 | GET | `/stream/:tripId` | Server-Sent Events: the live execution stream for a trip. |
 
 Example:

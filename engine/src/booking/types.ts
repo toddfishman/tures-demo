@@ -15,7 +15,9 @@ export interface BookedComponent {
   title: string;
   amountUsd: number;
   confirmation?: string; // PNR / booking ref once booked
-  status: "pending" | "confirmed" | "failed";
+  status: "pending" | "confirmed" | "failed" | "rebooked";
+  /** Set when the Hiccup Handler replaced a disrupted component. */
+  rebookedFrom?: { title: string; confirmation?: string };
   /** Which card the wallet selector chose for this charge, and why. */
   card?: { connectionId: string; key: string; name: string; last4?: string; reason: string };
   payment?: PaymentRecord;
@@ -50,6 +52,8 @@ export interface Booking {
   charges: PaymentRecord[];
   /** Passenger/traveler details applied from the profile (audit-friendly, no raw PII). */
   passenger?: { note: string; ktnApplied: boolean; passportOnFile: boolean; loyaltyCredited: string[] };
+  /** Disruptions the Hiccup Handler has processed for this booking. */
+  hiccups?: Array<{ ts: string; kind: string; detail: string; resolution: string }>;
   /** Why the gate is open / why it failed — surfaced to the client. */
   violations: string[];
   audit: AuditEntry[];

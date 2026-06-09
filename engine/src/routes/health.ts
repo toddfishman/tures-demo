@@ -17,6 +17,7 @@ export async function healthRoutes(app: FastifyInstance) {
       vault: true, // Chunk 4 — connected services + scoped grants
       wallet: true, // Chunk 4.5 — multi-card selection by reward value
       travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
+      hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
     },
   }));
 }

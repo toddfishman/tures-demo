@@ -221,6 +221,40 @@ let bookingId = "";
   ok("duplicate /book with same idempotencyKey is deduped");
 }
 
+// 13. Hiccup Handler: auto-rebook a cancellation within standing authority
+{
+  const autoBrief = { ...brief, rebooking: { mode: "auto", maxUpchargeUsd: 5000 } };
+  const bk = (await app.inject({ method: "POST", url: "/book", payload: { brief: autoBrief } })).json();
+  await app.inject({ method: "POST", url: `/book/${bk.id}/confirm` });
+  const beforeFlight = (await (await app.inject({ method: "GET", url: `/book/${bk.id}` })).json()).components.find((c: any) => c.kind === "flight");
+  const res = await app.inject({ method: "POST", url: "/disruptions", payload: { bookingId: bk.id, kind: "cancellation", detail: "flight cancelled" } });
+  assert.equal(res.statusCode, 200);
+  const { resolution, booking } = res.json();
+  assert.equal(resolution.status, "rebooked", "auto-rebooked");
+  const flight = booking.components.find((c: any) => c.kind === "flight");
+  assert.equal(flight.status, "rebooked");
+  assert.ok(flight.confirmation && flight.confirmation !== beforeFlight.confirmation, "new confirmation issued");
+  assert.ok(flight.rebookedFrom, "records what it replaced");
+  assert.ok(booking.audit.some((a: any) => a.action === "disruption_detected"), "audit: detected");
+  assert.ok(booking.audit.some((a: any) => a.action === "rebooked"), "audit: rebooked");
+  assert.ok(booking.hiccups && booking.hiccups.length === 1, "hiccup recorded on booking");
+  ok("Hiccup Handler auto-rebooks within standing authority");
+}
+
+// 14. Hiccup Handler: propose-only (no standing authority) — no charge, original untouched
+{
+  const bk = (await app.inject({ method: "POST", url: "/book", payload: { brief } })).json(); // default rebooking = propose
+  await app.inject({ method: "POST", url: `/book/${bk.id}/confirm` });
+  const chargesBefore = (await (await app.inject({ method: "GET", url: `/book/${bk.id}` })).json()).charges.length;
+  const res = await app.inject({ method: "POST", url: "/disruptions", payload: { bookingId: bk.id, kind: "schedule_change" } });
+  const { resolution, booking } = res.json();
+  assert.equal(resolution.status, "proposed", "proposed, not auto");
+  assert.ok(resolution.to && resolution.upchargeUsd !== undefined, "proposal names an option + cost");
+  assert.equal(booking.charges.length, chargesBefore, "no extra charge on a proposal");
+  assert.ok(booking.audit.some((a: any) => a.action === "rebook_proposed"), "audit: proposed");
+  ok("Hiccup Handler proposes (no auto-charge) without standing authority");
+}
+
 // 12. revoking all payment methods blocks new bookings at the policy gate
 {
   await app.inject({ method: "POST", url: `/connections/${platConnId}/revoke` });
