@@ -21,6 +21,7 @@ function audit(b: Booking, actor: Booking["audit"][number]["actor"], action: str
 
 export interface CreateBookingInput {
   brief: Brief;
+  accountId?: string;
   flightId?: string;
   stayId?: string;
   idempotencyKey?: string;
@@ -33,6 +34,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     if (existing) return existing;
   }
 
+  const accountId = input.accountId ?? "demo";
   const supplier = getSupplier();
   const { flights, stays } = await runSearch(tripId, input.brief); // emits search + score
   const flight = (input.flightId && flights.find((o) => o.id === input.flightId)) || flights[0];
@@ -40,7 +42,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
   const totalUsd = (flight?.priceUsd ?? 0) + (stay?.priceUsd ?? 0);
   const currency = flight?.currency ?? stay?.currency ?? "USD";
 
-  const violations = checkPolicy({ brief: input.brief, flight, stay, totalUsd, supplier });
+  const violations = checkPolicy({ accountId, brief: input.brief, flight, stay, totalUsd, supplier });
 
   const now = new Date().toISOString();
   const components: BookedComponent[] = [];
@@ -50,6 +52,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
   const booking: Booking = {
     id: nextBookingId(),
     tripId,
+    accountId,
     brief: input.brief,
     status: violations.length ? "failed" : "confirmation_required",
     totalUsd,
@@ -107,7 +110,7 @@ async function execute(booking: Booking): Promise<Booking> {
   try {
     // 1. Charge — idempotency key bound to the booking so a retry never double-charges.
     const idemKey = booking.idempotencyKey ?? booking.id;
-    booking.payment = await payments.charge(booking.totalUsd, booking.currency, idemKey);
+    booking.payment = await payments.charge(booking.totalUsd, booking.currency, idemKey, { accountId: booking.accountId });
     audit(booking, "system", "payment_charged", `${booking.payment.provider} ${booking.payment.intentId} · $${booking.totalUsd.toLocaleString()} · ${booking.payment.status}`);
     emitEvent(booking.tripId, "book", "Payment authorized", { detail: `${booking.payment.provider} · $${booking.totalUsd.toLocaleString()}`, data: { bookingId: booking.id } });
 

@@ -94,7 +94,7 @@ and a real Pause/Resume that halts the agent mid-loop (the demo's Pause button, 
 | 1 | **Deal search (read-only)** | Duffel adapter (flights + stays) in test mode, normalized `Offer` model, scoring v1, `/search` endpoints. No booking. | ✅ core done |
 | 2 | **Agent loop** | Claude tool-use orchestrator: brief → search → score → **propose a plan**. Streams real events to SSE. Still no booking. | ✅ done |
 | 3 | **Booking + payment** | Booking state machine, **human-confirm gate**, idempotency, audit log, policy/budget enforcement, mock payment + mock supplier `book()` end-to-end. Stripe charge + Duffel order are deploy-time leaves. Deploy scaffolding (Dockerfile/fly.toml/DEPLOY.md) shipped. | ✅ core done |
-| 4 | **Connected services & permissions** | Credential vault; scoped grants matching the demo's permission toggles; Gmail/calendar read for confirmations. Finishes the real Stripe charge (PaymentMethod/Customer). | → next |
+| 4 | **Connected services & permissions** | Encrypted vault (AES-256-GCM), scoped grants matching the demo's toggles (payment/email/calendar/loyalty), revocation; booking now requires a `payment:charge` grant; real Stripe charge path (vault PaymentMethod/Customer, off_session confirm) wired behind the key. Gmail/calendar OAuth providers still deferred. | ✅ core done |
 | 5 | **Hiccup Handler** | Disruption detection + autonomous rebooking within standing instructions. | |
 | 6 | **Hardening + prod deploy** | Postgres (persist bookings/audit), auth, rate limits, observability, `fly deploy`. Wire `v5/05-execution` to the live stream + `03-paste-trip` to `/plan`+`/book`. | |
 

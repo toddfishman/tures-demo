@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { build } from "../src/server.ts";
 import { bus } from "../src/events/bus.ts";
+import { encrypt, decrypt } from "../src/vault/crypto.ts";
 
 let passed = 0;
 function ok(name: string) {
@@ -84,6 +85,40 @@ let tripId = "";
   ok("invalid brief rejected with 400 + issues");
 }
 
+// 5a. vault crypto: AES-256-GCM round-trips, ciphertext hides the plaintext, tampering fails
+{
+  const secret = JSON.stringify({ customerId: "cus_live", paymentMethodId: "pm_live" });
+  const blob = encrypt(secret);
+  assert.notEqual(blob, secret, "ciphertext differs from plaintext");
+  assert.ok(!blob.includes("cus_live"), "plaintext not present in ciphertext");
+  assert.equal(decrypt(blob), secret, "round-trips back to the original");
+  const tampered = "A" + blob.slice(1);
+  assert.throws(() => decrypt(tampered), "GCM auth tag rejects tampering");
+  ok("vault crypto: AES-256-GCM round-trip + tamper detection");
+}
+
+// 5b. vault: connecting a service redacts the secret and grants scopes
+let paymentConnId = "";
+{
+  const res = await app.inject({
+    method: "POST",
+    url: "/connections",
+    payload: { kind: "payment", label: "AmEx ··1004", secret: { customerId: "cus_x", paymentMethodId: "pm_x" }, meta: { last4: "1004" } },
+  });
+  assert.equal(res.statusCode, 200);
+  const c = res.json();
+  paymentConnId = c.id;
+  assert.equal(c.secretCipher, undefined, "secret never returned to client");
+  assert.ok(c.scopes.includes("payment:charge"), "payment grant present");
+  const listed = (await (await app.inject({ method: "GET", url: "/connections" })).json()).connections;
+  assert.ok(listed.every((x: any) => x.secretCipher === undefined), "list is redacted");
+  ok("vault connects a payment method (redacted) and grants payment:charge");
+}
+
+// 5c. without a payment grant, booking is blocked (prove the grant gate before connecting above
+//     would have failed — here we confirm the positive path needs the connection)
+//     handled implicitly: tests 6–11 only pass because the payment method is connected.
+
 // 6. booking gate: confirm_each opens the gate and charges NOTHING
 let bookingId = "";
 {
@@ -151,6 +186,16 @@ let bookingId = "";
   const b = (await app.inject({ method: "POST", url: "/book", payload: { brief, idempotencyKey: key } })).json();
   assert.equal(a.id, b.id, "same idempotency key → same booking");
   ok("duplicate /book with same idempotencyKey is deduped");
+}
+
+// 12. revoking the payment method blocks new bookings at the policy gate
+{
+  const rev = await app.inject({ method: "POST", url: `/connections/${paymentConnId}/revoke` });
+  assert.equal(rev.json().status, "revoked");
+  const res = await app.inject({ method: "POST", url: "/book", payload: { brief } });
+  assert.equal(res.statusCode, 409, "no payment method → blocked");
+  assert.ok(res.json().violations.some((v: string) => /payment method/.test(v)), "violation cites payment method");
+  ok("revoking the payment method immediately blocks new bookings");
 }
 
 await app.close();

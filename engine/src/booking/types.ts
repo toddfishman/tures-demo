@@ -37,6 +37,7 @@ export interface AuditEntry {
 export interface Booking {
   id: string;
   tripId: string;
+  accountId: string;
   brief: Brief;
   status: BookingStatus;
   totalUsd: number;

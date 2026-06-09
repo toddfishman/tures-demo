@@ -1,14 +1,19 @@
-// Payment provider. Mirrors the supplier pattern: a deterministic Mock provider so the whole
-// booking flow runs and tests with NO keys, and a guarded Stripe path that is wired at deploy
-// time (real charges need a PaymentMethod + customer, which only exist with live credentials).
+// Payment provider. Mock runs with no keys; Stripe charges a PaymentMethod stored in the vault
+// (Chunk 4). Both require a connected `payment` service for the account — you cannot charge a
+// card the user never connected.
 import type { PaymentRecord } from "./types.ts";
 import { config } from "../config.ts";
+import { activeConnection, reveal } from "../vault/index.ts";
+
+export interface ChargeContext {
+  accountId: string;
+}
 
 export interface PaymentProvider {
   readonly provider: "stripe" | "mock";
   readonly live: boolean;
   /** Charge in the traveler's name. idempotencyKey guarantees one charge per booking. */
-  charge(amountUsd: number, currency: string, idempotencyKey: string): Promise<PaymentRecord>;
+  charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord>;
 }
 
 function hash(s: string): string {
@@ -23,7 +28,11 @@ function hash(s: string): string {
 class MockPayments implements PaymentProvider {
   readonly provider = "mock" as const;
   readonly live = false;
-  async charge(amountUsd: number, currency: string, idempotencyKey: string): Promise<PaymentRecord> {
+  async charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord> {
+    // Even in mock mode, a payment method must be connected — mirrors the real authorization rule.
+    if (!activeConnection(ctx.accountId, "payment")) {
+      throw new Error("no_payment_method: connect a payment method before booking");
+    }
     return {
       provider: "mock",
       intentId: `pi_mock_${hash(idempotencyKey)}`,
@@ -38,11 +47,39 @@ class MockPayments implements PaymentProvider {
 class StripePayments implements PaymentProvider {
   readonly provider = "stripe" as const;
   readonly live = true;
-  async charge(): Promise<PaymentRecord> {
-    // Real Stripe PaymentIntent confirmation is finished in the deploy pass: it needs a stored
-    // PaymentMethod + Customer from the connected-accounts flow (Chunk 4). Guarded so we never
-    // half-charge.
-    throw new Error("stripe_not_wired: live Stripe charging lands at deploy time (needs PaymentMethod/Customer)");
+  async charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord> {
+    const conn = activeConnection(ctx.accountId, "payment");
+    if (!conn) throw new Error("no_payment_method: connect a payment method before booking");
+
+    // The vault holds the Stripe Customer + PaymentMethod created via the connect flow (SetupIntent).
+    const cred = reveal(conn) as { customerId?: string; paymentMethodId?: string };
+    if (!cred.customerId || !cred.paymentMethodId) {
+      throw new Error("payment_connection_incomplete: missing Stripe customer/payment_method");
+    }
+
+    const { default: Stripe } = await import("stripe");
+    const stripe = new Stripe(config.stripeKey!);
+    // off_session + confirm: charge the stored method now. Idempotency key prevents double charges.
+    const intent = await stripe.paymentIntents.create(
+      {
+        amount: Math.round(amountUsd * 100),
+        currency: currency.toLowerCase(),
+        customer: cred.customerId,
+        payment_method: cred.paymentMethodId,
+        off_session: true,
+        confirm: true,
+      },
+      { idempotencyKey },
+    );
+
+    return {
+      provider: "stripe",
+      intentId: intent.id,
+      amountUsd,
+      currency,
+      status: intent.status === "succeeded" ? "succeeded" : intent.status === "requires_confirmation" ? "requires_confirmation" : "failed",
+      live: !config.stripeKey!.startsWith("sk_test_"),
+    };
   }
 }
 

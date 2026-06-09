@@ -14,6 +14,7 @@ export async function healthRoutes(app: FastifyInstance) {
       booking: true, // Chunk 3 — gate + mock execution always available
       paymentProvider: config.payments, // "mock" until a Stripe key is set
       liveBookingAllowed: config.allowLiveBooking, // hard safety switch
+      vault: true, // Chunk 4 — connected services + scoped grants
     },
   }));
 }

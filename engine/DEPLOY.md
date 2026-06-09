@@ -22,9 +22,13 @@ fly secrets set DUFFEL_API_TOKEN=duffel_test_xxx
 # Real agent loop (Claude tool-use planning instead of the deterministic planner)
 fly secrets set ANTHROPIC_API_KEY=sk-ant-xxx
 
-# Payments (Stripe). NOTE: live charging needs a stored PaymentMethod/Customer from the
-# connected-accounts flow (Chunk 4) — until then the engine uses mock payments even with a key.
+# Payments (Stripe). Charges a PaymentMethod stored in the vault via POST /connections
+# (kind:"payment", secret:{customerId, paymentMethodId} from your Stripe SetupIntent flow).
 fly secrets set STRIPE_SECRET_KEY=sk_test_xxx
+
+# Vault encryption key (32 bytes). Without it the vault uses an ephemeral key and connected
+# credentials are lost on restart — set this in any real deploy.
+fly secrets set VAULT_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 ```
 
 ### The real-money safety switch

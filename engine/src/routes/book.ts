@@ -6,6 +6,7 @@ import { bookings } from "../booking/store.ts";
 
 const BookBody = z.object({
   brief: BriefSchema,
+  accountId: z.string().optional(),
   flightId: z.string().optional(),
   stayId: z.string().optional(),
   idempotencyKey: z.string().min(8).optional(),

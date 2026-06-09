@@ -3,7 +3,7 @@
 The agentic booking engine behind the Tures demo. See [`PLAN.md`](./PLAN.md) for the full
 architecture and the chunk-by-chunk roadmap.
 
-**Status:** Chunk 0 foundation ✅ · Chunk 1 deal search ✅ · Chunk 2 agent loop (Claude tool-use) ✅ · Chunk 3 booking + confirm gate ✅ core. Deploy: see [`DEPLOY.md`](./DEPLOY.md).
+**Status:** Chunk 0 foundation ✅ · 1 deal search ✅ · 2 agent loop (Claude tool-use) ✅ · 3 booking + confirm gate ✅ · 4 vault + scoped permissions + Stripe charge path ✅ core. Deploy: see [`DEPLOY.md`](./DEPLOY.md).
 
 ## Run it
 
@@ -28,6 +28,9 @@ npm run typecheck        # tsc --noEmit
 | POST | `/book` | Open a booking. Default opens the **confirm gate** (charges nothing); `auto_within_brief` books immediately. Over-budget → 409. |
 | POST | `/book/:id/confirm` | The human-confirm gate. Charges once + books each component. Idempotent. |
 | GET | `/book/:id` | Booking status + full audit trail. |
+| POST | `/connections` | Connect a service (payment/email/calendar/loyalty). Secret encrypted at rest; response redacted. |
+| GET | `/connections` | List connected services (redacted, no secrets). |
+| POST | `/connections/:id/revoke` | Revoke a grant — immediate for new actions. |
 | GET | `/stream/:tripId` | Server-Sent Events: the live execution stream for a trip. |
 
 Example:

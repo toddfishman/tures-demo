@@ -3,8 +3,10 @@
 import type { Brief, Offer } from "../types.ts";
 import { config } from "../config.ts";
 import type { SupplierAdapter } from "../suppliers/adapter.ts";
+import { hasScope } from "../vault/index.ts";
 
 export interface PolicyInput {
+  accountId: string;
   brief: Brief;
   flight?: Offer;
   stay?: Offer;
@@ -24,6 +26,11 @@ export function checkPolicy(input: PolicyInput): string[] {
 
   // Must have something bookable.
   if (!input.flight && !input.stay) v.push("nothing to book (no flight or stay selected)");
+
+  // Authorization: a payment method must be connected and grant payment:charge (Chunk 4 vault).
+  if (!hasScope(input.accountId, "payment:charge")) {
+    v.push("no payment method connected (grant payment:charge by connecting a card)");
+  }
 
   // Real-money safety: refuse a live supplier unless explicitly allowed.
   if (input.supplier.isLive && !config.allowLiveBooking) {

@@ -7,6 +7,7 @@ import { healthRoutes } from "./routes/health.ts";
 import { searchRoutes } from "./routes/search.ts";
 import { planRoutes } from "./routes/plan.ts";
 import { bookRoutes } from "./routes/book.ts";
+import { connectionRoutes } from "./routes/connections.ts";
 import { streamRoutes } from "./routes/stream.ts";
 
 export async function build() {
@@ -22,6 +23,7 @@ export async function build() {
   await app.register(searchRoutes);
   await app.register(planRoutes);
   await app.register(bookRoutes);
+  await app.register(connectionRoutes);
   await app.register(streamRoutes);
 
   return app;
