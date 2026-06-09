@@ -205,6 +205,7 @@
   </div>
 </div>
 
+<script src="assets/engine.js"></script>
 <script>
 /* ---------- live agent stream: skeleton → typewriter fade-in ---------- */
 var SEED = [
@@ -304,10 +305,28 @@ document.getElementById('pauseBtn').addEventListener('click', function(){
   document.getElementById('pauseIcon').textContent = paused?'▶':'⏸';
   document.getElementById('pauseLbl').textContent = paused?'Resume':'Pause';
   document.getElementById('liveDot').className = paused?'dot dot-amber':'dot dot-gold pulse';
-  if(!paused) drip();
+  if(!paused){ drip(); if(window._turesFlush) window._turesFlush(); }
 });
 
-boot();
+/* Live engine stream when ?trip=… and an engine is configured; scripted demo otherwise. */
+var _tripParam = new URLSearchParams(location.search).get('trip');
+if (window.tures && tures.configured && _tripParam) { liveBoot(_tripParam); } else { boot(); }
+
+function liveBoot(tripId){
+  document.getElementById('liveDot').className = 'dot dot-gold pulse';
+  skeleton();
+  setTimeout(function(){
+    stream.innerHTML = '';
+    var buffer = [];
+    function renderEv(ev){ pushEvent([ (ev.ts||'').slice(11,19), ev.label, ev.detail||'' ], true); }
+    window._turesFlush = function(){ while(buffer.length){ renderEv(buffer.shift()); } };
+    tures.stream(tripId, function(ev){
+      if(paused){ buffer.push(ev); return; }
+      renderEv(ev);
+      if(ev.kind === 'notify') document.getElementById('liveDot').className = 'dot dot-green';
+    });
+  }, 900);
+}
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>

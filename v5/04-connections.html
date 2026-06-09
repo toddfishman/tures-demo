@@ -171,9 +171,29 @@
   <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
 </div></div>
 
+<script src="assets/engine.js"></script>
 <script>
 var REQUIRED = ['card','loyalty','calendar','inbox'];
 function rowFor(name){ return document.querySelector('.perm[data-perm="'+name+'"]'); }
+
+/* When an engine is configured, the toggles connect/revoke real vault grants (kept additive —
+   the scripted UX is unchanged either way). */
+var ENGINE_KIND = { card:'payment', loyalty:'loyalty', calendar:'calendar', inbox:'email' };
+var ENGINE_LABEL = { card:'AmEx ··1004', loyalty:'Loyalty programs', calendar:'Calendar', inbox:'Travel inbox' };
+var ENGINE_SECRET = { card:{ customerId:'cus_demo', paymentMethodId:'pm_demo' } };
+var _connIds = {};
+function syncEngine(name, on){
+  if(!(window.tures && tures.configured)) return;
+  var kind = ENGINE_KIND[name]; if(!kind) return; // messaging has no vault kind
+  if(on){
+    tures.connections.connect({ kind:kind, label:ENGINE_LABEL[name]||name, secret:ENGINE_SECRET[name]||{ token:'demo' }, meta:{ source:'demo' } })
+      .then(function(c){ _connIds[name] = c.id; })
+      .catch(function(e){ console.warn('[tures] connect failed', name, e); });
+  } else if(_connIds[name]){
+    tures.connections.revoke(_connIds[name]).catch(function(e){ console.warn('[tures] revoke failed', name, e); });
+    delete _connIds[name];
+  }
+}
 function setGranted(name, on){
   var row = rowFor(name); if(!row) return;
   var sw = row.querySelector('.switch');
@@ -181,6 +201,7 @@ function setGranted(name, on){
   row.classList.toggle('granted', on);
   if(on){ row.classList.remove('grant-flash'); void row.offsetWidth; row.classList.add('grant-flash'); }
   update();
+  syncEngine(name, on);
 }
 function update(){
   var on = [].slice.call(document.querySelectorAll('.switch.on')).length;

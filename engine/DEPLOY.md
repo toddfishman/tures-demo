@@ -55,9 +55,22 @@ fly open /health      # confirm it's up; shows which capabilities are live
   "liveBookingAllowed": false } }
 ```
 
-## Wiring the demo to the live engine (Chunk 6)
+## Pointing the demo at the live engine
 
-Once deployed, point the demo's execution stream at it: in `v5/05-execution.html`, replace the
-hardcoded `QUEUE` drip with `new EventSource("https://<your-app>.fly.dev/stream/" + tripId)`, and
-have `v5/03-paste-trip.html` POST the composed brief to `/plan` (then `/book`). CORS is already
-allowed for the GitHub Pages origin in `fly.toml`.
+The demo is already wired (see `v5/assets/engine.js`). It calls the engine when an engine URL is
+configured and falls back to the scripted demo otherwise — so the public Pages site is unaffected
+until you opt in. To activate against your deployed engine:
+
+- **Per visit:** add `?engine=https://<your-app>.fly.dev` to any v5 URL (it's remembered in
+  localStorage), or run `tures.use('https://<your-app>.fly.dev')` in the browser console.
+- **Always-on:** set the default in `engine.js` (replace the empty `url` fallback with your
+  Fly URL) and redeploy Pages.
+
+What lights up once configured:
+- `03-paste-trip.html` — the chat composer POSTs prose to `/parse` → `/plan`, renders the real
+  proposed flight + stay, and streams live `/stream/:tripId` events into the thread.
+- `05-execution.html` — with `?trip=<tripId>`, streams real execution events instead of the
+  hardcoded `QUEUE` (Pause/Resume buffers live events).
+- `04-connections.html` — the permission toggles connect/revoke real vault grants.
+
+CORS for the GitHub Pages origin is already set in `fly.toml`.

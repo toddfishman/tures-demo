@@ -1,0 +1,121 @@
+// Prose → Brief. Turns a free-text trip description ("two of us, a long weekend in Lisbon,
+// somewhere design-y") into the structured Brief the engine plans against. With an Anthropic key
+// Claude does the extraction; without one, a heuristic produces a best-effort Brief plus a list
+// of the assumptions it made — so the chat's "describe it once" promise works either way.
+import { BriefSchema } from "../types.ts";
+import type { Brief } from "../types.ts";
+import { config } from "../config.ts";
+import { log } from "../logger.ts";
+
+export interface ParseResult {
+  brief: Brief;
+  assumptions: string[];
+  via: "agent" | "heuristic";
+}
+
+// Minimal city → IATA table for the heuristic path (the agent path needs none).
+const CITY_IATA: Record<string, string> = {
+  paris: "CDG", lisbon: "LIS", london: "LHR", "new york": "JFK", tokyo: "HND",
+  kyoto: "KIX", seattle: "SEA", "san francisco": "SFO", "sf": "SFO", copenhagen: "CPH",
+  helsinki: "HEL", ivalo: "IVL", rome: "FCO", barcelona: "BCN", amsterdam: "AMS",
+  berlin: "BER", reykjavik: "KEF", oslo: "OSL", stockholm: "ARN", lima: "LIM",
+};
+
+function isoDaysFromNow(days: number): string {
+  const ms = Date.parse("2026-06-09T00:00:00Z") + days * 86400000; // stable base; refined by deploy clock
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+function heuristicParse(text: string): ParseResult {
+  const t = text.toLowerCase();
+  const assumptions: string[] = [];
+
+  const found: string[] = [];
+  for (const city of Object.keys(CITY_IATA)) {
+    if (t.includes(city)) found.push(city);
+  }
+  const fromMatch = t.match(/from\s+([a-z\s]+?)[,.\n]/);
+  const fromCity = fromMatch?.[1]?.trim() ?? "";
+  const origin = CITY_IATA[fromCity] ?? "SFO";
+  if (!CITY_IATA[fromCity]) assumptions.push("assumed home airport SFO");
+
+  const destCity = found.find((c) => CITY_IATA[c] !== origin) ?? found[0];
+  const destination = destCity ? CITY_IATA[destCity]! : "LIS";
+  if (!destCity) assumptions.push("could not find a destination — defaulted to Lisbon (LIS)");
+
+  let adults = 1;
+  if (/family of (\d+)|(\d+) of us|party of (\d+)/.test(t)) {
+    const m = t.match(/family of (\d+)|(\d+) of us|party of (\d+)/)!;
+    adults = Number(m[1] || m[2] || m[3]) || 1;
+  } else if (/\b(couple|two of us|both of us|me and|my partner|my wife|my husband)\b/.test(t)) {
+    adults = 2;
+  }
+
+  const cabin = /business/.test(t)
+    ? "business"
+    : /premium economy/.test(t)
+      ? "premium_economy"
+      : /first class/.test(t)
+        ? "first"
+        : "economy";
+
+  const placeTypes: string[] = [];
+  for (const kw of ["design-hotel", "design", "boutique", "ryokan", "sauna", "spa", "waterfront", "minimalist", "grand"]) {
+    if (t.includes(kw.replace("-hotel", "")) || t.includes(kw)) placeTypes.push(kw);
+  }
+
+  const departDate = isoDaysFromNow(45);
+  const returnDate = /weekend/.test(t) ? isoDaysFromNow(48) : isoDaysFromNow(52);
+  assumptions.push(`assumed dates ${departDate} → ${returnDate} (none clearly stated)`);
+
+  const brief = BriefSchema.parse({
+    origin, destination, departDate, returnDate, adults, cabin,
+    placeTypes: [...new Set(placeTypes)], bookingMode: "confirm_each",
+  });
+  return { brief, assumptions, via: "heuristic" };
+}
+
+export async function parseBrief(text: string): Promise<ParseResult> {
+  if (!config.anthropicKey) return heuristicParse(text);
+
+  try {
+    const { default: Anthropic } = await import("@anthropic-ai/sdk");
+    const client = new Anthropic({ apiKey: config.anthropicKey });
+    const resp = await client.messages.create({
+      model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
+      max_tokens: 512,
+      system:
+        "Extract a structured travel brief from the user's prose. Use IATA codes for origin/" +
+        "destination. If something isn't stated, choose a sensible default and note it. Call emit_brief.",
+      tools: [
+        {
+          name: "emit_brief",
+          description: "Return the structured brief.",
+          input_schema: {
+            type: "object",
+            properties: {
+              origin: { type: "string" }, destination: { type: "string" },
+              departDate: { type: "string" }, returnDate: { type: "string" },
+              adults: { type: "number" },
+              cabin: { type: "string", enum: ["economy", "premium_economy", "business", "first"] },
+              placeTypes: { type: "array", items: { type: "string" } },
+              assumptions: { type: "array", items: { type: "string" } },
+            },
+            required: ["origin", "destination", "departDate"],
+          },
+        },
+      ],
+      tool_choice: { type: "tool", name: "emit_brief" },
+      messages: [{ role: "user", content: text }],
+    });
+    const toolUse = resp.content.find((b) => b.type === "tool_use");
+    if (toolUse && toolUse.type === "tool_use") {
+      const input = toolUse.input as any;
+      const brief = BriefSchema.parse({ ...input, bookingMode: "confirm_each" });
+      return { brief, assumptions: input.assumptions ?? [], via: "agent" };
+    }
+  } catch (e) {
+    log.warn("parse via agent failed, falling back to heuristic", { err: String(e) });
+  }
+  return heuristicParse(text);
+}

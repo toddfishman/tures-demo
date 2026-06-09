@@ -6,6 +6,7 @@ import { log } from "./logger.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { searchRoutes } from "./routes/search.ts";
 import { planRoutes } from "./routes/plan.ts";
+import { parseRoutes } from "./routes/parse.ts";
 import { bookRoutes } from "./routes/book.ts";
 import { connectionRoutes } from "./routes/connections.ts";
 import { streamRoutes } from "./routes/stream.ts";
@@ -13,15 +14,19 @@ import { streamRoutes } from "./routes/stream.ts";
 export async function build() {
   const app = Fastify({ logger: false });
 
+  // Wildcard → literal "*" (emits Access-Control-Allow-Origin: *). Otherwise an explicit
+  // allowlist that reflects a matching Origin. (origin:true is avoided — it can omit the
+  // allow-origin header on some setups, which silently breaks browser CORS.)
+  const wildcard = config.corsOrigins.length === 1 && config.corsOrigins[0] === "*";
   await app.register(cors, {
-    origin: config.corsOrigins.length === 1 && config.corsOrigins[0] === "*"
-      ? true
-      : config.corsOrigins,
+    origin: wildcard ? "*" : config.corsOrigins,
+    methods: ["GET", "POST", "OPTIONS"],
   });
 
   await app.register(healthRoutes);
   await app.register(searchRoutes);
   await app.register(planRoutes);
+  await app.register(parseRoutes);
   await app.register(bookRoutes);
   await app.register(connectionRoutes);
   await app.register(streamRoutes);

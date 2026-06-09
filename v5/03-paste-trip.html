@@ -189,6 +189,7 @@
   </div>
 </div>
 
+<script src="assets/engine.js"></script>
 <script>
 var chat = document.getElementById('chat');
 var sugEl = document.getElementById('suggestions');
@@ -303,7 +304,11 @@ function sendBrief(){
   composer.value = ''; autoGrow();
   sugEl.innerHTML = '';
   setStep(1);
+  if (window.tures && tures.configured) { realFlow(text); } else { scriptedFlow(); }
+}
 
+/* ---------- scripted demo flow (no engine configured) ---------- */
+function scriptedFlow(){
   // typing → thinking (cycling reasons) → plan
   var t = typing();
   setTimeout(function(){
@@ -347,6 +352,65 @@ function sendBrief(){
       document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
     }, 1800);
   }, 950);
+}
+
+/* ---------- live engine flow (?engine=… configured) ---------- */
+function offerCard(o){
+  var reasons = (o.scoreReasons && o.scoreReasons.length) ? ' — ' + o.scoreReasons.join(', ') : '';
+  return {
+    type: o.kind === 'flight' ? 'fly' : 'stay',
+    title: o.title,
+    meta: (o.currency || 'USD') + ' ' + Math.round(o.priceUsd).toLocaleString(),
+    detail: (o.summary || []).join(' · ') + reasons,
+  };
+}
+function realFlow(text){
+  document.getElementById('threadStatus').textContent = 'Live engine · ' + tures.url.replace(/^https?:\/\//, '');
+  var t = typing();
+  tures.parse(text).then(function(p){
+    t.remove();
+    var b = p.brief;
+    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + b.adults + ' traveler' + (b.adults>1?'s':'') + ' · ' + b.cabin +
+      (p.assumptions && p.assumptions.length ? ' <span class="text-ink-faint">(' + p.assumptions.join('; ') + ')</span>' : ''), 't');
+    var act = actingPill('Searching live inventory…');
+    return tures.plan(b).then(function(plan){
+      // stream the real execution events into the thread as a muted log
+      var logWrap = document.createElement('div'); logWrap.className = 'msg text-[12px] text-ink-faint space-y-1 pl-1';
+      chat.appendChild(logWrap); requestAnimationFrame(function(){ logWrap.classList.add('in'); });
+      var seen = {};
+      var es = tures.stream(plan.tripId, function(ev){
+        var k = ev.kind + ':' + ev.label; if(seen[k]) return; seen[k] = 1;
+        var line = document.createElement('div');
+        line.innerHTML = '· ' + ev.label + (ev.detail ? ' — <span class="text-ink-soft">' + ev.detail + '</span>' : '');
+        logWrap.appendChild(line); logWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+        if(ev.kind === 'propose' || ev.kind === 'notify') setTimeout(function(){ try{es.close();}catch(_){} }, 300);
+      });
+      setTimeout(function(){ try{es.close();}catch(_){} }, 5000);
+
+      act.remove();
+      var cards = []; if(plan.flight) cards.push(offerCard(plan.flight)); if(plan.stay) cards.push(offerCard(plan.stay));
+      addMsg('Here\'s what I\'d book — <strong>' + (plan.withinBudget ? 'within budget' : 'over budget') + '</strong>. ' + (plan.rationale || ''), 't');
+      var wrap = document.createElement('div'); wrap.className = 'msg space-y-2.5 mt-1';
+      wrap.innerHTML = cards.map(legCard).join('');
+      chat.appendChild(wrap);
+      requestAnimationFrame(function(){ wrap.classList.add('in'); [].forEach.call(wrap.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); });
+      wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+      var cta = document.querySelector('#ctaBar a'); if(cta) cta.textContent = 'Approve & book →';
+      setStep(2);
+      setTimeout(function(){
+        addMsg('Before I book, how are you feeling about <em>this</em> trip?', 't');
+        var s = document.getElementById('sentiment'); s.classList.remove('hidden');
+        requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
+        document.getElementById('ctaBar').style.display = ''; s.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 700);
+      planned = true;
+      document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
+    });
+  }).catch(function(err){
+    try{ t.remove(); }catch(_){}
+    addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
+    scriptedFlow();
+  });
 }
 
 function restart(){
