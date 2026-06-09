@@ -73,6 +73,9 @@ export function findByEmail(email: string): User | undefined {
 export function getUser(id: string): User | undefined {
   return users.get(id);
 }
+export function findByStripeCustomer(customerId: string): User | undefined {
+  return users.values().find((u) => u.stripeCustomerId === customerId);
+}
 export function createUser(email: string, name: string, password: string): User {
   const u: User = {
     id: `acct_${Date.now().toString(36)}_${counter++}`,

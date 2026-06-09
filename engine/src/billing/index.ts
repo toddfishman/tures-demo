@@ -2,7 +2,7 @@
 // us). The per-trip concierge fee is charged with the booking (see booking/service). Gated by
 // STRIPE_SECRET_KEY: without it, "subscribe" activates in mock mode so the demo still flows.
 import { config } from "../config.ts";
-import { getUser, saveUser } from "../auth/index.ts";
+import { getUser, saveUser, findByStripeCustomer } from "../auth/index.ts";
 import { log } from "../logger.ts";
 
 export interface CheckoutResult {
@@ -59,6 +59,15 @@ export async function handleWebhook(rawBody: Buffer, signature: string | undefin
       if (customerId) user.stripeCustomerId = customerId;
       saveUser(user);
       log.info("billing: subscription confirmed", { accountId });
+    }
+  } else if (event.type === "customer.subscription.deleted") {
+    // Cancellation (or end of a failed/expired subscription) → back to free.
+    const customerId = event.data.object.customer as string | undefined;
+    const user = customerId ? findByStripeCustomer(customerId) : undefined;
+    if (user) {
+      user.plan = "free";
+      saveUser(user);
+      log.info("billing: subscription ended → free", { accountId: user.id });
     }
   }
   return { handled: true };
