@@ -52,6 +52,17 @@ export class MockSupplier implements SupplierAdapter {
     });
   }
 
+  async book(offer: Offer): Promise<{ confirmation: string }> {
+    // Deterministic confirmation code derived from the offer id (stable for idempotency tests).
+    const code = Math.floor(seed(offer.id + "book") * 0xffffff)
+      .toString(36)
+      .toUpperCase()
+      .padStart(5, "0")
+      .slice(0, 5);
+    const prefix = offer.kind === "flight" ? "PNR" : "CONF";
+    return { confirmation: `${prefix}-${code}` };
+  }
+
   async searchStays(brief: Brief): Promise<Offer[]> {
     const nights = brief.returnDate
       ? Math.max(1, Math.round((Date.parse(brief.returnDate) - Date.parse(brief.departDate)) / 86400000))

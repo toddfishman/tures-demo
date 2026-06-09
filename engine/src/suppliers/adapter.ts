@@ -8,4 +8,7 @@ export interface SupplierAdapter {
   readonly isLive: boolean;
   searchFlights(brief: Brief): Promise<Offer[]>;
   searchStays(brief: Brief): Promise<Offer[]>;
+  /** Commit an offer into a real reservation. Optional: a supplier without this can be
+   *  searched but not booked (the booking service guards against it). */
+  book?(offer: Offer): Promise<{ confirmation: string }>;
 }

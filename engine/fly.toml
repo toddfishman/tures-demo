@@ -1,0 +1,27 @@
+# Fly.io config for the Tures Engine. Rename `app` to your Fly app, then `fly deploy`.
+app = "tures-engine"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8787"
+  # CORS for the demo on GitHub Pages + local dev. Add your custom domain when you have one.
+  CORS_ORIGINS = "https://toddfishman.github.io,http://localhost:8123"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1   # keep one warm so the SSE execution stream stays connected
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/health"
+    interval = "15s"
+    timeout = "3s"
+
+# Secrets are NOT set here — use `fly secrets set` (see DEPLOY.md):
+#   DUFFEL_API_TOKEN, ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, ALLOW_LIVE_BOOKING

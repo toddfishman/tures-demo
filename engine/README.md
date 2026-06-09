@@ -3,7 +3,7 @@
 The agentic booking engine behind the Tures demo. See [`PLAN.md`](./PLAN.md) for the full
 architecture and the chunk-by-chunk roadmap.
 
-**Status:** Chunk 0 (foundation) ✅ · Chunk 1 (deal search) 🔨 core in place · Chunk 2 (agent loop) planner stub in place.
+**Status:** Chunk 0 foundation ✅ · Chunk 1 deal search ✅ · Chunk 2 agent loop (Claude tool-use) ✅ · Chunk 3 booking + confirm gate ✅ core. Deploy: see [`DEPLOY.md`](./DEPLOY.md).
 
 ## Run it
 
@@ -25,6 +25,9 @@ npm run typecheck        # tsc --noEmit
 | GET | `/health` | Service + which supplier/capabilities are live |
 | POST | `/search` | Validate a brief → scored, ranked flights + stays. Read-only. |
 | POST | `/plan` | Search → score → **propose** a flight + stay within budget. Proposes only. |
+| POST | `/book` | Open a booking. Default opens the **confirm gate** (charges nothing); `auto_within_brief` books immediately. Over-budget → 409. |
+| POST | `/book/:id/confirm` | The human-confirm gate. Charges once + books each component. Idempotent. |
+| GET | `/book/:id` | Booking status + full audit trail. |
 | GET | `/stream/:tripId` | Server-Sent Events: the live execution stream for a trip. |
 
 Example:

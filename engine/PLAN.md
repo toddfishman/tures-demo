@@ -90,13 +90,13 @@ and a real Pause/Resume that halts the agent mid-loop (the demo's Pause button, 
 
 | # | Chunk | Outcome | Status |
 |---|-------|---------|--------|
-| 0 | **Foundation** | `/engine` scaffold: Node+TS+Fastify, config, health, event bus, SSE, Prisma schema, mock supplier, runs locally with `npm run dev`, smoke test green | ✅ shipping now |
-| 1 | **Deal search (read-only)** | Duffel adapter (flights + stays) in test mode, normalized `Offer` model, scoring v1, `/search` endpoints. No booking. | 🔨 core shipping now |
-| 2 | **Agent loop** | Claude tool-use orchestrator: brief → search → score → **propose a plan**. Streams real events to SSE. Still no booking. | next |
-| 3 | **Booking + payment** | Stripe PaymentIntent + Duffel order, idempotency, **human-confirm gate**, audit log. Full test-mode book end-to-end. | |
-| 4 | **Connected services & permissions** | Credential vault; scoped grants matching the demo's permission toggles; Gmail/calendar read for confirmations. | |
+| 0 | **Foundation** | `/engine` scaffold: Node+TS+Fastify, config, health, event bus, SSE, mock supplier, runs locally, smoke test green | ✅ done |
+| 1 | **Deal search (read-only)** | Duffel adapter (flights + stays) in test mode, normalized `Offer` model, scoring v1, `/search` endpoints. No booking. | ✅ core done |
+| 2 | **Agent loop** | Claude tool-use orchestrator: brief → search → score → **propose a plan**. Streams real events to SSE. Still no booking. | ✅ done |
+| 3 | **Booking + payment** | Booking state machine, **human-confirm gate**, idempotency, audit log, policy/budget enforcement, mock payment + mock supplier `book()` end-to-end. Stripe charge + Duffel order are deploy-time leaves. Deploy scaffolding (Dockerfile/fly.toml/DEPLOY.md) shipped. | ✅ core done |
+| 4 | **Connected services & permissions** | Credential vault; scoped grants matching the demo's permission toggles; Gmail/calendar read for confirmations. Finishes the real Stripe charge (PaymentMethod/Customer). | → next |
 | 5 | **Hiccup Handler** | Disruption detection + autonomous rebooking within standing instructions. | |
-| 6 | **Hardening + prod deploy** | Postgres, secrets, auth, rate limits, observability, Fly.io deploy. Wire `v5/05-execution` to the live stream. | |
+| 6 | **Hardening + prod deploy** | Postgres (persist bookings/audit), auth, rate limits, observability, `fly deploy`. Wire `v5/05-execution` to the live stream + `03-paste-trip` to `/plan`+`/book`. | |
 
 Each chunk is independently runnable and leaves the engine in a working state.
 

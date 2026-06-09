@@ -16,6 +16,9 @@ const Env = z.object({
   DUFFEL_API_URL: z.string().url().default("https://api.duffel.com"),
   ANTHROPIC_API_KEY: z.string().optional(),
   STRIPE_SECRET_KEY: z.string().optional(),
+  // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
+  // is explicitly "true". Default false so dev/test can never charge a real card.
+  ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
 });
 
 const parsed = Env.parse(process.env);
@@ -31,6 +34,11 @@ export const config = {
   },
   anthropicKey: parsed.ANTHROPIC_API_KEY,
   stripeKey: parsed.STRIPE_SECRET_KEY,
+  allowLiveBooking: parsed.ALLOW_LIVE_BOOKING === "true",
+  /** Which payment provider will be used. Stripe needs a key AND lands at deploy time. */
+  get payments(): "stripe" | "mock" {
+    return parsed.STRIPE_SECRET_KEY ? "stripe" : "mock";
+  },
   /** Which supplier the engine will use given current env. */
   get supplier(): "duffel" | "mock" {
     return parsed.DUFFEL_API_TOKEN ? "duffel" : "mock";
