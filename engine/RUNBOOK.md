@@ -6,12 +6,14 @@ need Docker installed locally. Run everything from the `engine/` directory unles
 ## 0. Install flyctl + log in (one time)
 
 ```powershell
-# Install flyctl (installs to ~\.fly\bin and adds it to PATH for new shells)
-pwsh -Command "iwr https://fly.io/install.ps1 -useb | iex"
-# If `fly` isn't found in THIS shell, add it for the session:
+# Install flyctl (installs to ~\.fly\bin). Run directly in Windows PowerShell 5.1 —
+# do NOT prefix with `pwsh` (that's PowerShell 7, which isn't installed).
+iwr https://fly.io/install.ps1 -useb | iex
+
+# Add it to PATH for THIS shell (the installer only updates new shells):
 $env:Path += ";$HOME\.fly\bin"
 
-fly version          # confirm it's installed
+fly version          # confirm it installed
 fly auth login       # opens a browser — sign in / create a Fly account
 ```
 
