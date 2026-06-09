@@ -1,21 +1,16 @@
-// Agent orchestrator — STUB for Chunk 2.
+// Agent orchestrator — Chunk 2.
 //
-// This is where the Claude tool-use loop will live. The tools it calls are the engine's own
-// verbs, already built or stubbed: runSearch (Chunk 1 ✓), scoreOffers (✓), holdOffer,
-// requestConfirmation, book (Chunk 3), notify. The loop:
+// proposePlan() is the entry point and dispatches between two planners with the same return
+// shape:
+//   • the Claude tool-use agent loop in ./llm.ts (when ANTHROPIC_API_KEY is set) — real
+//     reasoning streamed to the live execution feed; tools are the engine's own verbs.
+//   • the deterministic planner below (no keys) — top scored flight + stay within budget.
 //
-//   1. Receive a Brief (the task + the authorization scope).
-//   2. search_flights / search_stays  → runSearch()
-//   3. score_options                  → already folded into runSearch()
-//   4. propose a plan (best flight + best stay within budget) → emit "propose" event
-//   5. if bookingMode !== propose_only: request_confirmation (Chunk 3 gate)
-//   6. book within the brief, idempotently, writing every step to the audit log (Chunk 3)
-//
-// For now: a deterministic, non-LLM planner so the pipeline is exercisable end-to-end before
-// the model is wired in. Same return shape the LLM version will produce.
+// Still PROPOSE-ONLY. Booking (request_confirmation → book, idempotent, audited) is Chunk 3.
 import type { Brief, Offer } from "../types.ts";
 import { runSearch } from "../search/service.ts";
 import { emitEvent } from "../events/bus.ts";
+import { config } from "../config.ts";
 
 export interface ProposedPlan {
   tripId: string;
@@ -24,9 +19,24 @@ export interface ProposedPlan {
   totalUsd: number;
   withinBudget: boolean;
   rationale: string;
+  /** Which planner produced this — "agent" (Claude loop) or "deterministic". */
+  planner?: "agent" | "deterministic";
 }
 
+/** Entry point. Uses the Claude tool-use agent loop when ANTHROPIC_API_KEY is set; otherwise
+ *  the deterministic planner below. Same return shape either way. */
 export async function proposePlan(tripId: string, brief: Brief): Promise<ProposedPlan> {
+  if (config.anthropicKey) {
+    const { runAgentLoop } = await import("./llm.ts");
+    const plan = await runAgentLoop(tripId, brief);
+    return { ...plan, planner: "agent" };
+  }
+  return proposePlanDeterministic(tripId, brief);
+}
+
+/** Pre-LLM planner: top scored flight + top stay that still fits the budget when combined.
+ *  Deterministic, no keys — used as the fallback and for tests. */
+export async function proposePlanDeterministic(tripId: string, brief: Brief): Promise<ProposedPlan> {
   const { flights, stays } = await runSearch(tripId, brief);
 
   // Pick the top-scored option in each category that still fits the budget when combined.
@@ -50,5 +60,5 @@ export async function proposePlan(tripId: string, brief: Brief): Promise<Propose
     data: { totalUsd, withinBudget, flightId: flight?.id, stayId: stay?.id },
   });
 
-  return { tripId, flight, stay, totalUsd, withinBudget, rationale };
+  return { tripId, flight, stay, totalUsd, withinBudget, rationale, planner: "deterministic" };
 }

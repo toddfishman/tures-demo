@@ -72,7 +72,8 @@ let tripId = "";
   assert.equal(plan.totalUsd, plan.flight.priceUsd + plan.stay.priceUsd, "total adds up");
   assert.equal(typeof plan.withinBudget, "boolean");
   assert.ok(plan.rationale.length > 0, "has a rationale");
-  ok("planner proposes flight + stay with a rationale");
+  assert.equal(plan.planner, "deterministic", "no key in test → deterministic planner");
+  ok("planner proposes flight + stay with a rationale (deterministic fallback)");
 }
 
 // 5. brief validation rejects garbage

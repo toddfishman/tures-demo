@@ -11,10 +11,32 @@
 <link rel="stylesheet" href="assets/tures.css">
 <style>
   body{ background:var(--obsidian); padding-bottom:84px; }
-  .compose{ width:100%; min-height:230px; resize:vertical; background:rgba(255,253,247,0.6);
-    border:1px solid var(--canvas-line); border-radius:10px; padding:16px 16px; color:var(--ink);
-    font-size:14px; line-height:1.65; outline:none; }
-  .compose:focus{ border-color:rgba(200,162,74,0.6); box-shadow:0 0 0 3px rgba(200,162,74,0.14); }
+
+  /* ---- conversational brief: bubbles in the paper-warm palette ---- */
+  .bubble-me{ background:#2a201a; color:var(--canvas-warm); white-space:pre-wrap; }
+  .bubble-t{ background:rgba(255,253,247,0.94); color:var(--ink); border:1px solid var(--canvas-line); }
+  .msg{ opacity:0; transform:translateY(10px) scale(.97);
+        transition:opacity .3s ease, transform .34s cubic-bezier(.34,1.5,.64,1); }
+  .msg.in{ opacity:1; transform:none; }
+
+  .typing span{ display:inline-block; width:5px; height:5px; border-radius:99px; background:var(--ink-faint); margin:0 1px; animation:blink 1.2s infinite; }
+  .typing span:nth-child(2){ animation-delay:.2s } .typing span:nth-child(3){ animation-delay:.4s }
+  @keyframes blink{ 0%,60%,100%{opacity:.3} 30%{opacity:1} }
+
+  .acting{ display:inline-flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold-deep); background:rgba(200,162,74,0.10); border:1px solid rgba(200,162,74,0.30); padding:5px 11px; border-radius:99px; }
+
+  .qr{ padding:7px 13px; border-radius:99px; font-size:12.5px; cursor:pointer; white-space:nowrap;
+    border:1px solid rgba(200,162,74,0.4); color:var(--gold-deep); background:rgba(255,253,247,0.5); transition:all .14s; }
+  .qr:hover{ background:rgba(200,162,74,0.1); border-color:rgba(200,162,74,0.7); }
+  .qr:active{ transform:scale(.96); }
+
+  .composer{ width:100%; resize:none; background:transparent; border:0; outline:none; color:var(--ink);
+    font-size:14px; line-height:1.6; max-height:160px; }
+  .composer::placeholder{ color:var(--ink-faint); }
+  .composer-wrap{ background:rgba(255,253,247,0.75); border:1px solid var(--canvas-line); border-radius:14px; transition:all 140ms; }
+  .composer-wrap:focus-within{ border-color:rgba(200,162,74,0.6); box-shadow:0 0 0 3px rgba(200,162,74,0.14); }
+
   .step{ display:flex; align-items:center; gap:8px; }
   .step .num{ width:22px;height:22px;border-radius:99px;display:grid;place-items:center;font-size:11px;
     font-family:'JetBrains Mono',monospace; border:1px solid var(--canvas-line); color:var(--ink-faint);}
@@ -22,6 +44,7 @@
   .step.on .lbl{ color:var(--ink);}
   .step .lbl{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);}
   .step-sep{ width:22px; height:1px; background:var(--canvas-line); }
+
   .reveal{ opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
   .reveal.in{ opacity:1; transform:none; }
   .legcard{ opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; }
@@ -53,8 +76,8 @@
   <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">III</div>
   <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9">
     <div class="caps text-[11px] text-gold/80 mb-3">Chapter III · Describe &amp; book</div>
-    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Describe it once.</h1>
-    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Brief it like a friend. Hit Parse. Watch prose become a bookable plan.</p>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Just tell it the trip.</h1>
+    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">No forms. Talk to Tures like you'd text a friend — it asks what it needs and turns the conversation into a bookable plan.</p>
     <div class="mt-6 flex items-center gap-3">
       <div class="step on" id="stp1"><span class="num">1</span><span class="lbl">Describe</span></div>
       <div class="step-sep"></div>
@@ -66,49 +89,39 @@
 </section>
 
 <section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 space-y-7">
+ <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-7">
 
-  <div class="grid lg:grid-cols-2 gap-7 items-start">
-   <!-- compose -->
-   <div class="leaf overflow-hidden">
-    <div class="leaf-tab px-5 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2 text-xs"><span class="dot dot-gold"></span><span class="caps-sm text-ink-faint">Your brief → trip@tures.app</span></div>
-      <button onclick="resetEmail()" class="press text-[11px] text-gold-deep hover:underline">↺ Andy's example</button>
-    </div>
-    <div class="p-5">
-      <textarea id="brief" class="compose font-body" spellcheck="false" data-noswipe></textarea>
-      <div class="mt-4 flex items-center justify-between gap-3">
-        <span class="text-xs text-ink-faint hidden sm:block">Name hotels, dates, cabins — whatever matters.</span>
-        <button id="planBtn" onclick="planTrip()" class="btn-gold px-6 py-3 rounded-lg shrink-0 w-full sm:w-auto">Parse this trip →</button>
+  <!-- ===== CONVERSATIONAL BRIEF ===== -->
+  <div class="leaf overflow-hidden">
+    <!-- thread header -->
+    <div class="flex items-center gap-3 px-5 py-3 border-b" style="border-color:var(--canvas-line)">
+      <div class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0"
+           style="background:var(--leather);color:var(--gold-bright);border:1px solid rgba(200,162,74,.4)">t</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-ink">Tures</div>
+        <div class="text-[11px] text-ink-faint" id="threadStatus">Booking concierge · online</div>
       </div>
+      <button onclick="restart()" class="press text-[11px] text-gold-deep hover:underline shrink-0">↺ Start over</button>
     </div>
-   </div>
 
-   <!-- result -->
-   <div class="leaf overflow-hidden">
-    <div class="leaf-tab px-5 py-3 flex items-center justify-between">
-      <div class="caps-sm text-ink-faint text-xs" id="resHead">Structured plan</div>
-      <span class="pill pill-gold" id="resPill">Waiting</span>
-    </div>
-    <div class="p-5">
-      <div id="placeholder" class="text-center text-ink-faint py-16">
-        <div class="text-4xl mb-3 text-gold-deep">❧</div>
-        <p class="text-sm">Your leg-by-leg plan appears here<br>once you hit <span class="text-ink">Parse</span>.</p>
+    <!-- messages -->
+    <div id="chat" class="px-4 sm:px-5 py-5 space-y-3 text-[13.5px] min-h-[280px]" data-noswipe></div>
+
+    <!-- quick replies -->
+    <div class="px-4 sm:px-5 pb-1 flex gap-2 overflow-x-auto" id="suggestions" data-noswipe></div>
+
+    <!-- composer -->
+    <div class="px-4 sm:px-5 py-3 border-t" style="border-color:var(--canvas-line)">
+      <div class="composer-wrap px-4 py-3 flex items-end gap-3">
+        <textarea id="composer" class="composer font-body" rows="1" spellcheck="false" data-noswipe
+          placeholder="Describe your trip — cities, dates, how you fly &amp; stay…"></textarea>
+        <button id="sendBtn" class="btn-gold w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end">↑</button>
       </div>
-
-      <div id="parsing" class="hidden space-y-3 py-2">
-        <div class="caps text-[11px] text-ink-faint mb-2 flex items-center gap-2"><span class="dot dot-gold pulse"></span> <span id="reasonLine">Reading your brief…</span></div>
-        <div class="skel h-6 w-2/3"></div><div class="skel h-6 w-full"></div>
-        <div class="skel h-6 w-5/6"></div><div class="skel h-6 w-3/4"></div><div class="skel h-6 w-full"></div>
-      </div>
-
-      <!-- leg-by-leg tappable cards -->
-      <div id="plan" class="hidden space-y-2.5"></div>
+      <div class="text-[11px] text-ink-faint mt-2 px-1">Enter to send · Shift+Enter for a new line</div>
     </div>
-   </div>
   </div>
 
-  <!-- ===== THIS TRIP, SPECIFICALLY ===== -->
+  <!-- ===== THIS TRIP, SPECIFICALLY (revealed as the conversation continues) ===== -->
   <div id="sentiment" class="reveal hidden leaf p-6 sm:p-8">
     <div class="grid lg:grid-cols-12 gap-8">
       <div class="lg:col-span-7">
@@ -177,19 +190,20 @@
 </div>
 
 <script>
-var ANDY = `Show me this can be done and my mind is officially blown. More curious if it can be done with the room types I want, flight schedules, etc.
+var chat = document.getElementById('chat');
+var sugEl = document.getElementById('suggestions');
+var composer = document.getElementById('composer');
 
-Leave Thursday December 3rd — fly direct into Paris, arrive the 4th. Business.
+/* Andy's example brief — offered as a one-tap quick reply that fills the composer. */
+var ANDY = `Leave Thursday December 3rd — fly direct into Paris, arrive the 4th. Business.
 Paris the 4–5–6th at Real Christine.
 Paris → Ivalo on the 7th. Should be non-stop on Finnair?
 Javri Lodge the 7–8–9th.
 Ivalo → Copenhagen on the 10th.
 Hotel Sanders the 10–11–12.
 Home the 13th — probably through Paris to keep both ways non-stop on business.`;
-function resetEmail(){ document.getElementById('brief').value = ANDY; }
-resetEmail();
 
-/* the parsed legs — each renders as a tap-to-expand card */
+/* the parsed legs — each renders as a tap-to-expand card (ui.js .exp delegation) */
 var LEGS = [
   {type:'fly', title:'AA 142 · SEA → CDG', meta:'12/03 · Biz · non-stop',
    detail:'Only same-day non-stop in business arriving the 4th. Seat 5A held.'},
@@ -208,12 +222,45 @@ var LEGS = [
    detail:'Non-stop CDG→SEA on the back half. Flying Blue credited.'},
 ];
 
+/* ---------- chat primitives (paper-warm adaptation of the concierge thread) ---------- */
+function addMsg(html, who){
+  var el = document.createElement('div');
+  el.className = 'msg ' + (who==='me'
+    ? 'max-w-[82%] ml-auto rounded-2xl rounded-tr-sm px-3.5 py-2.5 bubble-me'
+    : 'max-w-[90%] rounded-2xl rounded-tl-sm px-3.5 py-2.5 bubble-t');
+  el.innerHTML = html;
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+function typing(){
+  var el = document.createElement('div');
+  el.className = 'msg max-w-[60%] rounded-2xl rounded-tl-sm px-3.5 py-3 bubble-t typing';
+  el.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+function actingPill(label){
+  var el = document.createElement('div');
+  el.className = 'msg';
+  el.innerHTML = '<span class="acting"><span class="dot dot-amber pulse"></span><span id="reasonLine">'+label+'</span></span>';
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+
+function setStep(n){ ['stp1','stp2','stp3'].forEach(function(id,i){ document.getElementById(id).classList.toggle('on', i < n); }); }
+
 function legCard(l, i){
   var icon = l.type==='stay' ? '⌂' : l.type==='flag' ? '⚑' : '✈';
   var titleCls = l.type==='stay' ? 'font-display text-lg' : 'font-mono text-[15px]';
   var pill = l.pill ? '<span class="pill '+l.pill[0]+' ml-2">'+l.pill[1]+'</span>' : '';
-  var alert = l.type==='flag' ? ' style="border-color:rgba(181,84,58,0.4);background:rgba(181,84,58,0.05)"' : '';
-  return '<div class="exp legcard leaf"'+alert+' style="transition-delay:'+(i*60)+'ms">'+
+  var alert = l.type==='flag' ? ' style="border-color:rgba(181,84,58,0.4);background:rgba(181,84,58,0.05);transition-delay:'+(i*60)+'ms"' : ' style="transition-delay:'+(i*60)+'ms"';
+  return '<div class="exp legcard leaf"'+alert+'>'+
     '<div class="exp-head flex items-center gap-3 p-4 cursor-pointer">'+
       '<span class="text-gold-deep w-5 text-center">'+icon+'</span>'+
       '<span class="flex-1 min-w-0"><span class="'+titleCls+' text-ink">'+l.title+'</span>'+pill+'</span>'+
@@ -224,39 +271,107 @@ function legCard(l, i){
   '</div>';
 }
 
-function setStep(n){ ['stp1','stp2','stp3'].forEach(function(id,i){ document.getElementById(id).classList.toggle('on', i < n); }); }
-
+/* ---------- conversation flow ---------- */
 var REASONS = ['Reading your brief…','Resolving hotels & dates…','Checking flight schedules…','Flagging what won\'t book…'];
-function planTrip(){
-  document.getElementById('placeholder').classList.add('hidden');
-  var plan = document.getElementById('plan'); plan.classList.add('hidden'); plan.innerHTML='';
-  var parsing = document.getElementById('parsing'); parsing.classList.remove('hidden');
-  document.getElementById('resPill').textContent = 'Parsing…';
-  var btn = document.getElementById('planBtn'); btn.textContent = 'Parsing…'; btn.disabled = true; btn.style.opacity = .7;
-  setStep(1);
+var planned = false;
 
-  // cycle the reasoning line for a "thinking" feel
-  var ri=0; var rl=document.getElementById('reasonLine');
-  var rt=setInterval(function(){ ri=(ri+1)%REASONS.length; rl.textContent=REASONS[ri]; }, 440);
-
-  setTimeout(function(){
-    clearInterval(rt);
-    parsing.classList.add('hidden');
-    // fill leg cards
-    plan.innerHTML = LEGS.map(legCard).join('');
-    plan.classList.remove('hidden');
-    [].forEach.call(plan.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); });
-    document.getElementById('resHead').textContent = '7 legs · 9 dinners · tap any';
-    var pill = document.getElementById('resPill'); pill.textContent = 'Parsed'; pill.className = 'pill pill-confirm';
-    btn.textContent = 'Re-parse'; btn.disabled = false; btn.style.opacity = 1;
-    var s = document.getElementById('sentiment'); s.classList.remove('hidden'); requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
-    document.getElementById('ctaBar').style.display='';
-    setStep(2);
-    s.scrollIntoView({behavior:'smooth', block:'center'});
-  }, 1800);
+function greet(){
+  addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
+  renderSuggestions();
 }
 
-/* ---- trip-time sentiment ---- */
+function renderSuggestions(){
+  sugEl.innerHTML = '';
+  var qs = [
+    {label:'✦ Use Andy\'s example', fill:ANDY},
+    {label:'A weekend in Lisbon', fill:'Two of us, a long weekend in Lisbon next month. Somewhere design-y to stay, walkable, good seafood. Flexible on flights.'},
+    {label:'Family week in Japan', fill:'Family of four, a week in Japan in spring — Tokyo + Kyoto, ryokan for a couple of nights, premium economy if it\'s not silly money.'},
+  ];
+  qs.forEach(function(q){
+    var b = document.createElement('button');
+    b.className = 'qr';
+    b.textContent = q.label;
+    b.onclick = function(){ composer.value = q.fill; autoGrow(); composer.focus(); };
+    sugEl.appendChild(b);
+  });
+}
+
+function sendBrief(){
+  var text = composer.value.trim();
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me');
+  composer.value = ''; autoGrow();
+  sugEl.innerHTML = '';
+  setStep(1);
+
+  // typing → thinking (cycling reasons) → plan
+  var t = typing();
+  setTimeout(function(){
+    t.remove();
+    var act = actingPill(REASONS[0]);
+    var ri = 0;
+    var rt = setInterval(function(){
+      ri = (ri+1) % REASONS.length;
+      var rl = document.getElementById('reasonLine');
+      if(rl) rl.textContent = REASONS[ri];
+    }, 440);
+
+    setTimeout(function(){
+      clearInterval(rt);
+      act.remove();
+      addMsg('Parsed. Here\'s your plan — <strong>7 legs, 9 dinners</strong>. Tap any leg to see why I chose it.', 't');
+
+      // render leg cards as a rich assistant turn (full width inside the thread)
+      var wrap = document.createElement('div');
+      wrap.className = 'msg space-y-2.5 mt-1';
+      wrap.innerHTML = LEGS.map(legCard).join('');
+      chat.appendChild(wrap);
+      requestAnimationFrame(function(){
+        wrap.classList.add('in');
+        [].forEach.call(wrap.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); });
+      });
+      wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+      setStep(2);
+
+      // follow-up that opens the sentiment tuning
+      setTimeout(function(){
+        addMsg('One flag: the Ivalo leg won\'t book non-stop in December — I\'ve staged two clean alternatives and won\'t touch them until you pick. Before I book the rest, how are you feeling about <em>this</em> one?', 't');
+        var s = document.getElementById('sentiment');
+        s.classList.remove('hidden');
+        requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
+        document.getElementById('ctaBar').style.display = '';
+        s.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 750);
+
+      planned = true;
+      document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
+    }, 1800);
+  }, 950);
+}
+
+function restart(){
+  chat.innerHTML = '';
+  composer.value = ''; autoGrow();
+  document.getElementById('sentiment').classList.add('hidden');
+  document.getElementById('sentiment').classList.remove('in');
+  document.getElementById('ctaBar').style.display = 'none';
+  document.getElementById('threadStatus').textContent = 'Booking concierge · online';
+  planned = false;
+  setStep(1);
+  state = { purpose:[], pace:'balanced', avoid:[] };
+  document.getElementById('tripSummary').textContent = "Pick a few and I'll read it back — then tune the plan before anything is booked.";
+  greet();
+}
+
+/* composer behavior */
+function autoGrow(){ composer.style.height = 'auto'; composer.style.height = Math.min(160, composer.scrollHeight) + 'px'; }
+composer.addEventListener('input', autoGrow);
+document.getElementById('sendBtn').addEventListener('click', sendBrief);
+composer.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendBrief(); }
+});
+
+/* ---- trip-time sentiment (unchanged behavior, now part of the conversation) ---- */
 var state = { purpose:[], pace:'balanced', avoid:[] };
 document.querySelectorAll('[data-group]').forEach(function(group){
   var key = group.getAttribute('data-group');
@@ -268,19 +383,22 @@ document.querySelectorAll('[data-group]').forEach(function(group){
     });
   });
 });
-document.getElementById('paceSeg').addEventListener('segchange', function(e){ state.pace=e.detail.value; render(); setStep(3); });
+document.getElementById('paceSeg').addEventListener('segchange', function(e){ state.pace = e.detail.value; render(); setStep(3); });
 
-function list(arr){ if(arr.length===1) return arr[0]; if(arr.length===2) return arr[0]+' and '+arr[1]; return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1]; }
+function listFmt(arr){ if(arr.length===1) return arr[0]; if(arr.length===2) return arr[0]+' and '+arr[1]; return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1]; }
 function render(){
-  var s=state, out=[];
-  var lead='This is ' + (s.purpose.length ? 'a '+list(s.purpose)+' trip' : 'this trip');
-  if(s.pace==='easy') lead+=' at an easy pace — I\'ll hold your mornings and protect the downtime';
-  else if(s.pace==='full') lead+=' run full — earliest sensible reservations, nothing missed';
-  else lead+=' kept balanced';
+  var s = state, out = [];
+  var lead = 'This is ' + (s.purpose.length ? 'a '+listFmt(s.purpose)+' trip' : 'this trip');
+  if(s.pace==='easy') lead += ' at an easy pace — I\'ll hold your mornings and protect the downtime';
+  else if(s.pace==='full') lead += ' run full — earliest sensible reservations, nothing missed';
+  else lead += ' kept balanced';
   out.push(lead+'.');
-  if(s.avoid.length) out.push('And I\'ll keep '+list(s.avoid)+' off the table.');
+  if(s.avoid.length) out.push('And I\'ll keep '+listFmt(s.avoid)+' off the table.');
   document.getElementById('tripSummary').textContent = out.join(' ');
 }
+
+/* boot */
+greet();
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
