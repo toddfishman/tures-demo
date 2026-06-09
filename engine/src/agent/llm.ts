@@ -46,7 +46,7 @@ const TOOLS = [
   },
 ];
 
-export async function runAgentLoop(tripId: string, brief: Brief): Promise<ProposedPlan> {
+export async function runAgentLoop(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey: config.anthropicKey });
 
@@ -58,7 +58,7 @@ export async function runAgentLoop(tripId: string, brief: Brief): Promise<Propos
 
   async function executeTool(name: string, input: any): Promise<unknown> {
     if (name === "search_offers") {
-      const res = await runSearch(tripId, brief); // emits search + score events
+      const res = await runSearch(tripId, brief, accountId); // emits search + score events
       flights = res.flights;
       stays = res.stays;
       const slim = (o: Offer) => ({ id: o.id, title: o.title, priceUsd: o.priceUsd, score: o.score, summary: o.summary });

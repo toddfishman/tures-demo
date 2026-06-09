@@ -92,7 +92,9 @@ let tripId = "";
   assert.notEqual(blob, secret, "ciphertext differs from plaintext");
   assert.ok(!blob.includes("cus_live"), "plaintext not present in ciphertext");
   assert.equal(decrypt(blob), secret, "round-trips back to the original");
-  const tampered = "A" + blob.slice(1);
+  // flip a char in the auth-tag region to a guaranteed-different value (deterministic tamper)
+  const i = 18;
+  const tampered = blob.slice(0, i) + (blob[i] === "A" ? "B" : "A") + blob.slice(i + 1);
   assert.throws(() => decrypt(tampered), "GCM auth tag rejects tampering");
   ok("vault crypto: AES-256-GCM round-trip + tamper detection");
 }
@@ -335,6 +337,11 @@ let bookingId = "";
   assert.ok(res.taste.lovedPlaces.includes("Lisbon") && !res.taste.lovedPlaces.includes("Dubai"), "taste signal = highly-rated only");
   assert.ok(res.taste.favoriteTags.includes("food"), "favorite tags derived from loved places");
   ok("places: rate where you've been → derives a taste signal for the planner");
+
+  // the taste signal actually reaches scoring: search with NO placeTypes still boosts on taste
+  const sres = (await (await app.inject({ method: "POST", url: "/search", headers: auth, payload: { ...brief, placeTypes: [] } })).json());
+  assert.ok(sres.stays.some((s: any) => (s.scoreReasons || []).some((r: string) => /your taste/.test(r))), "account taste boosts a stay");
+  ok("taste signal feeds the planner — where you've been changes the suggestions");
 }
 
 // 15. /metrics reports counts + uptime

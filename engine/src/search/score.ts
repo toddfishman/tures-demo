@@ -3,8 +3,10 @@
 // numeric floor here keeps results sane and gives every pick a reason string.
 import type { Brief, Offer } from "../types.ts";
 
-/** Score a set of like-kind offers in place (mutates score/scoreReasons) and return sorted. */
-export function scoreOffers(offers: Offer[], brief: Brief): Offer[] {
+/** Score a set of like-kind offers in place (mutates score/scoreReasons) and return sorted.
+ *  `tasteTags` are the account's favorite tags (from "where you've been") — a personalization
+ *  boost layered on top of the brief's own placeTypes. */
+export function scoreOffers(offers: Offer[], brief: Brief, tasteTags: string[] = []): Offer[] {
   if (offers.length === 0) return offers;
 
   const prices = offers.map((o) => o.priceUsd);
@@ -28,15 +30,19 @@ export function scoreOffers(offers: Offer[], brief: Brief): Offer[] {
       else if (share <= 0.5) reasons.push("well within budget");
     }
 
-    // Taste match: how many placeTypes the offer's tags/summary hit. (stays mostly)
+    // Taste match: the brief's placeTypes PLUS the account's favorite tags ("where you've been").
     let taste = 0.5;
-    if (brief.placeTypes.length) {
+    const terms = [...brief.placeTypes, ...tasteTags];
+    if (terms.length) {
       const hay = [o.title, ...o.summary, String((o.raw as any).style ?? "")]
         .join(" ")
         .toLowerCase();
-      const hits = brief.placeTypes.filter((t) => hay.includes(t.toLowerCase()));
-      taste = hits.length ? Math.min(1, 0.5 + hits.length * 0.25) : 0.4;
-      if (hits.length) reasons.push(`matches ${hits.join(", ")}`);
+      const briefHits = brief.placeTypes.filter((t) => hay.includes(t.toLowerCase()));
+      const tasteHits = tasteTags.filter((t) => hay.includes(t.toLowerCase()));
+      const total = briefHits.length + tasteHits.length;
+      taste = total ? Math.min(1, 0.5 + total * 0.22) : 0.4;
+      if (briefHits.length) reasons.push(`matches ${briefHits.join(", ")}`);
+      if (tasteHits.length) reasons.push(`your taste: ${tasteHits.join(", ")}`);
     }
 
     // Flight convenience: fewer stops is better.

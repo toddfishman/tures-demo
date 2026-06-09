@@ -73,26 +73,26 @@
 </header>
 
 <section class="leather-surface grain relative overflow-hidden">
-  <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">III</div>
-  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9">
-    <div class="caps text-[11px] text-gold/80 mb-3">Chapter III · Describe &amp; book</div>
-    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Just tell it the trip.</h1>
-    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">No forms. Talk to Tures like you'd text a friend — it asks what it needs and turns the conversation into a bookable plan.</p>
-    <div class="mt-6 flex items-center gap-3">
-      <div class="step on" id="stp1"><span class="num">1</span><span class="lbl">Describe</span></div>
-      <div class="step-sep"></div>
-      <div class="step" id="stp2"><span class="num">2</span><span class="lbl">Plan</span></div>
-      <div class="step-sep"></div>
-      <div class="step" id="stp3"><span class="num">3</span><span class="lbl">Book</span></div>
+  <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+    <div class="flex items-baseline gap-3 min-w-0">
+      <span class="caps text-[11px] text-gold/80 shrink-0">Chapter III</span>
+      <h1 class="font-display text-2xl text-canvas leading-none truncate">Just tell it the trip.</h1>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="step on" id="stp1"><span class="num">1</span><span class="lbl hidden sm:inline">Describe</span></div>
+      <div class="step-sep hidden sm:block"></div>
+      <div class="step" id="stp2"><span class="num">2</span><span class="lbl hidden sm:inline">Plan</span></div>
+      <div class="step-sep hidden sm:block"></div>
+      <div class="step" id="stp3"><span class="num">3</span><span class="lbl hidden sm:inline">Book</span></div>
     </div>
   </div>
 </section>
 
 <section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-7">
+ <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-5 space-y-6">
 
-  <!-- ===== CONVERSATIONAL BRIEF ===== -->
-  <div class="leaf overflow-hidden">
+  <!-- ===== CONVERSATIONAL BRIEF (app-style full-height panel) ===== -->
+  <div class="leaf overflow-hidden flex flex-col" style="height:calc(100dvh - 150px); min-height:440px">
     <!-- thread header -->
     <div class="flex items-center gap-3 px-5 py-3 border-b" style="border-color:var(--canvas-line)">
       <div class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0"
@@ -105,19 +105,20 @@
     </div>
 
     <!-- messages -->
-    <div id="chat" class="px-4 sm:px-5 py-5 space-y-3 text-[13.5px] min-h-[280px]" data-noswipe></div>
+    <div id="chat" class="px-4 sm:px-5 py-5 space-y-3 text-[13.5px] flex-1 overflow-y-auto min-h-0" data-noswipe></div>
 
     <!-- quick replies -->
     <div class="px-4 sm:px-5 pb-1 flex gap-2 overflow-x-auto" id="suggestions" data-noswipe></div>
 
     <!-- composer -->
     <div class="px-4 sm:px-5 py-3 border-t" style="border-color:var(--canvas-line)">
-      <div class="composer-wrap px-4 py-3 flex items-end gap-3">
+      <div class="composer-wrap px-4 py-3 flex items-end gap-2">
         <textarea id="composer" class="composer font-body" rows="1" spellcheck="false" data-noswipe
           placeholder="Describe your trip — cities, dates, how you fly &amp; stay…"></textarea>
+        <button id="micBtn" title="Speak your trip" class="w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end" style="display:none;border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">🎤</button>
         <button id="sendBtn" class="btn-gold w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end">↑</button>
       </div>
-      <div class="text-[11px] text-ink-faint mt-2 px-1">Enter to send · Shift+Enter for a new line</div>
+      <div class="text-[11px] text-ink-faint mt-2 px-1" id="composerHint">Enter to send · Shift+Enter for a new line</div>
     </div>
   </div>
 
@@ -475,6 +476,34 @@ function render(){
   if(s.avoid.length) out.push('And I\'ll keep '+listFmt(s.avoid)+' off the table.');
   document.getElementById('tripSummary').textContent = out.join(' ');
 }
+
+/* voice input (Deepgram) — mic button appears only when the engine has it configured */
+(function(){
+  var micBtn = document.getElementById('micBtn'); if(!micBtn || !(window.tures && tures.configured)) return;
+  tures.health().then(function(h){ if(h && h.capabilities && h.capabilities.voice) micBtn.style.display=''; }).catch(function(){});
+  var rec=null, chunks=[], recording=false;
+  var hint = document.getElementById('composerHint');
+  micBtn.onclick = function(){
+    if(recording){ rec && rec.stop(); return; }
+    if(!navigator.mediaDevices || !window.MediaRecorder){ hint.textContent='Voice not supported in this browser.'; return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      rec = new MediaRecorder(stream); chunks=[];
+      rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop=function(){
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        recording=false; micBtn.textContent='🎤'; micBtn.style.background='rgba(255,253,247,0.6)';
+        var blob = new Blob(chunks, { type: (rec.mimeType||'audio/webm') });
+        hint.textContent='Transcribing…';
+        tures.voice.transcribe(blob).then(function(r){
+          if(r.transcript){ composer.value = (composer.value? composer.value.trim()+' ':'') + r.transcript; autoGrow(); composer.focus(); }
+          hint.textContent='Enter to send · Shift+Enter for a new line';
+        }).catch(function(){ hint.textContent='Voice failed — type instead.'; });
+      };
+      rec.start(); recording=true; micBtn.textContent='⏹'; micBtn.style.background='rgba(181,84,58,0.15)';
+      hint.textContent='Listening… tap ⏹ when done.';
+    }).catch(function(){ hint.textContent='Mic permission needed.'; });
+  };
+})();
 
 /* boot */
 greet();

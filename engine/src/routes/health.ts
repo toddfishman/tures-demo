@@ -21,6 +21,7 @@ export async function healthRoutes(app: FastifyInstance) {
       accounts: true, // email+password logins with sessions
       travelers: true, // family/companion travelers on the account
       placesGraph: true, // "where you've been" personalization signal
+      voice: !!config.deepgramKey, // Deepgram speech-to-text on the brief chat
       billingLive: !!config.stripeKey && !!config.stripePriceSubscription, // real Stripe subscriptions
     },
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts

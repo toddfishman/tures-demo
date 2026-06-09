@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { BriefSchema } from "../types.ts";
 import { runSearch } from "../search/service.ts";
+import { resolveAccountId } from "../auth/index.ts";
 
 let tripCounter = 0;
 
@@ -13,7 +14,7 @@ export async function searchRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "invalid_brief", issues: parsed.error.issues });
     }
     const tripId = `trip_${Date.now().toString(36)}_${tripCounter++}`;
-    const result = await runSearch(tripId, parsed.data);
+    const result = await runSearch(tripId, parsed.data, resolveAccountId(req));
     return { tripId, ...result };
   });
 }

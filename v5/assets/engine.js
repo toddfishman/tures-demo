@@ -102,6 +102,17 @@
       remove: function (name) { return api("/places/" + encodeURIComponent(name), { method: "DELETE" }); },
     },
 
+    /* Voice: POST a recorded audio Blob to Deepgram (via the engine) → { transcript }. */
+    voice: {
+      transcribe: function (blob) {
+        var h = { "Content-Type": blob.type || "audio/webm" };
+        if (token) h["Authorization"] = "Bearer " + token;
+        return fetch(url + "/voice/transcribe", { method: "POST", headers: h, body: blob }).then(function (r) {
+          return r.json().then(function (b) { if (!r.ok) throw Object.assign(new Error(b.error || r.status), { status: r.status, body: b }); return b; });
+        });
+      },
+    },
+
     stream: function (tripId, onEvent) {
       var es = new EventSource(url + "/stream/" + tripId + (token ? "?token=" + encodeURIComponent(token) : ""));
       es.onmessage = function (e) { try { onEvent(JSON.parse(e.data)); } catch (_) {} };

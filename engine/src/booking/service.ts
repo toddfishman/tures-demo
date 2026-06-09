@@ -40,7 +40,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
 
   const accountId = input.accountId ?? "demo";
   const supplier = getSupplier();
-  const { flights, stays } = await runSearch(tripId, input.brief); // emits search + score
+  const { flights, stays } = await runSearch(tripId, input.brief, accountId); // emits search + score
   const flight = (input.flightId && flights.find((o) => o.id === input.flightId)) || flights[0];
   const stay = (input.stayId && stays.find((o) => o.id === input.stayId)) || stays[0];
   const totalUsd = (flight?.priceUsd ?? 0) + (stay?.priceUsd ?? 0);

@@ -42,6 +42,8 @@ const Env = z.object({
   VGS_VAULT_URL: z.string().optional(), // e.g. https://api.sandbox.verygoodvault.com
   VGS_USERNAME: z.string().optional(),
   VGS_PASSWORD: z.string().optional(),
+  // Deepgram speech-to-text (voice input on the brief chat). Unset → /voice/transcribe is off.
+  DEEPGRAM_API_KEY: z.string().optional(),
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
@@ -59,6 +61,7 @@ export const config = {
     isLive: !!parsed.DUFFEL_API_TOKEN && !parsed.DUFFEL_API_TOKEN.startsWith("duffel_test_"),
   },
   anthropicKey: parsed.ANTHROPIC_API_KEY,
+  deepgramKey: parsed.DEEPGRAM_API_KEY,
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
   rateLimitMax: parsed.RATE_LIMIT_MAX,

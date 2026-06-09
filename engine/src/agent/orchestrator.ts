@@ -25,19 +25,19 @@ export interface ProposedPlan {
 
 /** Entry point. Uses the Claude tool-use agent loop when ANTHROPIC_API_KEY is set; otherwise
  *  the deterministic planner below. Same return shape either way. */
-export async function proposePlan(tripId: string, brief: Brief): Promise<ProposedPlan> {
+export async function proposePlan(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
   if (config.anthropicKey) {
     const { runAgentLoop } = await import("./llm.ts");
-    const plan = await runAgentLoop(tripId, brief);
+    const plan = await runAgentLoop(tripId, brief, accountId);
     return { ...plan, planner: "agent" };
   }
-  return proposePlanDeterministic(tripId, brief);
+  return proposePlanDeterministic(tripId, brief, accountId);
 }
 
 /** Pre-LLM planner: top scored flight + top stay that still fits the budget when combined.
  *  Deterministic, no keys — used as the fallback and for tests. */
-export async function proposePlanDeterministic(tripId: string, brief: Brief): Promise<ProposedPlan> {
-  const { flights, stays } = await runSearch(tripId, brief);
+export async function proposePlanDeterministic(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
+  const { flights, stays } = await runSearch(tripId, brief, accountId);
 
   // Pick the top-scored option in each category that still fits the budget when combined.
   const flight = flights[0];

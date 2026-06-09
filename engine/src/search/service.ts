@@ -4,12 +4,15 @@
 import type { Brief, SearchResult } from "../types.ts";
 import { getSupplier } from "../suppliers/index.ts";
 import { scoreOffers } from "./score.ts";
+import { tasteSignal } from "../places/index.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
 
-export async function runSearch(tripId: string, brief: Brief): Promise<SearchResult> {
+export async function runSearch(tripId: string, brief: Brief, accountId = "demo"): Promise<SearchResult> {
   const supplier = getSupplier();
   const startedAt = performance.now();
+  // Personalization: the account's favorite tags from "where you've been" sharpen stay scoring.
+  const tasteTags = tasteSignal(accountId).favoriteTags;
 
   emitEvent(tripId, "search", `Searching ${supplier.name} for ${brief.origin}→${brief.destination}`, {
     detail: `${brief.adults} traveler(s) · ${brief.cabin}${brief.budgetUsd ? ` · ≤ $${brief.budgetUsd.toLocaleString()}` : ""}`,
@@ -29,7 +32,7 @@ export async function runSearch(tripId: string, brief: Brief): Promise<SearchRes
   ]);
 
   const flights = scoreOffers(flightsRaw, brief);
-  const stays = scoreOffers(staysRaw, brief);
+  const stays = scoreOffers(staysRaw, brief, tasteTags);
 
   const tookMs = Math.round(performance.now() - startedAt);
 
