@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { connect, list, revoke } from "../vault/index.ts";
+import { resolveAccountId } from "../auth/index.ts";
 
 const ConnectBody = z.object({
   accountId: z.string().optional(),
@@ -19,12 +20,12 @@ export async function connectionRoutes(app: FastifyInstance) {
     if (!parsed.success) {
       return reply.status(400).send({ error: "invalid_request", issues: parsed.error.issues });
     }
-    return connect(parsed.data);
+    return connect({ ...parsed.data, accountId: resolveAccountId(req, parsed.data.accountId) });
   });
 
   // GET /connections?accountId=demo — list connected services (redacted).
   app.get<{ Querystring: { accountId?: string } }>("/connections", async (req) => {
-    return { connections: list(req.query.accountId ?? "demo") };
+    return { connections: list(resolveAccountId(req, req.query.accountId)) };
   });
 
   // POST /connections/:id/revoke — pull the plug. Immediate for new actions.

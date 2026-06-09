@@ -23,6 +23,15 @@ const Env = z.object({
   ENGINE_API_KEY: z.string().optional(),
   // Per-IP request ceiling per minute.
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(600),
+  // Directory for durable JSON storage (accounts/vault/bookings). Unset → in-memory only.
+  DATA_DIR: z.string().optional(),
+  // Secret for signing session tokens (JWT HS256). Unset → ephemeral (sessions drop on restart).
+  AUTH_SECRET: z.string().optional(),
+  // Stripe billing (Chunk: real money). Price IDs for the subscription + the per-trip fee.
+  STRIPE_PRICE_SUBSCRIPTION: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // Public base URL of the demo, for Stripe Checkout success/cancel redirects.
+  PUBLIC_BASE_URL: z.string().optional(),
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
@@ -43,6 +52,11 @@ export const config = {
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
   rateLimitMax: parsed.RATE_LIMIT_MAX,
+  dataDir: parsed.DATA_DIR,
+  authSecret: parsed.AUTH_SECRET,
+  stripePriceSubscription: parsed.STRIPE_PRICE_SUBSCRIPTION,
+  stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
+  publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v5",
   /** Read live from the env so tests can toggle auth without a fresh import. */
   get apiKey(): string | undefined {
     return process.env.ENGINE_API_KEY || undefined;

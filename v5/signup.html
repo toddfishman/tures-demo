@@ -14,9 +14,10 @@
   .fld{ width:100%; border-radius:12px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.75);
         padding:12px 14px; font-size:15px; color:var(--ink); outline:none; transition:all .14s; }
   .fld:focus{ border-color:rgba(200,162,74,0.6); box-shadow:0 0 0 3px rgba(200,162,74,0.14); }
-  .tab{ flex:1; text-align:center; padding:10px; font-size:13px; cursor:pointer; color:var(--ink-soft);
-        border-bottom:2px solid transparent; letter-spacing:.04em; }
+  .tab{ flex:1; text-align:center; padding:10px; font-size:12.5px; cursor:pointer; color:var(--ink-soft);
+        border-bottom:2px solid transparent; letter-spacing:.03em; }
   .tab.on{ color:var(--ink); border-color:var(--gold); font-weight:600; }
+  .err{ color:var(--alert); font-size:13px; }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -34,19 +35,30 @@
   <div class="leaf p-7 sm:p-9">
     <div class="caps text-[11px] text-gold-deep mb-2">Welcome aboard</div>
     <h1 class="font-display text-4xl text-ink leading-tight mb-2">Plan your first trip.</h1>
-    <p class="text-ink-soft text-sm leading-relaxed mb-6">It's free to plan. You only pay when Tures actually books — and never without your say-so.</p>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">Free to plan. You only pay when Tures actually books — never without your say-so.</p>
 
     <div class="flex border-b mb-6" style="border-color:var(--canvas-line)">
-      <div class="tab on" data-tab="signup" id="tabSignup">Create account</div>
-      <div class="tab" data-tab="waitlist" id="tabWaitlist">Early access</div>
+      <div class="tab on" data-tab="signup">Create account</div>
+      <div class="tab" data-tab="login">Log in</div>
+      <div class="tab" data-tab="waitlist">Early access</div>
     </div>
 
     <!-- SIGN UP -->
     <form id="signupForm" class="space-y-3">
       <input id="suName" class="fld" placeholder="Your name" autocomplete="name" />
       <input id="suEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <input id="suPass" type="password" class="fld" placeholder="Password (8+ characters)" autocomplete="new-password" required />
       <button class="btn-gold w-full px-6 py-3 rounded-xl quiet font-semibold mt-1">Start planning — free →</button>
+      <div id="suErr" class="err"></div>
       <p class="text-[12px] text-ink-faint text-center pt-1">No card required to start. Plan all you like.</p>
+    </form>
+
+    <!-- LOG IN -->
+    <form id="loginForm" class="space-y-3" style="display:none">
+      <input id="liEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <input id="liPass" type="password" class="fld" placeholder="Password" autocomplete="current-password" required />
+      <button class="btn-gold w-full px-6 py-3 rounded-xl quiet font-semibold mt-1">Log in →</button>
+      <div id="liErr" class="err"></div>
     </form>
 
     <!-- WAITLIST -->
@@ -58,44 +70,44 @@
       <div id="wlMsg" class="text-[13px] text-center pt-1"></div>
     </form>
   </div>
-
-  <p class="text-center text-canvas/45 text-xs mt-5">Already exploring? <a href="03-paste-trip.html" class="text-gold quiet underline">Jump to planning</a></p>
  </div>
 </main>
 
 <script src="assets/engine.js"></script>
 <script>
 function showTab(which){
-  document.getElementById('tabSignup').classList.toggle('on', which==='signup');
-  document.getElementById('tabWaitlist').classList.toggle('on', which==='waitlist');
-  document.getElementById('signupForm').style.display = which==='signup' ? '' : 'none';
-  document.getElementById('waitlistForm').style.display = which==='waitlist' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab')===which); });
+  ['signup','login','waitlist'].forEach(function(n){ document.getElementById(n+'Form').style.display = n===which ? '' : 'none'; });
 }
-document.getElementById('tabSignup').onclick = function(){ showTab('signup'); };
-document.getElementById('tabWaitlist').onclick = function(){ showTab('waitlist'); };
+document.querySelectorAll('.tab').forEach(function(t){ t.onclick = function(){ showTab(t.getAttribute('data-tab')); }; });
 if(location.hash === '#waitlist') showTab('waitlist');
+if(location.hash === '#login') showTab('login');
 
 document.getElementById('signupForm').addEventListener('submit', function(e){
   e.preventDefault();
-  var name = document.getElementById('suName').value.trim();
-  var email = document.getElementById('suEmail').value.trim();
-  if(!email) return;
-  if(window.tures) tures.signUp(name, email);   // per-browser account (works with or without engine)
-  location.href = 'welcome.html';
+  var btn = e.target.querySelector('button'); var err = document.getElementById('suErr'); err.textContent='';
+  btn.disabled=true; btn.style.opacity=.7; btn.textContent='Creating…';
+  tures.signUp(document.getElementById('suName').value.trim(), document.getElementById('suEmail').value.trim(), document.getElementById('suPass').value)
+    .then(function(){ location.href='welcome.html'; })
+    .catch(function(ex){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Start planning — free →'; err.textContent = ex.status===409 ? 'That email already has an account — try logging in.' : 'Could not sign up. Check your details and try again.'; });
+});
+
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector('button'); var err = document.getElementById('liErr'); err.textContent='';
+  btn.disabled=true; btn.style.opacity=.7; btn.textContent='Logging in…';
+  tures.login(document.getElementById('liEmail').value.trim(), document.getElementById('liPass').value)
+    .then(function(){ location.href='account.html'; })
+    .catch(function(){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Log in →'; err.textContent='Wrong email or password.'; });
 });
 
 document.getElementById('waitlistForm').addEventListener('submit', function(e){
   e.preventDefault();
-  var email = document.getElementById('wlEmail').value.trim();
-  var name = document.getElementById('wlName').value.trim();
+  var email = document.getElementById('wlEmail').value.trim(); var name = document.getElementById('wlName').value.trim();
   if(!email) return;
   var msg = document.getElementById('wlMsg');
-  function done(extra){ msg.style.color='var(--confirm)'; msg.innerHTML = "✓ You're on the list." + (extra||''); }
-  if(window.tures && tures.configured){
-    tures.waitlist(email, name).then(function(r){ done(r && r.position ? ' You\'re #' + r.position + '.' : ''); })
-      .catch(function(){ done(''); });
-  } else { done(''); }   // graceful when no engine configured
-  e.target.querySelector('button').textContent = 'Added ✓';
+  function done(extra){ msg.style.color='var(--confirm)'; msg.innerHTML = "✓ You're on the list." + (extra||''); e.target.querySelector('button').textContent='Added ✓'; }
+  tures.waitlist(email, name).then(function(r){ done(r && r.position ? ' You\'re #' + r.position + '.' : ''); }).catch(function(){ done(''); });
 });
 </script>
 </body>

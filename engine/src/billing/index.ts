@@ -1,0 +1,65 @@
+// Real billing. Subscriptions go through Stripe Checkout (hosted card entry — no PCI burden on
+// us). The per-trip concierge fee is charged with the booking (see booking/service). Gated by
+// STRIPE_SECRET_KEY: without it, "subscribe" activates in mock mode so the demo still flows.
+import { config } from "../config.ts";
+import { getUser, saveUser } from "../auth/index.ts";
+import { log } from "../logger.ts";
+
+export interface CheckoutResult {
+  url: string;
+  mock: boolean;
+}
+
+/** Start a subscription purchase. Returns a URL to redirect the browser to. */
+export async function startSubscription(accountId: string): Promise<CheckoutResult> {
+  const user = getUser(accountId);
+  const base = config.publicBaseUrl;
+
+  if (!config.stripeKey || !config.stripePriceSubscription) {
+    // Mock: activate immediately so the funnel works end-to-end without Stripe keys.
+    if (user) {
+      user.plan = "subscribe";
+      saveUser(user);
+    }
+    log.info("billing: mock subscription activated", { accountId });
+    return { url: `${base}/account.html?subscribed=1`, mock: true };
+  }
+
+  const { default: Stripe } = await import("stripe");
+  const stripe = new Stripe(config.stripeKey);
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    line_items: [{ price: config.stripePriceSubscription, quantity: 1 }],
+    success_url: `${base}/account.html?subscribed=1`,
+    cancel_url: `${base}/pricing.html`,
+    client_reference_id: accountId,
+    customer_email: user?.email,
+  });
+  return { url: session.url ?? `${base}/account.html`, mock: false };
+}
+
+/** Stripe webhook: confirm a subscription and flip the user's plan. */
+export async function handleWebhook(rawBody: Buffer, signature: string | undefined): Promise<{ handled: boolean }> {
+  if (!config.stripeKey || !config.stripeWebhookSecret) return { handled: false };
+  const { default: Stripe } = await import("stripe");
+  const stripe = new Stripe(config.stripeKey);
+  let event: any;
+  try {
+    event = stripe.webhooks.constructEvent(rawBody, signature ?? "", config.stripeWebhookSecret);
+  } catch (e) {
+    log.warn("billing: bad webhook signature", { err: String(e) });
+    throw Object.assign(new Error("bad_signature"), { statusCode: 400 });
+  }
+  if (event.type === "checkout.session.completed") {
+    const accountId = event.data.object.client_reference_id as string | undefined;
+    const customerId = event.data.object.customer as string | undefined;
+    const user = accountId ? getUser(accountId) : undefined;
+    if (user) {
+      user.plan = "subscribe";
+      if (customerId) user.stripeCustomerId = customerId;
+      saveUser(user);
+      log.info("billing: subscription confirmed", { accountId });
+    }
+  }
+  return { handled: true };
+}

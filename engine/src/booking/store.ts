@@ -1,23 +1,23 @@
-// In-memory booking store. One place behind a tiny interface so Chunk 6 swaps in Prisma/Postgres
-// without touching the booking service. Also tracks idempotency keys → booking id.
+// Booking store — durable when DATA_DIR is set (see db/persist). Idempotency + per-account
+// lookups are derived from the collection so they survive restarts too.
 import type { Booking } from "./types.ts";
+import { Collection } from "../db/persist.ts";
 
 class BookingStore {
-  private byId = new Map<string, Booking>();
-  private byIdemKey = new Map<string, string>();
+  private byId = new Collection<Booking>("bookings");
 
   get(id: string): Booking | undefined {
     return this.byId.get(id);
   }
 
   getByIdemKey(key: string): Booking | undefined {
-    const id = this.byIdemKey.get(key);
-    return id ? this.byId.get(id) : undefined;
+    return this.byId.values().find((b) => b.idempotencyKey === key);
   }
 
   /** All bookings for an account, newest first — the account dashboard's trip list. */
   listByAccount(accountId: string): Booking[] {
-    return [...this.byId.values()]
+    return this.byId
+      .values()
       .filter((b) => b.accountId === accountId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
@@ -25,7 +25,6 @@ class BookingStore {
   put(b: Booking): Booking {
     b.updatedAt = new Date().toISOString();
     this.byId.set(b.id, b);
-    if (b.idempotencyKey) this.byIdemKey.set(b.idempotencyKey, b.id);
     return b;
   }
 }

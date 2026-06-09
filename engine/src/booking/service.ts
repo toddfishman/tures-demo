@@ -27,6 +27,8 @@ export interface CreateBookingInput {
   flightId?: string;
   stayId?: string;
   idempotencyKey?: string;
+  /** Tures concierge fee to collect with this booking (per-trip pricing; 0 for subscribers). */
+  feeUsd?: number;
 }
 
 export async function createBooking(tripId: string, input: CreateBookingInput): Promise<Booking> {
@@ -61,6 +63,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     currency,
     components,
     charges: [],
+    feeUsd: input.feeUsd && input.feeUsd > 0 ? input.feeUsd : undefined,
     passenger: passengerSummary(accountId),
     violations,
     audit: [],
@@ -140,6 +143,14 @@ async function execute(booking: Booking): Promise<Booking> {
       audit(booking, "agent", "component_booked", `${c.title} → ${confirmation}`);
       emitEvent(booking.tripId, "book", `Booked ${c.title}`, { detail: confirmation, data: { bookingId: booking.id, confirmation } });
       bookings.put(booking);
+    }
+
+    // Tures concierge fee (per-trip pricing). Charged to the best card alongside the trip.
+    if (booking.feeUsd && booking.feeUsd > 0) {
+      const choice = chooseCard(booking.accountId, { category: "other", amountUsd: booking.feeUsd });
+      const feePay = await payments.charge(booking.feeUsd, booking.currency, `${booking.idempotencyKey ?? booking.id}:fee`, { accountId: booking.accountId, connectionId: choice?.connectionId });
+      booking.charges.push(feePay);
+      audit(booking, "system", "concierge_fee", `$${booking.feeUsd} Tures fee · ${feePay.provider} ${feePay.intentId}`);
     }
 
     booking.status = "booked";

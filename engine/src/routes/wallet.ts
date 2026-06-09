@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { CARD_CATALOG, chooseCard, type ChargeCategory } from "../wallet/cards.ts";
+import { resolveAccountId } from "../auth/index.ts";
 
 export async function walletRoutes(app: FastifyInstance) {
   // GET /wallet/catalog — the curated card types (for the demo's card-type picker).
@@ -15,7 +16,7 @@ export async function walletRoutes(app: FastifyInstance) {
       const category = (req.query.category ?? "airfare") as ChargeCategory;
       const amountUsd = Number(req.query.amount ?? 0);
       if (!amountUsd || amountUsd <= 0) return reply.status(400).send({ error: "amount required" });
-      const choice = chooseCard(req.query.accountId ?? "demo", { category, amountUsd });
+      const choice = chooseCard(resolveAccountId(req, req.query.accountId), { category, amountUsd });
       if (!choice) return reply.status(404).send({ error: "no_cards", message: "no payment cards connected" });
       return choice;
     },

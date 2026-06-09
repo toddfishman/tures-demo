@@ -266,6 +266,51 @@ let bookingId = "";
   ok("revoking all payment methods immediately blocks new bookings");
 }
 
+// 13.5 auth + sessions + per-trip fee + mock billing
+{
+  const su = await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "a@b.com", name: "Ada", password: "password123" } });
+  assert.equal(su.statusCode, 200);
+  const { token, user } = su.json();
+  assert.ok(token && user.id.startsWith("acct_"), "signup returns token + account");
+  assert.equal(user.passwordHash, undefined, "never returns the password hash");
+
+  const auth = { authorization: "Bearer " + token };
+
+  // a card connected under the session is namespaced to this account
+  await app.inject({ method: "POST", url: "/connections", headers: auth, payload: { kind: "payment", label: "Amex Platinum", secret: { customerId: "c", paymentMethodId: "p" }, meta: { cardKey: "amex_platinum" } } });
+  const mine = (await (await app.inject({ method: "GET", url: "/connections", headers: auth })).json()).connections;
+  assert.equal(mine.length, 1, "session sees only its own connection");
+  const demoConns = (await (await app.inject({ method: "GET", url: "/connections" })).json()).connections;
+  assert.ok(demoConns.every((c: any) => c.accountId !== user.id), "another account can't see it");
+  ok("auth: signup + session namespaces vault data to the account");
+
+  // book with the session + a per-trip concierge fee
+  const bk = (await app.inject({ method: "POST", url: "/book", headers: auth, payload: { brief, feeUsd: 99 } })).json();
+  assert.equal(bk.accountId, user.id, "booking belongs to the signed-in account");
+  const booked = (await app.inject({ method: "POST", url: `/book/${bk.id}/confirm`, headers: auth })).json();
+  assert.equal(booked.status, "booked");
+  assert.equal(booked.charges.length, 3, "2 components + 1 concierge fee");
+  assert.ok(booked.audit.some((a: any) => a.action === "concierge_fee"), "fee in audit");
+  ok("booking collects the $99 per-trip fee with the trip");
+
+  // the trip shows in the account's dashboard list
+  const trips = (await (await app.inject({ method: "GET", url: "/bookings", headers: auth })).json()).bookings;
+  assert.ok(trips.length >= 1 && trips[0].accountId === user.id, "trip appears for the account");
+
+  // mock subscription flips the plan
+  const co = (await app.inject({ method: "POST", url: "/billing/checkout", headers: auth })).json();
+  assert.equal(co.mock, true, "no Stripe key → mock activation");
+  const me = (await (await app.inject({ method: "GET", url: "/auth/me", headers: auth })).json()).user;
+  assert.equal(me.plan, "subscribe", "plan upgraded to subscribe");
+  ok("billing: subscription activates and upgrades the plan");
+
+  // login checks
+  assert.equal((await app.inject({ method: "POST", url: "/auth/login", payload: { email: "a@b.com", password: "nope" } })).statusCode, 401, "wrong password rejected");
+  assert.equal((await app.inject({ method: "POST", url: "/auth/login", payload: { email: "a@b.com", password: "password123" } })).statusCode, 200, "correct password accepted");
+  assert.equal((await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "a@b.com", password: "password123" } })).statusCode, 409, "duplicate email rejected");
+  ok("auth: login succeeds, bad password + duplicate email rejected");
+}
+
 // 15. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });

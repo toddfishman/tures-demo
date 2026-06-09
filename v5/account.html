@@ -37,6 +37,7 @@
   </div>
   <div class="flex items-center gap-3">
     <span class="pill pill-gold" id="planPill">Free</span>
+    <button id="upgradeBtn" class="btn-ink px-4 py-2.5 rounded-xl quiet text-sm" style="display:none">Subscribe · $99/mo</button>
     <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-xl quiet font-semibold">Plan a trip →</a>
   </div>
  </div>
@@ -83,8 +84,27 @@ if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
 var a = tures.account || {};
 document.getElementById('name').textContent = a.name || 'Traveler';
 document.getElementById('email').textContent = a.email || '';
-document.getElementById('planPill').textContent = a.plan === 'subscribe' ? 'Concierge · $99/mo' : (a.plan === 'per_trip' ? 'Pay per trip' : 'Free');
 document.getElementById('signOut').onclick = function(e){ e.preventDefault(); tures.signOut(); location.href='index.html'; };
+
+function renderPlan(){
+  var p = (tures.account && tures.account.plan) || 'free';
+  document.getElementById('planPill').textContent = p === 'subscribe' ? 'Concierge · $99/mo' : 'Free · pay per trip';
+  document.getElementById('upgradeBtn').style.display = p === 'subscribe' ? 'none' : '';
+}
+renderPlan();
+
+// refresh plan/identity from the server (it may have changed, e.g. after subscribing)
+if(tures.configured && tures.signedIn){ tures.me().then(renderPlan).catch(function(){}); }
+
+// returned from a successful subscription
+if(new URLSearchParams(location.search).get('subscribed')){
+  if(tures.configured && tures.signedIn) tures.me().then(renderPlan).catch(function(){});
+}
+
+document.getElementById('upgradeBtn').onclick = function(){
+  this.textContent = 'Starting…'; this.disabled = true;
+  tures.billing.checkout().then(function(r){ location.href = r.url; }).catch(function(){ document.getElementById('upgradeBtn').textContent='Subscribe · $99/mo'; document.getElementById('upgradeBtn').disabled=false; });
+};
 
 function money(n){ return '$' + Math.round(n||0).toLocaleString(); }
 function statusPill(s){

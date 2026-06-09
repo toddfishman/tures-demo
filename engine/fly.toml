@@ -9,6 +9,14 @@ primary_region = "sjc"
   PORT = "8787"
   # CORS for the demo on GitHub Pages + local dev. Add your custom domain when you have one.
   CORS_ORIGINS = "https://toddfishman.github.io,http://localhost:8123"
+  # Durable storage lives on the mounted volume below (accounts/vault/bookings survive restarts).
+  DATA_DIR = "/data"
+  PUBLIC_BASE_URL = "https://toddfishman.github.io/tures-demo/v5"
+
+# Persistent volume for DATA_DIR. Create it once: flyctl volumes create tures_data --size 1
+[mounts]
+  source = "tures_data"
+  destination = "/data"
 
 [http_service]
   internal_port = 8787
@@ -24,4 +32,5 @@ primary_region = "sjc"
     timeout = "3s"
 
 # Secrets are NOT set here - use `flyctl secrets set` (see DEPLOY.md):
-#   DUFFEL_API_TOKEN, ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, ALLOW_LIVE_BOOKING
+#   AUTH_SECRET (sessions), VAULT_KEY (PII encryption), DUFFEL_API_TOKEN, ANTHROPIC_API_KEY,
+#   STRIPE_SECRET_KEY, STRIPE_PRICE_SUBSCRIPTION, STRIPE_WEBHOOK_SECRET, ALLOW_LIVE_BOOKING

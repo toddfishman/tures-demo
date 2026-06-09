@@ -86,7 +86,7 @@
       <li class="flex gap-2.5"><span class="ck">✓</span> Hiccup Handler always on, every trip</li>
       <li class="flex gap-2.5"><span class="ck">✓</span> Priority concierge by text</li>
     </ul>
-    <a href="signup.html" class="btn-ink w-full text-center px-5 py-3 rounded-xl quiet mt-6">Subscribe</a>
+    <a href="signup.html" id="subscribeBtn" class="btn-ink w-full text-center px-5 py-3 rounded-xl quiet mt-6">Subscribe</a>
   </div>
 
  </div>
@@ -103,5 +103,15 @@
 </footer>
 
 <script src="assets/ui.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+// Subscribe: signed-in → start checkout (Stripe live, or mock activation); else → sign up first.
+document.getElementById('subscribeBtn').addEventListener('click', function(e){
+  if(!(window.tures && tures.signedIn)){ return; } // fall through to signup.html
+  e.preventDefault();
+  var b=this; b.textContent='Starting…';
+  tures.billing.checkout().then(function(r){ location.href = r.url; }).catch(function(){ b.textContent='Subscribe'; });
+});
+</script>
 </body>
 </html>

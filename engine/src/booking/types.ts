@@ -48,8 +48,10 @@ export interface Booking {
   totalUsd: number;
   currency: string;
   components: BookedComponent[];
-  /** All charges across components (one per card used). */
+  /** All charges across components (one per card used), plus any Tures fee. */
   charges: PaymentRecord[];
+  /** Tures concierge fee charged for this booking ($0 for subscribers). */
+  feeUsd?: number;
   /** Passenger/traveler details applied from the profile (audit-friendly, no raw PII). */
   passenger?: { note: string; ktnApplied: boolean; passportOnFile: boolean; loyaltyCredited: string[] };
   /** Disruptions the Hiccup Handler has processed for this booking. */

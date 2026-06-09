@@ -7,6 +7,8 @@ import { log } from "./logger.ts";
 import { registerOps } from "./ops/index.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { metricsRoutes } from "./routes/metrics.ts";
+import { authRoutes } from "./routes/auth.ts";
+import { billingRoutes } from "./routes/billing.ts";
 import { searchRoutes } from "./routes/search.ts";
 import { planRoutes } from "./routes/plan.ts";
 import { parseRoutes } from "./routes/parse.ts";
@@ -37,11 +39,25 @@ export async function build() {
     allowList: (req) => req.url === "/health" || req.url.startsWith("/health?"),
   });
 
+  // Keep the raw JSON body (needed for Stripe webhook signature verification) while still
+  // parsing JSON. Also tolerates empty-body POSTs (returns {}).
+  app.addContentTypeParser("application/json", { parseAs: "buffer" }, (req, body, done) => {
+    (req as any).rawBody = body;
+    try {
+      const buf = body as Buffer;
+      done(null, buf.length ? JSON.parse(buf.toString()) : {});
+    } catch (e) {
+      done(e as Error);
+    }
+  });
+
   // Auth, request logging, metrics, error/404 handlers.
   registerOps(app);
 
   await app.register(healthRoutes);
   await app.register(metricsRoutes);
+  await app.register(authRoutes);
+  await app.register(billingRoutes);
   await app.register(searchRoutes);
   await app.register(planRoutes);
   await app.register(parseRoutes);

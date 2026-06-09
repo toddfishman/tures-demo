@@ -4,9 +4,11 @@
 import { encrypt, decrypt } from "./crypto.ts";
 import { DEFAULT_SCOPES, redact } from "./types.ts";
 import type { Connection, ConnectionKind, RedactedConnection } from "./types.ts";
+import { Collection } from "../db/persist.ts";
 import { log } from "../logger.ts";
 
-const byId = new Map<string, Connection>();
+// Durable when DATA_DIR is set. Only ciphertext (secretCipher) is persisted — never plaintext PII.
+const byId = new Collection<Connection>("connections");
 let counter = 0;
 
 export interface ConnectInput {
@@ -47,6 +49,7 @@ export function revoke(id: string): RedactedConnection | null {
   if (!conn) return null;
   conn.status = "revoked";
   conn.revokedAt = new Date().toISOString();
+  byId.set(conn.id, conn); // persist the revocation
   log.info("vault: revoked", { id, kind: conn.kind });
   return redact(conn);
 }

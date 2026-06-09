@@ -18,7 +18,10 @@ export async function healthRoutes(app: FastifyInstance) {
       wallet: true, // Chunk 4.5 — multi-card selection by reward value
       travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
+      accounts: true, // email+password logins with sessions
+      billingLive: !!config.stripeKey && !!config.stripePriceSubscription, // real Stripe subscriptions
     },
+    durable: !!config.dataDir, // persists accounts/vault/bookings across restarts
     auth: !!config.apiKey, // Chunk 6 — true when an API key is required
   }));
 }

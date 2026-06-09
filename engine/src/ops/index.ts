@@ -4,26 +4,31 @@ import type { FastifyInstance } from "fastify";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { recordResponse } from "./metrics.ts";
+import { verifyToken } from "../auth/index.ts";
 
 let reqSeq = 0;
 
 export function registerOps(app: FastifyInstance) {
-  // Auth — only enforced when ENGINE_API_KEY is set. /health stays open for uptime checks;
-  // SSE accepts the key via ?token= since EventSource can't send headers.
   app.addHook("onRequest", async (req, reply) => {
     (req as any)._startNs = process.hrtime.bigint();
     (req as any)._rid = `r${reqSeq++}`;
 
+    const auth = req.headers["authorization"];
+    const bearer = typeof auth === "string" && auth.startsWith("Bearer ") ? auth.slice(7) : undefined;
+    const queryToken = (req.query as Record<string, string> | undefined)?.token;
+
+    // Session: a valid user JWT (header or ?token=) sets the acting account for the request.
+    const session = verifyToken(bearer) ?? verifyToken(queryToken);
+    if (session) (req as any).accountId = session.sub;
+
+    // Optional shared API-key gate (ops). Public + auth endpoints stay open.
     const key = config.apiKey;
     if (!key) return;
     if (req.method === "OPTIONS") return; // never block CORS preflight
-    if (req.url === "/health" || req.url.startsWith("/health?")) return;
-    if (req.url === "/waitlist" || req.url.startsWith("/waitlist")) return; // public early-access capture
-
-    const auth = req.headers["authorization"];
-    const bearer = typeof auth === "string" && auth.startsWith("Bearer ") ? auth.slice(7) : undefined;
+    const open = ["/health", "/waitlist", "/auth", "/billing/webhook"];
+    if (open.some((p) => req.url === p || req.url.startsWith(p))) return;
+    if (session) return; // a signed-in user is authorized
     const headerKey = (req.headers["x-api-key"] as string | undefined) ?? bearer;
-    const queryToken = (req.query as Record<string, string> | undefined)?.token;
     if (headerKey !== key && queryToken !== key) {
       return reply.code(401).send({ error: "unauthorized" });
     }

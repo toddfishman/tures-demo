@@ -53,18 +53,9 @@
       <div class="flex justify-between text-sm"><span class="text-ink-soft">Travel total (to your card)</span><span class="font-mono text-ink" id="travelTotal">—</span></div>
     </div>
 
-    <!-- tures plan -->
-    <div class="caps text-[11px] text-ink-faint mb-3">How you'll pay Tures</div>
-    <div class="space-y-2 mb-5">
-      <div class="opt on flex items-center gap-3" data-plan="per_trip" data-fee="99">
-        <span class="tick"></span>
-        <span class="flex-1"><span class="text-ink font-medium">Pay per trip</span><span class="text-ink-soft text-sm block">$99 concierge fee on this booking. No commitment.</span></span>
-      </div>
-      <div class="opt flex items-center gap-3" data-plan="subscribe" data-fee="0">
-        <span class="tick"></span>
-        <span class="flex-1"><span class="text-ink font-medium">Subscribe — $99/mo</span><span class="text-ink-soft text-sm block">No per-trip fee, unlimited planning &amp; the Hiccup Handler watching every trip.</span></span>
-      </div>
-    </div>
+    <!-- tures fee -->
+    <div class="caps text-[11px] text-ink-faint mb-3">Tures fee</div>
+    <div id="feeBox" class="rounded-lg p-4 mb-5" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28)"></div>
 
     <!-- payment method -->
     <div class="caps text-[11px] text-ink-faint mb-3">Card for this trip</div>
@@ -79,6 +70,7 @@
       <span class="font-display text-3xl text-ink" id="grand">—</span>
     </div>
     <button id="payBtn" class="btn-gold w-full px-6 py-4 rounded-xl quiet font-semibold text-lg">Confirm &amp; book →</button>
+    <div id="payErr" class="text-center text-sm mt-2" style="color:var(--alert)"></div>
     <p class="text-[12px] text-ink-faint text-center mt-3">Tures acts as agent-of-record for flights and books boutique stays in your name. Cancel anytime.</p>
   </div>
 
@@ -100,9 +92,13 @@ var pending = null;
 try { pending = JSON.parse(localStorage.getItem('tures.pendingTrip') || 'null'); } catch(e){}
 
 function money(n){ return '$' + Math.round(n).toLocaleString(); }
-var _sel0 = document.querySelector('.opt.on');
-var plan = _sel0 ? _sel0.getAttribute('data-plan') : 'per_trip';
-var fee = _sel0 ? Number(_sel0.getAttribute('data-fee')) : 99;
+var isSub = !!(window.tures && tures.account && tures.account.plan === 'subscribe');
+var fee = isSub ? 0 : 99;
+function renderFee(){
+  var box = document.getElementById('feeBox');
+  if(isSub) box.innerHTML = '<span class="text-ink font-medium">$0 — concierge fee waived</span><span class="text-ink-soft text-sm block">You\'re on the Concierge plan. Travel charges still pass through to your card.</span>';
+  else box.innerHTML = '<div class="flex items-baseline justify-between"><span class="text-ink font-medium">$99 concierge fee</span><span class="text-ink-soft text-sm">on this booking only</span></div><span class="text-ink-soft text-sm block mt-1">Booking unlimited? <a href="pricing.html" class="text-gold-deep underline quiet">Subscribe for $99/mo</a> and skip per-trip fees.</span>';
+}
 
 function gate(){
   if(!pending){ document.getElementById('needPlan').style.display=''; return false; }
@@ -120,15 +116,6 @@ function renderItin(){
   recompute();
 }
 function recompute(){ document.getElementById('grand').textContent = money((pending.totalUsd||0) + fee); }
-
-document.querySelectorAll('.opt').forEach(function(o){
-  o.onclick = function(){
-    document.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('on'); });
-    o.classList.add('on');
-    plan = o.getAttribute('data-plan'); fee = Number(o.getAttribute('data-fee'));
-    recompute();
-  };
-});
 
 // payment cards
 function refreshCards(){
@@ -156,7 +143,6 @@ if(addCard) addCard.onclick = function(){
 };
 
 document.getElementById('payBtn').addEventListener('click', function(){
-  if(window.tures) tures.setPlan && tures.setPlan(plan);
   var btn=this; btn.textContent='Booking…'; btn.disabled=true; btn.style.opacity=.7;
 
   function showBooked(components){
@@ -169,24 +155,24 @@ document.getElementById('payBtn').addEventListener('click', function(){
     localStorage.removeItem('tures.pendingTrip');
   }
 
+  function fail(msg){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Confirm & book →'; var e=document.getElementById('payErr'); if(e){ e.textContent=msg; } }
+
   if(window.tures && tures.configured){
-    tures.book({ brief: pending.brief, flightId: pending.flightId, stayId: pending.stayId })
+    tures.book({ brief: pending.brief, flightId: pending.flightId, stayId: pending.stayId, feeUsd: fee })
+      .then(function(b){ return b.status === 'confirmation_required' ? tures.confirm(b.id) : b; })
       .then(function(b){
-        if(b.status === 'confirmation_required') return tures.confirm(b.id);
-        return b;
+        if(b.status !== 'booked'){ throw Object.assign(new Error('not booked'), { body: b }); }
+        showBooked(b.components);
       })
-      .then(function(b){ showBooked(b.components); })
       .catch(function(err){
-        btn.disabled=false; btn.style.opacity=1; btn.textContent='Confirm & book →';
-        alert('Could not book: ' + ((err && err.body && (err.body.violations||[]).join('; ')) || (err && err.message) || err));
+        fail('Could not book: ' + ((err && err.body && (err.body.violations||[]).join('; ')) || (err && err.message) || err));
       });
   } else {
-    // demo fallback
     setTimeout(function(){ showBooked([{title: pending.flightTitle, confirmation:'PNR-DEMO1'},{title: pending.stayTitle, confirmation:'CONF-DEMO2'}]); }, 900);
   }
 });
 
-if(gate()){ renderItin(); refreshCards(); }
+if(gate()){ renderFee(); renderItin(); refreshCards(); }
 </script>
 </body>
 </html>
