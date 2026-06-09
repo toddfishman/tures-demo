@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Tures — Account</title>
+<title>Tures — Your account</title>
 <meta name="description" content="Your trips, payment methods, connected services, and agent settings." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,378 +11,131 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="assets/tures.css">
 <style>
-  body{ background:var(--obsidian); padding-bottom:96px; }
-  /* payment card */
-  .pcard{ position:relative; border-radius:14px; padding:18px 18px 16px; min-height:128px;
-    display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
-    box-shadow:0 18px 40px -22px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08); }
-  .pcard.visa{ background:linear-gradient(150deg,#1a2740,#0d1626 70%); border:1px solid rgba(120,150,200,.25); }
-  .pcard.amex{ background:linear-gradient(150deg,#143a3c,#0a2122 70%); border:1px solid rgba(120,200,190,.22); }
-  .pcard .chip{ width:34px; height:25px; border-radius:5px;
-    background:linear-gradient(135deg,#e6c873,#a8842f); box-shadow:inset 0 1px 0 rgba(255,240,200,.6); }
-  .pcard .net{ font-family:'DM Serif Display',serif; letter-spacing:.04em; }
-  /* trip strip */
-  .trip-legs{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; }
-  .trip-legs::-webkit-scrollbar{ display:none; }
-  .leg{ padding:5px 9px; border-radius:6px; border:1px solid rgba(200,162,74,0.18); font-size:10.5px; white-space:nowrap; color:var(--ink-soft); }
-  /* integration row icon */
-  .iico{ width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-size:17px;
-    background:linear-gradient(160deg,#241910,#15100a); border:1px solid rgba(200,162,74,.28); color:var(--gold-bright); }
-  .revoke{ font-size:10px; letter-spacing:.08em; text-transform:uppercase; padding:4px 10px; border-radius:999px;
-    border:1px solid rgba(181,84,58,.4); color:#8f3f2b; background:rgba(181,84,58,.08); cursor:pointer;
-    transition:background .15s ease, transform .14s cubic-bezier(.34,1.56,.64,1); }
-  .revoke:active{ transform:scale(.94); }
-  .revoke.done{ border-color:var(--canvas-line); color:var(--ink-faint); background:transparent; }
+  body{ background:var(--obsidian); }
+  .card{ border:1px solid var(--canvas-line); border-radius:12px; background:rgba(255,253,247,0.55); }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
 
 <header class="chrome sticky top-0 z-30">
-  <nav class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="index.html#contents" class="text-sm quiet flex items-center gap-2"><span>←</span> Contents</a>
-    <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="flex items-center gap-5 text-sm">
+      <a href="03-paste-trip.html" class="quiet">Plan a trip</a>
+      <a href="#" id="signOut" class="text-canvas/60 quiet">Sign out</a>
+    </div>
   </nav>
 </header>
 
-<!-- HERO -->
 <section class="leather-surface grain relative overflow-hidden">
- <div class="ghost-num absolute -top-12 right-2 text-[30vw] sm:text-[18vw] z-0" data-parallax="0.12">✦</div>
- <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
-   <div class="caps text-[11px] text-gold/80 mb-3 flex items-center gap-2"><span class="dot dot-green beat" style="color:var(--confirm)"></span>Andy Rockwell · Founders member</div>
-   <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Your account</h1>
-   <p class="mt-4 max-w-lg text-canvas/70 leading-relaxed text-lg">Everything Tures holds on your behalf — trips, cards, connected services — in one place. Revoke anything, anytime.</p>
-   <div class="mt-6 flex flex-wrap gap-3">
-     <a href="billing.html" class="btn-ghost px-4 py-2 rounded-full text-sm quiet press">Billing &amp; subscription →</a>
-     <a href="02-taste-engine.html" class="btn-ghost px-4 py-2 rounded-full text-sm quiet press">Taste Engine settings →</a>
-   </div>
- </div>
- <div class="relative z-10 max-w-3xl mx-auto px-6 pb-10 grid grid-cols-3 gap-3">
-   <div class="plate p-4"><div class="caps text-[10px] text-gold/60">Trips booked</div><div class="font-mono text-2xl text-gold-bright mt-1" data-countup="11" data-countup-dur="1100">0</div></div>
-   <div class="plate p-4"><div class="caps text-[10px] text-gold/60">Nights away</div><div class="font-mono text-2xl text-gold-bright mt-1" data-countup="64" data-countup-dur="1300">0</div></div>
-   <div class="plate p-4"><div class="caps text-[10px] text-gold/60">Hiccups handled</div><div class="font-mono text-2xl text-gold-bright mt-1" data-countup="3" data-countup-dur="900">0</div></div>
+ <div class="ghost-num absolute -top-8 right-2 text-[20vw] z-0" data-parallax="0.12">✦</div>
+ <div class="relative z-10 max-w-5xl mx-auto px-6 pt-12 pb-8 flex items-end justify-between flex-wrap gap-4">
+  <div>
+    <div class="caps text-[11px] text-gold/80 mb-2">Your account</div>
+    <h1 class="font-display text-5xl leading-[1.0]" id="name">Traveler</h1>
+    <p class="text-canvas/65 mt-2 text-sm" id="email"></p>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="pill pill-gold" id="planPill">Free</span>
+    <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-xl quiet font-semibold">Plan a trip →</a>
+  </div>
  </div>
 </section>
 
 <main class="canvas-surface text-ink">
- <div class="relative z-10 max-w-3xl mx-auto px-6 py-12 space-y-12">
+ <div class="max-w-5xl mx-auto px-6 py-12 space-y-10">
 
-  <!-- ============ TRIPS ============ -->
-  <section>
-    <div class="flex items-center justify-between mb-4">
-      <div><div class="caps text-[11px] text-ink-faint">Section I</div><h2 class="font-display text-3xl text-ink leading-none">Your trips</h2></div>
-      <div class="seg" data-seg>
-        <button data-v="upcoming" class="on">Upcoming</button>
-        <button data-v="past">Past</button>
-      </div>
+  <!-- TRIPS -->
+  <div>
+    <div class="caps text-[11px] text-ink-faint mb-4">Your trips</div>
+    <div id="trips" class="space-y-3"><div class="text-sm text-ink-faint">Loading…</div></div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-10">
+    <!-- WALLET -->
+    <div>
+      <div class="caps text-[11px] text-ink-faint mb-4">Wallet</div>
+      <div id="wallet" class="space-y-2 mb-3"><div class="text-sm text-ink-faint">—</div></div>
+      <div id="walletRec" class="text-[12.5px] text-ink-soft"></div>
+      <a href="welcome.html" class="text-[13px] text-gold-deep quiet underline mt-2 inline-block">Manage wallet &amp; setup →</a>
     </div>
-
-    <!-- upcoming -->
-    <div id="trips-upcoming" class="space-y-3">
-      <div class="exp leaf">
-        <div class="exp-head flex items-center gap-3 p-4 cursor-pointer">
-          <span class="font-display text-lg" style="width:42px;height:42px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(160deg,#241910,#15100a);color:var(--gold-bright);border:1px solid rgba(200,162,74,.3)">I</span>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap"><span class="font-display text-xl text-ink leading-tight">Paris · Lapland · Copenhagen</span><span class="pill pill-confirm">Confirmed</span></div>
-            <div class="caps text-[10px] text-ink-faint mt-0.5">Dec 10–18 · 2 travelers · #T-2087</div>
-          </div>
-          <span class="exp-chev text-gold-deep">›</span>
-        </div>
-        <div class="exp-body"><div class="px-4 pb-4">
-          <div class="trip-legs mb-3">
-            <span class="leg">SEA→CDG</span><span class="leg">Real Christine</span><span class="leg">CDG→IVL</span>
-            <span class="leg">Javri Lodge</span><span class="leg">IVL→CPH</span><span class="leg">Hotel Sanders</span><span class="leg">CPH→SEA</span>
-          </div>
-          <div class="flex items-center gap-2 text-xs text-ink-soft mb-3"><span class="dot dot-green"></span>Hiccup Handler watching · French ATC strike resolved Dec 12</div>
-          <div class="flex flex-wrap gap-2">
-            <a href="07-itinerary.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">View itinerary →</a>
-            <a href="06-hiccup-handler.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Watch status</a>
-            <a href="08-concierge.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Message concierge</a>
-          </div>
-        </div></div>
-      </div>
-
-      <div class="exp leaf">
-        <div class="exp-head flex items-center gap-3 p-4 cursor-pointer">
-          <span class="font-display text-lg" style="width:42px;height:42px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(160deg,#241910,#15100a);color:var(--gold-bright);border:1px solid rgba(200,162,74,.3)">II</span>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap"><span class="font-display text-xl text-ink leading-tight">Amalfi, anniversary</span><span class="pill pill-pending">Assembling</span></div>
-            <div class="caps text-[10px] text-ink-faint mt-0.5">May 4–11 · 2 travelers · #T-2140</div>
-          </div>
-          <span class="exp-chev text-gold-deep">›</span>
-        </div>
-        <div class="exp-body"><div class="px-4 pb-4">
-          <div class="trip-legs mb-3">
-            <span class="leg">SEA→NAP</span><span class="leg">Le Sirenuse</span><span class="leg">Il San Pietro</span><span class="leg">NAP→SEA</span>
-          </div>
-          <div class="flex items-center gap-2 text-xs text-ink-soft mb-3"><span class="dot dot-amber pulse"></span>2 legs confirmed · dinner at La Sponda holding a request</div>
-          <div class="flex flex-wrap gap-2">
-            <a href="05-execution.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Watch it build →</a>
-            <a href="08-concierge.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Message concierge</a>
-          </div>
-        </div></div>
-      </div>
+    <!-- PROFILE + SERVICES -->
+    <div>
+      <div class="caps text-[11px] text-ink-faint mb-4">Traveler profile</div>
+      <div id="profile" class="card p-4 text-sm mb-6"><span class="text-ink-faint">No profile on file.</span></div>
+      <div class="caps text-[11px] text-ink-faint mb-4">Connected services</div>
+      <div id="services" class="space-y-2"><div class="text-sm text-ink-faint">—</div></div>
     </div>
-
-    <!-- past (hidden by default) -->
-    <div id="trips-past" class="space-y-3 hidden">
-      <div class="exp leaf">
-        <div class="exp-head flex items-center gap-3 p-4 cursor-pointer">
-          <span class="font-display text-lg" style="width:42px;height:42px;display:grid;place-items:center;border-radius:11px;background:rgba(43,33,20,.07);color:var(--ink-faint);border:1px solid var(--canvas-line)">·</span>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap"><span class="font-display text-xl text-ink leading-tight">Tokyo, late spring</span><span class="pill" style="background:rgba(43,33,20,.07);color:var(--ink-faint)">Completed</span></div>
-            <div class="caps text-[10px] text-ink-faint mt-0.5">Apr 3–12 · 2 travelers · #T-1894</div>
-          </div>
-          <span class="exp-chev text-gold-deep">›</span>
-        </div>
-        <div class="exp-body"><div class="px-4 pb-4">
-          <div class="trip-legs mb-3"><span class="leg">SEA→HND</span><span class="leg">Hoshinoya</span><span class="leg">Trunk Hotel</span><span class="leg">Den · Sushi Saito</span><span class="leg">HND→SEA</span></div>
-          <div class="flex flex-wrap gap-2">
-            <a href="billing.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Receipts →</a>
-            <a href="#" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Rebook similar</a>
-          </div>
-        </div></div>
-      </div>
-      <div class="exp leaf">
-        <div class="exp-head flex items-center gap-3 p-4 cursor-pointer">
-          <span class="font-display text-lg" style="width:42px;height:42px;display:grid;place-items:center;border-radius:11px;background:rgba(43,33,20,.07);color:var(--ink-faint);border:1px solid var(--canvas-line)">·</span>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap"><span class="font-display text-xl text-ink leading-tight">Lisbon long weekend</span><span class="pill" style="background:rgba(43,33,20,.07);color:var(--ink-faint)">Completed</span></div>
-            <div class="caps text-[10px] text-ink-faint mt-0.5">Feb 14–17 · 2 travelers · #T-1770</div>
-          </div>
-          <span class="exp-chev text-gold-deep">›</span>
-        </div>
-        <div class="exp-body"><div class="px-4 pb-4">
-          <div class="trip-legs mb-3"><span class="leg">SEA→LIS</span><span class="leg">Palácio Belmonte</span><span class="leg">Belcanto</span><span class="leg">LIS→SEA</span></div>
-          <div class="flex flex-wrap gap-2">
-            <a href="billing.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Receipts →</a>
-            <a href="#" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Rebook similar</a>
-          </div>
-        </div></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="rule-gold"></div>
-
-  <!-- ============ PAYMENT METHODS ============ -->
-  <section>
-    <div class="flex items-end justify-between mb-4">
-      <div><div class="caps text-[11px] text-ink-faint">Section II</div><h2 class="font-display text-3xl text-ink leading-none">Payment methods</h2></div>
-      <a href="billing.html" class="text-gold-deep text-sm underline quiet">Manage in billing →</a>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div class="pcard visa text-canvas">
-        <div class="flex items-start justify-between">
-          <div class="chip"></div>
-          <span class="pill pill-d-gold">Default</span>
-        </div>
-        <div>
-          <div class="font-mono text-base tracking-widest text-canvas/90">•••• •••• •••• 6411</div>
-          <div class="flex items-center justify-between mt-1.5">
-            <span class="caps text-[10px] text-canvas/55">Andy Rockwell · 09/27</span>
-            <span class="net text-lg text-canvas/90">VISA</span>
-          </div>
-        </div>
-      </div>
-      <div class="pcard amex text-canvas">
-        <div class="flex items-start justify-between">
-          <div class="chip"></div>
-          <span class="pill pill-d-gold" style="opacity:.7">Backup</span>
-        </div>
-        <div>
-          <div class="font-mono text-base tracking-widest text-canvas/90">•••• •••••• •2003</div>
-          <div class="flex items-center justify-between mt-1.5">
-            <span class="caps text-[10px] text-canvas/55">Andy Rockwell · 04/26</span>
-            <span class="net text-lg text-canvas/90">AMEX</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button class="btn-ink w-full mt-3 px-4 py-3 rounded-xl text-sm press">+ Add a card</button>
-    <p class="text-xs text-ink-faint mt-2 leading-relaxed">Cards are tokenized by Stripe. Tures never stores your full card number. We charge in your name for boutique bookings and act as agent-of-record for flights.</p>
-  </section>
-
-  <div class="rule-gold"></div>
-
-  <!-- ============ CONNECTIONS ============ -->
-  <section>
-    <div class="caps text-[11px] text-ink-faint">Section III</div>
-    <h2 class="font-display text-3xl text-ink leading-none mb-1">Connected services</h2>
-    <p class="text-sm text-ink-soft mb-4">Each grant is scoped and logged. We show you when we last used it — revoke any of them and the agent stops immediately.</p>
-
-    <div class="leaf divide-y" style="border-color:var(--canvas-line)">
-      <div class="flex items-center gap-3 p-4" style="border-color:var(--canvas-line)">
-        <span class="iico">✉</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Gmail</div>
-          <div class="caps text-[10px] text-ink-faint">Read-only · travel senders only · used 6h ago</div>
-        </div>
-        <button class="revoke" onclick="revoke(this)">Revoke</button>
-      </div>
-      <div class="flex items-center gap-3 p-4" style="border-color:var(--canvas-line)">
-        <span class="iico">📅</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Google Calendar</div>
-          <div class="caps text-[10px] text-ink-faint">Read &amp; write holds · used yesterday</div>
-        </div>
-        <button class="revoke" onclick="revoke(this)">Revoke</button>
-      </div>
-      <div class="flex items-center gap-3 p-4" style="border-color:var(--canvas-line)">
-        <span class="iico"></span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Apple Wallet</div>
-          <div class="caps text-[10px] text-ink-faint">Boarding passes &amp; hotel keys · auto-push</div>
-        </div>
-        <button class="revoke" onclick="revoke(this)">Revoke</button>
-      </div>
-      <div class="flex items-center gap-3 p-4" style="border-color:var(--canvas-line)">
-        <span class="iico">★</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Loyalty — Delta SkyMiles</div>
-          <div class="caps text-[10px] text-ink-faint">Diamond · #20043•••• · credits status</div>
-        </div>
-        <button class="revoke" onclick="revoke(this)">Revoke</button>
-      </div>
-      <div class="flex items-center gap-3 p-4" style="border-color:var(--canvas-line)">
-        <span class="iico">★</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Loyalty — Hyatt Globalist</div>
-          <div class="caps text-[10px] text-ink-faint">#788•••• · applies suite upgrades</div>
-        </div>
-        <button class="revoke" onclick="revoke(this)">Revoke</button>
-      </div>
-      <div class="flex items-center gap-3 p-4">
-        <span class="iico" style="color:var(--ink-faint);border-color:var(--canvas-line);background:rgba(43,33,20,.05)">＋</span>
-        <div class="flex-1 min-w-0">
-          <div class="text-ink font-medium">Add a service</div>
-          <div class="caps text-[10px] text-ink-faint">Outlook · Amex · Marriott · WhatsApp</div>
-        </div>
-        <a href="04-connections.html" class="btn-ink px-3.5 py-2 rounded-lg text-xs quiet">Connect →</a>
-      </div>
-    </div>
-    <a href="04-connections.html" class="inline-flex items-center gap-2 text-gold-deep text-sm underline quiet mt-3">See the full permission gradient →</a>
-  </section>
-
-  <div class="rule-gold"></div>
-
-  <!-- ============ AGENT SETTINGS ============ -->
-  <section>
-    <div class="caps text-[11px] text-ink-faint">Section IV</div>
-    <h2 class="font-display text-3xl text-ink leading-none mb-4">Agent settings</h2>
-    <div class="leaf divide-y" style="border-color:var(--canvas-line)">
-      <div class="flex items-center gap-4 p-4" style="border-color:var(--canvas-line)">
-        <div class="flex-1">
-          <div class="text-ink font-medium">Hiccup Handler watch</div>
-          <div class="text-xs text-ink-soft mt-0.5 leading-relaxed">Always-on monitoring of every active trip. Pre-stages fixes before disruptions reach you.</div>
-        </div>
-        <div class="switch on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"><span class="knob"></span></div>
-      </div>
-      <div class="flex items-center gap-4 p-4" style="border-color:var(--canvas-line)">
-        <div class="flex-1">
-          <div class="text-ink font-medium">Standing rebooking authority</div>
-          <div class="text-xs text-ink-soft mt-0.5 leading-relaxed">Let Tures rebook same-class alternatives without asking, under your pre-set rules.</div>
-        </div>
-        <div class="switch on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"><span class="knob"></span></div>
-      </div>
-      <div class="flex items-center gap-4 p-4" style="border-color:var(--canvas-line)">
-        <div class="flex-1">
-          <div class="text-ink font-medium">Confirm bookings over $2,000</div>
-          <div class="text-xs text-ink-soft mt-0.5 leading-relaxed">Require a one-tap confirmation before committing large spend.</div>
-        </div>
-        <div class="switch on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"><span class="knob"></span></div>
-      </div>
-      <div class="flex items-center gap-4 p-4">
-        <div class="flex-1">
-          <div class="text-ink font-medium">Quiet hours notifications</div>
-          <div class="text-xs text-ink-soft mt-0.5 leading-relaxed">Hold non-urgent updates between 10pm–7am your local time.</div>
-        </div>
-        <div class="switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')" role="switch" aria-checked="false"><span class="knob"></span></div>
-      </div>
-    </div>
-    <a href="02-taste-engine.html" class="block leaf p-4 mt-3 lift">
-      <div class="flex items-center gap-3">
-        <span class="iico">◈</span>
-        <div class="flex-1"><div class="text-ink font-medium">Taste Engine</div><div class="caps text-[10px] text-ink-faint">Your Taste Print · last sharpened after Tokyo</div></div>
-        <span class="text-gold-deep">›</span>
-      </div>
-    </a>
-  </section>
-
-  <div class="rule-gold"></div>
-
-  <!-- ============ DANGER / ACCOUNT ============ -->
-  <section>
-    <div class="caps text-[11px] text-ink-faint">Section V</div>
-    <h2 class="font-display text-3xl text-ink leading-none mb-4">Account</h2>
-    <div class="space-y-2.5">
-      <button data-sheet="sheet-killswitch" class="w-full leaf p-4 flex items-center gap-3 text-left press">
-        <span class="iico" style="color:#e39179;border-color:rgba(181,84,58,.4)">⏻</span>
-        <div class="flex-1"><div class="text-ink font-medium">Pause all agent access</div><div class="caps text-[10px] text-ink-faint">One-tap kill switch · stops every running agent</div></div>
-        <span class="text-ink-faint">›</span>
-      </button>
-      <div class="flex flex-wrap items-center gap-3 pt-3">
-        <button class="btn-ink px-4 py-2.5 rounded-lg text-sm press">Sign out</button>
-        <button data-sheet="sheet-delete" class="text-sm quiet" style="color:#8f3f2b">Delete account &amp; purge data</button>
-      </div>
-      <p class="text-xs text-ink-faint leading-relaxed pt-1">Signed in as <span class="text-ink-soft">andy@rockwell.co</span> · member since June 2026 · <a href="legal/privacy.html" class="underline text-ink-soft quiet">Privacy</a> · <a href="legal/terms.html" class="underline text-ink-soft quiet">Terms</a> · <a href="faq.html" class="underline text-ink-soft quiet">FAQ</a></p>
-    </div>
-  </section>
+  </div>
 
  </div>
 </main>
 
 <footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
   <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
-  <div class="text-canvas/45 text-xs mt-2 caps">Your account · Founders edition</div>
-  <div class="mt-3 flex items-center justify-center gap-4 text-xs text-canvas/40">
-    <a href="billing.html" class="quiet hover:text-gold-bright">Billing</a>
-    <a href="faq.html" class="quiet hover:text-gold-bright">FAQ</a>
-    <a href="legal/index.html" class="quiet hover:text-gold-bright">Legal</a>
-  </div>
+  <div class="text-canvas/45 text-xs mt-2">Plan free. Pay when it books.</div>
 </footer>
 
-<!-- sticky CTA -->
-<div class="cta-bar">
-  <div class="max-w-3xl mx-auto w-full flex items-center gap-3">
-    <a href="billing.html" class="btn-ghost px-5 py-3 rounded-xl hidden sm:inline-block quiet">Billing</a>
-    <a href="08-concierge.html" class="btn-gold flex-1 sm:flex-none sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Open the concierge →</a>
-  </div>
-</div>
-
-<!-- bottom sheet: kill switch -->
-<div class="sheet" id="sheet-killswitch"><div class="sheet-backdrop"></div><div class="sheet-panel">
-  <div class="sheet-handle"></div>
-  <div class="caps text-[11px] text-ink-faint mb-1">Kill switch</div>
-  <h3 class="font-display text-2xl text-ink mb-3">Pause all agent access?</h3>
-  <p class="text-sm text-ink-soft leading-relaxed mb-4">This immediately: invalidates active sessions, halts every running agent, and marks all connected services as revoked. Confirmed bookings remain yours with the vendor. You can re-enable anytime within 7 days before tokens are purged.</p>
-  <button class="btn-gold w-full px-5 py-3 rounded-xl font-semibold press" data-sheet-close>Pause everything now</button>
-  <button data-sheet-close class="btn-ink w-full mt-2 px-5 py-3 rounded-xl">Never mind</button>
-</div></div>
-
-<!-- bottom sheet: delete -->
-<div class="sheet" id="sheet-delete"><div class="sheet-backdrop"></div><div class="sheet-panel">
-  <div class="sheet-handle"></div>
-  <div class="caps text-[11px] text-ink-faint mb-1">Delete account</div>
-  <h3 class="font-display text-2xl text-ink mb-3">Delete &amp; purge your data?</h3>
-  <p class="text-sm text-ink-soft leading-relaxed mb-4">We purge inbox &amp; calendar content within 30 days and personal data per your GDPR/CCPA rights. Audit-log records of agent actions are retained for legal defense with your PII redacted. This cannot be undone.</p>
-  <button class="w-full px-5 py-3 rounded-xl font-semibold press" style="background:#b5543a;color:#fff" data-sheet-close>Delete my account</button>
-  <button data-sheet-close class="btn-ink w-full mt-2 px-5 py-3 rounded-xl">Keep my account</button>
-</div></div>
-
+<script src="assets/engine.js"></script>
 <script>
-  // trips segmented toggle
-  document.querySelector('[data-seg]').addEventListener('segchange', function(e){
-    var up = e.detail.value === 'upcoming';
-    document.getElementById('trips-upcoming').classList.toggle('hidden', !up);
-    document.getElementById('trips-past').classList.toggle('hidden', up);
-  });
-  // revoke chips
-  function revoke(btn){
-    if(btn.classList.contains('done')){ btn.classList.remove('done'); btn.textContent='Revoke'; return; }
-    btn.classList.add('done'); btn.textContent='Revoked ✓';
-  }
+if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
+
+var a = tures.account || {};
+document.getElementById('name').textContent = a.name || 'Traveler';
+document.getElementById('email').textContent = a.email || '';
+document.getElementById('planPill').textContent = a.plan === 'subscribe' ? 'Concierge · $29/mo' : (a.plan === 'per_trip' ? 'Pay per trip' : 'Free');
+document.getElementById('signOut').onclick = function(e){ e.preventDefault(); tures.signOut(); location.href='index.html'; };
+
+function money(n){ return '$' + Math.round(n||0).toLocaleString(); }
+function statusPill(s){
+  var map = { booked:['pill-confirm','Booked'], confirmation_required:['pill-pending','Awaiting you'], booking:['pill-gold','Booking…'], failed:['pill-alert','Failed'] };
+  var m = map[s] || ['pill-gold', s];
+  return '<span class="pill '+m[0]+'">'+m[1]+'</span>';
+}
+
+if(tures.configured){
+  tures.bookings().then(function(res){
+    var el = document.getElementById('trips');
+    var list = res.bookings || [];
+    if(!list.length){ el.innerHTML = '<div class="card p-5 text-center text-sm text-ink-soft">No trips yet. <a href="03-paste-trip.html" class="text-gold-deep underline quiet">Plan your first →</a></div>'; return; }
+    el.innerHTML = '';
+    list.forEach(function(b){
+      var legs = (b.components||[]).map(function(c){
+        return '<div class="flex justify-between text-[13px]"><span class="text-ink">'+(c.kind==='flight'?'✈':'⌂')+' '+c.title+'</span><span class="font-mono text-ink-soft">'+(c.confirmation||c.status)+(c.card?' · '+c.card.name:'')+'</span></div>';
+      }).join('');
+      var row = document.createElement('div'); row.className='card p-4';
+      row.innerHTML = '<div class="flex items-center justify-between mb-2"><span class="font-display text-lg text-ink">'+((b.brief&&b.brief.origin)||'?')+' → '+((b.brief&&b.brief.destination)||'?')+'</span>'+statusPill(b.status)+'</div>'+
+        legs + '<div class="flex justify-between mt-2 pt-2 text-[13px]" style="border-top:1px solid var(--canvas-line)"><span class="text-ink-faint">Total</span><span class="font-mono text-ink">'+money(b.totalUsd)+'</span></div>';
+      el.appendChild(row);
+    });
+  }).catch(function(){ document.getElementById('trips').innerHTML = '<div class="text-sm text-ink-faint">Couldn\'t load trips.</div>'; });
+
+  tures.connections.list().then(function(res){
+    var conns = res.connections || [];
+    var cards = conns.filter(function(c){return c.kind==='payment';});
+    var w = document.getElementById('wallet');
+    w.innerHTML = cards.length ? '' : '<div class="text-sm text-ink-faint">No cards yet.</div>';
+    cards.forEach(function(c){ var r=document.createElement('div'); r.className='card px-3 py-2 text-sm text-ink'; r.textContent=c.label; w.appendChild(r); });
+    if(cards.length){
+      Promise.all([tures.wallet.recommend('airfare',5000), tures.wallet.recommend('hotel',2000)]).then(function(rs){
+        document.getElementById('walletRec').innerHTML = '✈ flights → '+(rs[0].name||'—')+' · ⌂ hotels → '+(rs[1].name||'—');
+      }).catch(function(){});
+    }
+    var svc = conns.filter(function(c){ return c.kind==='email'||c.kind==='calendar'||c.kind==='loyalty'; });
+    var s = document.getElementById('services');
+    s.innerHTML = svc.length ? '' : '<div class="text-sm text-ink-faint">None connected.</div>';
+    svc.forEach(function(c){ var r=document.createElement('div'); r.className='card px-3 py-2 text-sm flex justify-between'; r.innerHTML='<span class="text-ink">'+c.label+'</span><span class="dot dot-green"></span>'; s.appendChild(r); });
+  }).catch(function(){});
+
+  tures.profile.get().then(function(p){
+    if(p && p.meta){
+      document.getElementById('profile').innerHTML =
+        '<div class="flex justify-between"><span class="text-ink-soft">Passport</span><span class="text-ink font-mono">'+(p.meta.passportMasked||'—')+'</span></div>'+
+        '<div class="flex justify-between mt-1"><span class="text-ink-soft">Known Traveler</span><span class="text-ink">'+(p.meta.ktnOnFile?'on file':'—')+'</span></div>'+
+        ((p.meta.memberships&&p.meta.memberships.length)?'<div class="flex justify-between mt-1"><span class="text-ink-soft">Loyalty</span><span class="text-ink">'+p.meta.memberships.map(function(m){return m.program;}).join(', ')+'</span></div>':'');
+    }
+  }).catch(function(){});
+}
 </script>
-<script src="assets/ui.js"></script>
-<script src="assets/pageturn.js"></script>
 </body>
 </html>

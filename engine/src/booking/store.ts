@@ -15,6 +15,13 @@ class BookingStore {
     return id ? this.byId.get(id) : undefined;
   }
 
+  /** All bookings for an account, newest first — the account dashboard's trip list. */
+  listByAccount(accountId: string): Booking[] {
+    return [...this.byId.values()]
+      .filter((b) => b.accountId === accountId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
   put(b: Booking): Booking {
     b.updatedAt = new Date().toISOString();
     this.byId.set(b.id, b);

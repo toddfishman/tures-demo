@@ -45,4 +45,9 @@ export async function bookRoutes(app: FastifyInstance) {
     if (!booking) return reply.status(404).send({ error: "not_found" });
     return booking;
   });
+
+  // GET /bookings?accountId=… — an account's trips (newest first) for the dashboard.
+  app.get<{ Querystring: { accountId?: string } }>("/bookings", async (req) => {
+    return { bookings: bookings.listByAccount(req.query.accountId ?? "demo") };
+  });
 }

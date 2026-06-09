@@ -81,6 +81,7 @@
     /* ----- booking (account-scoped) ----- */
     book: function (body) { body = body || {}; if (!body.accountId) body.accountId = acctId(); return api("/book", { method: "POST", body: JSON.stringify(body) }); },
     confirm: function (id) { return api("/book/" + id + "/confirm", { method: "POST" }); },
+    bookings: function () { return api("/bookings?accountId=" + acctId()); },
 
     connections: {
       connect: function (c) { c = c || {}; if (!c.accountId) c.accountId = acctId(); return api("/connections", { method: "POST", body: JSON.stringify(c) }); },
