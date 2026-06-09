@@ -29,7 +29,12 @@ const Env = z.object({
   AUTH_SECRET: z.string().optional(),
   // Stripe billing (Chunk: real money). Price IDs for the subscription + the per-trip fee.
   STRIPE_PRICE_SUBSCRIPTION: z.string().optional(),
+  STRIPE_PRICE_PER_TRIP: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // Charge real cards for travel + per-trip fees. Requires a SetupIntent "save a card" flow
+  // (not built yet) — until then booking charges stay mock even with a Stripe key set, so the
+  // subscription can go live without breaking bookings.
+  STRIPE_CHARGE_CARDS: z.enum(["true", "false"]).default("false"),
   // Public base URL of the demo, for Stripe Checkout success/cancel redirects.
   PUBLIC_BASE_URL: z.string().optional(),
   // VGS (Very Good Security) PII vault. When all three are set, sensitive data is tokenized into
@@ -61,6 +66,7 @@ export const config = {
   authSecret: parsed.AUTH_SECRET,
   stripePriceSubscription: parsed.STRIPE_PRICE_SUBSCRIPTION,
   stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
+  stripePricePerTrip: parsed.STRIPE_PRICE_PER_TRIP,
   publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v5",
   vgs: {
     url: parsed.VGS_VAULT_URL?.replace(/\/$/, ""),
@@ -75,9 +81,10 @@ export const config = {
     return process.env.ENGINE_API_KEY || undefined;
   },
   allowLiveBooking: parsed.ALLOW_LIVE_BOOKING === "true",
-  /** Which payment provider will be used. Stripe needs a key AND lands at deploy time. */
+  /** Which provider charges cards for bookings. Stays mock until STRIPE_CHARGE_CARDS=true AND a
+   *  real saved-card flow exists — so enabling subscriptions never breaks bookings. */
   get payments(): "stripe" | "mock" {
-    return parsed.STRIPE_SECRET_KEY ? "stripe" : "mock";
+    return parsed.STRIPE_SECRET_KEY && parsed.STRIPE_CHARGE_CARDS === "true" ? "stripe" : "mock";
   },
   /** Which supplier the engine will use given current env. */
   get supplier(): "duffel" | "mock" {
