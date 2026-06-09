@@ -11,11 +11,18 @@
 <link rel="stylesheet" href="assets/tures.css">
 <style>
   body{ background:var(--obsidian); }
-  .setup{ display:block; transition:all .14s; }
-  .setup:hover{ border-color:rgba(200,162,74,0.5); transform:translateY(-1px); }
-  .num{ width:30px;height:30px;border-radius:99px;display:grid;place-items:center;font-size:13px;
-        font-family:'JetBrains Mono',monospace; border:1px solid var(--canvas-line); color:var(--ink-faint); }
-  .done .num{ background:var(--gold); color:#241a0c; border-color:var(--gold); }
+  .step-panel{ display:none; }
+  .step-panel.on{ display:block; }
+  .pdot{ height:6px; border-radius:99px; background:var(--canvas-line); flex:1; transition:background .2s; }
+  .pdot.on{ background:var(--gold); }
+  .chip{ padding:8px 15px; border-radius:999px; font-size:14px; cursor:pointer; border:1px solid var(--canvas-line);
+    color:var(--ink-soft); background:rgba(255,253,247,0.5); transition:all .14s; user-select:none; }
+  .chip.on{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
+  .fld{ width:100%; border-radius:10px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.7); padding:11px 13px; font-size:14px; color:var(--ink); outline:none; }
+  .perm-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 15px; border:1px solid var(--canvas-line); border-radius:12px; background:rgba(255,253,247,0.5); }
+  .sw{ width:44px;height:26px;border-radius:99px;background:var(--canvas-line);position:relative;cursor:pointer;transition:all .16s; flex-shrink:0; }
+  .sw::after{ content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:99px;background:#fff;transition:all .16s; }
+  .sw.on{ background:var(--gold); } .sw.on::after{ left:21px; }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -23,62 +30,202 @@
 <header class="chrome">
   <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
     <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
-    <span id="who" class="text-sm text-canvas/60"></span>
+    <a href="03-paste-trip.html" class="text-sm text-canvas/60 quiet">Skip setup →</a>
   </nav>
 </header>
 
-<section class="leather-surface grain relative overflow-hidden">
- <div class="ghost-num absolute -top-8 right-2 text-[20vw] z-0" data-parallax="0.12">✦</div>
- <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
-  <div class="caps text-[11px] text-gold/80 mb-3">Getting started</div>
-  <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]" id="greeting">Welcome.</h1>
-  <p class="mt-4 max-w-lg text-canvas/70 leading-relaxed">You can start planning right now — setup is optional and you'll only need a card the moment you actually book. Do as much or as little as you like.</p>
- </div>
-</section>
+<main class="canvas-surface text-ink min-h-[90vh]">
+ <div class="max-w-xl mx-auto px-6 py-10">
 
-<section class="canvas-surface text-ink">
- <div class="max-w-3xl mx-auto px-6 py-12">
-
-  <a href="03-paste-trip.html" class="btn-gold w-full text-center px-6 py-4 rounded-xl quiet font-semibold block mb-8 text-lg">Plan a trip now — it's free →</a>
-
-  <div class="caps text-[11px] text-ink-faint mb-4">Or set things up first (you can do any of this later)</div>
-  <div class="space-y-3">
-    <a href="02-taste-engine.html" class="setup leaf p-5 flex items-center gap-4" id="s-taste">
-      <span class="num">1</span>
-      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Your taste</span><span class="text-sm text-ink-soft">How you like to fly and stay — so every trip starts as <em>you</em>.</span></span>
-      <span class="text-gold-deep">›</span>
-    </a>
-    <a href="04-connections.html" class="setup leaf p-5 flex items-center gap-4" id="s-wallet">
-      <span class="num">2</span>
-      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Wallet &amp; travel docs</span><span class="text-sm text-ink-soft">Add cards (we pick the best per charge) and your passport / Known Traveler / loyalty.</span></span>
-      <span class="text-gold-deep">›</span>
-    </a>
-    <a href="04-connections.html" class="setup leaf p-5 flex items-center gap-4" id="s-perms">
-      <span class="num">3</span>
-      <span class="flex-1"><span class="font-display text-xl text-ink block leading-tight">Connected services</span><span class="text-sm text-ink-soft">Travel inbox, calendar, loyalty — a permission gradient, granted only as a trip needs it.</span></span>
-      <span class="text-gold-deep">›</span>
-    </a>
+  <!-- progress -->
+  <div class="flex gap-1.5 mb-2" id="progress">
+    <div class="pdot on"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div>
+  </div>
+  <div class="flex justify-between items-center mb-8">
+    <span class="caps text-[11px] text-ink-faint" id="stepLabel">Step 1 of 4 · Your taste</span>
+    <span class="text-[11px] text-ink-faint" id="who"></span>
   </div>
 
-  <div class="rule-gold my-8"></div>
-  <p class="text-center text-sm text-ink-soft">The promise: <strong class="text-ink">plan free, pay only when Tures books.</strong> Nothing is charged without your approval.</p>
+  <!-- STEP 1 — taste -->
+  <div class="step-panel on" data-step="0">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2" id="hi">How do you travel?</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">A couple taps gives Tures a standing read on your taste — every trip starts from here.</p>
+    <div class="caps text-[11px] text-ink-faint mb-3">The vibe</div>
+    <div class="flex flex-wrap gap-2 mb-6" data-group="vibe">
+      <span class="chip" data-v="design-forward">Design-forward</span>
+      <span class="chip" data-v="boutique">Boutique</span>
+      <span class="chip" data-v="grand">Grand classics</span>
+      <span class="chip" data-v="off-the-map">Off the map</span>
+      <span class="chip" data-v="foodie">Food-first</span>
+    </div>
+    <div class="caps text-[11px] text-ink-faint mb-3">Pace</div>
+    <div class="flex flex-wrap gap-2 mb-8" data-group="pace" data-single="1">
+      <span class="chip" data-v="easy">Easy</span>
+      <span class="chip on" data-v="balanced">Balanced</span>
+      <span class="chip" data-v="full">Full</span>
+    </div>
+  </div>
+
+  <!-- STEP 2 — wallet -->
+  <div class="step-panel" data-step="1">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Your wallet.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">Add the cards you carry — Tures charges each leg to whichever earns the most. You won't be charged anything now; cards are only used when you book.</p>
+    <div class="flex gap-2 mb-3">
+      <select id="cardPick" class="fld flex-1"></select>
+      <button id="addCard" class="btn-ink px-4 rounded-lg text-sm press shrink-0">Add</button>
+    </div>
+    <div id="walletList" class="space-y-2 mb-3"></div>
+    <div id="walletRec" class="text-[13px] text-ink-soft rounded-lg p-3 mb-2" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28);display:none"></div>
+  </div>
+
+  <!-- STEP 3 — docs -->
+  <div class="step-panel" data-step="2">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Travel documents.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">What a real booking needs — stored encrypted, shown only masked. Optional, but it lets Tures ticket international trips and credit your miles.</p>
+    <div class="space-y-2.5 mb-3">
+      <input id="pfPassport" class="fld" placeholder="Passport number" />
+      <input id="pfKtn" class="fld" placeholder="Known Traveler Number (TSA Pre)" />
+      <div class="flex gap-2">
+        <input id="pfProgram" class="fld flex-1" placeholder="Loyalty program (e.g. Finnair Plus)" />
+        <input id="pfNumber" class="fld w-28" placeholder="Number" />
+      </div>
+    </div>
+    <div id="docStatus" class="text-[13px] text-ink-soft"></div>
+  </div>
+
+  <!-- STEP 4 — connections -->
+  <div class="step-panel" data-step="3">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Connected services.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">A permission gradient — grant only what you like. Tures uses these to verify bookings and catch disruptions early.</p>
+    <div class="space-y-2.5">
+      <div class="perm-row"><span><span class="text-ink font-medium">Travel inbox</span><span class="text-ink-soft text-sm block">Read-only, travel senders only — the second check on every booking.</span></span><span class="sw" data-perm="email" data-label="Travel inbox"></span></div>
+      <div class="perm-row"><span><span class="text-ink font-medium">Calendar</span><span class="text-ink-soft text-sm block">Route around what's already on your plate; write trips back.</span></span><span class="sw" data-perm="calendar" data-label="Calendar"></span></div>
+      <div class="perm-row"><span><span class="text-ink font-medium">Loyalty</span><span class="text-ink-soft text-sm block">Apply status &amp; credit miles automatically.</span></span><span class="sw" data-perm="loyalty" data-label="Loyalty"></span></div>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="step-panel" data-step="4">
+    <div class="text-center py-6">
+      <div class="text-5xl text-gold-deep mb-3">✦</div>
+      <h1 class="font-display text-4xl text-ink leading-tight mb-2">You're set.</h1>
+      <p class="text-ink-soft text-sm leading-relaxed mb-7 max-w-sm mx-auto">Everything's in place. Plan a trip whenever you like — you'll only pay if Tures books it.</p>
+      <a href="03-paste-trip.html" class="btn-gold px-7 py-3.5 rounded-xl quiet font-semibold inline-block">Plan my first trip →</a>
+    </div>
+  </div>
+
+  <!-- nav -->
+  <div class="flex items-center justify-between mt-8" id="navRow">
+    <button id="backBtn" class="text-sm text-ink-faint quiet" style="visibility:hidden">← Back</button>
+    <div class="flex gap-3">
+      <button id="skipBtn" class="btn-ghost px-5 py-2.5 rounded-xl quiet text-sm">Skip</button>
+      <button id="nextBtn" class="btn-gold px-6 py-2.5 rounded-xl quiet font-semibold">Continue</button>
+    </div>
+  </div>
+
  </div>
-</section>
+</main>
 
 <script src="assets/engine.js"></script>
 <script>
-if(window.tures && tures.account){
-  document.getElementById('greeting').textContent = 'Welcome, ' + (tures.account.name || 'traveler') + '.';
-  document.getElementById('who').textContent = tures.account.email || '';
+if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
+
+var LABELS = ['Step 1 of 4 · Your taste','Step 2 of 4 · Your wallet','Step 3 of 4 · Travel documents','Step 4 of 4 · Connected services','All set'];
+var step = 0;
+var taste = { vibe:[], pace:'balanced' };
+
+document.getElementById('who').textContent = (tures.account && tures.account.email) || '';
+document.getElementById('hi').textContent = 'How do you travel, ' + ((tures.account && (tures.account.name||'').split(' ')[0]) || 'friend') + '?';
+
+function render(){
+  document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.toggle('on', Number(p.getAttribute('data-step'))===step); });
+  document.querySelectorAll('#progress .pdot').forEach(function(d,i){ d.classList.toggle('on', i <= Math.min(step,3)); });
+  document.getElementById('stepLabel').textContent = LABELS[step];
+  document.getElementById('backBtn').style.visibility = step>0 && step<4 ? 'visible' : 'hidden';
+  document.getElementById('navRow').style.display = step===4 ? 'none' : 'flex';
+  document.getElementById('nextBtn').textContent = step===3 ? 'Finish' : 'Continue';
+  window.scrollTo(0,0);
 }
-// mark a step done if the account already has it (best-effort, only when engine configured)
-if(window.tures && tures.configured){
+function go(n){ step = Math.max(0, Math.min(4, n)); if(step===4) saveTaste(); render(); if(step===1) loadWallet(); }
+
+document.getElementById('nextBtn').onclick = function(){ saveStep(step); go(step+1); };
+document.getElementById('skipBtn').onclick = function(){ go(step+1); };
+document.getElementById('backBtn').onclick = function(){ go(step-1); };
+
+/* step 1 — taste chips */
+document.querySelectorAll('[data-group]').forEach(function(group){
+  var single = group.getAttribute('data-single');
+  group.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      if(single){ group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); chip.classList.add('on'); }
+      else chip.classList.toggle('on');
+    });
+  });
+});
+function saveTaste(){
+  taste.vibe = Array.prototype.map.call(document.querySelectorAll('[data-group="vibe"] .chip.on'), function(c){ return c.getAttribute('data-v'); });
+  var p = document.querySelector('[data-group="pace"] .chip.on'); taste.pace = p ? p.getAttribute('data-v') : 'balanced';
+  try { localStorage.setItem('tures.taste', JSON.stringify(taste)); } catch(e){}
+}
+
+/* step 2 — wallet (engine) */
+var walletLoaded = false;
+function loadWallet(){
+  if(walletLoaded || !tures.configured) return; walletLoaded = true;
+  var pick = document.getElementById('cardPick');
+  tures.wallet.catalog().then(function(cat){ (cat.cards||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; pick.appendChild(o); }); }).catch(function(){});
+  refreshWallet();
+}
+function refreshWallet(){
+  if(!tures.configured) return;
   tures.connections.list().then(function(res){
-    var kinds = (res.connections||[]).map(function(c){return c.kind;});
-    if(kinds.indexOf('payment')>=0) document.getElementById('s-wallet').classList.add('done');
-    if(kinds.indexOf('email')>=0 || kinds.indexOf('calendar')>=0) document.getElementById('s-perms').classList.add('done');
+    var cards = (res.connections||[]).filter(function(c){return c.kind==='payment';});
+    var list = document.getElementById('walletList');
+    list.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — optional, add later if you like.</div>';
+    cards.forEach(function(c){ var r=document.createElement('div'); r.className='perm-row'; r.innerHTML='<span class="text-ink text-sm">'+c.label+'</span><button class="text-[12px] text-gold-deep" data-rev="'+c.id+'">remove</button>'; list.appendChild(r); });
+    list.querySelectorAll('[data-rev]').forEach(function(b){ b.onclick=function(){ tures.connections.revoke(b.getAttribute('data-rev')).then(refreshWallet); }; });
+    if(cards.length>=1){
+      Promise.all([tures.wallet.recommend('airfare',5000), tures.wallet.recommend('hotel',2000)]).then(function(rs){
+        var rec=document.getElementById('walletRec'); rec.style.display=''; rec.innerHTML='<strong>How Tures would charge:</strong> ✈ '+(rs[0].name||'—')+' · ⌂ '+(rs[1].name||'—');
+      }).catch(function(){});
+    }
   }).catch(function(){});
 }
+document.getElementById('addCard').onclick = function(){
+  if(!tures.configured) return;
+  var pick=document.getElementById('cardPick'); var key=pick.value; var name=pick.options[pick.selectedIndex].textContent;
+  tures.connections.connect({ kind:'payment', label:name, secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key}, meta:{cardKey:key, last4:'0000'} }).then(refreshWallet);
+};
+
+/* step 3 — docs (engine) */
+function saveDocs(){
+  if(!tures.configured) return Promise.resolve();
+  var pass = document.getElementById('pfPassport').value.trim();
+  var ktn = document.getElementById('pfKtn').value.trim();
+  var prog = document.getElementById('pfProgram').value.trim();
+  if(!pass && !ktn && !prog) return Promise.resolve();
+  var profile = {
+    passport: pass ? { number: pass, country:'US' } : undefined,
+    knownTravelerNumber: ktn || undefined,
+    memberships: prog ? [{ kind:'airline', program: prog, number: document.getElementById('pfNumber').value.trim() }] : []
+  };
+  return tures.profile.set(profile).then(function(c){ document.getElementById('docStatus').innerHTML='✓ Saved · passport '+((c.meta&&c.meta.passportMasked)||'—'); }).catch(function(){});
+}
+
+/* step 4 — connections (engine) */
+document.querySelectorAll('.sw').forEach(function(sw){
+  sw.addEventListener('click', function(){
+    var on = sw.classList.toggle('on');
+    if(!tures.configured) return;
+    var kind = sw.getAttribute('data-perm'); var label = sw.getAttribute('data-label');
+    if(on){ tures.connections.connect({ kind:kind, label:label, secret:{token:'demo'} }).then(function(c){ sw.setAttribute('data-id', c.id); }); }
+    else { var id=sw.getAttribute('data-id'); if(id) tures.connections.revoke(id); }
+  });
+});
+
+function saveStep(s){ if(s===2) saveDocs(); }
+
+render();
 </script>
 </body>
 </html>
