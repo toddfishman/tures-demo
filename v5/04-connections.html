@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Grant permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+  .perm{ transition:border-color .3s ease, box-shadow .3s ease; }
+  .perm.granted{ border-color:rgba(95,125,79,0.5); box-shadow:0 0 0 1px rgba(95,125,79,0.25); }
+  .grant-flash{ animation:flash .6s ease; }
+  @keyframes flash{ 0%{background:rgba(95,125,79,0)} 40%{background:rgba(95,125,79,0.12)} 100%{background:rgba(95,125,79,0)} }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="04-connections.html" class="active">Connections</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+  <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">IV</div>
+  <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-9">
+    <div class="caps text-[11px] text-gold/80 mb-3">Chapter IV · Connect</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Grant the access.<br><span class="foil">Pull it any time.</span></h1>
+    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Scoped, revocable, logged. Exactly what's needed to book and watch — nothing speculative.</p>
+  </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
+
+  <div class="lg:col-span-2 space-y-3">
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="card">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">▦</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Payment · AmEx ··1004</div>
+        <div class="text-xs text-ink-faint mt-0.5">Per-trip cap you set · <button class="text-gold-deep underline" data-sheet="sheet-card">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="loyalty">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">✦</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Loyalty &amp; status</div>
+        <div class="text-xs text-ink-faint mt-0.5">AAdvantage · Flying Blue · Virtuoso · <button class="text-gold-deep underline" data-sheet="sheet-loyalty">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="calendar">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Calendar</div>
+        <div class="text-xs text-ink-faint mt-0.5">Route around what's booked · <button class="text-gold-deep underline" data-sheet="sheet-calendar">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="inbox">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Inbox · read confirmations</div>
+        <div class="text-xs text-ink-faint mt-0.5">Travel senders only, read-only · <button class="text-gold-deep underline" data-sheet="sheet-inbox">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="messaging">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Messaging · WhatsApp / Telegram</div>
+        <div class="text-xs text-ink-faint mt-0.5">Optional — the daily channel · <button class="text-gold-deep underline" data-sheet="sheet-messaging">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <button id="grantAll" class="btn-gold w-full px-5 py-3.5 rounded-xl mt-2 font-semibold">⚡ Connect required (4) in sequence</button>
+  </div>
+
+  <aside class="space-y-4">
+    <div class="leaf p-6">
+      <div class="flex items-center justify-between mb-3">
+        <div class="caps text-[11px] text-ink-faint">Status</div>
+        <span class="pill" id="statusPill"><span class="dot dot-amber"></span> Not ready</span>
+      </div>
+      <div class="flex items-baseline gap-2 mb-4">
+        <span class="font-mono text-4xl text-ink" id="connCount">0</span>
+        <span class="text-ink-soft text-sm">of 5 connected</span>
+      </div>
+      <div class="track mb-5"><div class="fill" id="connBar" style="width:0%"></div></div>
+      <div class="caps text-[11px] text-ink-faint mb-3">Your guarantees</div>
+      <ul class="space-y-2.5 text-sm text-ink/85">
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged beyond your cap.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Read-only inbox, travel senders only.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Every action in an exportable log.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Revoke in one tap — bookings stay yours.</li>
+      </ul>
+    </div>
+  </aside>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter IV · Grant permissions</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-5xl mx-auto w-full flex items-center gap-3">
+    <a href="05-execution.html" id="execCta" class="btn-gold flex-1 text-center px-6 py-3 rounded-xl quiet font-semibold" style="opacity:.55;pointer-events:none">Connect 4 required to begin →</a>
+  </div>
+</div>
+
+<!-- ===== bottom sheets ===== -->
+<div class="sheet" id="sheet-card"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Payment</div>
+  <h3 class="font-display text-2xl text-ink mb-3">How your card is used</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">A per-trip authorization with a ceiling you set. Every charge is itemized and pushed to you the moment it's made. The card is held in a PCI-scope tokenization vault — Tures' agent never sees the raw number. Nothing is charged without an authorization you've approved.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-loyalty"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Loyalty &amp; status</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Applied automatically</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">AAdvantage, Flying Blue, Finnair Plus and your Virtuoso membership are attached to every booking that supports them — credits applied, status chased mid-trip, upgrades requested at check-in. You see exactly which program was used on each leg.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-calendar"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Calendar</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Routes around your life</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">We read availability to avoid booking over what's already on your plate, then write the confirmed trip back in — flights, hotels, dinners — with confirmation numbers attached to each event. Scoped to free/busy and the events we create.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-inbox"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Inbox</div>
+  <h3 class="font-display text-2xl text-ink mb-3">The second source of truth</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Read-only, scoped to travel senders only — never marketing, never your personal mail. We use the confirmation email as an independent check against the provider receipt. We don't mark anything "Booked" until both agree.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-messaging"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Messaging</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Where the concierge lives</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Optional, but it's where most of the relationship happens once you're moving. Connect WhatsApp or Telegram and you can brief Tures the way you'd text a fixer. Same agent, same memory, same permissions as the app.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<script>
+var REQUIRED = ['card','loyalty','calendar','inbox'];
+function rowFor(name){ return document.querySelector('.perm[data-perm="'+name+'"]'); }
+function setGranted(name, on){
+  var row = rowFor(name); if(!row) return;
+  var sw = row.querySelector('.switch');
+  sw.classList.toggle('on', on); sw.classList.toggle('off', !on);
+  row.classList.toggle('granted', on);
+  if(on){ row.classList.remove('grant-flash'); void row.offsetWidth; row.classList.add('grant-flash'); }
+  update();
+}
+function update(){
+  var on = [].slice.call(document.querySelectorAll('.switch.on')).length;
+  document.getElementById('connCount').textContent = on;
+  document.getElementById('connBar').style.width = (on/5*100)+'%';
+  var ready = REQUIRED.every(function(n){ return rowFor(n).querySelector('.switch').classList.contains('on'); });
+  var pill = document.getElementById('statusPill');
+  pill.innerHTML = ready ? '<span class="dot dot-green"></span> Ready to book' : '<span class="dot dot-amber"></span> Not ready';
+  pill.className = 'pill ' + (ready ? 'pill-confirm' : 'pill-pending');
+  var cta = document.getElementById('execCta');
+  if(ready){ cta.style.opacity=1; cta.style.pointerEvents='auto'; cta.textContent='Begin execution →'; }
+  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Connect 4 required to begin →'; }
+}
+// individual toggles
+document.querySelectorAll('[data-toggle]').forEach(function(sw){
+  sw.addEventListener('click', function(){
+    var name = sw.closest('.perm').getAttribute('data-perm');
+    setGranted(name, !sw.classList.contains('on'));
+  });
+});
+// sequential grant
+document.getElementById('grantAll').addEventListener('click', function(){
+  var btn=this; btn.disabled=true; btn.style.opacity=.7; btn.textContent='Connecting…';
+  REQUIRED.forEach(function(name, i){
+    setTimeout(function(){
+      setGranted(name, true);
+      if(i===REQUIRED.length-1){ btn.textContent='✓ Connected'; setTimeout(function(){ btn.style.display='none'; }, 700); }
+    }, 350 + i*420);
+  });
+});
+update();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>
