@@ -481,27 +481,52 @@ function render(){
 (function(){
   var micBtn = document.getElementById('micBtn'); if(!micBtn || !(window.tures && tures.configured)) return;
   tures.health().then(function(h){ if(h && h.capabilities && h.capabilities.voice) micBtn.style.display=''; }).catch(function(){});
-  var rec=null, chunks=[], recording=false;
   var hint = document.getElementById('composerHint');
+  var DEFAULT_HINT = 'Enter to send · Shift+Enter for a new line';
+  var rec=null, chunks=[], recording=false;
+
+  /* Record in a container/codec Deepgram reliably decodes. Leaving MediaRecorder on the browser
+     default occasionally produced a clip Deepgram returned an EMPTY transcript for — which the
+     old code swallowed silently, so it looked like nothing happened. */
+  function pickMime(){
+    var prefs = ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4','audio/mpeg'];
+    if(window.MediaRecorder && MediaRecorder.isTypeSupported){
+      for(var i=0;i<prefs.length;i++){ if(MediaRecorder.isTypeSupported(prefs[i])) return prefs[i]; }
+    }
+    return '';
+  }
+  function resetBtn(){ recording=false; micBtn.textContent='🎤'; micBtn.style.background='rgba(255,253,247,0.6)'; }
+
   micBtn.onclick = function(){
-    if(recording){ rec && rec.stop(); return; }
-    if(!navigator.mediaDevices || !window.MediaRecorder){ hint.textContent='Voice not supported in this browser.'; return; }
+    if(recording){ if(rec && rec.state!=='inactive') rec.stop(); return; }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
+      hint.textContent='Voice needs a modern browser over https — type your trip instead.'; return;
+    }
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-      rec = new MediaRecorder(stream); chunks=[];
+      var mime = pickMime();
+      try { rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); }
+      catch(_){ rec = new MediaRecorder(stream); }
+      chunks=[];
       rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+      rec.onerror=function(){ stream.getTracks().forEach(function(t){t.stop();}); resetBtn(); hint.textContent='Recording failed — type instead.'; };
       rec.onstop=function(){
         stream.getTracks().forEach(function(t){ t.stop(); });
-        recording=false; micBtn.textContent='🎤'; micBtn.style.background='rgba(255,253,247,0.6)';
-        var blob = new Blob(chunks, { type: (rec.mimeType||'audio/webm') });
+        resetBtn();
+        var blob = new Blob(chunks, { type: (rec.mimeType || mime || 'audio/webm') });
+        if(!blob.size){ hint.textContent="Didn't catch any audio — hold the mic a beat longer."; return; }
         hint.textContent='Transcribing…';
         tures.voice.transcribe(blob).then(function(r){
-          if(r.transcript){ composer.value = (composer.value? composer.value.trim()+' ':'') + r.transcript; autoGrow(); composer.focus(); }
-          hint.textContent='Enter to send · Shift+Enter for a new line';
-        }).catch(function(){ hint.textContent='Voice failed — type instead.'; });
+          var t = (r && r.transcript) ? r.transcript.trim() : '';
+          if(t){ composer.value = (composer.value? composer.value.trim()+' ':'') + t; autoGrow(); composer.focus(); hint.textContent=DEFAULT_HINT; }
+          else { hint.textContent="Didn't catch that — try again, or just type it."; }
+        }).catch(function(err){
+          console.warn('[tures] voice transcribe failed', err && err.status, err && err.body);
+          hint.textContent = (err && err.status===501) ? "Voice isn't enabled on the server yet." : 'Voice failed — type instead.';
+        });
       };
-      rec.start(); recording=true; micBtn.textContent='⏹'; micBtn.style.background='rgba(181,84,58,0.15)';
+      rec.start(250); recording=true; micBtn.textContent='⏹'; micBtn.style.background='rgba(181,84,58,0.15)';
       hint.textContent='Listening… tap ⏹ when done.';
-    }).catch(function(){ hint.textContent='Mic permission needed.'; });
+    }).catch(function(){ hint.textContent='Mic permission needed — allow the microphone, then tap 🎤 again.'; });
   };
 })();
 
