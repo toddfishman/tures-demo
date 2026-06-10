@@ -12,7 +12,7 @@
 <style>
   body{ background:var(--obsidian); padding-bottom:84px; }
   .mapthumb{ width:56px; height:56px; border-radius:11px; flex-shrink:0; background:rgba(43,33,20,0.06);
-    border:1px solid var(--canvas-line); overflow:hidden; }
+    border:1px solid var(--canvas-line); overflow:hidden; object-fit:cover; }
   .legcard{ opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; }
   .legcard.in{ opacity:1; transform:none; }
 </style>
@@ -115,20 +115,21 @@ function mapThumb(seed){
     '</svg>';
 }
 
+var IMG = function(id){ return 'https://images.unsplash.com/photo-'+id+'?w=160&q=80&auto=format&fit=crop'; };
 var STOPS = [
-  {kind:'fly', seed:1, status:['pill-confirm','Verified'], title:'AA 142 · SEA → CDG', dates:'Dec 3 → 4 · non-stop',
+  {kind:'fly', photo:IMG('1502602898657-3e91760cbb34'), place:'Paris', status:['pill-confirm','Verified'], title:'AA 142 · SEA → CDG', dates:'Dec 3 → 4 · non-stop',
    detail:'Business · seat 5A · non-stop · <span class="font-mono">PNR LXJ7Q3</span><br>AAdvantage credited · 25,200 EQM.'},
-  {kind:'stay', seed:7, status:['pill-confirm','Verified'], title:'Real Christine, Paris', dates:'Dec 4 → 7 · 3 nights',
+  {kind:'stay', photo:IMG('1431274172761-fca41d930114'), place:'Paris', status:['pill-confirm','Verified'], title:'Real Christine, Paris', dates:'Dec 4 → 7 · 3 nights',
    detail:'Junior Suite · garden view · breakfast · <span class="font-mono">CONF 8849-RCP</span><br>Virtuoso: €100 F&amp;B credit + upgrade at check-in.'},
-  {kind:'fly', seed:3, status:['pill-gold','Approved alt'], title:'AY 1574 · CDG → HEL → IVL', dates:'Dec 7 · 10:25 → 21:00',
+  {kind:'fly', photo:IMG('1483347756197-71ef80e95f73'), place:'Finnish Lapland', status:['pill-gold','Approved alt'], title:'AY 1574 · CDG → HEL → IVL', dates:'Dec 7 · 10:25 → 21:00',
    detail:'Business · 1h 50m HEL connection · approved alternative to the non-existent non-stop · 4,300 tier pts.'},
-  {kind:'stay', seed:9, status:['pill-confirm','Verified'], title:'Javri Lodge, Saariselkä', dates:'Dec 7 → 10 · 3 nights',
+  {kind:'stay', photo:IMG('1538970272646-f61fabb3a8a2'), place:'Saariselkä', status:['pill-confirm','Verified'], title:'Javri Lodge, Saariselkä', dates:'Dec 7 → 10 · 3 nights',
    detail:'Aurora Suite · private terrace · half-board · airport transfer · <span class="font-mono">CONF JL-12041</span>.'},
-  {kind:'fly', seed:5, status:['pill-confirm','Verified'], title:'AY 945 · IVL → HEL → CPH', dates:'Dec 10 · 14:20 → 19:15',
+  {kind:'fly', photo:IMG('1513622470522-26c3c8a854bc'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'AY 945 · IVL → HEL → CPH', dates:'Dec 10 · 14:20 → 19:15',
    detail:'Business · refundable fare D · <span class="font-mono">PNR 5RT2QK</span>.'},
-  {kind:'stay', seed:2, status:['pill-confirm','Verified'], title:'Hotel Sanders, Copenhagen', dates:'Dec 10 → 13 · 3 nights',
+  {kind:'stay', photo:IMG('1552410260-0fd9b577afa6'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'Hotel Sanders, Copenhagen', dates:'Dec 10 → 13 · 3 nights',
    detail:'Junior Suite · booked direct · <span class="font-mono" style="color:var(--confirm)">rate-protected −$351</span> · <span class="font-mono">CONF SAN-3398</span>.'},
-  {kind:'flag', seed:6, status:['pill-confirm','Rerouted'], title:'KL 1130 + DL 9302 · CPH → AMS → SEA', dates:'Dec 13 · 11:05 → 17:40',
+  {kind:'flag', photo:IMG('1502175353174-a7a70e73b362'), place:'Seattle', status:['pill-confirm','Rerouted'], title:'KL 1130 + DL 9302 · CPH → AMS → SEA', dates:'Dec 13 · 11:05 → 17:40',
    detail:'Business · <strong>re-routed around the CDG ATC strike</strong> by the Hiccup Handler · fare protected · $0 change fee · <span class="font-mono">PNR 7QZ2RB</span>.'},
 ];
 
@@ -139,7 +140,7 @@ STOPS.forEach(function(s, i){
   var flagStyle = s.kind==='flag' ? ' style="border-color:rgba(95,125,79,0.4)"' : '';
   var html = '<div class="exp legcard leaf"'+flagStyle+' style="transition-delay:'+(i*55)+'ms">'+
     '<div class="exp-head flex items-center gap-3 p-3 cursor-pointer">'+
-      mapThumb(s.seed)+
+      '<img class="mapthumb" src="'+s.photo+'" alt="'+s.place+'" loading="lazy">'+
       '<div class="flex-1 min-w-0">'+
         '<div class="'+titleCls+' text-ink leading-tight truncate">'+s.title+'</div>'+
         '<div class="text-xs text-ink-faint mt-0.5">'+s.dates+'</div>'+
