@@ -168,29 +168,30 @@ const DIMS = [
 ];
 
 /* ---------- the 6 swipe cards (one per dimension) ---------- */
+const TIMG = function(id){ return 'https://images.unsplash.com/photo-'+id+'?w=720&q=80&auto=format&fit=crop'; };
 const CARDS = [
   { dim:'register', prompt:'Where you sleep.',
-    grad:'linear-gradient(150deg,#241a0e,#544023)',
+    photo:TIMG('1566073771259-6a8506099945'),
     left:{label:'The hidden gem',sub:'No sign. The locals know.',d:{register:-40,planning:-8},tags:['Hidden over famous']},
     right:{label:'The grand hotel',sub:'A doorman, a century-old bar.',d:{register:+40},tags:['Grand register']} },
   { dim:'pace', prompt:'Your ideal day.',
-    grad:'linear-gradient(150deg,#2a2030,#4a3a5c)',
+    photo:TIMG('1507525428034-b723cf961d3e'),
     left:{label:'Languid',sub:'Long breakfast, nowhere to be.',d:{pace:-40},tags:['Unhurried']},
     right:{label:'Packed',sub:'Three things done before lunch.',d:{pace:+40},tags:['Maximizer']} },
   { dim:'aesthetic', prompt:'The room itself.',
-    grad:'linear-gradient(150deg,#101820,#28414f)',
+    photo:TIMG('1618221195710-dd6b41faaea6'),
     left:{label:'Heritage',sub:'Patina, history, heavy drapes.',d:{aesthetic:-38},tags:['Heritage spaces']},
     right:{label:'Modern & spare',sub:'Ten perfect things, nothing extra.',d:{aesthetic:+40},tags:['Design-forward']} },
   { dim:'palate', prompt:'The one great dinner.',
-    grad:'linear-gradient(150deg,#2e1f12,#63421f)',
+    photo:TIMG('1517248135467-4c7edcad34c4'),
     left:{label:'Comfort',sub:'One perfect dish, done right.',d:{palate:-36,register:-6},tags:['Dependable excellence']},
     right:{label:'Adventurous',sub:'The fourteen-course tasting.',d:{palate:+40},tags:['Chef’s table']} },
   { dim:'energy', prompt:'By midnight, you’d rather be…',
-    grad:'linear-gradient(150deg,#2a1d24,#5a3548)',
+    photo:TIMG('1529417305485-480f579e7578'),
     left:{label:'A quiet corner',sub:'The person you came with.',d:{energy:-40},tags:['Travels close']},
     right:{label:'A long table',sub:'New friends collected as you go.',d:{energy:+40},tags:['Sociable']} },
   { dim:'planning', prompt:'A free day.',
-    grad:'linear-gradient(150deg,#1b2622,#354d44)',
+    photo:TIMG('1469854523086-cc02fe5d8800'),
     left:{label:'Spontaneous',sub:'Decide when you get there.',d:{planning:-40,pace:-8},tags:['Room to drift']},
     right:{label:'Scripted',sub:'The optimum, nothing missed.',d:{planning:+40,pace:+8},tags:['Wants the optimum']} },
 ];
@@ -251,7 +252,10 @@ function renderDeck(){
     const depth = k - qi;
     const el = document.createElement('div');
     el.className='card';
-    el.style.background=c.grad;
+    el.style.backgroundColor='#1b130c';
+    el.style.backgroundImage="url('"+c.photo+"')";
+    el.style.backgroundSize='cover';
+    el.style.backgroundPosition='center';
     el.style.zIndex = 10 - depth;
     el.style.transform = `translateY(${depth*10}px) scale(${1 - depth*0.04})`;
     el.style.opacity = depth>1 ? 0 : 1;
