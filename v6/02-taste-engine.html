@@ -382,6 +382,17 @@ function finishUp(){
   bh.push('Watch every booking and pre-stage a fix the moment the world wobbles.');
   const ul=document.getElementById('behaviors'); ul.innerHTML='';
   bh.forEach(t=> ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>${t}</span></li>`));
+
+  /* Persist the Taste Print — Describe & Book folds it into every live plan.
+     placeTypes use the engine's search vocabulary. */
+  const placeTypes=[];
+  if(reg>55) placeTypes.push('grand');
+  if(reg<45) placeTypes.push('boutique');
+  if(aes>52) placeTypes.push('design-hotel','minimalist');
+  const tags=[...document.querySelectorAll('#tags .tag-chip')].map(c=>c.textContent);
+  const dims={}; DIMS.forEach(d=>{ dims[d.key]=d.v; });
+  try{ localStorage.setItem('tures.tastePrint', JSON.stringify({ placeTypes, tags, dims, signature:sig })); }catch(_){}
+  ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>Saved. Every plan you describe starts from this print.</span></li>`);
 }
 
 function restart(){

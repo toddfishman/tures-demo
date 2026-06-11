@@ -133,7 +133,7 @@
         and a receipt of everything we touched.
       </p>
       <div class="mt-7 flex flex-wrap gap-2">
-        <span class="pill pill-d-gold">WhatsApp</span><span class="pill pill-d-gold">Telegram</span><span class="pill pill-d-gold">Web · App</span>
+        <span class="pill pill-d-gold">Web · App</span><span class="pill pill-d-gold" style="opacity:.65">WhatsApp · soon</span><span class="pill pill-d-gold" style="opacity:.65">Telegram · soon</span>
       </div>
     </div>
     <!-- phone mock -->
@@ -198,13 +198,23 @@
   <div class="text-canvas/50 text-sm mt-3">A trip booked is the only thing we ship.</div>
 </footer>
 
-<!-- sticky CTA -->
-<div class="cta-bar">
+<!-- sticky CTA — tucked while the hero's own CTA is on screen -->
+<div class="cta-bar tuck" id="ctaBar" style="transition:transform .35s ease">
   <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
     <a href="signup.html" class="btn-gold flex-1 sm:flex-none sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Start planning — free →</a>
     <a href="signup.html#waitlist" class="btn-ghost px-5 py-3 rounded-xl quiet hidden sm:inline-block">Get early access</a>
   </div>
 </div>
+<script>
+(function(){
+  var bar = document.getElementById('ctaBar');
+  var heroCta = document.querySelector('.photo-hero .btn-gold');
+  if(!bar || !heroCta || !('IntersectionObserver' in window)){ bar && bar.classList.remove('tuck'); return; }
+  new IntersectionObserver(function(ents){
+    bar.classList.toggle('tuck', ents[0].isIntersecting);
+  }, { threshold: 0.1 }).observe(heroCta);
+})();
+</script>
 
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>

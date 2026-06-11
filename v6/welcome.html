@@ -179,6 +179,16 @@ function saveTaste(){
   taste.vibe = tasteLikes.slice();
   var p = document.querySelector('[data-group="pace"] .chip.on'); taste.pace = p ? p.getAttribute('data-v') : 'balanced';
   try { localStorage.setItem('tures.taste', JSON.stringify(taste)); } catch(e){}
+  // Merge the vibe picks into the shared Taste Print (engine search vocabulary).
+  var VIBE_PLACE = { 'design-forward':['design-hotel','minimalist'], 'boutique':['boutique'], 'grand':['grand'], 'sun-sea':['waterfront'] };
+  var pts = [];
+  tasteLikes.forEach(function(k){ (VIBE_PLACE[k]||[]).forEach(function(t){ if(pts.indexOf(t)<0) pts.push(t); }); });
+  try {
+    var tp = JSON.parse(localStorage.getItem('tures.tastePrint') || '{}');
+    tp.placeTypes = (tp.placeTypes||[]).concat(pts).filter(function(v,i,a){ return a.indexOf(v)===i; });
+    tp.vibes = taste.vibe; tp.pace = taste.pace;
+    localStorage.setItem('tures.tastePrint', JSON.stringify(tp));
+  } catch(e){}
 }
 
 /* step 1 — visual vibe swipe deck (drag / press, like the taste engine) */

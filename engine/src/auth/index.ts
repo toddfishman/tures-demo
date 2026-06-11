@@ -98,7 +98,11 @@ export function publicUser(u: User) {
   return { id: u.id, email: u.email, name: u.name, plan: u.plan, createdAt: u.createdAt };
 }
 
-/** Resolve the acting account: session (req.accountId) → explicit body/query → "demo". */
-export function resolveAccountId(req: any, explicit?: string): string {
-  return req?.accountId || explicit || "demo";
+/** Resolve the acting account. The session token is the only authority: a signed-in
+ *  request always acts as its own account, and an anonymous request always acts as
+ *  "demo". A client-supplied accountId is never honored for a real account — account
+ *  ids are guessable, so trusting it would let anyone read or mutate another
+ *  account's connections, bookings, and profile. */
+export function resolveAccountId(req: any, _explicit?: string): string {
+  return req?.accountId || "demo";
 }

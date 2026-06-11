@@ -298,6 +298,15 @@ function renderSuggestions(){
   });
 }
 
+/* The live engine plans one city at a time today. A clearly multi-city brief
+   (several lines or chained legs) runs the guided sample instead of letting the
+   engine mangle it into a single origin→destination guess. */
+function looksMultiLeg(text){
+  var lines = (text.match(/\n/g)||[]).length;
+  var arrows = (text.match(/→|->/g)||[]).length;
+  return lines >= 3 || arrows >= 2;
+}
+
 function sendBrief(){
   var text = composer.value.trim();
   if(!text) return;
@@ -305,7 +314,14 @@ function sendBrief(){
   composer.value = ''; autoGrow();
   sugEl.innerHTML = '';
   setStep(1);
-  if (window.tures && tures.configured) { realFlow(text); } else { scriptedFlow(); }
+  if (window.tures && tures.configured) {
+    if (looksMultiLeg(text)) {
+      addMsg('That reads as a multi-city trip. The live engine books one city at a time today — multi-city is in the works. Here is how a trip like yours runs, on a sample itinerary.', 't');
+      scriptedFlow();
+      return;
+    }
+    realFlow(text);
+  } else { scriptedFlow(); }
 }
 
 /* ---------- scripted demo flow (no engine configured) ---------- */
@@ -371,10 +387,44 @@ function realFlow(text){
   tures.parse(text).then(function(p){
     t.remove();
     var b = p.brief;
-    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + b.adults + ' traveler' + (b.adults>1?'s':'') + ' · ' + b.cabin +
-      (p.assumptions && p.assumptions.length ? ' <span class="text-ink-faint">(' + p.assumptions.join('; ') + ')</span>' : ''), 't');
-    var act = actingPill('Searching live inventory…');
-    return tures.plan(b).then(function(plan){
+    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + b.adults + ' traveler' + (b.adults>1?'s':'') + ' · ' + b.cabin, 't');
+    var assumed = p.assumptions || [];
+    if(assumed.length){
+      /* When in doubt, ask — an assumption is a question, not a decision. */
+      addMsg('Before I search, I had to assume a few things:<br>' +
+        assumed.map(function(a){ return '· ' + String(a).replace(/</g,'&lt;'); }).join('<br>') +
+        '<br>Correct me below, or tell me to go ahead.', 't');
+      askProceed(b);
+      return;
+    }
+    planAndPropose(b);
+  }).catch(function(err){
+    try{ t.remove(); }catch(_){}
+    addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
+    scriptedFlow();
+  });
+}
+
+function askProceed(b){
+  sugEl.innerHTML = '';
+  var go = document.createElement('button');
+  go.className = 'qr'; go.textContent = '✦ Looks right — go ahead';
+  go.onclick = function(){ sugEl.innerHTML=''; addMsg('Go ahead.', 'me'); planAndPropose(b); };
+  var fix = document.createElement('button');
+  fix.className = 'qr'; fix.textContent = 'Let me fix the details';
+  fix.onclick = function(){ sugEl.innerHTML=''; composer.placeholder = 'Re-describe the trip with the right dates and cities…'; composer.focus(); };
+  sugEl.appendChild(go); sugEl.appendChild(fix);
+}
+
+function planAndPropose(b){
+  /* Fold in the standing Taste Print (saved by the Taste Engine / onboarding). */
+  var tp = null; try { tp = JSON.parse(localStorage.getItem('tures.tastePrint') || 'null'); } catch(_){}
+  if(tp && tp.placeTypes && tp.placeTypes.length){
+    b.placeTypes = (b.placeTypes || []).concat(tp.placeTypes).filter(function(v,i,a){ return a.indexOf(v)===i; });
+    addMsg('Folding in your <a href="02-taste-engine.html" class="text-gold-deep underline quiet">Taste Print</a> — ' + tp.placeTypes.join(', ') + '.', 't');
+  }
+  var act = actingPill('Searching live inventory…');
+  return tures.plan(b).then(function(plan){
       // stream the real execution events into the thread as a muted log
       var logWrap = document.createElement('div'); logWrap.className = 'msg text-[12px] text-ink-faint space-y-1 pl-1';
       chat.appendChild(logWrap); requestAnimationFrame(function(){ logWrap.classList.add('in'); });
@@ -421,12 +471,11 @@ function realFlow(text){
       }, 700);
       planned = true;
       document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
+    }).catch(function(err){
+      try{ act.remove(); }catch(_){}
+      addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
+      scriptedFlow();
     });
-  }).catch(function(err){
-    try{ t.remove(); }catch(_){}
-    addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
-    scriptedFlow();
-  });
 }
 
 function restart(){

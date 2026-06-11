@@ -34,7 +34,7 @@
 
         '<div class="menu-group">' +
           '<div class="menu-label">Plan from anywhere</div>' +
-          '<div class="menu-channels"><span class="chan">WhatsApp</span><span class="chan">Telegram</span><span class="chan">Web &amp; App</span></div>' +
+          '<div class="menu-channels"><span class="chan">Web &amp; App</span><span class="chan" style="opacity:.6">WhatsApp · soon</span><span class="chan" style="opacity:.6">Telegram · soon</span></div>' +
           '<p class="menu-note">Brief Tures the way you’d text a friend — a message, a voice memo, or a forwarded email. Same concierge, wherever you already are.</p>' +
         '</div>' +
 
