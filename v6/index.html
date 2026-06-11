@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The Bound Edition</title>
+<meta name="description" content="Tures — the AI travel concierge. Books the impossible. Watches everything. Rebooks before you notice." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  html,body{ background:#0b0907; min-height:100%; }
+  body{ overflow:hidden; }
+  .vol{ position:fixed; inset:0; perspective:2200px; }
+
+  /* ===== full-bleed leather cover ===== */
+  .cover{
+    position:absolute; inset:0; z-index:20; cursor:pointer;
+    transform-origin:left center; backface-visibility:hidden;
+    transition:transform 1000ms cubic-bezier(.7,.02,.27,1), opacity 650ms ease;
+  }
+  .cover::before{ /* binding / spine shadow on the left edge */
+    content:""; position:absolute; top:0; bottom:0; left:0; width:46px; z-index:2;
+    background:linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0) 75%);
+    border-right:1px solid rgba(255,220,150,0.06);
+  }
+  .opened .cover{ transform:rotateY(-128deg); opacity:0; pointer-events:none; }
+
+  .frame{ position:absolute; inset:28px; border:1px solid rgba(200,162,74,0.42);
+    border-radius:3px; box-shadow:inset 0 0 0 5px rgba(0,0,0,0.22), 0 1px 0 rgba(255,230,160,0.07); z-index:3; }
+  .frame.dashed{ inset:38px; border-style:dashed; opacity:0.5; }
+
+  /* ===== canvas contents PAGE beneath ===== */
+  .toc{
+    position:absolute; inset:0; z-index:10; overflow-y:auto;
+    opacity:0; pointer-events:none; transition:opacity 650ms ease 250ms;
+    -webkit-overflow-scrolling:touch;
+  }
+  .opened .toc{ opacity:1; pointer-events:auto; }
+  .skip-cover .cover{ transition:none !important; }
+  .skip-cover .toc{ transition:none !important; }
+
+  /* now-playing queue rows */
+  .q{ display:flex; align-items:center; gap:14px; padding:11px 12px; text-decoration:none;
+    border-radius:12px; border:1px solid transparent; transition:background .16s ease, border-color .16s ease, transform .16s ease; }
+  .q:hover{ background:rgba(255,253,247,0.7); border-color:var(--canvas-line); transform:translateX(2px); }
+  .q:active{ transform:scale(.99); }
+  .q .num{ width:34px; height:34px; flex-shrink:0; border-radius:9px; display:grid; place-items:center;
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:15px;
+    background:linear-gradient(160deg,#241910,#15100a); color:var(--gold-bright);
+    border:1px solid rgba(200,162,74,0.3); box-shadow:inset 0 1px 0 rgba(255,220,150,.08); }
+  .q .qchev{ color:var(--ink-faint); font-size:18px; transition:transform .2s ease, color .2s ease; }
+  .q:hover .qchev{ transform:translateX(3px); color:var(--gold-deep); }
+  /* the first row hints the swipe gesture */
+  .q.lead .qchev{ animation:qhint 1.9s ease-in-out infinite; color:var(--gold-deep); }
+  @keyframes qhint{ 0%,100%{transform:translateX(0);opacity:.6} 50%{transform:translateX(5px);opacity:1} }
+
+  /* sticky Start bar — appears once the book is open */
+  .startbar{ position:fixed; left:0; right:0; bottom:0; z-index:40;
+    padding:14px 18px calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(236,227,208,0) 0%, rgba(236,227,208,0.9) 38%, rgba(236,227,208,0.99) 100%);
+    display:flex; align-items:center; gap:14px;
+    opacity:0; transform:translateY(12px); pointer-events:none; transition:opacity .5s ease .35s, transform .5s ease .35s; }
+  .opened .startbar{ opacity:1; transform:none; pointer-events:auto; }
+
+  @media (max-width:640px){
+    .q .qtitle{ font-size:1.12rem; line-height:1.15; }
+    .q{ padding:9px 10px; gap:11px; }
+    #tocHeading{ font-size:2rem; }
+  }
+</style>
+</head>
+<body class="text-canvas">
+ <div class="vol">
+
+  <!-- ============ FULL-BLEED COVER ============ -->
+  <div class="cover leather-surface grain" id="cover" onclick="openBook()">
+    <div class="frame"></div>
+    <div class="frame dashed"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-8">
+      <div class="caps text-[11px] text-gold/70 mb-8">The AI Travel Concierge</div>
+      <div class="wordmark foil text-[76px] sm:text-[96px] leading-none">t<span class="spark">✦</span>ures</div>
+      <div class="foil-line w-28 my-8"></div>
+      <p class="font-display italic text-2xl text-canvas/80 leading-snug">
+        Books the impossible.<br>Watches everything.<br>Rebooks before you notice.
+      </p>
+      <div class="mt-14 flex items-center gap-3 text-gold/80">
+        <span class="swipe-arrow text-2xl" style="animation:qhint 1.8s ease-in-out infinite">←</span>
+        <span class="caps text-[10px]">Swipe to open</span>
+      </div>
+    </div>
+    <div class="absolute bottom-7 inset-x-0 text-center caps text-[9px] text-gold/40 z-10">First Edition · MMXXVI</div>
+  </div>
+
+  <!-- ============ CONTENTS — the queue (canvas) ============ -->
+  <div class="toc canvas-surface" id="toc">
+    <div class="relative z-10 max-w-xl mx-auto px-6" style="padding-top:4.2vh; padding-bottom:120px;">
+      <div class="flex items-center justify-between mb-4">
+        <a class="wordmark text-5xl quiet" style="color:var(--gold-deep)" href="#" onclick="closeBook();return false;">t<span class="spark">✦</span>ures</a>
+        <span class="caps text-[10px] text-ink-faint flex items-center gap-1.5"><span class="dot dot-gold pulse"></span>Now playing</span>
+      </div>
+      <div id="tocHeading" class="font-display text-4xl text-ink leading-none mb-1">The Bound Edition</div>
+      <p class="text-ink-faint text-sm mb-5">Eight chapters. Tap to jump in — or swipe through.</p>
+
+      <a class="q lead" href="01-landing.html">
+        <span class="num">I</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">Meet Tures</span><span class="caps text-[10px] text-ink-faint">Describe a trip. We book it.</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="02-taste-engine.html">
+        <span class="num">II</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">The Taste Engine</span><span class="caps text-[10px] text-ink-faint">Swipe to calibrate</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="03-paste-trip.html">
+        <span class="num">III</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">Describe &amp; Book</span><span class="caps text-[10px] text-ink-faint">Prose → itinerary</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="04-connections.html">
+        <span class="num">IV</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">Grant Permissions</span><span class="caps text-[10px] text-ink-faint">Connect &amp; revoke</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="05-execution.html">
+        <span class="num">V</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">Watch It Execute</span><span class="caps text-[10px] text-ink-faint">Live agent stream</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="06-hiccup-handler.html">
+        <span class="num">VI</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">The Hiccup Handler</span><span class="caps text-[10px] text-ink-faint">Always watching</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="07-itinerary.html">
+        <span class="num">VII</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">The Itinerary</span><span class="caps text-[10px] text-ink-faint">Confirmed, leg by leg</span></span>
+        <span class="qchev">›</span></a>
+      <a class="q" href="08-concierge.html">
+        <span class="num">VIII</span>
+        <span class="flex-1 min-w-0"><span class="qtitle font-display text-2xl text-ink block leading-tight">In-Trip Concierge</span><span class="caps text-[10px] text-ink-faint">Just text us</span></span>
+        <span class="qchev">›</span></a>
+
+      <div class="rule-gold my-5"></div>
+      <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 caps text-[10px] text-ink-faint">
+        <a href="auth/login.html" class="quiet hover:text-gold-deep">Sign in</a>
+        <a href="account.html" class="quiet hover:text-gold-deep">Account</a>
+        <a href="billing.html" class="quiet hover:text-gold-deep">Billing</a>
+        <a href="faq.html" class="quiet hover:text-gold-deep">FAQ</a>
+        <a href="legal/index.html" class="quiet hover:text-gold-deep">Legal</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- sticky Start CTA -->
+  <div class="startbar">
+    <div class="max-w-xl mx-auto w-full flex items-center gap-4">
+      <div class="hidden sm:block">
+        <div class="caps text-[9px] text-ink-faint">Begin at</div>
+        <div class="font-display text-lg text-ink leading-none">Chapter I · Meet Tures</div>
+      </div>
+      <a href="01-landing.html" class="btn-gold flex-1 text-center px-6 py-3.5 rounded-xl quiet font-semibold">Start the walkthrough →</a>
+    </div>
+  </div>
+
+ </div>
+
+<script>
+  function openBook(){ document.body.classList.add('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); document.documentElement.classList.remove('skip-cover'); history.replaceState(null,'','index.html'); }
+  // swipe-left on the cover also opens
+  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
+  // arriving from a "Contents" link → open straight to the queue
+  if(location.hash === '#contents'){ document.documentElement.classList.add('skip-cover'); openBook(); }
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>
