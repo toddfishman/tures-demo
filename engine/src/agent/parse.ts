@@ -85,8 +85,11 @@ export async function parseBrief(text: string): Promise<ParseResult> {
       model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
       max_tokens: 512,
       system:
+        `Today is ${new Date().toISOString().slice(0, 10)}. ` +
         "Extract a structured travel brief from the user's prose. Use IATA codes for origin/" +
-        "destination. If something isn't stated, choose a sensible default and note it. Call emit_brief.",
+        "destination. Resolve all dates to the future relative to today — a bare month/day like " +
+        "'December 3rd' means the next December 3rd that has not yet passed; never return a date " +
+        "in the past. If something isn't stated, choose a sensible default and note it. Call emit_brief.",
       tools: [
         {
           name: "emit_brief",
@@ -111,8 +114,40 @@ export async function parseBrief(text: string): Promise<ParseResult> {
     const toolUse = resp.content.find((b) => b.type === "tool_use");
     if (toolUse && toolUse.type === "tool_use") {
       const input = toolUse.input as any;
-      const brief = BriefSchema.parse({ ...input, bookingMode: "confirm_each" });
-      return { brief, assumptions: input.assumptions ?? [], via: "agent" };
+      const assumptions: string[] = Array.isArray(input.assumptions) ? [...input.assumptions] : [];
+
+      // The model can't always emit a 3-letter IATA origin (the traveler rarely states their
+      // home airport). Rather than fail the whole parse — which silently drops us back to the
+      // heuristic and loses the real Claude reading of dates/cabin/destination — fill the same
+      // sensible default the heuristic uses, and surface it as an assumption.
+      const iata = (v: unknown) => (typeof v === "string" ? v.trim().toUpperCase() : "");
+      let origin = iata(input.origin);
+      if (!/^[A-Z]{3}$/.test(origin)) {
+        origin = "SFO";
+        if (!assumptions.some((a) => /home airport/i.test(a))) assumptions.push("assumed home airport SFO");
+      }
+      const destination = iata(input.destination);
+      if (!/^[A-Z]{3}$/.test(destination)) {
+        // A missing/garbled destination means the model didn't actually understand the trip;
+        // the heuristic's keyword matching is a safer read in that case.
+        return heuristicParse(text);
+      }
+
+      // Deterministic backstop: never let a past departure through, even if the model ignores
+      // the "future only" instruction. Roll the year forward until depart is today or later.
+      const today = new Date().toISOString().slice(0, 10);
+      let depart = String(input.departDate || "");
+      let ret = input.returnDate ? String(input.returnDate) : undefined;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(depart) && depart < today) {
+        const bumpYears = Number(today.slice(0, 4)) - Number(depart.slice(0, 4)) + (depart.slice(5) < today.slice(5) ? 1 : 0);
+        const roll = (d: string) => `${Number(d.slice(0, 4)) + bumpYears}${d.slice(4)}`;
+        depart = roll(depart);
+        if (ret && /^\d{4}-\d{2}-\d{2}$/.test(ret)) ret = roll(ret);
+        if (!assumptions.some((a) => /year/i.test(a))) assumptions.push(`assumed ${depart.slice(0, 4)} (next future occurrence)`);
+      }
+
+      const brief = BriefSchema.parse({ ...input, origin, destination, departDate: depart, returnDate: ret, bookingMode: "confirm_each" });
+      return { brief, assumptions, via: "agent" };
     }
   } catch (e) {
     log.warn("parse via agent failed, falling back to heuristic", { err: String(e) });
