@@ -15,7 +15,32 @@ function seed(s: string): number {
   return (h >>> 0) / 0xffffffff; // 0..1
 }
 
-const CARRIERS = ["Finnair", "Lufthansa", "KLM", "British Airways", "SAS"];
+// Carriers that actually serve a route — so a Hawaii trip never gets offered Finnair.
+const REGION = {
+  hawaii: /^(HNL|OGG|KOA|ITO|LIH)$/,
+  us: /^(JFK|EWR|LGA|BOS|IAD|DCA|ORD|ATL|MIA|FLL|LAX|SFO|SEA|SAN|LAS|DEN|PHX|DFW|IAH|MSP|DTW|PHL|CLT|SLC|PDX|AUS|BNA|MCO|TPA|HNL|OGG|KOA)$/,
+  europe: /^(CDG|ORY|LHR|LGW|FRA|MUC|AMS|HEL|CPH|ARN|OSL|FCO|MXP|BCN|MAD|LIS|DUB|ZRH|VIE|BRU|KEF|IVL)$/,
+  asia: /^(HND|NRT|KIX|ITM|ICN|GMP|PEK|PVG|HKG|SIN|BKK|TPE|KUL|DEL|BOM)$/,
+} as const;
+function regionOf(code: string): keyof typeof REGION | "intl" {
+  for (const r of Object.keys(REGION) as (keyof typeof REGION)[]) if (REGION[r].test(code)) return r;
+  return "intl";
+}
+const CARRIERS_BY = {
+  hawaii: ["Hawaiian", "Alaska", "United", "Delta", "American", "Southwest"],
+  us: ["Delta", "United", "American", "Alaska", "JetBlue", "Southwest"],
+  europe: ["Finnair", "Lufthansa", "KLM", "British Airways", "Air France", "SAS"],
+  asia: ["ANA", "Japan Airlines", "Korean Air", "Singapore", "Cathay Pacific", "United"],
+  intl: ["United", "Delta", "American", "Lufthansa", "Emirates", "Qatar Airways"],
+};
+function carriersFor(origin: string, destination: string): string[] {
+  const ro = regionOf(origin), rd = regionOf(destination);
+  if (ro === "hawaii" || rd === "hawaii") return CARRIERS_BY.hawaii;
+  if (ro === "us" && rd === "us") return CARRIERS_BY.us;
+  if (ro === "asia" || rd === "asia") return CARRIERS_BY.asia;
+  if (ro === "europe" || rd === "europe") return CARRIERS_BY.europe;
+  return CARRIERS_BY.intl;
+}
 const STAY_STYLES = [
   "design-hotel",
   "boutique",
@@ -35,7 +60,7 @@ export class MockSupplier implements SupplierAdapter {
     // Children fly at ~75% of an adult fare.
     const seats = brief.adults + brief.children * 0.75;
     const pax = brief.adults + brief.children;
-    return CARRIERS.slice(0, 4).map((carrier, i) => {
+    return carriersFor(brief.origin, brief.destination).slice(0, 4).map((carrier, i) => {
       const price = Math.round(base * cabinMult * (1 + i * 0.12) * seats);
       const stops = i === 0 ? 0 : i === 3 ? 2 : 1;
       return {
