@@ -75,10 +75,10 @@
 <section class="leather-surface grain relative overflow-hidden">
   <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
     <div class="flex items-baseline gap-3 min-w-0">
-      <span class="caps text-[11px] text-gold/80 shrink-0">Chapter III</span>
-      <h1 class="font-display text-2xl text-canvas leading-none truncate">Just tell Tures the trip.</h1>
+      <span class="caps text-[11px] text-gold/80 shrink-0 hidden sm:inline">Chapter III</span>
+      <h1 class="font-display text-xl sm:text-2xl text-canvas leading-none">Tell Tures the trip.</h1>
     </div>
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <div class="step on" id="stp1"><span class="num">1</span><span class="lbl hidden sm:inline">Describe</span></div>
       <div class="step-sep hidden sm:block"></div>
       <div class="step" id="stp2"><span class="num">2</span><span class="lbl hidden sm:inline">Plan</span></div>
@@ -92,7 +92,7 @@
  <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-5 space-y-6">
 
   <!-- ===== CONVERSATIONAL BRIEF (app-style full-height panel) ===== -->
-  <div class="leaf overflow-hidden flex flex-col" style="height:calc(100dvh - 150px); min-height:440px">
+  <div class="leaf overflow-hidden flex flex-col" style="height:calc(100dvh - 178px); min-height:420px">
     <!-- thread header -->
     <div class="flex items-center gap-3 px-5 py-3 border-b" style="border-color:var(--canvas-line)">
       <div class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0"
@@ -101,7 +101,8 @@
         <div class="text-sm text-ink">Tures</div>
         <div class="text-[11px] text-ink-faint" id="threadStatus">Booking concierge · online</div>
       </div>
-      <button onclick="restart()" class="press text-[11px] text-gold-deep hover:underline shrink-0">↺ Start over</button>
+      <span data-voice-mount class="shrink-0"></span>
+      <button onclick="restart()" class="press text-[11px] text-gold-deep hover:underline shrink-0"><span class="hidden sm:inline">↺ Start over</span><span class="sm:hidden">↺</span></button>
     </div>
 
     <!-- messages -->
