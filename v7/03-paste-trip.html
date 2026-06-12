@@ -215,7 +215,19 @@ var composer = document.getElementById('composer');
 
 /* Demo mode (?demo=1 or arriving via the Andy tour) pre-loads Andy's persona + trip. Real
    visitors get a neutral, first-person greeting with no pre-filled stranger's name or trip. */
-var DEMO = new URLSearchParams(location.search).get('demo') === '1';
+var _q = new URLSearchParams(location.search);
+var DEMO = _q.get('demo') === '1';
+var DEMO_TRIP = _q.get('trip');   // landing cards play a specific trip's demo
+var DEMO_EMAIL = 'andy@arrowfish.com';
+
+/* Single-destination demos the landing cards launch — each plays its own conversation through
+   the live engine, so Tokyo plans a real Tokyo trip, Paris a Paris trip, etc. */
+var TRIPS = {
+  paris:   'From Seattle, a long weekend in Paris for two in March, business class, a design hotel near the Marais, walkable, good dinners.',
+  tokyo:   'From Seattle, 48 hours in Tokyo for two in April, business class, a design-forward hotel in Shibuya, every dinner reservation handled.',
+  newyork: 'From Seattle, a weekend in New York for two, business class, a boutique hotel downtown, and a table at Carbone.',
+  lapland: 'From Seattle, a week in Finnish Lapland in December for two, business class, an aurora lodge with a sauna, not price sensitive.'
+};
 
 /* Andy's example brief — offered as a one-tap quick reply that fills the composer. */
 var ANDY = `Leave Thursday December 3rd — fly direct into Paris, arrive the 4th. Business.
@@ -461,6 +473,8 @@ function askProceed(b){
   fix.className = 'qr'; fix.textContent = 'Let me fix the details';
   fix.onclick = function(){ sugEl.innerHTML=''; composer.placeholder = 'Just the correction — e.g. "from Seattle" or "the dates are Dec 3–10"…'; composer.focus(); };
   sugEl.appendChild(go); sugEl.appendChild(fix);
+  // A launched demo plays itself through — accept the assumptions and proceed to the plan.
+  if(DEMO_TRIP) setTimeout(function(){ go.click(); }, 1900);
 }
 
 function planAndPropose(b){
@@ -523,10 +537,12 @@ function planAndPropose(b){
             if(!cta.__previewed){ cta.__previewed = true; previewBooking(plan, cta); }
             else { savePending(); location.href = 'signup.html'; }
           };
+          // The launched demo plays through to the booking (the "execution part").
+          if(DEMO_TRIP && !cta.__previewed){ cta.__previewed = true; setTimeout(function(){ previewBooking(plan, cta); }, 2400); }
         }
       }
       setStep(2);
-      var firstPlan = !planned;
+      var firstPlan = !planned && !DEMO_TRIP;  // a launched demo plays straight through to booking
       setTimeout(function(){
         if(firstPlan){
           addMsg('Before I book, how are you feeling about <em>this</em> trip? Tune the budget and I\'ll re-plan.', 't');
@@ -720,7 +736,26 @@ function render(){
 })();
 
 /* boot */
-greet();
+function bootDemo(){
+  if(DEMO){
+    // The demo shows what Andy sees — a persistent "signed in as andy@…" badge in the thread
+    // header (separate from the live status line, which changes as the engine works).
+    var startBtn = document.querySelector('[onclick="restart()"]');
+    if(startBtn && startBtn.parentNode){
+      var chip = document.createElement('span');
+      chip.className = 'text-[11px] text-ink-faint shrink-0 mr-3 hidden sm:inline-flex items-center gap-1.5';
+      chip.innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--confirm)"></span>' + DEMO_EMAIL;
+      startBtn.parentNode.insertBefore(chip, startBtn);
+    }
+  }
+  greet();
+  // A landing card launched a specific trip → play its conversation: Andy briefs it, Tures plans
+  // it live (the streamed search/score/propose events are the execution), then offers to book.
+  if(DEMO && DEMO_TRIP && TRIPS[DEMO_TRIP]){
+    setTimeout(function(){ composer.value = TRIPS[DEMO_TRIP]; autoGrow(); sendBrief(); }, 1300);
+  }
+}
+bootDemo();
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
