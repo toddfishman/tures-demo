@@ -30,28 +30,25 @@
     try { dir = sessionStorage.getItem('ptDir') || 'next'; sessionStorage.removeItem('ptDir'); } catch (e) {}
     wrap.style.display = '';
     leaf.className = (dir === 'prev' ? 'out-prev' : 'out-next') + ' start';
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { leaf.classList.add('go'); });
-    });
+    var reveal = function () { leaf.classList.add('go'); };
+    requestAnimationFrame(function () { requestAnimationFrame(reveal); });
+    setTimeout(reveal, 24);  // failsafe: rAF is throttled in background/headless contexts
+    var hide = function () { wrap.style.display = 'none'; };
     leaf.addEventListener('transitionend', function onEnd(e) {
       if (e.propertyName !== 'transform') return;
       leaf.removeEventListener('transitionend', onEnd);
-      wrap.style.display = 'none';
+      hide();
     });
+    setTimeout(hide, 520);  // hard failsafe: the cover can never stay up
   }
 
-  // departure: leaf sweeps in to cover, then we navigate
+  // departure: navigate immediately. The single, fast reveal happens on the *arrival* side
+  // (enter), so there's one quick motion per page change instead of a cover-then-reveal pair.
   var leaving = false;
   function exit(href, dir) {
-    if (REDUCE) { window.location.href = href; return; }
     if (leaving) return; leaving = true;
     try { sessionStorage.setItem('ptDir', dir); } catch (e) {}
-    wrap.style.display = '';
-    leaf.className = (dir === 'prev' ? 'in-prev' : 'in-next') + ' start';
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { leaf.classList.add('go'); });
-    });
-    setTimeout(function () { window.location.href = href; }, 470);
+    window.location.href = href;
   }
 
   function go(dir) {
@@ -60,7 +57,10 @@
     if (window.__turesOnSwipe && window.__turesOnSwipe(dir)) return;  // page may intercept (cover opening)
     var j = dir === 'next' ? i + 1 : i - 1;
     if (j < 0 || j >= ORDER.length) return;            // clamp at the ends
-    exit(ORDER[j], dir);
+    var href = ORDER[j];
+    // Carry demo mode through the guided tour (chapter-to-chapter), so Andy stays consistent.
+    if (/[?&]demo=1\b/.test(location.search)) href += '?demo=1';
+    exit(href, dir);
   }
 
   function isInternal(a, href) {

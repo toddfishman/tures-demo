@@ -274,16 +274,16 @@ details[open] .chev{ transform:rotate(90deg); }
 #pt-leaf.in-next.go{ transform:translateX(0) rotateY(0deg);
   transition:transform 440ms cubic-bezier(.4,0,.2,1); }
 #pt-leaf.out-next.start{ transform:translateX(0) rotateY(0deg); }
-#pt-leaf.out-next.go{ transform:translateX(-106%) rotateY(9deg);
-  transition:transform 680ms cubic-bezier(.45,.02,.2,1); }
+#pt-leaf.out-next.go{ transform:translateX(-106%) rotateY(7deg);
+  transition:transform 280ms cubic-bezier(.33,0,.2,1); }
 
 /* BACK (prev): the leaf travels LEFT → RIGHT — mirror image. */
 #pt-leaf.in-prev.start{ transform:translateX(-106%) rotateY(9deg); }
 #pt-leaf.in-prev.go{ transform:translateX(0) rotateY(0deg);
   transition:transform 440ms cubic-bezier(.4,0,.2,1); }
 #pt-leaf.out-prev.start{ transform:translateX(0) rotateY(0deg); }
-#pt-leaf.out-prev.go{ transform:translateX(106%) rotateY(-9deg);
-  transition:transform 680ms cubic-bezier(.45,.02,.2,1); }
+#pt-leaf.out-prev.go{ transform:translateX(106%) rotateY(-7deg);
+  transition:transform 280ms cubic-bezier(.33,0,.2,1); }
 @media (prefers-reduced-motion: reduce){ #pt-wrap{ display:none !important; } }
 
 a.quiet{ text-decoration:none; }

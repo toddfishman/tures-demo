@@ -213,6 +213,10 @@ var chat = document.getElementById('chat');
 var sugEl = document.getElementById('suggestions');
 var composer = document.getElementById('composer');
 
+/* Demo mode (?demo=1 or arriving via the Andy tour) pre-loads Andy's persona + trip. Real
+   visitors get a neutral, first-person greeting with no pre-filled stranger's name or trip. */
+var DEMO = new URLSearchParams(location.search).get('demo') === '1';
+
 /* Andy's example brief — offered as a one-tap quick reply that fills the composer. */
 var ANDY = `Leave Thursday December 3rd — fly direct into Paris, arrive the 4th. Business.
 Paris the 4–5–6th at Real Christine.
@@ -300,15 +304,23 @@ var convoText = '';
 var currentBrief = null;
 
 function greet(){
-  addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
+  if(DEMO){
+    addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
+  } else {
+    addMsg("Where are we headed? Tell me the trip like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
+  }
   renderSuggestions();
 }
 
 function renderSuggestions(){
   sugEl.innerHTML = '';
-  var qs = [
+  var qs = DEMO ? [
     {label:'✦ Use Andy\'s example', fill:ANDY},
     {label:'A weekend in Lisbon', fill:'Two of us, a long weekend in Lisbon next month. Somewhere design-y to stay, walkable, good seafood. Flexible on flights.'},
+    {label:'Family week in Japan', fill:'Family of four, a week in Japan in spring — Tokyo + Kyoto, ryokan for a couple of nights, premium economy if it\'s not silly money.'},
+  ] : [
+    {label:'A weekend in Lisbon', fill:'Two of us, a long weekend in Lisbon next month. Somewhere design-y to stay, walkable, good seafood. Flexible on flights.'},
+    {label:'A week in Hawaii', fill:'A week on the Big Island in October for two. Business class, design-y hotels, not price sensitive.'},
     {label:'Family week in Japan', fill:'Family of four, a week in Japan in spring — Tokyo + Kyoto, ryokan for a couple of nights, premium economy if it\'s not silly money.'},
   ];
   qs.forEach(function(q){
