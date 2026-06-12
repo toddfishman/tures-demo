@@ -22,6 +22,7 @@ import { travelerRoutes } from "./routes/travelers.ts";
 import { placeRoutes } from "./routes/places.ts";
 import { waitlistRoutes } from "./routes/waitlist.ts";
 import { voiceRoutes } from "./routes/voice.ts";
+import { converseRoutes } from "./routes/converse.ts";
 import { streamRoutes } from "./routes/stream.ts";
 
 export async function build() {
@@ -75,6 +76,7 @@ export async function build() {
   await app.register(placeRoutes);
   await app.register(waitlistRoutes);
   await app.register(voiceRoutes);
+  await app.register(converseRoutes);
   await app.register(streamRoutes);
 
   return app;

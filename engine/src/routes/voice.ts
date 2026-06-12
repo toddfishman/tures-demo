@@ -40,4 +40,29 @@ export async function voiceRoutes(app: FastifyInstance) {
       return reply.status(502).send({ error: "transcription_failed" });
     }
   });
+
+  // POST /voice/speak {text} — Deepgram Aura TTS → mp3 audio of Tures' voice. Gated by the key.
+  app.post("/voice/speak", async (req, reply) => {
+    if (!config.deepgramKey) return reply.status(501).send({ error: "voice_not_configured" });
+    const text = (((req.body as any) || {}).text || "").toString().trim().slice(0, 1800);
+    if (!text) return reply.status(400).send({ error: "no_text" });
+    try {
+      const res = await fetch("https://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mp3", {
+        method: "POST",
+        headers: { Authorization: `Token ${config.deepgramKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) {
+        log.error("aura tts error", { status: res.status });
+        return reply.status(502).send({ error: "tts_failed" });
+      }
+      const buf = Buffer.from(await res.arrayBuffer());
+      reply.header("Content-Type", "audio/mpeg");
+      reply.header("Cache-Control", "no-store");
+      return reply.send(buf);
+    } catch (e) {
+      log.error("voice speak failed", { err: String(e) });
+      return reply.status(502).send({ error: "tts_failed" });
+    }
+  });
 }
