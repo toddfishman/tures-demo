@@ -67,6 +67,14 @@ function heuristicParse(text: string): ParseResult {
         ? "first"
         : "economy";
 
+  // Budget posture + optional hard cap.
+  let priceSensitivity: "thrifty" | "balanced" | "premium" | "no_limit" = "balanced";
+  if (/budget|cheap|save money|affordable|frugal|inexpensive/.test(t)) priceSensitivity = "thrifty";
+  else if (/no expense|to the nines|money is no object|not price sensitive|splurge|whatever it costs|sky'?s the limit/.test(t)) priceSensitivity = "no_limit";
+  else if (/treat ourselves|treat myself|nice but|spare no|go all out|special/.test(t)) priceSensitivity = "premium";
+  const capMatch = t.match(/(?:under|below|max|up to|budget of|no more than)\s*\$?\s*([\d,]+)\s*(k)?/);
+  const budgetUsd = capMatch ? Number((capMatch[1] ?? "0").replace(/,/g, "")) * (capMatch[2] ? 1000 : 1) || undefined : undefined;
+
   const placeTypes: string[] = [];
   for (const kw of ["design-hotel", "design", "boutique", "ryokan", "sauna", "spa", "waterfront", "minimalist", "grand"]) {
     if (t.includes(kw.replace("-hotel", "")) || t.includes(kw)) placeTypes.push(kw);
@@ -78,8 +86,11 @@ function heuristicParse(text: string): ParseResult {
 
   if (children) assumptions.push(`read ${adults} adult${adults > 1 ? "s" : ""} + ${children} child${children > 1 ? "ren" : ""}`);
 
+  if (priceSensitivity !== "balanced") assumptions.push(`read budget posture: ${priceSensitivity.replace("_", " ")}`);
+
   const brief = BriefSchema.parse({
     origin, destination, departDate, returnDate, adults, children, cabin,
+    priceSensitivity, budgetUsd,
     placeTypes: [...new Set(placeTypes)], bookingMode: "confirm_each",
   });
   return { brief, assumptions, via: "heuristic" };
@@ -100,10 +111,13 @@ export async function parseBrief(text: string): Promise<ParseResult> {
         "destination. Count travelers precisely: 'adults' is the number of adults and 'children' " +
         "the number of kids — e.g. '4 people (2 kids)' is adults:2, children:2. Resolve all dates " +
         "to the future relative to today — a bare month/day like 'December 3rd' means the next " +
-        "December 3rd that has not yet passed; never return a date in the past. The prose may arrive " +
-        "as an initial brief followed by '[Update]' corrections — treat later updates as overrides " +
-        "and merge them into one coherent brief. If something isn't stated, choose a sensible default " +
-        "and note it in assumptions. Call emit_brief.",
+        "December 3rd that has not yet passed; never return a date in the past. Read budget posture " +
+        "into priceSensitivity: phrases like 'budget-friendly'/'cheap'/'save money' → thrifty; " +
+        "'splurge'/'to the nines'/'money is no object'/'not price sensitive' → no_limit; 'nice but " +
+        "reasonable'/'treat ourselves' → premium; otherwise balanced. If a hard dollar cap is stated " +
+        "('under $5k'), set budgetUsd too. The prose may arrive as an initial brief followed by " +
+        "'[Update]' corrections — treat later updates as overrides and merge them into one coherent " +
+        "brief. If something isn't stated, choose a sensible default and note it in assumptions. Call emit_brief.",
       tools: [
         {
           name: "emit_brief",
@@ -115,6 +129,8 @@ export async function parseBrief(text: string): Promise<ParseResult> {
               departDate: { type: "string" }, returnDate: { type: "string" },
               adults: { type: "number" },
               children: { type: "number" },
+              priceSensitivity: { type: "string", enum: ["thrifty", "balanced", "premium", "no_limit"] },
+              budgetUsd: { type: "number" },
               cabin: { type: "string", enum: ["economy", "premium_economy", "business", "first"] },
               placeTypes: { type: "array", items: { type: "string" } },
               assumptions: { type: "array", items: { type: "string" } },

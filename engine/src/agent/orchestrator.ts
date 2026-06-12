@@ -9,6 +9,7 @@
 // Still PROPOSE-ONLY. Booking (request_confirmation → book, idempotent, audited) is Chunk 3.
 import type { Brief, Offer } from "../types.ts";
 import { runSearch } from "../search/service.ts";
+import { assembleContext } from "./context.ts";
 import { emitEvent } from "../events/bus.ts";
 import { config } from "../config.ts";
 
@@ -26,18 +27,24 @@ export interface ProposedPlan {
 /** Entry point. Uses the Claude tool-use agent loop when ANTHROPIC_API_KEY is set; otherwise
  *  the deterministic planner below. Same return shape either way. */
 export async function proposePlan(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
+  // Fold standing memory (Taste Print, loyalty, "where you've been") + this-trip brief into one
+  // coherent picture before planning. Both planners see the effective brief + the context prose.
+  const { context, brief: effBrief } = assembleContext(accountId, brief);
+  if (context.prose) emitEvent(tripId, "status", "Personalizing for you", { detail: context.prose.slice(0, 280) });
+
   if (config.anthropicKey) {
     const { runAgentLoop } = await import("./llm.ts");
-    const plan = await runAgentLoop(tripId, brief, accountId);
+    const plan = await runAgentLoop(tripId, effBrief, accountId, context);
     return { ...plan, planner: "agent" };
   }
-  return proposePlanDeterministic(tripId, brief, accountId);
+  return proposePlanDeterministic(tripId, effBrief, accountId, context);
 }
 
 /** Pre-LLM planner: top scored flight + top stay that still fits the budget when combined.
  *  Deterministic, no keys — used as the fallback and for tests. */
-export async function proposePlanDeterministic(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
-  const { flights, stays } = await runSearch(tripId, brief, accountId);
+export async function proposePlanDeterministic(tripId: string, brief: Brief, accountId = "demo", ctx?: ReturnType<typeof assembleContext>["context"]): Promise<ProposedPlan> {
+  const context = ctx ?? assembleContext(accountId, brief).context;
+  const { flights, stays } = await runSearch(tripId, brief, accountId, context);
 
   // Pick the top-scored option in each category that still fits the budget when combined.
   const flight = flights[0];

@@ -15,6 +15,7 @@ import { parseRoutes } from "./routes/parse.ts";
 import { bookRoutes } from "./routes/book.ts";
 import { connectionRoutes } from "./routes/connections.ts";
 import { profileRoutes } from "./routes/profile.ts";
+import { prefsRoutes } from "./routes/prefs.ts";
 import { walletRoutes } from "./routes/wallet.ts";
 import { disruptionRoutes } from "./routes/disruptions.ts";
 import { travelerRoutes } from "./routes/travelers.ts";
@@ -67,6 +68,7 @@ export async function build() {
   await app.register(bookRoutes);
   await app.register(connectionRoutes);
   await app.register(profileRoutes);
+  await app.register(prefsRoutes);
   await app.register(walletRoutes);
   await app.register(disruptionRoutes);
   await app.register(travelerRoutes);

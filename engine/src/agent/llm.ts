@@ -11,18 +11,24 @@ import { runSearch } from "../search/service.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
 import type { ProposedPlan } from "./orchestrator.ts";
+import type { TravelerContext } from "./context.ts";
 
 const AGENT_MODEL = process.env.AGENT_MODEL ?? "claude-sonnet-4-6";
 const MAX_TURNS = 6;
 
-const SYSTEM = `You are Tures, an autonomous travel booking agent. You are given a trip BRIEF
-which is BOTH the task and the limit of your authority: never propose anything that exceeds the
-stated budget, and respect the requested cabin and place preferences.
+const SYSTEM = `You are Tures, an autonomous travel booking agent. You are given a TRAVELER CONTEXT
+(who this person is — their standing taste, loyalty, budget posture, and what they want this trip)
+and a structured BRIEF. The brief is the limit of your authority: never exceed a stated hard budget
+cap, and respect the cabin and place preferences.
 
-Work the loop: call search_offers to get scored flights and stays, reason about the best fit
-for THIS traveler (value, convenience, and how well a stay matches their placeTypes), then call
-propose_plan exactly once with your chosen flight and stay and a short, warm rationale a concierge
-would write. Do not book anything — you only propose. Keep any free-text brief and concise.`;
+Honor the budget POSTURE: if they are not price-sensitive ("no_limit"), do NOT pick the cheapest —
+optimize for the best fit and quality; if they're "thrifty", favor value. Use the context's taste,
+loyalty, and dislikes to choose between close options, and reflect that reasoning in your rationale.
+
+Work the loop: call search_offers to get scored flights and stays, reason about the best fit for
+THIS traveler, then call propose_plan exactly once with your chosen flight and stay and a short, warm
+rationale a concierge would write (name WHY it fits them). Do not book anything — you only propose.
+Keep it concise.`;
 
 const TOOLS = [
   {
@@ -46,7 +52,7 @@ const TOOLS = [
   },
 ];
 
-export async function runAgentLoop(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
+export async function runAgentLoop(tripId: string, brief: Brief, accountId = "demo", context?: TravelerContext): Promise<ProposedPlan> {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey: config.anthropicKey });
 
@@ -83,8 +89,9 @@ export async function runAgentLoop(tripId: string, brief: Brief, accountId = "de
     {
       role: "user",
       content:
+        (context?.prose ? `TRAVELER CONTEXT:\n${context.prose}\n\n` : "") +
         `BRIEF:\n${JSON.stringify(brief, null, 2)}\n\n` +
-        `Find and propose the best flight + stay within this brief.`,
+        `Find and propose the best flight + stay for this traveler, honoring their budget posture.`,
     },
   ];
 

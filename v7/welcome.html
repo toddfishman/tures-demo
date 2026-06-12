@@ -186,8 +186,12 @@ function saveTaste(){
   try {
     var tp = JSON.parse(localStorage.getItem('tures.tastePrint') || '{}');
     tp.placeTypes = (tp.placeTypes||[]).concat(pts).filter(function(v,i,a){ return a.indexOf(v)===i; });
-    tp.vibes = taste.vibe; tp.pace = taste.pace;
+    tp.tags = (tp.tags||[]).concat(taste.vibe).filter(function(v,i,a){ return a.indexOf(v)===i; });
     localStorage.setItem('tures.tastePrint', JSON.stringify(tp));
+    // Onboarding always has an account → persist the standing Taste Print server-side.
+    if(window.tures && tures.configured && tures.signedIn){
+      tures.prefs.set({ tastePrint:{ placeTypes:tp.placeTypes, tags:tp.tags } }).catch(function(){});
+    }
   } catch(e){}
 }
 

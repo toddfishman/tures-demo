@@ -391,7 +391,11 @@ function finishUp(){
   if(aes>52) placeTypes.push('design-hotel','minimalist');
   const tags=[...document.querySelectorAll('#tags .tag-chip')].map(c=>c.textContent);
   const dims={}; DIMS.forEach(d=>{ dims[d.key]=d.v; });
-  try{ localStorage.setItem('tures.tastePrint', JSON.stringify({ placeTypes, tags, dims, signature:sig })); }catch(_){}
+  const tastePrint={ placeTypes, tags, dims, signature:sig };
+  try{ localStorage.setItem('tures.tastePrint', JSON.stringify(tastePrint)); }catch(_){}
+  // Signed-in travelers get it persisted server-side so the planner reads it on every device.
+  // (Anonymous demo visitors stay localStorage-only so the shared demo account isn't polluted.)
+  if(window.tures && tures.configured && tures.signedIn){ tures.prefs.set({ tastePrint:tastePrint }).catch(function(){}); }
   ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>Saved. Every plan you describe starts from this print.</span></li>`);
 }
 

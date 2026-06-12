@@ -152,6 +152,23 @@
           </div>
 
           <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Budget, this trip <span class="normal-case tracking-normal text-ink-faint/70">· changing this re-plans</span></div>
+            <div class="flex flex-wrap gap-2" data-group="budget" data-mode="single">
+              <span class="chip" data-v="thrifty">Budget-friendly</span>
+              <span class="chip on" data-v="balanced">Balanced</span>
+              <span class="chip" data-v="premium">Treat ourselves</span>
+              <span class="chip" data-v="no_limit">To the nines</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="text-xs text-ink-soft">Optional hard cap</span>
+              <div class="flex items-center rounded-lg px-2.5 py-1.5" style="border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">
+                <span class="text-ink-faint text-sm">$</span>
+                <input id="capInput" inputmode="numeric" placeholder="—" class="w-20 bg-transparent outline-none text-sm text-ink ml-1" data-noswipe />
+              </div>
+            </div>
+          </div>
+
+          <div>
             <div class="caps text-[11px] text-ink-faint mb-3">Not feeling this time <span class="normal-case tracking-normal text-ink-faint/70">· any</span></div>
             <div class="flex flex-wrap gap-2" data-group="avoid" data-mode="multi">
               <span class="chip" data-v="late nights">Late nights</span>
@@ -279,6 +296,8 @@ var planned = false;
 /* The running brief. Every user turn is appended so a correction ("sorry, SEA") is
    re-parsed WITH the original trip, not as a brand-new one. */
 var convoText = '';
+/* The most recent parsed brief — the budget/sentiment controls mutate it and can re-plan. */
+var currentBrief = null;
 
 function greet(){
   addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
@@ -400,7 +419,10 @@ function realFlow(text){
     var b = p.brief;
     var pax = (b.adults || 1) + (b.children || 0);
     var paxLabel = pax + ' traveler' + (pax > 1 ? 's' : '') + (b.children ? ' (' + b.adults + ' adult' + (b.adults>1?'s':'') + ' + ' + b.children + ' child' + (b.children>1?'ren':'') + ')' : '');
-    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + paxLabel + ' · ' + b.cabin, 't');
+    var POSTURE = { thrifty:'budget-friendly', balanced:'balanced budget', premium:'treating yourself', no_limit:'to the nines' };
+    var postureLabel = (b.priceSensitivity && b.priceSensitivity!=='balanced') ? ' · ' + POSTURE[b.priceSensitivity] : '';
+    var capLabel = b.budgetUsd ? ' · cap $' + Number(b.budgetUsd).toLocaleString() : '';
+    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + paxLabel + ' · ' + b.cabin + postureLabel + capLabel, 't');
     var assumed = p.assumptions || [];
     if(assumed.length){
       /* When in doubt, ask — an assumption is a question, not a decision. */
@@ -430,6 +452,12 @@ function askProceed(b){
 }
 
 function planAndPropose(b){
+  currentBrief = b;
+  // Fold this-trip sentiment (purpose / pace / avoid) into the brief the agent plans against.
+  if(state && (state.purpose.length || state.avoid.length || state.pace)){
+    b.tripSentiment = { purpose: state.purpose, pace: state.pace, avoid: state.avoid };
+  }
+  syncBudgetUI(b);
   /* Fold in the standing Taste Print (saved by the Taste Engine / onboarding). */
   var tp = null; try { tp = JSON.parse(localStorage.getItem('tures.tastePrint') || 'null'); } catch(_){}
   if(tp && tp.placeTypes && tp.placeTypes.length){
@@ -476,11 +504,14 @@ function planAndPropose(b){
         };
       }
       setStep(2);
+      var firstPlan = !planned;
       setTimeout(function(){
-        addMsg('Before I book, how are you feeling about <em>this</em> trip?', 't');
-        var s = document.getElementById('sentiment'); s.classList.remove('hidden');
-        requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
-        document.getElementById('ctaBar').style.display = ''; s.scrollIntoView({behavior:'smooth', block:'center'});
+        if(firstPlan){
+          addMsg('Before I book, how are you feeling about <em>this</em> trip? Tune the budget and I\'ll re-plan.', 't');
+          var s = document.getElementById('sentiment'); s.classList.remove('hidden');
+          requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
+          document.getElementById('ctaBar').style.display = ''; s.scrollIntoView({behavior:'smooth', block:'center'});
+        }
       }, 700);
       planned = true;
       document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
@@ -500,8 +531,12 @@ function restart(){
   document.getElementById('threadStatus').textContent = 'Booking concierge · online';
   planned = false;
   convoText = '';
+  currentBrief = null;
   setStep(1);
-  state = { purpose:[], pace:'balanced', avoid:[] };
+  state = { purpose:[], pace:'balanced', avoid:[], budget:'balanced', cap:null };
+  document.querySelectorAll('[data-group="purpose"] .chip.on, [data-group="avoid"] .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('[data-group="budget"] .chip').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-v')==='balanced'); });
+  if(capEl) capEl.value = '';
   document.getElementById('tripSummary').textContent = "Pick a few and I'll read it back — then tune the plan before anything is booked.";
   greet();
 }
@@ -514,19 +549,57 @@ composer.addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendBrief(); }
 });
 
-/* ---- trip-time sentiment (unchanged behavior, now part of the conversation) ---- */
-var state = { purpose:[], pace:'balanced', avoid:[] };
+/* ---- trip-time sentiment + budget posture (folds into the brief; budget re-plans) ---- */
+var state = { purpose:[], pace:'balanced', avoid:[], budget:'balanced', cap:null };
+
 document.querySelectorAll('[data-group]').forEach(function(group){
   var key = group.getAttribute('data-group');
+  var single = group.getAttribute('data-mode') === 'single';
   group.querySelectorAll('.chip').forEach(function(chip){
     chip.addEventListener('click', function(){
-      chip.classList.toggle('on');
+      if(single){
+        group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+        chip.classList.add('on');
+      } else {
+        chip.classList.toggle('on');
+      }
+      if(key === 'budget'){ onBudgetChange(chip.getAttribute('data-v')); return; }
       state[key] = Array.from(group.querySelectorAll('.chip.on')).map(function(c){ return c.getAttribute('data-v'); });
       render(); setStep(3);
     });
   });
 });
 document.getElementById('paceSeg').addEventListener('segchange', function(e){ state.pace = e.detail.value; render(); setStep(3); });
+
+/* Budget posture changed → update the brief and re-plan with it (the strongest lever). */
+function onBudgetChange(v){
+  state.budget = v;
+  if(!currentBrief) { render(); return; }
+  currentBrief.priceSensitivity = v;
+  var POSTURE = { thrifty:'Make it budget-friendly.', balanced:'Keep the budget balanced.', premium:'Treat us — lean into quality.', no_limit:'Go to the nines — money\'s no object.' };
+  addMsg(POSTURE[v] || ('Budget: '+v), 'me');
+  render();
+  if(window.tures && tures.configured){ planAndPropose(currentBrief); } else { addMsg('On the live engine I\'d re-plan at that budget. (Demo plan shown above.)', 't'); }
+}
+
+/* Optional hard cap. */
+var capEl = document.getElementById('capInput');
+if(capEl){
+  capEl.addEventListener('change', function(){
+    var n = parseInt(String(capEl.value).replace(/[^\d]/g,''), 10);
+    state.cap = isFinite(n) && n>0 ? n : null;
+    if(currentBrief){ currentBrief.budgetUsd = state.cap || undefined; render(); if(window.tures && tures.configured) planAndPropose(currentBrief); }
+  });
+}
+
+/* Reflect the parsed/standing posture in the controls when a plan first appears. */
+function syncBudgetUI(b){
+  if(!b) return;
+  state.budget = b.priceSensitivity || 'balanced';
+  state.cap = b.budgetUsd || null;
+  document.querySelectorAll('[data-group="budget"] .chip').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-v') === state.budget); });
+  if(capEl) capEl.value = state.cap ? String(state.cap) : '';
+}
 
 function listFmt(arr){ if(arr.length===1) return arr[0]; if(arr.length===2) return arr[0]+' and '+arr[1]; return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1]; }
 function render(){
@@ -537,6 +610,9 @@ function render(){
   else lead += ' kept balanced';
   out.push(lead+'.');
   if(s.avoid.length) out.push('And I\'ll keep '+listFmt(s.avoid)+' off the table.');
+  var BUD = { thrifty:'I\'ll favor value', balanced:'', premium:'I\'ll lean into quality', no_limit:'I\'ll optimize for the best, not the cheapest' };
+  if(BUD[s.budget]) out.push(BUD[s.budget] + (s.cap ? ', capped at $'+Number(s.cap).toLocaleString() : '') + '.');
+  else if(s.cap) out.push('Capped at $'+Number(s.cap).toLocaleString()+'.');
   document.getElementById('tripSummary').textContent = out.join(' ');
 }
 

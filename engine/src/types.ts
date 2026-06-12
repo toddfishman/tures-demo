@@ -11,8 +11,21 @@ export const BriefSchema = z.object({
   returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   adults: z.number().int().min(1).max(9).default(1),
   children: z.number().int().min(0).max(9).default(0),
-  /** Hard ceiling, in USD, across the whole trip. The agent may never exceed this. */
+  /** How the traveler wants money weighed on THIS trip. Drives the value-vs-taste blend in
+   *  scoring. "no_limit" tells the agent to optimize purely for fit/quality. */
+  priceSensitivity: z.enum(["thrifty", "balanced", "premium", "no_limit"]).default("balanced"),
+  /** Optional hard ceiling, in USD, across the whole trip. The agent may never exceed this.
+   *  Independent of priceSensitivity — you can be "to the nines" but still cap at $X. */
   budgetUsd: z.number().positive().optional(),
+  /** This-trip mood, distinct from the standing Taste Print: why you're going, the pace you
+   *  want this time, and what to keep off the table. Folded into the agent's context. */
+  tripSentiment: z
+    .object({
+      purpose: z.array(z.string()).default([]),
+      pace: z.enum(["easy", "balanced", "full"]).default("balanced"),
+      avoid: z.array(z.string()).default([]),
+    })
+    .optional(),
   /** Free-form "right kinds of places" signals — drives stay scoring. */
   placeTypes: z.array(z.string()).default([]),
   cabin: z.enum(["economy", "premium_economy", "business", "first"]).default("economy"),

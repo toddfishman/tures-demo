@@ -4,19 +4,22 @@
 import type { Brief, SearchResult } from "../types.ts";
 import { getSupplier } from "../suppliers/index.ts";
 import { scoreOffers } from "./score.ts";
-import { tasteSignal } from "../places/index.ts";
+import { assembleContext, type TravelerContext } from "../agent/context.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
 
-export async function runSearch(tripId: string, brief: Brief, accountId = "demo"): Promise<SearchResult> {
+export async function runSearch(tripId: string, brief: Brief, accountId = "demo", ctx?: TravelerContext): Promise<SearchResult> {
   const supplier = getSupplier();
   const startedAt = performance.now();
-  // Personalization: the account's favorite tags from "where you've been" sharpen stay scoring.
-  const tasteTags = tasteSignal(accountId).favoriteTags;
+  // Personalization: the unified Traveler Context (standing Taste Print + "where you've been" +
+  // this-trip avoid) sharpens scoring. Assembled here if the caller didn't already.
+  const context = ctx ?? assembleContext(accountId, brief).context;
+  const tasteTags = context.tasteTags;
+  const avoid = context.avoid;
 
   const pax = brief.adults + brief.children;
   emitEvent(tripId, "search", `Searching ${supplier.name} for ${brief.origin}→${brief.destination}`, {
-    detail: `${pax} traveler(s) · ${brief.cabin}${brief.budgetUsd ? ` · ≤ $${brief.budgetUsd.toLocaleString()}` : ""}`,
+    detail: `${pax} traveler(s) · ${brief.cabin} · ${brief.priceSensitivity ?? "balanced"}${brief.budgetUsd ? ` · ≤ $${brief.budgetUsd.toLocaleString()}` : ""}`,
   });
 
   const [flightsRaw, staysRaw] = await Promise.all([
@@ -32,8 +35,8 @@ export async function runSearch(tripId: string, brief: Brief, accountId = "demo"
     }),
   ]);
 
-  const flights = scoreOffers(flightsRaw, brief);
-  const stays = scoreOffers(staysRaw, brief, tasteTags);
+  const flights = scoreOffers(flightsRaw, brief, [], avoid);
+  const stays = scoreOffers(staysRaw, brief, tasteTags, avoid);
 
   const tookMs = Math.round(performance.now() - startedAt);
 

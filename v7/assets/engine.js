@@ -84,6 +84,11 @@
       set: function (profile) { return api("/profile", { method: "POST", body: JSON.stringify({ accountId: acctId(), profile: profile }) }); },
       get: function () { return api("/profile?accountId=" + acctId()); },
     },
+    /* Standing preferences the planner reads: Taste Print, cabin default, avoid, dietary. */
+    prefs: {
+      set: function (prefs) { return api("/prefs", { method: "POST", body: JSON.stringify({ accountId: acctId(), prefs: prefs }) }); },
+      get: function () { return api("/prefs?accountId=" + acctId()); },
+    },
     wallet: {
       catalog: function () { return api("/wallet/catalog"); },
       recommend: function (category, amount) { return api("/wallet/recommend?accountId=" + acctId() + "&category=" + category + "&amount=" + amount); },
