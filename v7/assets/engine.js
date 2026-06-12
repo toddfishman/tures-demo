@@ -109,13 +109,26 @@
       remove: function (name) { return api("/places/" + encodeURIComponent(name), { method: "DELETE" }); },
     },
 
-    /* Voice: POST a recorded audio Blob to Deepgram (via the engine) → { transcript }. */
+    /* Conversational Tures (spoken). messages: prior turns; text: the new user turn. → { reply } */
+    converse: function (messages, text) {
+      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text }) });
+    },
+
+    /* Voice: transcribe a recorded Blob (Deepgram STT) and speak text (Deepgram Aura TTS → mp3 Blob). */
     voice: {
       transcribe: function (blob) {
         var h = { "Content-Type": blob.type || "audio/webm" };
         if (token) h["Authorization"] = "Bearer " + token;
         return fetch(url + "/voice/transcribe", { method: "POST", headers: h, body: blob }).then(function (r) {
           return r.json().then(function (b) { if (!r.ok) throw Object.assign(new Error(b.error || r.status), { status: r.status, body: b }); return b; });
+        });
+      },
+      speak: function (text) {
+        var h = { "Content-Type": "application/json" };
+        if (token) h["Authorization"] = "Bearer " + token;
+        return fetch(url + "/voice/speak", { method: "POST", headers: h, body: JSON.stringify({ text: text }) }).then(function (r) {
+          if (!r.ok) throw Object.assign(new Error("tts " + r.status), { status: r.status });
+          return r.blob();
         });
       },
     },
