@@ -19,6 +19,7 @@ const CITY_IATA: Record<string, string> = {
   kyoto: "KIX", seattle: "SEA", "san francisco": "SFO", "sf": "SFO", copenhagen: "CPH",
   helsinki: "HEL", ivalo: "IVL", rome: "FCO", barcelona: "BCN", amsterdam: "AMS",
   berlin: "BER", reykjavik: "KEF", oslo: "OSL", stockholm: "ARN", lima: "LIM",
+  "big island": "KOA", kona: "KOA", hawaii: "KOA", honolulu: "HNL", maui: "OGG",
 };
 
 function isoDaysFromNow(days: number): string {
@@ -41,12 +42,19 @@ function heuristicParse(text: string): ParseResult {
 
   const destCity = found.find((c) => CITY_IATA[c] !== origin) ?? found[0];
   const destination = destCity ? CITY_IATA[destCity]! : "LIS";
-  if (!destCity) assumptions.push("could not find a destination — defaulted to Lisbon (LIS)");
+  if (!destCity) assumptions.push("couldn't read a destination yet — tell me the city and I'll re-plan");
+
+  // Children, e.g. "(2 kids)", "2 children", "two kids".
+  let children = 0;
+  const kidMatch = t.match(/(\d+)\s*(?:kids?|children|child)/);
+  if (kidMatch) children = Number(kidMatch[1]) || 0;
 
   let adults = 1;
-  if (/family of (\d+)|(\d+) of us|party of (\d+)/.test(t)) {
-    const m = t.match(/family of (\d+)|(\d+) of us|party of (\d+)/)!;
-    adults = Number(m[1] || m[2] || m[3]) || 1;
+  if (/family of (\d+)|(\d+) of us|party of (\d+)|(\d+)\s*people|(\d+)\s*adults/.test(t)) {
+    const m = t.match(/family of (\d+)|(\d+) of us|party of (\d+)|(\d+)\s*people|(\d+)\s*adults/)!;
+    const total = Number(m[1] || m[2] || m[3] || m[4] || m[5]) || 1;
+    // "4 people (2 kids)" → 4 total, 2 kids → 2 adults. "2 adults" → 2 adults flat.
+    adults = m[5] ? total : Math.max(1, total - children);
   } else if (/\b(couple|two of us|both of us|me and|my partner|my wife|my husband)\b/.test(t)) {
     adults = 2;
   }
@@ -68,8 +76,10 @@ function heuristicParse(text: string): ParseResult {
   const returnDate = /weekend/.test(t) ? isoDaysFromNow(48) : isoDaysFromNow(52);
   assumptions.push(`assumed dates ${departDate} → ${returnDate} (none clearly stated)`);
 
+  if (children) assumptions.push(`read ${adults} adult${adults > 1 ? "s" : ""} + ${children} child${children > 1 ? "ren" : ""}`);
+
   const brief = BriefSchema.parse({
-    origin, destination, departDate, returnDate, adults, cabin,
+    origin, destination, departDate, returnDate, adults, children, cabin,
     placeTypes: [...new Set(placeTypes)], bookingMode: "confirm_each",
   });
   return { brief, assumptions, via: "heuristic" };
@@ -87,9 +97,13 @@ export async function parseBrief(text: string): Promise<ParseResult> {
       system:
         `Today is ${new Date().toISOString().slice(0, 10)}. ` +
         "Extract a structured travel brief from the user's prose. Use IATA codes for origin/" +
-        "destination. Resolve all dates to the future relative to today — a bare month/day like " +
-        "'December 3rd' means the next December 3rd that has not yet passed; never return a date " +
-        "in the past. If something isn't stated, choose a sensible default and note it. Call emit_brief.",
+        "destination. Count travelers precisely: 'adults' is the number of adults and 'children' " +
+        "the number of kids — e.g. '4 people (2 kids)' is adults:2, children:2. Resolve all dates " +
+        "to the future relative to today — a bare month/day like 'December 3rd' means the next " +
+        "December 3rd that has not yet passed; never return a date in the past. The prose may arrive " +
+        "as an initial brief followed by '[Update]' corrections — treat later updates as overrides " +
+        "and merge them into one coherent brief. If something isn't stated, choose a sensible default " +
+        "and note it in assumptions. Call emit_brief.",
       tools: [
         {
           name: "emit_brief",
@@ -100,6 +114,7 @@ export async function parseBrief(text: string): Promise<ParseResult> {
               origin: { type: "string" }, destination: { type: "string" },
               departDate: { type: "string" }, returnDate: { type: "string" },
               adults: { type: "number" },
+              children: { type: "number" },
               cabin: { type: "string", enum: ["economy", "premium_economy", "business", "first"] },
               placeTypes: { type: "array", items: { type: "string" } },
               assumptions: { type: "array", items: { type: "string" } },

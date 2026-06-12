@@ -10,6 +10,7 @@ export const BriefSchema = z.object({
   departDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   adults: z.number().int().min(1).max(9).default(1),
+  children: z.number().int().min(0).max(9).default(0),
   /** Hard ceiling, in USD, across the whole trip. The agent may never exceed this. */
   budgetUsd: z.number().positive().optional(),
   /** Free-form "right kinds of places" signals — drives stay scoring. */

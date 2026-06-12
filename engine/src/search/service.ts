@@ -14,8 +14,9 @@ export async function runSearch(tripId: string, brief: Brief, accountId = "demo"
   // Personalization: the account's favorite tags from "where you've been" sharpen stay scoring.
   const tasteTags = tasteSignal(accountId).favoriteTags;
 
+  const pax = brief.adults + brief.children;
   emitEvent(tripId, "search", `Searching ${supplier.name} for ${brief.origin}→${brief.destination}`, {
-    detail: `${brief.adults} traveler(s) · ${brief.cabin}${brief.budgetUsd ? ` · ≤ $${brief.budgetUsd.toLocaleString()}` : ""}`,
+    detail: `${pax} traveler(s) · ${brief.cabin}${brief.budgetUsd ? ` · ≤ $${brief.budgetUsd.toLocaleString()}` : ""}`,
   });
 
   const [flightsRaw, staysRaw] = await Promise.all([

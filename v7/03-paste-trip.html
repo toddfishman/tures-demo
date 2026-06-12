@@ -276,6 +276,9 @@ function legCard(l, i){
 /* ---------- conversation flow ---------- */
 var REASONS = ['Reading your brief…','Resolving hotels & dates…','Checking flight schedules…','Flagging what won\'t book…'];
 var planned = false;
+/* The running brief. Every user turn is appended so a correction ("sorry, SEA") is
+   re-parsed WITH the original trip, not as a brand-new one. */
+var convoText = '';
 
 function greet(){
   addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
@@ -313,14 +316,22 @@ function sendBrief(){
   addMsg(text.replace(/</g,'&lt;'), 'me');
   composer.value = ''; autoGrow();
   sugEl.innerHTML = '';
+  composer.placeholder = 'Describe your trip — cities, dates, how you fly & stay…';
   setStep(1);
+
+  var isCorrection = convoText !== '';
+  // Append this turn to the running brief so corrections refine the trip in context.
+  convoText = isCorrection ? (convoText + '\n\n[Update] ' + text) : text;
+
   if (window.tures && tures.configured) {
-    if (looksMultiLeg(text)) {
+    // Only the FIRST message can trigger the multi-city sample; a short correction never should.
+    if (!isCorrection && looksMultiLeg(text)) {
       addMsg('That reads as a multi-city trip. The live engine books one city at a time today — multi-city is in the works. Here is how a trip like yours runs, on a sample itinerary.', 't');
       scriptedFlow();
       return;
     }
-    realFlow(text);
+    if (isCorrection) addMsg('Got it — folding that in.', 't');
+    realFlow(convoText);
   } else { scriptedFlow(); }
 }
 
@@ -387,7 +398,9 @@ function realFlow(text){
   tures.parse(text).then(function(p){
     t.remove();
     var b = p.brief;
-    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + b.adults + ' traveler' + (b.adults>1?'s':'') + ' · ' + b.cabin, 't');
+    var pax = (b.adults || 1) + (b.children || 0);
+    var paxLabel = pax + ' traveler' + (pax > 1 ? 's' : '') + (b.children ? ' (' + b.adults + ' adult' + (b.adults>1?'s':'') + ' + ' + b.children + ' child' + (b.children>1?'ren':'') + ')' : '');
+    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + paxLabel + ' · ' + b.cabin, 't');
     var assumed = p.assumptions || [];
     if(assumed.length){
       /* When in doubt, ask — an assumption is a question, not a decision. */
@@ -412,7 +425,7 @@ function askProceed(b){
   go.onclick = function(){ sugEl.innerHTML=''; addMsg('Go ahead.', 'me'); planAndPropose(b); };
   var fix = document.createElement('button');
   fix.className = 'qr'; fix.textContent = 'Let me fix the details';
-  fix.onclick = function(){ sugEl.innerHTML=''; composer.placeholder = 'Re-describe the trip with the right dates and cities…'; composer.focus(); };
+  fix.onclick = function(){ sugEl.innerHTML=''; composer.placeholder = 'Just the correction — e.g. "from Seattle" or "the dates are Dec 3–10"…'; composer.focus(); };
   sugEl.appendChild(go); sugEl.appendChild(fix);
 }
 
@@ -486,6 +499,7 @@ function restart(){
   document.getElementById('ctaBar').style.display = 'none';
   document.getElementById('threadStatus').textContent = 'Booking concierge · online';
   planned = false;
+  convoText = '';
   setStep(1);
   state = { purpose:[], pace:'balanced', avoid:[] };
   document.getElementById('tripSummary').textContent = "Pick a few and I'll read it back — then tune the plan before anything is booked.";

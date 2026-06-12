@@ -32,8 +32,11 @@ export class MockSupplier implements SupplierAdapter {
   async searchFlights(brief: Brief): Promise<Offer[]> {
     const base = 380 + Math.round(seed(brief.origin + brief.destination) * 900);
     const cabinMult = { economy: 1, premium_economy: 1.8, business: 3.4, first: 6 }[brief.cabin];
+    // Children fly at ~75% of an adult fare.
+    const seats = brief.adults + brief.children * 0.75;
+    const pax = brief.adults + brief.children;
     return CARRIERS.slice(0, 4).map((carrier, i) => {
-      const price = Math.round(base * cabinMult * (1 + i * 0.12) * brief.adults);
+      const price = Math.round(base * cabinMult * (1 + i * 0.12) * seats);
       const stops = i === 0 ? 0 : i === 3 ? 2 : 1;
       return {
         id: `mock-fl-${brief.origin}${brief.destination}-${i}`,
@@ -46,7 +49,7 @@ export class MockSupplier implements SupplierAdapter {
         summary: [
           `${carrier} · ${brief.cabin}`,
           stops === 0 ? "nonstop" : `${stops} stop${stops > 1 ? "s" : ""}`,
-          `$${price.toLocaleString()} for ${brief.adults}`,
+          `$${price.toLocaleString()} for ${pax}`,
         ],
       } satisfies Offer;
     });

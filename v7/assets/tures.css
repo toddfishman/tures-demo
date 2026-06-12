@@ -21,18 +21,22 @@
   /* Ink */
   --ink:           #2a2118;
   --ink-soft:      #6b5d49;
-  --ink-faint:     #97886f;
+  --ink-faint:     #6c6149;  /* darkened for AA on cream + tinted info boxes (was #97886f, ~3.0:1) */
 
   /* Gold foil */
   --gold:          #c8a24a;
   --gold-bright:   #e6c873;
-  --gold-deep:     #9c7a2e;
+  --gold-deep:     #7d5e20;  /* darkened for AA on cream (was #9c7a2e, ~3.5:1). Use text-gold/bright on dark surfaces. */
 
   /* Status — muted, leather-bound register */
   --confirm:       #5f7d4f;
   --pending:       #b88a2e;
   --alert:         #b5543a;
   --info:          #4a6b86;
+  /* Text-on-cream variants — the status hues above are tuned as dots/fills (light enough to read
+     on dark); these darker shades are for status-colored TEXT on cream so it clears AA (4.5:1). */
+  --confirm-ink:   #4e6a3a;
+  --alert-ink:     #8f3f2b;
 }
 
 /* ---------- type ---------- */
@@ -49,6 +53,7 @@ body{ font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antiali
 /* ---------- color helpers ---------- */
 .text-gold{ color:var(--gold); }
 .text-gold-bright{ color:var(--gold-bright); }
+.text-gold-deep{ color:var(--gold-deep); }  /* was never defined — 113 uses had been silently inheriting */
 .text-ink{ color:var(--ink); }
 .text-ink-soft{ color:var(--ink-soft); }
 .text-ink-faint{ color:var(--ink-faint); }
@@ -181,10 +186,10 @@ body{ font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antiali
 .pill{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px;
   font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600; }
 .pill-confirm{ background:rgba(95,125,79,0.16); color:#43603a; }
-.pill-pending{ background:rgba(184,138,46,0.18); color:#8a6a26; }
+.pill-pending{ background:rgba(184,138,46,0.18); color:#7d5e20; }
 .pill-alert  { background:rgba(181,84,58,0.16); color:#8f3f2b; }
 .pill-info   { background:rgba(74,107,134,0.16); color:#3c5a72; }
-.pill-gold   { background:rgba(200,162,74,0.16); color:#8a6a26; border:1px solid rgba(200,162,74,0.35); }
+.pill-gold   { background:rgba(200,162,74,0.16); color:#7d5e20; border:1px solid rgba(200,162,74,0.35); }
 /* dark variants for leather backgrounds */
 .pill-d-confirm{ background:rgba(95,125,79,0.2); color:#a7c293; }
 .pill-d-pending{ background:rgba(184,138,46,0.2); color:#e6c873; }

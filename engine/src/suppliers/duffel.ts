@@ -43,7 +43,11 @@ export class DuffelSupplier implements SupplierAdapter {
     if (brief.returnDate) {
       slices.push({ origin: brief.destination, destination: brief.origin, departure_date: brief.returnDate });
     }
-    const passengers = Array.from({ length: brief.adults }, () => ({ type: "adult" as const }));
+    const passengers: Array<{ type: "adult" } | { age: number }> = [
+      ...Array.from({ length: brief.adults }, () => ({ type: "adult" as const })),
+      // Duffel identifies a child passenger by age, not a "child" type.
+      ...Array.from({ length: brief.children }, () => ({ age: 8 })),
+    ];
 
     // return_offers=true embeds offers in the response so we avoid a second round-trip.
     const json = await this.post("/air/offer_requests?return_offers=true&supplier_timeout=10000", {
