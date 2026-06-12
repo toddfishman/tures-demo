@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The Bound Edition (concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  html,body{ background:#0b0907; min-height:100%; }
+  body{ overflow:hidden; }
+
+  /* ===== the living world behind the book ===== */
+  .scene{ position:fixed; inset:0; z-index:0; overflow:hidden; background:#0b0907; }
+  .scene .frame-img{ position:absolute; inset:0; background-size:cover; background-position:center;
+    opacity:0; animation:slide 45s infinite; }
+  @keyframes slide{
+    0%{ opacity:0; transform:scale(1.05) } 3%{ opacity:1 } 17%{ opacity:1 }
+    20%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
+  }
+  .veil{ position:fixed; inset:0; z-index:1;
+    background:radial-gradient(135% 115% at 50% 42%, rgba(11,9,7,0.04), rgba(11,9,7,0.22) 58%, rgba(11,9,7,0.62) 100%); }
+  .placecap{ position:fixed; left:0; right:0; bottom:26px; z-index:6; text-align:center; pointer-events:none; }
+  .placecap span{ position:absolute; left:0; right:0; opacity:0; animation:slide 45s infinite;
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:rgba(230,200,115,0.85); }
+
+  /* ===== the small leather book — the constant ===== */
+  .bookstage{ position:fixed; inset:0; z-index:5; display:grid; place-items:center; perspective:2200px; padding:18px; }
+  .book{ position:relative; width:min(80vw,322px); aspect-ratio:5/7; cursor:pointer; border-radius:7px;
+    transform-origin:left center; backface-visibility:hidden; background-color:#1b130c;
+    box-shadow:0 3px 6px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.9);
+    animation:float 7.5s ease-in-out infinite;
+    transition:transform 1000ms cubic-bezier(.7,.02,.27,1), opacity 650ms ease; }
+  @keyframes float{ 0%,100%{ transform:translateY(0) rotateZ(-.28deg) } 50%{ transform:translateY(-10px) rotateZ(.28deg) } }
+  .book::before{ content:""; position:absolute; top:0; bottom:0; left:0; width:30px; z-index:2; border-radius:7px 0 0 7px;
+    background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 80%); border-right:1px solid rgba(255,220,150,0.07); }
+  .opened .book{ transform:translateY(-10px) rotateY(-122deg) scale(.95); opacity:0; pointer-events:none; animation:none; }
+  .bframe{ position:absolute; inset:16px; border:1px solid rgba(200,162,74,0.42); border-radius:3px;
+    box-shadow:inset 0 0 0 4px rgba(0,0,0,0.22); z-index:3; }
+  .bframe.dashed{ inset:23px; border-style:dashed; opacity:0.5; }
+
+  /* ===== the pages (chooser) revealed on open ===== */
+  .pages{ position:fixed; inset:0; z-index:8; overflow-y:auto; opacity:0; pointer-events:none;
+    transition:opacity 650ms ease 250ms; -webkit-overflow-scrolling:touch; }
+  .opened .pages{ opacity:1; pointer-events:auto; }
+
+  .doors{ display:grid; gap:18px; }
+  @media(min-width:760px){ .doors{ grid-template-columns:1fr 1fr; gap:22px; } }
+  .door{ position:relative; display:flex; flex-direction:column; justify-content:flex-end; min-height:320px;
+    border-radius:16px; overflow:hidden; text-decoration:none; border:1px solid rgba(200,162,74,0.34);
+    box-shadow:0 30px 64px -34px rgba(0,0,0,0.92); opacity:0; transform:translateY(16px);
+    transition:transform .55s cubic-bezier(.2,.7,.2,1), opacity .55s ease, border-color .25s ease; }
+  .opened .door{ opacity:1; transform:none; }
+  .opened .door.d1{ transition-delay:.34s; } .opened .door.d2{ transition-delay:.46s; }
+  .door:hover{ border-color:rgba(230,200,115,0.7); }
+  .door .art{ position:absolute; inset:0; z-index:0; } .door .art img{ width:100%; height:100%; object-fit:cover; }
+  .door .dveil{ position:absolute; inset:0; z-index:1; } .door .body{ position:relative; z-index:2; padding:22px; }
+  .door .inner-frame{ position:absolute; inset:13px; z-index:1; border:1px solid rgba(200,162,74,0.28); border-radius:9px; pointer-events:none; }
+  .door.d1 .dveil{ background:linear-gradient(180deg, rgba(11,9,7,0.30) 0%, rgba(11,9,7,0.72) 58%, rgba(11,9,7,0.97) 100%); }
+  .door.d2{ background:radial-gradient(130% 90% at 50% 0%, #3a2a19 0%, #1b130c 55%, #120c07 100%); }
+  .door.d2 .dveil{ background:radial-gradient(120% 80% at 50% -10%, rgba(230,200,115,0.22), transparent 60%); }
+  .kk{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .arr{ display:inline-flex; align-items:center; gap:8px; margin-top:13px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+</style>
+</head>
+<body class="text-canvas">
+
+  <!-- the rotating, drifting world -->
+  <div class="scene" aria-hidden="true">
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80&auto=format&fit=crop');animation-delay:0s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80&auto=format&fit=crop');animation-delay:9s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1920&q=80&auto=format&fit=crop');animation-delay:18s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1920&q=80&auto=format&fit=crop');animation-delay:27s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1920&q=80&auto=format&fit=crop');animation-delay:36s"></div>
+  </div>
+  <div class="veil"></div>
+  <div class="placecap">
+    <span style="animation-delay:0s">Tulum</span>
+    <span style="animation-delay:9s">Paris</span>
+    <span style="animation-delay:18s">Tokyo</span>
+    <span style="animation-delay:27s">Lapland</span>
+    <span style="animation-delay:36s">New York</span>
+  </div>
+
+  <!-- the book you carry -->
+  <div class="bookstage">
+    <div class="book leather-surface grain" id="book" onclick="openBook()">
+      <div class="bframe"></div>
+      <div class="bframe dashed"></div>
+      <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+        <div class="caps text-[10px] text-gold/70 mb-5">The AI Travel Concierge</div>
+        <div class="wordmark foil text-[58px] leading-none">t<span class="spark">✦</span>ures</div>
+        <div class="foil-line w-20 my-5"></div>
+        <p class="font-display italic text-lg text-canvas/85 leading-snug">Adventures,<br>handled.</p>
+        <div class="mt-10 flex items-center gap-2.5 text-gold/80">
+          <span class="text-xl" style="animation:qhint 1.8s ease-in-out infinite">←</span>
+          <span class="caps text-[9px]">Open the book</span>
+        </div>
+      </div>
+      <div class="absolute bottom-5 inset-x-0 text-center caps text-[8px] text-gold/40 z-10">First Edition · MMXXVI</div>
+    </div>
+  </div>
+
+  <!-- the pages: where would you like to begin -->
+  <div class="pages canvas-surface" id="pages">
+    <div class="relative z-10 max-w-3xl mx-auto px-6" style="padding-top:6vh; padding-bottom:8vh;">
+      <div class="flex items-center justify-between mb-7">
+        <a class="wordmark text-4xl quiet" style="color:var(--gold-deep)" href="#" onclick="closeBook();return false;">t<span class="spark">✦</span>ures</a>
+        <span class="caps text-[10px] text-ink-faint">First Edition</span>
+      </div>
+      <div class="font-display text-4xl sm:text-5xl text-ink leading-[1.04] mb-2">Where would you like to begin?</div>
+      <p class="text-ink-faint text-sm mb-7">Two ways in. No wrong door.</p>
+      <div class="doors">
+        <a class="door d1" href="01-landing.html">
+          <div class="art"><img src="https://images.unsplash.com/photo-1538970272646-f61fabb3a8a2?w=900&q=80&auto=format&fit=crop" alt="" aria-hidden="true" loading="lazy"></div>
+          <div class="dveil"></div><div class="inner-frame"></div>
+          <div class="body">
+            <div class="kk text-gold-bright/85 mb-1">New here?</div>
+            <div class="font-display text-3xl text-canvas leading-tight">What is Tures?</div>
+            <p class="text-canvas/75 text-sm mt-2 leading-relaxed">Eleven days across three cities, booked leg by leg — and rebooked before the traveler noticed. Five minutes, no signup.</p>
+            <span class="arr text-gold-bright">Show me →</span>
+          </div>
+        </a>
+        <a class="door d2" href="03-paste-trip.html">
+          <div class="dveil"></div><div class="inner-frame"></div>
+          <div class="body">
+            <div class="kk text-gold-bright/85 mb-1">Free to start</div>
+            <div class="font-display text-3xl text-canvas leading-tight">Plan a trip.</div>
+            <p class="text-canvas/75 text-sm mt-2 leading-relaxed">No sign up. Pay only when you book for real.</p>
+            <span class="arr text-gold-bright">Begin →</span>
+          </div>
+        </a>
+      </div>
+      <div class="rule-gold my-7" style="max-width:120px"></div>
+      <span class="text-ink-faint text-sm">Already with us? <a href="auth/login.html" class="text-gold-deep quiet hover:underline">Sign in</a></span>
+    </div>
+  </div>
+
+<script>
+  function openBook(){ document.body.classList.add('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); return false; }
+  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>
