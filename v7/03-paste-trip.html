@@ -487,21 +487,31 @@ function planAndPropose(b){
       chat.appendChild(wrap);
       requestAnimationFrame(function(){ wrap.classList.add('in'); [].forEach.call(wrap.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); });
       wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
-      // hand the plan to checkout — pay only happens there, only if they book
+      // Planning is free with no signup. Signed-in → checkout. Anonymous → first a FREE mock-book
+      // preview (watch it book, $0, nothing real), then "Sign Up & Book" to do it for real — the
+      // pending trip is saved so it carries through onboarding to checkout.
       var cta = document.querySelector('#ctaBar a');
       if(cta){
-        cta.textContent = 'Approve & book →';
-        cta.href = 'checkout.html';
-        cta.onclick = function(e){
-          e.preventDefault();
+        var signedIn = !!(window.tures && tures.signedIn);
+        function savePending(){
           localStorage.setItem('tures.pendingTrip', JSON.stringify({
             brief: b,
             flightId: plan.flight && plan.flight.id, stayId: plan.stay && plan.stay.id,
             flightTitle: plan.flight && plan.flight.title, stayTitle: plan.stay && plan.stay.title,
             totalUsd: plan.totalUsd, currency: (plan.flight && plan.flight.currency) || 'USD'
           }));
-          location.href = (window.tures && tures.signedIn) ? 'checkout.html' : 'signup.html';
-        };
+        }
+        if(signedIn){
+          cta.textContent = 'Approve & book →'; cta.href = 'checkout.html';
+          cta.onclick = function(e){ e.preventDefault(); savePending(); location.href = 'checkout.html'; };
+        } else {
+          cta.textContent = 'Watch it book — free →'; cta.href = '#';
+          cta.onclick = function(e){
+            e.preventDefault();
+            if(!cta.__previewed){ cta.__previewed = true; previewBooking(plan, cta); }
+            else { savePending(); location.href = 'signup.html'; }
+          };
+        }
       }
       setStep(2);
       var firstPlan = !planned;
@@ -520,6 +530,34 @@ function planAndPropose(b){
       addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
       scriptedFlow();
     });
+}
+
+/* Free mock-book preview — watch the trip "book" with $0 charged and nothing real, then offer
+   to do it for real via Sign Up & Book. Honest by design: every line is tagged (preview). */
+function mockCode(n){ var s='', a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for(var k=0;k<n;k++) s+=a.charAt(Math.floor(Math.random()*a.length)); return s; }
+function previewBooking(plan, cta){
+  document.getElementById('threadStatus').textContent = 'Preview booking · nothing charged';
+  var legs = [];
+  if(plan.flight) legs.push({icon:'✈', t:plan.flight.title, c:'PNR ' + mockCode(6)});
+  if(plan.stay)   legs.push({icon:'⌂', t:plan.stay.title,   c:'CONF ' + mockCode(5)});
+  sugEl.innerHTML = '';
+  var act = actingPill('Booking your trip — preview · $0');
+  var i = 0;
+  (function step(){
+    if(i >= legs.length){
+      try{ act.remove(); }catch(_){}
+      addMsg('Preview done — <strong>nothing was booked and $0 was charged.</strong> This is exactly how it runs for real, verified twice before anything says “Booked.” Want to make it real?', 't');
+      cta.textContent = 'Sign Up & Book →';
+      return;
+    }
+    var l = legs[i++];
+    var ty = typing();
+    setTimeout(function(){
+      ty.remove();
+      addMsg(l.icon + ' Booked <strong>' + l.t + '</strong> · <span class="font-mono text-ink-faint">' + l.c + '</span> <span class="text-ink-faint">(preview)</span>', 't');
+      setTimeout(step, 480);
+    }, 780);
+  })();
 }
 
 function restart(){

@@ -395,8 +395,24 @@ a.quiet{ text-decoration:none; }
 }
 
 /* ============================================================
-   ✦ MENU — shared overlay navigation (elegant, tech-forward)
-   Replaces the inline nav links site-wide. Built by assets/menu.js.
+   ✦ HOME STAR — universal home button, fixed top-right (assets/menu.js)
+   ============================================================ */
+.tures-home-star{
+  position:fixed; top:14px; right:18px; z-index:70; text-decoration:none;
+  display:inline-flex; align-items:baseline; gap:0;
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:22px; line-height:1;
+  color:var(--gold-bright); letter-spacing:0.02em;
+  padding:8px 13px; border-radius:99px;
+  background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
+  box-shadow:0 6px 20px -8px rgba(0,0,0,0.6); transition:transform .14s ease, border-color .2s ease, background .2s ease;
+}
+.tures-home-star .spark{ font-size:0.62em; vertical-align:super; color:var(--gold-bright); margin:0 0.02em; }
+.tures-home-star:hover{ transform:translateY(-1px); border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+.tures-home-star:active{ transform:translateY(0) scale(.97); }
+@media (max-width:640px){ .tures-home-star{ top:10px; right:12px; font-size:19px; padding:7px 11px; } }
+
+/* ============================================================
+   ✦ MENU — legacy overlay styles (unused; kept for safety)
    ============================================================ */
 .menu-star{ appearance:none; cursor:pointer; color:var(--gold-bright);
   font-family:'Cormorant Garamond',Georgia,serif; font-size:24px; line-height:1;
