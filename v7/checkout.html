@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Confirm &amp; book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .opt{ border:1px solid var(--canvas-line); border-radius:12px; padding:14px 16px; cursor:pointer; transition:all .14s; background:rgba(255,253,247,0.5); }
+  .opt.on{ border-color:var(--gold); background:rgba(200,162,74,0.08); }
+  .opt .tick{ width:18px;height:18px;border-radius:99px;border:2px solid var(--canvas-line); display:inline-grid;place-items:center; }
+  .opt.on .tick{ border-color:var(--gold); background:var(--gold); }
+  .fld{ border-radius:10px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.7); padding:10px 12px; font-size:14px; color:var(--ink); outline:none; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <a href="03-paste-trip.html" class="text-sm text-canvas/70 quiet">← Back to planning</a>
+  </nav>
+</header>
+
+<main class="canvas-surface text-ink min-h-[88vh]">
+ <div class="max-w-2xl mx-auto px-6 py-12">
+
+  <div class="caps text-[11px] text-gold-deep mb-2">Final step</div>
+  <h1 class="font-display text-4xl sm:text-5xl text-ink leading-tight mb-2">You're only charged because it books.</h1>
+  <p class="text-ink-soft text-sm leading-relaxed mb-8">Everything up to here was free. Confirm below and Tures books your itinerary — travel charges pass through to your card, plus your Tures fee.</p>
+
+  <!-- gate states -->
+  <div id="needPlan" class="leaf p-6 text-center" style="display:none">
+    <p class="text-ink-soft mb-4">No itinerary to book yet.</p>
+    <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-xl quiet">Plan a trip →</a>
+  </div>
+  <div id="needAccount" class="leaf p-6 text-center" style="display:none">
+    <p class="text-ink-soft mb-4">Create a free account to book this trip.</p>
+    <a href="signup.html" class="btn-gold px-6 py-3 rounded-xl quiet">Sign up →</a>
+  </div>
+
+  <div id="checkout" style="display:none">
+    <!-- itinerary -->
+    <div class="leaf p-5 mb-5">
+      <div class="caps text-[11px] text-ink-faint mb-3">Your itinerary</div>
+      <div id="itin" class="space-y-2 text-sm"></div>
+      <div class="rule-gold my-3"></div>
+      <div class="flex justify-between text-sm"><span class="text-ink-soft">Travel total (to your card)</span><span class="font-mono text-ink" id="travelTotal">—</span></div>
+    </div>
+
+    <!-- tures fee -->
+    <div class="caps text-[11px] text-ink-faint mb-3">Tures fee</div>
+    <div id="feeBox" class="rounded-lg p-4 mb-5" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28)"></div>
+
+    <!-- payment method -->
+    <div class="caps text-[11px] text-ink-faint mb-3">Card for this trip</div>
+    <div id="cards" class="space-y-2 mb-3"></div>
+    <div id="addCardRow" class="flex gap-2 mb-5">
+      <select id="cardPick" class="fld flex-1"></select>
+      <button id="addCard" class="btn-ink px-4 rounded-lg text-sm press">Add card</button>
+    </div>
+    <!-- real card via Stripe Elements (shown when the engine has a publishable key) -->
+    <div id="realCardRow" class="mb-5" style="display:none">
+      <select id="cardPickReal" class="fld w-full mb-2" title="Card type — for picking the best rewards"></select>
+      <div id="cardElement" class="fld" style="padding:13px 14px"></div>
+      <button id="saveCardBtn" class="btn-ink px-4 py-2.5 rounded-lg text-sm press mt-2 w-full">Save card</button>
+      <div id="cardErr" class="text-[12px] mt-1" style="color:var(--alert)"></div>
+      <div class="text-[11px] text-ink-faint mt-1">Test card: 4242 4242 4242 4242 · any future date · any CVC · any ZIP</div>
+    </div>
+
+    <div class="flex justify-between items-baseline mb-4">
+      <span class="text-ink-soft text-sm">Charged now</span>
+      <span class="font-display text-3xl text-ink" id="grand">—</span>
+    </div>
+    <button id="payBtn" class="btn-gold w-full px-6 py-4 rounded-xl quiet font-semibold text-lg">Confirm &amp; book →</button>
+    <div id="payErr" class="text-center text-sm mt-2" style="color:var(--alert)"></div>
+    <p class="text-[12px] text-ink-faint text-center mt-3">Tures acts as agent-of-record for flights and books boutique stays in your name. Cancel anytime.</p>
+  </div>
+
+  <!-- success -->
+  <div id="booked" class="leaf p-7 text-center" style="display:none">
+    <div class="text-5xl text-gold-deep mb-3">✦</div>
+    <h2 class="font-display text-3xl text-ink mb-2">Booked.</h2>
+    <p class="text-ink-soft text-sm mb-5">Confirmations are in. You were charged because it booked — exactly as promised.</p>
+    <div id="confs" class="space-y-2 text-left text-sm mb-6"></div>
+    <a href="05-execution.html" class="btn-gold px-6 py-3 rounded-xl quiet block">Watch it work →</a>
+  </div>
+
+ </div>
+</main>
+
+<script src="assets/engine.js"></script>
+<script>
+var pending = null;
+try { pending = JSON.parse(localStorage.getItem('tures.pendingTrip') || 'null'); } catch(e){}
+
+function money(n){ return '$' + Math.round(n).toLocaleString(); }
+var isSub = !!(window.tures && tures.account && tures.account.plan === 'subscribe');
+var fee = isSub ? 0 : 99;
+function renderFee(){
+  var box = document.getElementById('feeBox');
+  if(isSub) box.innerHTML = '<span class="text-ink font-medium">$0 — concierge fee waived</span><span class="text-ink-soft text-sm block">You\'re on the Concierge plan. Travel charges still pass through to your card.</span>';
+  else box.innerHTML = '<div class="flex items-baseline justify-between"><span class="text-ink font-medium">$99 concierge fee</span><span class="text-ink-soft text-sm">on this booking only</span></div><span class="text-ink-soft text-sm block mt-1">Booking unlimited? <a href="pricing.html" class="text-gold-deep underline quiet">Subscribe for $99/mo</a> and skip per-trip fees.</span>';
+}
+
+function gate(){
+  if(!pending){ document.getElementById('needPlan').style.display=''; return false; }
+  if(window.tures && !tures.signedIn){ document.getElementById('needAccount').style.display=''; return false; }
+  document.getElementById('checkout').style.display='';
+  return true;
+}
+
+function renderItin(){
+  var html = '';
+  if(pending.flightTitle) html += '<div class="flex justify-between"><span class="text-ink">✈ '+pending.flightTitle+'</span></div>';
+  if(pending.stayTitle) html += '<div class="flex justify-between"><span class="text-ink">⌂ '+pending.stayTitle+'</span></div>';
+  document.getElementById('itin').innerHTML = html || '<span class="text-ink-soft">Your selected trip</span>';
+  document.getElementById('travelTotal').textContent = money(pending.totalUsd||0);
+  recompute();
+}
+function recompute(){ document.getElementById('grand').textContent = money((pending.totalUsd||0) + fee); }
+
+// payment cards
+function refreshCards(){
+  if(!(window.tures && tures.configured)){ document.getElementById('cards').innerHTML = '<div class="text-[13px] text-ink-faint">Demo mode — a card will be simulated.</div>'; document.getElementById('addCardRow').style.display='none'; return; }
+  tures.wallet.catalog().then(function(cat){
+    var pick = document.getElementById('cardPick'); pick.innerHTML='';
+    (cat.cards||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; pick.appendChild(o); });
+  }).catch(function(){});
+  tures.connections.list().then(function(res){
+    var cards = (res.connections||[]).filter(function(c){return c.kind==='payment';});
+    var el = document.getElementById('cards');
+    el.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint mb-1">Add a card to book.</div>';
+    cards.forEach(function(c){
+      var row=document.createElement('div'); row.className='flex items-center justify-between rounded-lg px-3 py-2 text-sm';
+      row.style='border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
+      row.innerHTML='<span class="text-ink">'+c.label+'</span><span class="text-[11px] text-gold-deep">on file</span>';
+      el.appendChild(row);
+    });
+  }).catch(function(){});
+}
+var addCard = document.getElementById('addCard');
+if(addCard) addCard.onclick = function(){
+  var pick=document.getElementById('cardPick'); var key=pick.value; var name=pick.options[pick.selectedIndex].textContent;
+  tures.connections.connect({ kind:'payment', label:name, secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key}, meta:{cardKey:key, last4:'0000'} }).then(refreshCards);
+};
+
+// Real card via Stripe Elements — used when the engine exposes a publishable key.
+var stripe, cardElement;
+function initRealCard(){
+  if(!(window.tures && tures.configured) || !window.Stripe) return;
+  tures.health().then(function(h){
+    var pk = h && h.stripePublishableKey;
+    if(!pk) return; // mock mode — keep the demo picker
+    document.getElementById('addCardRow').style.display='none';
+    document.getElementById('realCardRow').style.display='';
+    tures.wallet.catalog().then(function(cat){ var p=document.getElementById('cardPickReal'); p.innerHTML=''; (cat.cards||[]).forEach(function(c){ if(c.key==='generic_cashback') return; var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; p.appendChild(o); }); }).catch(function(){});
+    stripe = Stripe(pk);
+    cardElement = stripe.elements().create('card', { style:{ base:{ fontSize:'15px', color:'#2a201a' } } });
+    cardElement.mount('#cardElement');
+    document.getElementById('saveCardBtn').onclick = function(){
+      var btn=this; btn.disabled=true; btn.textContent='Saving…'; document.getElementById('cardErr').textContent='';
+      tures.billing.setupIntent()
+        .then(function(si){ return stripe.confirmCardSetup(si.clientSecret, { payment_method:{ card: cardElement } }); })
+        .then(function(r){ if(r.error) throw new Error(r.error.message); var sel=document.getElementById('cardPickReal');
+          return tures.billing.saveCard({ paymentMethodId: r.setupIntent.payment_method, label: sel.options[sel.selectedIndex].textContent, cardKey: sel.value }); })
+        .then(function(){ btn.disabled=false; btn.textContent='Save card'; cardElement.clear(); refreshCards(); })
+        .catch(function(e){ btn.disabled=false; btn.textContent='Save card'; document.getElementById('cardErr').textContent=(e&&e.message)||'Could not save card.'; });
+    };
+  }).catch(function(){});
+}
+
+document.getElementById('payBtn').addEventListener('click', function(){
+  var btn=this; btn.textContent='Booking…'; btn.disabled=true; btn.style.opacity=.7;
+
+  function showBooked(components){
+    document.getElementById('checkout').style.display='none';
+    var c = document.getElementById('confs');
+    c.innerHTML = (components||[]).map(function(x){
+      return '<div class="flex justify-between rounded-lg px-3 py-2" style="border:1px solid var(--canvas-line)"><span class="text-ink">'+(x.title||'Booked')+'</span><span class="font-mono text-ink-soft">'+(x.confirmation||'confirmed')+(x.card? ' · '+x.card.name : '')+'</span></div>';
+    }).join('');
+    document.getElementById('booked').style.display='';
+    localStorage.removeItem('tures.pendingTrip');
+  }
+
+  function fail(msg){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Confirm & book →'; var e=document.getElementById('payErr'); if(e){ e.textContent=msg; } }
+
+  if(window.tures && tures.configured){
+    tures.book({ brief: pending.brief, flightId: pending.flightId, stayId: pending.stayId, feeUsd: fee })
+      .then(function(b){ return b.status === 'confirmation_required' ? tures.confirm(b.id) : b; })
+      .then(function(b){
+        if(b.status !== 'booked'){ throw Object.assign(new Error('not booked'), { body: b }); }
+        showBooked(b.components);
+      })
+      .catch(function(err){
+        fail('Could not book: ' + ((err && err.body && (err.body.violations||[]).join('; ')) || (err && err.message) || err));
+      });
+  } else {
+    setTimeout(function(){ showBooked([{title: pending.flightTitle, confirmation:'PNR-DEMO1'},{title: pending.stayTitle, confirmation:'CONF-DEMO2'}]); }, 900);
+  }
+});
+
+if(gate()){ renderFee(); renderItin(); refreshCards(); initRealCard(); }
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

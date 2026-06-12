@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Describe a trip. We book it.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+  .hero-line{ transition-delay:var(--d,0ms); }
+
+  /* cinematic photo hero */
+  .photo-hero{ position:relative; isolation:isolate; }
+  .photo-hero img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; }
+  .photo-hero .veil{ position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(120% 90% at 80% 14%, rgba(200,162,74,0.20), transparent 52%),
+      linear-gradient(180deg, rgba(11,11,13,0.42) 0%, rgba(11,11,13,0.66) 52%, rgba(11,11,13,0.97) 100%); }
+
+  /* destination photo cards — the "real places" grid */
+  .dest{ position:relative; display:block; border-radius:10px; overflow:hidden; aspect-ratio:4/5;
+    border:1px solid rgba(200,162,74,0.18); box-shadow:0 20px 44px -28px rgba(0,0,0,0.92); }
+  .dest img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    transition:transform .7s cubic-bezier(.2,.6,.2,1); }
+  .dest:hover img{ transform:scale(1.06); }
+  .dest .veil{ position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(11,11,13,0) 34%, rgba(11,11,13,0.55) 70%, rgba(11,11,13,0.9) 100%); }
+  .dest .cap{ position:absolute; left:0; right:0; bottom:0; padding:16px 16px 18px; }
+</style>
+</head>
+<body class="text-canvas antialiased">
+
+<!-- CHROME -->
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-5xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="signup.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<!-- HERO — cinematic destination photo behind the promise -->
+<section class="photo-hero">
+  <img src="https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1600&q=80&auto=format&fit=crop" alt="" aria-hidden="true">
+  <div class="veil"></div>
+  <div class="max-w-6xl mx-auto px-6 pt-20 pb-20 sm:pt-28 sm:pb-28">
+    <div class="caps text-[11px] text-gold/85 mb-6">A travel agent that ships</div>
+    <h1 class="font-display font-light text-5xl sm:text-7xl md:text-8xl leading-[1.0] tracking-tight max-w-4xl">
+      <span class="rise hero-line block" style="--d:0ms">Books the impossible.</span>
+      <span class="rise hero-line block foil" style="--d:140ms">Watches everything.</span>
+      <span class="rise hero-line block" style="--d:280ms">Rebooks before you notice.</span>
+    </h1>
+    <p class="mt-8 text-lg sm:text-xl text-canvas/80 max-w-xl leading-relaxed">
+      Describe any trip in a sentence. Tures plans it, books every leg to your exact taste, and watches the
+      world so the trip survives contact with reality. Plan free — pay only when it actually books.
+    </p>
+    <div class="mt-9 flex flex-wrap items-center gap-3">
+      <a href="signup.html" class="btn-gold px-7 py-3.5 rounded-sm quiet font-semibold">Start planning — free →</a>
+      <a href="05-execution.html" class="btn-ghost px-7 py-3.5 rounded-sm quiet">Watch Tures book Andy's Trip</a>
+    </div>
+    <a href="02-taste-engine.html" class="inline-block mt-4 text-sm text-gold/75 hover:text-gold-bright quiet underline underline-offset-2">or try it yourself — swipe your taste →</a>
+    <p class="mt-4 text-xs text-canvas/55 max-w-md leading-relaxed">
+      Two friends. Andy texts Todd to plan his trip — so Todd built Tures to book it for real.
+    </p>
+  </div>
+</section>
+
+<!-- DESTINATIONS — real places, real bookings -->
+<section class="bg-obsidian">
+  <div class="max-w-6xl mx-auto px-6 py-16 sm:py-20">
+    <div class="flex items-end justify-between gap-4 mb-9">
+      <div>
+        <div class="caps text-[11px] text-gold/80 mb-3">Real trips, really booked</div>
+        <h2 class="font-display text-4xl sm:text-5xl leading-[1.05] text-canvas">Anywhere you can describe.</h2>
+      </div>
+      <a href="05-execution.html" class="hidden sm:inline-block text-sm text-gold/80 quiet underline whitespace-nowrap">See a live booking →</a>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <a href="05-execution.html" class="dest quiet">
+        <img src="https://images.unsplash.com/photo-1538970272646-f61fabb3a8a2?w=800&q=80&auto=format&fit=crop" alt="A cabin under the northern lights in Finnish Lapland" loading="lazy">
+        <div class="veil"></div>
+        <div class="cap">
+          <div class="caps text-[10px] text-gold-bright/90 mb-1">Finnish Lapland</div>
+          <div class="font-display text-xl text-canvas leading-tight">Aurora week, sauna at 9:45</div>
+        </div>
+      </a>
+      <a href="05-execution.html" class="dest quiet">
+        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80&auto=format&fit=crop" alt="Paris at dusk" loading="lazy">
+        <div class="veil"></div>
+        <div class="cap">
+          <div class="caps text-[10px] text-gold-bright/90 mb-1">Paris</div>
+          <div class="font-display text-xl text-canvas leading-tight">The hotel you named</div>
+        </div>
+      </a>
+      <a href="05-execution.html" class="dest quiet">
+        <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80&auto=format&fit=crop" alt="Tokyo street at night" loading="lazy">
+        <div class="veil"></div>
+        <div class="cap">
+          <div class="caps text-[10px] text-gold-bright/90 mb-1">Tokyo</div>
+          <div class="font-display text-xl text-canvas leading-tight">48 hours, every reservation</div>
+        </div>
+      </a>
+      <a href="05-execution.html" class="dest quiet">
+        <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80&auto=format&fit=crop" alt="New York City skyline" loading="lazy">
+        <div class="veil"></div>
+        <div class="cap">
+          <div class="caps text-[10px] text-gold-bright/90 mb-1">New York</div>
+          <div class="font-display text-xl text-canvas leading-tight">Business class + Carbone</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF — phone thread (show, don't tell) -->
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-12 gap-12 items-center">
+    <div class="lg:col-span-5">
+      <div class="caps text-[11px] text-gold/80 mb-4">The tip of the spear is a text message</div>
+      <h2 class="font-display text-4xl sm:text-5xl leading-[1.05]">One thread.<br><span class="foil">Your whole trip.</span></h2>
+      <p class="mt-6 text-canvas/70 leading-relaxed max-w-md">
+        Brief it like you'd text a friend. The app holds the deep workspace — your Taste Print, the live monitor,
+        and a receipt of everything we touched.
+      </p>
+      <div class="mt-7 flex flex-wrap gap-2">
+        <span class="pill pill-d-gold">Web · App</span><span class="pill pill-d-gold" style="opacity:.65">WhatsApp · soon</span><span class="pill pill-d-gold" style="opacity:.65">Telegram · soon</span>
+      </div>
+    </div>
+    <!-- phone mock -->
+    <div class="lg:col-span-7 flex justify-center">
+      <div class="leather-surface grain relative rounded-[34px] p-3 shadow-2xl" style="width:300px;">
+        <div class="relative z-10 rounded-[26px] overflow-hidden" style="background:#0c1116;">
+          <div class="flex items-center justify-between px-4 py-2.5 text-[11px] text-canvas/60 font-mono">
+            <span>9:41</span><span class="text-gold">Tures · WhatsApp</span><span>▮▮▮</span>
+          </div>
+          <div class="px-3 pb-4 space-y-2.5 text-[12.5px]">
+            <div class="max-w-[80%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2" style="background:#1f6e5a;color:#eafff5;">Land in Ivalo at 9pm. Anything I should worry about tonight?</div>
+            <div class="max-w-[86%] rounded-2xl rounded-tl-sm px-3 py-2" style="background:#14201a;color:#dfe9e2;">Forecast firmed up — −19°C and clear. Aurora KP hit 5. Driver Tomi waiting at arrivals (FIN-204). Held a 9:45 sauna slot — want it?</div>
+            <div class="max-w-[60%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2" style="background:#1f6e5a;color:#eafff5;">Yes please 🙏</div>
+            <div class="max-w-[86%] rounded-2xl rounded-tl-sm px-3 py-2" style="background:#14201a;color:#dfe9e2;">Booked. And I'm watching a small AY schedule wobble for Wed — nothing to do yet, I'll handle it.</div>
+          </div>
+          <div class="px-3 py-2 flex items-center gap-2 border-t border-white/5">
+            <div class="flex-1 rounded-full px-3 py-1.5 text-[12px] text-canvas/40" style="background:#10171c;">Message Tures…</div>
+            <div class="w-7 h-7 rounded-full btn-gold grid place-items-center text-xs">↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENCE — punchy headline, proof under tap-to-expand -->
+<section class="canvas-surface text-ink">
+  <div class="relative z-10 max-w-4xl mx-auto px-6 py-20">
+    <h2 class="font-display text-4xl sm:text-5xl leading-[1.05] mb-2">Other AI travel tools end with links.</h2>
+    <p class="font-display text-3xl sm:text-4xl foil leading-tight mb-9">Tures ends with confirmation numbers.</p>
+    <div class="space-y-2.5">
+      <div class="exp leaf">
+        <div class="exp-head flex items-center justify-between p-4 cursor-pointer">
+          <span class="font-display text-xl text-ink">Spec-match, not price-shop</span><span class="exp-chev text-gold-deep">›</span>
+        </div>
+        <div class="exp-body"><p class="px-4 pb-4 text-sm text-ink-soft leading-relaxed">You named Real Christine. We book Real Christine — not the comparable Marais boutique because it's $40 cheaper.</p></div>
+      </div>
+      <div class="exp leaf">
+        <div class="exp-head flex items-center justify-between p-4 cursor-pointer">
+          <span class="font-display text-xl text-ink">Never autonomous on uncertainty</span><span class="exp-chev text-gold-deep">›</span>
+        </div>
+        <div class="exp-body"><p class="px-4 pb-4 text-sm text-ink-soft leading-relaxed">When the non-stop doesn't exist, we surface the two cleanest alternatives and their trade-offs. We never rebook into something you didn't approve.</p></div>
+      </div>
+      <div class="exp leaf">
+        <div class="exp-head flex items-center justify-between p-4 cursor-pointer">
+          <span class="font-display text-xl text-ink">Verified twice before "Booked."</span><span class="exp-chev text-gold-deep">›</span>
+        </div>
+        <div class="exp-body"><p class="px-4 pb-4 text-sm text-ink-soft leading-relaxed">Every booking is checked against both the provider receipt and the email confirmation in your inbox. We don't say "Booked" until both agree.</p></div>
+      </div>
+      <div class="exp leaf">
+        <div class="exp-head flex items-center justify-between p-4 cursor-pointer">
+          <span class="font-display text-xl text-ink">It knows your taste</span><span class="exp-chev text-gold-deep">›</span>
+        </div>
+        <div class="exp-body"><p class="px-4 pb-4 text-sm text-ink-soft leading-relaxed">The Taste Engine turns a few choices into a working model of how you travel — and sharpens it after every trip.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-14 text-center">
+  <div class="wordmark foil text-3xl">t<span class="spark">✦</span>ures</div>
+  <div class="text-canvas/50 text-sm mt-3">A trip booked is the only thing we ship.</div>
+</footer>
+
+<!-- sticky CTA — tucked while the hero's own CTA is on screen -->
+<div class="cta-bar tuck" id="ctaBar" style="transition:transform .35s ease">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="signup.html" class="btn-gold flex-1 sm:flex-none sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Start planning — free →</a>
+    <a href="signup.html#waitlist" class="btn-ghost px-5 py-3 rounded-xl quiet hidden sm:inline-block">Get early access</a>
+  </div>
+</div>
+<script>
+(function(){
+  var bar = document.getElementById('ctaBar');
+  var heroCta = document.querySelector('.photo-hero .btn-gold');
+  if(!bar || !heroCta || !('IntersectionObserver' in window)){ bar && bar.classList.remove('tuck'); return; }
+  new IntersectionObserver(function(ents){
+    bar.classList.toggle('tuck', ents[0].isIntersecting);
+  }, { threshold: 0.1 }).observe(heroCta);
+})();
+</script>
+
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

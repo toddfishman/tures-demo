@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The Bound Edition</title>
+<meta name="description" content="Tures — the AI travel concierge. Books the impossible. Watches everything. Rebooks before you notice." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  html,body{ background:#0b0907; min-height:100%; }
+  body{ overflow:hidden; }
+  .vol{ position:fixed; inset:0; perspective:2200px; }
+
+  /* ===== full-bleed leather cover ===== */
+  .cover{
+    position:absolute; inset:0; z-index:20; cursor:pointer;
+    transform-origin:left center; backface-visibility:hidden;
+    transition:transform 1000ms cubic-bezier(.7,.02,.27,1), opacity 650ms ease;
+  }
+  .cover::before{ /* binding / spine shadow on the left edge */
+    content:""; position:absolute; top:0; bottom:0; left:0; width:46px; z-index:2;
+    background:linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0) 75%);
+    border-right:1px solid rgba(255,220,150,0.06);
+  }
+  .opened .cover{ transform:rotateY(-128deg); opacity:0; pointer-events:none; }
+
+  .frame{ position:absolute; inset:28px; border:1px solid rgba(200,162,74,0.42);
+    border-radius:3px; box-shadow:inset 0 0 0 5px rgba(0,0,0,0.22), 0 1px 0 rgba(255,230,160,0.07); z-index:3; }
+  .frame.dashed{ inset:38px; border-style:dashed; opacity:0.5; }
+
+  /* ===== the chooser PAGE beneath ===== */
+  .toc{
+    position:absolute; inset:0; z-index:10; overflow-y:auto;
+    opacity:0; pointer-events:none; transition:opacity 650ms ease 250ms;
+    -webkit-overflow-scrolling:touch;
+  }
+  .opened .toc{ opacity:1; pointer-events:auto; }
+  .skip-cover .cover{ transition:none !important; }
+  .skip-cover .toc{ transition:none !important; }
+
+  /* the two doors */
+  .doors{ display:grid; gap:18px; }
+  @media(min-width:760px){ .doors{ grid-template-columns:1fr 1fr; gap:22px; } }
+
+  .door{
+    position:relative; display:flex; flex-direction:column; justify-content:flex-end;
+    min-height:340px; border-radius:16px; overflow:hidden; text-decoration:none;
+    border:1px solid rgba(200,162,74,0.34);
+    box-shadow:0 30px 64px -34px rgba(0,0,0,0.92);
+    opacity:0; transform:translateY(16px);
+    transition:transform .55s cubic-bezier(.2,.7,.2,1), opacity .55s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .opened .door{ opacity:1; transform:none; }
+  .opened .door.d1{ transition-delay:.30s; }
+  .opened .door.d2{ transition-delay:.42s; }
+  .door:hover{ border-color:rgba(230,200,115,0.7); box-shadow:0 36px 72px -30px rgba(0,0,0,0.95); }
+  .door:active{ transform:translateY(1px) scale(.997); }
+
+  /* door art layers */
+  .door .art{ position:absolute; inset:0; z-index:0; }
+  .door .art img{ width:100%; height:100%; object-fit:cover; }
+  .door .veil{ position:absolute; inset:0; z-index:1; }
+  .door .body{ position:relative; z-index:2; padding:24px 24px 26px; }
+  .door .inner-frame{ position:absolute; inset:14px; z-index:1; border:1px solid rgba(200,162,74,0.28);
+    border-radius:9px; pointer-events:none; }
+
+  /* door 1 — learn / watch (photo-led, dark) */
+  .door.d1 .veil{ background:
+      radial-gradient(120% 80% at 80% 10%, rgba(200,162,74,0.18), transparent 55%),
+      linear-gradient(180deg, rgba(11,9,7,0.30) 0%, rgba(11,9,7,0.72) 58%, rgba(11,9,7,0.97) 100%); }
+  /* door 2 — plan (the primary action, brass) */
+  .door.d2{ background:
+      radial-gradient(130% 90% at 50% 0%, #3a2a19 0%, #1b130c 55%, #120c07 100%); }
+  .door.d2 .veil{ background:
+      radial-gradient(120% 80% at 50% -10%, rgba(230,200,115,0.22), transparent 60%); }
+
+  .door .kicker{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .door .glyph{ font-size:26px; line-height:1; margin-bottom:14px; display:inline-block; }
+  .door .arrow{ display:inline-flex; align-items:center; gap:8px; margin-top:14px;
+    font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+  .door .arr-i{ transition:transform .2s ease; }
+  .door:hover .arr-i{ transform:translateX(5px); }
+
+  /* compact chapter rows for the "browse all" list */
+  .q{ display:flex; align-items:center; gap:12px; padding:8px 8px; text-decoration:none;
+    border-radius:10px; border:1px solid transparent; transition:background .16s ease, border-color .16s ease, transform .16s ease; }
+  .q:hover{ background:rgba(255,253,247,0.7); border-color:var(--canvas-line); transform:translateX(2px); }
+  .q .num{ width:30px; height:30px; flex-shrink:0; border-radius:8px; display:grid; place-items:center;
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-size:13px;
+    background:linear-gradient(160deg,#241910,#15100a); color:var(--gold-bright);
+    border:1px solid rgba(200,162,74,0.3); }
+  .q .qchev{ color:var(--ink-faint); font-size:16px; transition:transform .2s ease, color .2s ease; }
+  .q:hover .qchev{ transform:translateX(3px); color:var(--gold-deep); }
+
+  @media (max-width:640px){
+    #tocHeading{ font-size:2.1rem; }
+    .door{ min-height:190px; }
+  }
+</style>
+</head>
+<body class="text-canvas">
+ <div class="vol">
+
+  <!-- ============ FULL-BLEED COVER ============ -->
+  <div class="cover leather-surface grain" id="cover" onclick="openBook()">
+    <div class="frame"></div>
+    <div class="frame dashed"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-8">
+      <div class="caps text-[11px] text-gold/70 mb-8">The AI Travel Concierge</div>
+      <div class="wordmark foil text-[76px] sm:text-[96px] leading-none">t<span class="spark">✦</span>ures</div>
+      <div class="foil-line w-28 my-8"></div>
+      <p class="font-display italic text-2xl text-canvas/80 leading-snug">
+        Books the impossible.<br>Watches everything.<br>Rebooks before you notice.
+      </p>
+      <div class="mt-14 flex items-center gap-3 text-gold/80">
+        <span class="swipe-arrow text-2xl" style="animation:qhint 1.8s ease-in-out infinite">←</span>
+        <span class="caps text-[10px]">Swipe to open</span>
+      </div>
+    </div>
+    <div class="absolute bottom-7 inset-x-0 text-center caps text-[9px] text-gold/40 z-10">First Edition · MMXXVI</div>
+  </div>
+
+  <!-- ============ THE CHOOSER — two doors ============ -->
+  <div class="toc canvas-surface" id="toc">
+    <div class="relative z-10 max-w-3xl mx-auto px-6" style="padding-top:5vh; padding-bottom:8vh;">
+      <div class="flex items-center justify-between mb-7">
+        <a class="wordmark text-4xl quiet" style="color:var(--gold-deep)" href="#" onclick="closeBook();return false;">t<span class="spark">✦</span>ures</a>
+        <span class="caps text-[10px] text-ink-faint">First Edition</span>
+      </div>
+
+      <div id="tocHeading" class="font-display text-4xl sm:text-5xl text-ink leading-[1.04] mb-2">Where would you like to begin?</div>
+      <p class="text-ink-faint text-sm mb-7">Two ways in. No wrong door.</p>
+
+      <div class="doors">
+
+        <!-- DOOR 1 — see how it works -->
+        <a class="door d1" href="01-landing.html">
+          <div class="art"><img src="https://images.unsplash.com/photo-1538970272646-f61fabb3a8a2?w=900&q=80&auto=format&fit=crop" alt="" aria-hidden="true" loading="lazy"></div>
+          <div class="veil"></div>
+          <div class="inner-frame"></div>
+          <div class="body">
+            <span class="glyph text-gold-bright">◷</span>
+            <div class="kicker text-gold-bright/85 mb-1">See how it works</div>
+            <div class="font-display text-3xl text-canvas leading-tight">Watch Tures book a real trip.</div>
+            <p class="text-canvas/70 text-sm mt-2 leading-relaxed">Eleven days across three cities, booked leg by leg — and rebooked before the traveler noticed. Five minutes, no signup.</p>
+            <span class="arrow text-gold-bright">Take the tour <span class="arr-i">→</span></span>
+          </div>
+        </a>
+
+        <!-- DOOR 2 — plan my trip (primary) -->
+        <a class="door d2" href="signup.html">
+          <div class="veil"></div>
+          <div class="inner-frame"></div>
+          <div class="body">
+            <span class="glyph text-gold-bright">✦</span>
+            <div class="kicker text-gold-bright/85 mb-1">Start planning</div>
+            <div class="font-display text-3xl text-canvas leading-tight">Tell Tures your trip.</div>
+            <p class="text-canvas/70 text-sm mt-2 leading-relaxed">Describe it in a sentence. Tures plans every leg to your taste and books it for real. Plan free — pay only when it books.</p>
+            <span class="arrow text-gold-bright">Begin <span class="arr-i">→</span></span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- sign-in + full index, quietly below the doors -->
+      <div class="rule-gold my-7" style="max-width:120px"></div>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <span class="text-ink-faint text-sm">Already with us? <a href="auth/login.html" class="text-gold-deep quiet hover:underline">Sign in</a></span>
+        <a href="#" onclick="showAll();return false;" class="caps text-[10px] text-ink-faint quiet hover:text-gold-deep">Browse all eight chapters →</a>
+      </div>
+
+      <!-- the full chapter list, hidden until asked for -->
+      <div id="allChapters" class="mt-6" style="display:none">
+        <div class="rule-ink mb-4"></div>
+        <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1">
+          <a class="q" href="01-landing.html"><span class="num">I</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">Meet Tures</span></span><span class="qchev">›</span></a>
+          <a class="q" href="02-taste-engine.html"><span class="num">II</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">The Taste Engine</span></span><span class="qchev">›</span></a>
+          <a class="q" href="03-paste-trip.html"><span class="num">III</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">Describe &amp; Book</span></span><span class="qchev">›</span></a>
+          <a class="q" href="04-connections.html"><span class="num">IV</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">Grant Permissions</span></span><span class="qchev">›</span></a>
+          <a class="q" href="05-execution.html"><span class="num">V</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">Watch It Execute</span></span><span class="qchev">›</span></a>
+          <a class="q" href="06-hiccup-handler.html"><span class="num">VI</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">The Hiccup Handler</span></span><span class="qchev">›</span></a>
+          <a class="q" href="07-itinerary.html"><span class="num">VII</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">The Itinerary</span></span><span class="qchev">›</span></a>
+          <a class="q" href="08-concierge.html"><span class="num">VIII</span><span class="flex-1 min-w-0"><span class="qtitle font-display text-lg text-ink block leading-tight">In-Trip Concierge</span></span><span class="qchev">›</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ </div>
+
+<script>
+  function openBook(){ document.body.classList.add('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); document.documentElement.classList.remove('skip-cover'); history.replaceState(null,'','index.html'); }
+  function showAll(){ var a=document.getElementById('allChapters'); a.style.display = a.style.display==='none' ? '' : 'none'; if(a.style.display==='') a.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  // swipe-left on the cover also opens
+  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
+  // arriving from a "Contents" link → open straight to the chooser
+  if(location.hash === '#contents'){ document.documentElement.classList.add('skip-cover'); openBook(); }
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>
