@@ -70,7 +70,7 @@
   ov.className = 'tv-ov';
   ov.innerHTML =
     '<div class="tv-panel" role="dialog" aria-label="Talk to Tures">' +
-      '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><button class="tv-x" aria-label="Close">×</button></div>' +
+      '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><span style="display:flex;align-items:center;gap:10px"><button class="tv-x" id="tvMute" aria-label="Mute Tures" title="Mute">🔊</button><button class="tv-x" aria-label="Close">×</button></span></div>' +
       '<div class="tv-status" id="tvStatus"><span class="pd"></span><span id="tvStatusT">Connecting…</span></div>' +
       '<div class="tv-log" id="tvLog"></div>' +
       '<div class="tv-foot"><button class="tv-mic" id="tvMic" disabled>🎤</button><div class="tv-hint" id="tvHint">…</div></div>' +
@@ -80,7 +80,20 @@
   var elStatus = ov.querySelector('#tvStatus'), elStatusT = ov.querySelector('#tvStatusT');
   var elLog = ov.querySelector('#tvLog'), elMic = ov.querySelector('#tvMic'), elHint = ov.querySelector('#tvHint');
 
-  var history = [], rec = null, chunks = [], recording = false, audio = null, open = false;
+  var history = [], rec = null, chunks = [], recording = false, open = false, muted = false;
+  // ONE reused audio element, primed by the user's first tap so replies (which arrive after the
+  // async transcribe/think round-trip) aren't blocked by the browser's autoplay policy.
+  var audioEl = new Audio(); audioEl.preload = 'auto';
+  var primed = false;
+  function unlockAudio() {
+    if (primed) return; primed = true;
+    try {
+      audioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      var p = audioEl.play(); if (p && p.catch) p.catch(function () {});
+    } catch (_) {}
+  }
+
+  var elMute = ov.querySelector('#tvMute');
 
   function setStatus(mode, text) { elStatus.className = 'tv-status ' + (mode || ''); elStatusT.textContent = text; }
   function bubble(text, who) {
@@ -102,10 +115,15 @@
   }
 
   function speak(text) {
+    // Muted → pace as if Tures were reading it, so turn-taking still feels natural.
+    if (muted) return new Promise(function (res) { setTimeout(res, Math.min(2800, 500 + text.length * 24)); });
     return tures.voice.speak(text).then(function (blob) {
       return new Promise(function (resolve) {
-        try { audio = new Audio(URL.createObjectURL(blob)); audio.onended = resolve; audio.onerror = resolve; audio.play().catch(resolve); }
-        catch (_) { resolve(); }
+        try {
+          audioEl.src = URL.createObjectURL(blob);
+          audioEl.onended = resolve; audioEl.onerror = resolve;
+          var p = audioEl.play(); if (p && p.catch) p.catch(function () { resolve(); });
+        } catch (_) { resolve(); }
       });
     }).catch(function () { /* TTS failed — the text is already on screen */ });
   }
@@ -158,18 +176,26 @@
 
   function openOv() {
     if (open) return; open = true; ov.classList.add('on'); document.body.style.overflow = 'hidden';
+    unlockAudio();  // this click is a user gesture — prime audio so every reply can speak
     history = []; elLog.innerHTML = '';
     greet();
   }
   function closeOv() {
     open = false; ov.classList.remove('on'); document.body.style.overflow = '';
-    try { if (audio) { audio.pause(); audio = null; } } catch (_) {}
+    try { audioEl.pause(); } catch (_) {}
     stopRec();
+  }
+
+  function setMuted(m) {
+    muted = m;
+    if (elMute) { elMute.textContent = m ? '🔇' : '🔊'; elMute.setAttribute('aria-label', m ? 'Unmute Tures' : 'Mute Tures'); elMute.title = m ? 'Unmute' : 'Mute'; }
+    if (m) { try { audioEl.pause(); } catch (_) {} }
   }
 
   fab.addEventListener('click', openOv);
   ov.querySelector('.tv-x').addEventListener('click', closeOv);
+  if (elMute) elMute.addEventListener('click', function () { setMuted(!muted); });
   ov.addEventListener('click', function (e) { if (e.target === ov) closeOv(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) closeOv(); });
-  elMic.addEventListener('click', function () { if (recording) stopRec(); else startRec(); });
+  elMic.addEventListener('click', function () { unlockAudio(); if (recording) stopRec(); else startRec(); });
 })();
