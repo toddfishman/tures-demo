@@ -33,7 +33,8 @@
     '.tv-top .wm{font-family:Cormorant Garamond,Georgia,serif;font-size:22px;color:#c8a24a}',
     '.tv-top .wm b{color:#e6c873;font-weight:400}',
     '.tv-x{background:transparent;border:0;color:#b8ab97;font-size:22px;cursor:pointer;line-height:1}',
-    '.tv-status{padding:10px 18px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b8ab97;display:flex;align-items:center;gap:8px}',
+    '.tv-sub{padding:0 18px 6px;font-size:11.5px;color:#b8ab97;line-height:1.4}',
+    '.tv-status{padding:8px 18px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b8ab97;display:flex;align-items:center;gap:8px}',
     '.tv-status .pd{width:8px;height:8px;border-radius:50%;background:#7a6f59}',
     '.tv-status.speak .pd{background:#e6c873;animation:tvp 1s infinite}',
     '.tv-status.listen .pd{background:#d98a6a;animation:tvp .8s infinite}',
@@ -70,7 +71,8 @@
   ov.className = 'tv-ov';
   ov.innerHTML =
     '<div class="tv-panel" role="dialog" aria-label="Talk to Tures">' +
-      '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><span style="display:flex;align-items:center;gap:10px"><button class="tv-x" id="tvMute" aria-label="Mute Tures" title="Mute">🔊</button><button class="tv-x" aria-label="Close">×</button></span></div>' +
+      '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><span style="display:flex;align-items:center;gap:10px"><button class="tv-x" id="tvMute" aria-label="Mute Tures" title="Mute">🔊</button><button class="tv-x" id="tvClose" aria-label="Close">×</button></span></div>' +
+      '<div class="tv-sub">Talk it through out loud — I’ll plan and book your trip as we go. Not the same as the dictation mic.</div>' +
       '<div class="tv-status" id="tvStatus"><span class="pd"></span><span id="tvStatusT">Connecting…</span></div>' +
       '<div class="tv-log" id="tvLog"></div>' +
       '<div class="tv-foot"><button class="tv-mic" id="tvMic" disabled>🎤</button><div class="tv-hint" id="tvHint">…</div></div>' +
@@ -169,9 +171,29 @@
       setStatus('think', 'Tures is thinking');
       return tures.converse(history.slice(-12)).then(function (c) {
         var reply = (c && c.reply || '').trim() || 'I’m here — tell me a trip and I’ll handle it.';
+        if (c && c.ready && c.brief) {
+          // Tures has enough — speak the wrap-up, then hand the brief to the planner.
+          return sayTures(reply).then(function () { startPlanning(c.brief); });
+        }
         return sayTures(reply);
       });
     }).catch(function () { setStatus('', 'Hiccup'); micState('ready'); elHint.textContent = 'Something hiccuped — tap to try again'; });
+  }
+
+  // Hand the gathered brief to the actual planning flow so the voice chat DOES something.
+  function startPlanning(brief) {
+    setStatus('think', 'Building your trip');
+    micState('off'); elHint.textContent = 'Putting your trip together…';
+    var comp = document.getElementById('composer');
+    if (comp && typeof window.sendBrief === 'function') {
+      comp.value = brief;
+      if (typeof window.autoGrow === 'function') window.autoGrow();
+      setTimeout(function () { closeOv(); window.sendBrief(); }, 700);
+    } else {
+      // not on the planning page — carry the brief there and let it plan on arrival
+      try { localStorage.setItem('tures.voiceBrief', brief); } catch (_) {}
+      location.href = '03-paste-trip.html';
+    }
   }
 
   function openOv() {
@@ -193,7 +215,7 @@
   }
 
   fab.addEventListener('click', openOv);
-  ov.querySelector('.tv-x').addEventListener('click', closeOv);
+  ov.querySelector('#tvClose').addEventListener('click', closeOv);
   if (elMute) elMute.addEventListener('click', function () { setMuted(!muted); });
   ov.addEventListener('click', function (e) { if (e.target === ov) closeOv(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) closeOv(); });

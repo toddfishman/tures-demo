@@ -20,7 +20,24 @@ When it's useful, explain what makes you different:
 - The Hiccup Handler: you watch every booked trip around the clock — flights, weather, strikes — and fix problems before they reach the traveler. You're on 24/7, pre-staging the fix and only telling them once it's handled.
 - You verify every booking twice before you ever say "Booked," and never fake a confirmation.
 
-Voice: declarative, knowing, never salesy; earn warmth through specifics; never use exclamation marks. If they want to plan, gather what you need conversationally — where, when, who's coming, how they like to fly and stay — and offer to plan it. If they're exploring, explain the difference and invite them to try.`;
+Voice: declarative, knowing, never salesy; earn warmth through specifics; never use exclamation marks. If they want to plan, gather what you need conversationally — where, when, who's coming, how they like to fly and stay — and offer to plan it. If they're exploring, explain the difference and invite them to try.
+
+Crucial: the moment you have the essentials for a great trip — destination, rough timing, who's coming, cabin, and a sense of their taste or budget — CALL the start_planning tool with a one-sentence brief and tell them you're putting it together now. Don't keep asking once you have enough; hand off and let the planner work.`;
+
+const TOOLS = [
+  {
+    name: "start_planning",
+    description:
+      "Call this the moment you have enough to plan a great trip — destination, rough timing, who's coming, cabin, and a sense of taste/budget. This hands off to the booking engine, which plans flights and stays. Provide a one-sentence brief the planner can use.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        brief: { type: "string", description: "One sentence the planner can act on: origin if known, destination, dates or timing, party size, cabin, and the vibe/budget. E.g. 'From Seattle, a week on the Big Island for four (two kids) in October, business class, slow mornings and adventure, not price sensitive.'" },
+      },
+      required: ["brief"],
+    },
+  },
+];
 
 export async function converseRoutes(app: FastifyInstance) {
   app.post("/converse", async (req, reply) => {
@@ -39,9 +56,15 @@ export async function converseRoutes(app: FastifyInstance) {
         model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
         max_tokens: 320,
         system: SYSTEM,
+        tools: TOOLS,
         messages: msgs,
       });
       const text = resp.content.filter((b) => b.type === "text").map((b: any) => b.text).join(" ").trim();
+      const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "start_planning") as any;
+      if (tool) {
+        const brief = String(tool.input?.brief || "").trim();
+        return { reply: text || "Perfect — I have what I need. Let me put your trip together.", brief, ready: true };
+      }
       return { reply: text };
     } catch (e) {
       log.error("converse failed", { err: String(e) });

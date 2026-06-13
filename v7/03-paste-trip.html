@@ -116,7 +116,7 @@
       <div class="composer-wrap px-4 py-3 flex items-end gap-2">
         <textarea id="composer" class="composer font-body" rows="1" spellcheck="false" data-noswipe
           placeholder="Describe your trip — cities, dates, how you fly &amp; stay…"></textarea>
-        <button id="micBtn" title="Speak your trip" class="w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end" style="display:none;border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">🎤</button>
+        <button id="micBtn" title="Dictate — speak your trip into the box (for a back-and-forth, use Talk to Tures above)" aria-label="Dictate your trip" class="w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end" style="display:none;border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">🎤</button>
         <button id="sendBtn" class="btn-gold w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end">↑</button>
       </div>
       <div class="text-[11px] text-ink-faint mt-2 px-1" id="composerHint">Enter to send · Shift+Enter for a new line</div>
@@ -750,6 +750,9 @@ function bootDemo(){
     }
   }
   greet();
+  // Handed a brief from the voice conversation (Talk to Tures) → plan it straight away.
+  var vb = null; try { vb = localStorage.getItem('tures.voiceBrief'); localStorage.removeItem('tures.voiceBrief'); } catch(_){}
+  if(vb){ setTimeout(function(){ composer.value = vb; autoGrow(); sendBrief(); }, 900); return; }
   // A landing card launched a specific trip → play its conversation: Andy briefs it, Tures plans
   // it live (the streamed search/score/propose events are the execution), then offers to book.
   if(DEMO && DEMO_TRIP && TRIPS[DEMO_TRIP]){
