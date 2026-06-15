@@ -27,23 +27,21 @@
 
   var PAGES = [
     { t: 'The cover', f: 'index.html', cover: true },
-    { p: '1', t: 'What is Tures', f: '01-landing.html' },
-    { p: '2', t: 'Plan a trip', f: '03-paste-trip.html', kids: [
-        { t: 'The Taste Engine', f: '02-taste-engine.html' },
-        { t: 'Connections',      f: '04-connections.html' },
-        { t: 'Live execution',   f: '05-execution.html' },
+    { p: '1',  t: 'What is Tures',        f: '01-landing.html' },
+    { p: '2',  t: 'Plan a trip',          f: '03-paste-trip.html', kids: [
         { t: 'The Hiccup Handler', f: '06-hiccup-handler.html' }
     ]},
-    { p: '3', t: 'My Trips', f: '07-itinerary.html' },
-    { p: '4', t: 'The concierge', f: '08-concierge.html' },
-    { t: 'Where you’ve been', f: 'been.html' },
+    { p: '3',  t: 'The Taste Engine',     f: '02-taste-engine.html' },
+    { p: '4',  t: 'Tures Vault Setup',    f: '04-connections.html' },
+    { p: '5',  t: 'Tures Demo',           f: '05-execution.html' },
+    { p: '6',  t: 'My Trips',             f: '07-itinerary.html' },
+    { p: '7',  t: 'The Tures Concierge',  f: '08-concierge.html' },
+    { p: '8',  t: 'Where you’ve been',    f: 'been.html' },
+    { p: '9',  t: 'Pricing',              f: 'pricing.html' },
+    { p: '10', t: 'About',                f: 'about.html' },
+    { p: '11', t: 'Contact',              f: 'about.html#contact' },
+    { p: '12', t: 'Privacy & Terms',      f: 'legal/index.html' },
     { sep: true },
-    { small: true, t: 'Watch the demo', f: '05-execution.html?demo=1' },
-    { small: true, t: 'Pricing', f: 'pricing.html' },
-    { small: true, t: 'About', f: 'about.html' },
-    { small: true, t: 'Contact', f: 'about.html#contact' },
-    { small: true, t: 'Privacy', f: 'legal/privacy.html' },
-    { small: true, t: 'Terms', f: 'legal/terms.html' },
     { socials: true }
   ];
   // SOCIALS: placeholder URLs — replace with the real handles.
@@ -55,6 +53,14 @@
 
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function isHere(f) { return f.split('?')[0] === here; }
+  function pageNumber() {
+    for (var i = 0; i < PAGES.length; i++) {
+      var it = PAGES[i];
+      if (it.f && isHere(it.f)) return it.p || null;
+      if (it.kids) for (var j = 0; j < it.kids.length; j++) { if (isHere(it.kids[j].f)) return it.kids[j].p || null; }
+    }
+    return null;
+  }
 
   function pageLink(it, sub) {
     var a = el('a', sub ? 'sub' : null,
@@ -131,6 +137,10 @@
     var act = el('a', 'tures-signup', signed ? 'Account' : 'Sign Up');
     act.href = base + (signed ? 'account.html' : 'signup.html');
     document.body.appendChild(act);
+
+    // book-style page number, lower-right
+    var num = pageNumber();
+    if (num) document.body.appendChild(el('div', 'tures-pageno', 'Page ' + num));
   }
 
   if (document.readyState !== 'loading') init();

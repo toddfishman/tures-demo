@@ -82,7 +82,8 @@
   .chatwin .composer{ color:var(--canvas-warm) !important; }
   .chatwin .composer-wrap{ background:rgba(0,0,0,0.3) !important; border-color:rgba(200,162,74,0.3) !important; }
   .chatwin .composer-wrap:focus-within{ border-color:rgba(230,200,115,0.6) !important; box-shadow:0 0 0 3px rgba(200,162,74,0.16) !important; }
-  .chatwin .bubble-t{ background:rgba(255,253,247,0.95) !important; color:var(--ink) !important; }
+  .chatwin .bubble-t{ background:rgba(255,253,247,0.97) !important; color:var(--ink) !important; }
+  .chatwin .bubble-t .text-ink, .chatwin .bubble-t .text-gold-deep{ color:var(--ink) !important; }  /* keep Tures' paper bubbles dark-on-light */
   .chatwin .bubble-me{ background:rgba(200,162,74,0.16) !important; color:var(--canvas-warm) !important; border:1px solid rgba(200,162,74,0.3) !important; }
   .chatwin .chip{ background:rgba(255,255,255,0.05) !important; color:rgba(236,227,208,0.85) !important; border-color:rgba(200,162,74,0.32) !important; }
   .chatwin .chip.on{ background:var(--gold) !important; color:#241a0c !important; }
@@ -108,7 +109,7 @@
 <section class="leather-surface grain relative overflow-hidden">
   <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
     <div class="flex items-baseline gap-3 min-w-0">
-      <span class="caps text-[11px] text-gold/80 shrink-0 hidden sm:inline">Page 2</span>
+      <span class="caps text-[11px] text-gold/80 shrink-0 hidden sm:inline">Plan a trip</span>
       <h1 class="font-display text-xl sm:text-2xl text-canvas leading-none">Tell Tures the trip.</h1>
     </div>
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -231,7 +232,7 @@
 
 <footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
   <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
-  <div class="text-canvas/45 text-xs mt-2 caps">Page 2 · Plan a trip</div>
+  <div class="text-canvas/45 text-xs mt-2 caps">Plan a trip</div>
 </footer>
 
 <!-- sticky CTA -->

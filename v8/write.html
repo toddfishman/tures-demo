@@ -46,16 +46,17 @@
   .stage{ position:fixed; inset:0; z-index:5; display:grid; justify-items:center; align-content:start;
     padding:clamp(54px,11vh,120px) 20px 104px; overflow-y:auto; }
   /* the leather cover the page is bound into — so the cover never "disappears" */
-  .book-open{ position:relative; width:min(94vw,600px); border-radius:5px 13px 13px 5px;
+  /* ONE fixed size — the book never grows; the writing fills a constant area (a book doesn't grow as you read it) */
+  .book-open{ position:relative; width:min(94vw,600px); height:min(80vh,640px); display:flex; border-radius:5px 13px 13px 5px;
     padding:15px 15px 16px 30px;   /* extra left = the spine fold */
     box-shadow:-18px 0 0 -6px #0a0703, 0 48px 100px -36px rgba(0,0,0,0.92), inset 0 0 0 1px rgba(0,0,0,0.5);
     animation:rise-in 450ms cubic-bezier(.2,.7,.2,1) both; }
-  .journal{ position:relative; width:100%; border-radius:2px 6px 6px 2px;
+  .journal{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; border-radius:2px 6px 6px 2px;
     background:
       radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
       linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
     box-shadow:0 0 0 1px rgba(125,94,32,0.18), 0 3px 14px -6px rgba(0,0,0,0.5);
-    padding:clamp(30px,5.5vw,56px) clamp(26px,5.5vw,60px) clamp(28px,4.5vw,48px);
+    padding:clamp(26px,5vw,48px) clamp(26px,5.5vw,56px) clamp(22px,4vw,40px);
     overflow:hidden;
   }
   @keyframes rise-in{ from{ opacity:0; transform:translateY(14px) scale(.985) } to{ opacity:1; transform:none } }
@@ -76,7 +77,8 @@
 
   /* the ink Tures writes */
   #ink{ font-family:'Cormorant Garamond',Georgia,serif; color:var(--ink); text-align:left;
-    font-size:clamp(20px,3.2vw,25px); line-height:1.6; min-height:8.5em; }
+    flex:1 1 auto; min-height:0; overflow-y:auto;
+    font-size:clamp(16px,2.6vw,21px); line-height:1.55; }
   .k-body{ }
   .k-em{ color:var(--gold-deep); font-style:italic; font-weight:600; }
   .k-sign{ font-style:italic; font-size:1.18em; color:var(--gold-deep); }
