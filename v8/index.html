@@ -140,25 +140,22 @@
   </div>
 
 <script>
-  var __userActed = false;
-  function openBook(manual){
-    if(manual){ __userActed = true; }              // a tap opens quickly
-    else { document.body.classList.add('auto'); }  // the auto-reveal turns the book slowly
-    document.body.classList.add('opened');
+  // Option 1: opening the book turns the page (changes URL) to write.html, where Tures
+  // inscribes the pitch on a blank page. The in-place chooser markup below is left dormant.
+  var __went = false;
+  function openBook(){
+    if(__went) return; __went = true;
+    try{ sessionStorage.setItem('ptDir','next'); }catch(e){}  // write.html's page-turn leaf reads this
+    location.href = 'write.html';
   }
-  function closeBook(){ document.body.classList.remove('opened','auto'); __userActed = true; /* a deliberate close stops the auto-reveal */ return false; }
-  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(true); return true; } return false; };
+  function closeBook(){ return false; }  // chooser is bypassed in option 1; kept so its inline handler never errors
+  window.__turesOnSwipe = function(dir){ if(dir==='next'){ openBook(); return true; } return false; };
 
-  // A "Contents" link (index.html#contents) lands you straight on the opened chooser.
+  // A tap turns the page now; otherwise it turns on its own after a brand beat (reduced-motion: sooner).
+  // A "Contents" back-link (index.html#contents) goes straight in.
+  var __reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(location.hash === '#contents'){ openBook(); }
-  else {
-    // Auto-reveal the chooser after a long brand beat, so a first-time visitor sees the two
-    // paths (the value) on their own. A manual tap opens sooner and quicker; a close cancels it.
-    var __reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(function(){
-      if(!__userActed && !document.body.classList.contains('opened')){ openBook(); }
-    }, __reduce ? 300 : 7000);
-  }
+  else { setTimeout(openBook, __reduce ? 600 : 7000); }
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
