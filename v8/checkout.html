@@ -33,6 +33,12 @@
   .opt .tick{ width:18px;height:18px;border-radius:99px;border:2px solid var(--canvas-line); display:inline-grid;place-items:center; }
   .opt.on .tick{ border-color:var(--gold); background:var(--gold); }
   .fld{ border-radius:10px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.7); padding:10px 12px; font-size:14px; color:var(--ink); outline:none; }
+  /* item-3 DRAFT — trust reinforcement at the pay step */
+  .trust-cell{ border:1px solid var(--canvas-line); background:rgba(255,253,247,0.5); border-radius:11px; padding:11px 8px; text-align:center; }
+  .trust-cell .ic{ color:var(--gold-deep); display:grid; place-items:center; height:22px; margin-bottom:5px; }
+  .trust-cell .lb{ font-size:11px; line-height:1.25; color:var(--ink-soft); }
+  .secure-badge{ display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); }
+  .secure-badge svg{ color:var(--gold-deep); }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -90,13 +96,45 @@
       <div class="text-[11px] text-ink-faint mt-1">Test card: 4242 4242 4242 4242 · any future date · any CVC · any ZIP</div>
     </div>
 
+    <!-- item-3 DRAFT — three truthful assurances at the highest-anxiety moment -->
+    <div class="grid grid-cols-3 gap-2 mb-4">
+      <div class="trust-cell">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/><path d="M23 6l-9 9"/></svg></div>
+        <div class="lb">Verified against<br>two sources</div>
+      </div>
+      <div class="trust-cell">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="lb">Secured by<br>Stripe</div>
+      </div>
+      <div class="trust-cell">
+        <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 4v4h4"/></svg></div>
+        <div class="lb">Cancel<br>anytime</div>
+      </div>
+    </div>
+
     <div class="flex justify-between items-baseline mb-4">
       <span class="text-ink-soft text-sm">Charged now</span>
       <span class="font-display text-3xl text-ink" id="grand">—</span>
     </div>
     <button id="payBtn" class="btn-gold w-full px-6 py-4 rounded-xl quiet font-semibold text-lg">Confirm &amp; book →</button>
     <div id="payErr" class="text-center text-sm mt-2" style="color:var(--alert)"></div>
-    <p class="text-[12px] text-ink-faint text-center mt-3">Tures acts as agent-of-record for flights and books boutique stays in your name. Cancel anytime.</p>
+
+    <!-- item-3 DRAFT — secure-payment badge + one-line reassurance beside the pay button -->
+    <div class="flex items-center justify-center gap-2 mt-3">
+      <span class="secure-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Secured by <span class="text-ink">Stripe</span> · 256-bit encryption</span>
+    </div>
+    <p class="text-[13px] text-ink-soft text-center mt-2">You approve every charge. Nothing books — and nothing is charged — without your word.</p>
+    <p class="text-[12px] text-ink-faint text-center mt-2">Tures acts as agent-of-record for flights and books boutique stays in your name. Cancel anytime.</p>
+
+    <!-- item-3 DRAFT — proof point. PLACEHOLDER ONLY: no real customers yet (mock bookings),
+         so per "no fake success states" I am NOT inventing a quote or a trips-booked number.
+         Todd: replace the blockquote + attribution with a REAL testimonial, or swap the whole
+         figure for a verified "N trips booked" stat, before this ships. -->
+    <figure class="leaf p-5 mt-6 text-center" id="proofPoint" style="border-style:dashed">
+      <div class="caps text-[10px] text-gold-deep mb-2">Placeholder · add a real proof point</div>
+      <blockquote class="font-display text-xl text-ink leading-snug">&ldquo;A real traveler quote goes here.&rdquo;</blockquote>
+      <figcaption class="text-[11px] text-ink-faint mt-2">— Name, trip · or replace with &ldquo;N trips booked, every confirmation verified&rdquo;</figcaption>
+    </figure>
   </div>
 
   <!-- success -->
