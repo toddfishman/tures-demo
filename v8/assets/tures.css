@@ -482,15 +482,35 @@ a.quiet{ text-decoration:none; }
   padding:8px; opacity:0; transform:translateY(-6px) scale(.98); pointer-events:none;
   transition:opacity .18s ease, transform .18s ease; }
 .tures-menu.open{ opacity:1; transform:none; pointer-events:auto; }
-.tures-menu a, .tures-menu .theme-item{ display:flex; align-items:center; justify-content:space-between; gap:14px;
-  width:100%; text-decoration:none; text-align:left; appearance:none; cursor:pointer; background:transparent; border:0;
-  padding:9px 12px; border-radius:9px; color:var(--canvas-warm); font-family:'Inter',sans-serif; font-size:13.5px;
-  transition:background .15s ease, padding-left .15s ease; }
-.tures-menu a:hover, .tures-menu .theme-item:hover{ background:rgba(200,162,74,0.12); padding-left:15px; }
-.tures-menu a.here{ color:var(--gold-bright); }
-.tures-menu .pg{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; color:var(--gold); opacity:.7; margin-right:7px; }
-.tures-menu .sep{ height:1px; background:rgba(200,162,74,0.16); margin:6px 6px; }
+.tures-menu{ max-height:min(82vh,600px); overflow-y:auto; }
+.tures-menu a, .tures-menu .theme-item, .tures-menu .grp-head{ display:flex; align-items:center; gap:10px; width:100%;
+  text-decoration:none; text-align:left; appearance:none; background:transparent; border:0;
+  color:var(--canvas-warm); font-family:'Inter',sans-serif; font-size:13.5px; }
+.tures-menu a{ padding:9px 12px; border-radius:9px; cursor:pointer; transition:background .15s ease, padding-left .15s ease; }
+.tures-menu a:hover{ background:rgba(200,162,74,0.12); padding-left:15px; }
+.tures-menu a .pg{ font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.04em; color:var(--gold); opacity:.75; min-width:46px; }
+.tures-menu a.here{ color:var(--gold-bright); } .tures-menu a.here .pg{ color:var(--gold-bright); opacity:1; }
+/* grouped page (Plan a trip ▸ subs) */
+.tures-menu .grp-head{ position:relative; }
+.tures-menu .grp-head a{ flex:1; }
+.tures-menu .chev{ cursor:pointer; color:var(--gold); font-size:17px; line-height:1; padding:6px 10px; border-radius:8px;
+  background:transparent; border:0; transition:transform .2s ease, background .15s ease; }
+.tures-menu .chev:hover{ background:rgba(200,162,74,0.12); }
+.tures-menu .grp.open .chev{ transform:rotate(90deg); }
+.tures-menu .kids{ overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease, opacity .2s ease; }
+.tures-menu .grp.open .kids{ max-height:260px; opacity:1; }
+.tures-menu a.sub{ font-size:12.5px; color:rgba(236,227,208,0.8); padding-left:36px; }
+.tures-menu a.sub:hover{ padding-left:39px; } .tures-menu a.sub.here{ color:var(--gold-bright); }
+.tures-menu a.small{ font-size:12px; color:rgba(236,227,208,0.66); padding:6px 12px; }
+.tures-menu a.small:hover{ color:var(--canvas-warm); }
+.tures-menu .socials{ display:flex; gap:8px; padding:8px 12px 4px; }
+.tures-menu .socials a{ flex:none; font-size:11px; letter-spacing:.03em; color:var(--gold-bright); padding:5px 11px; border-radius:99px;
+  border:1px solid rgba(200,162,74,0.3); background:rgba(200,162,74,0.06); }
+.tures-menu .socials a:hover{ background:rgba(200,162,74,0.14); padding-left:11px; }
+.tures-menu .theme-item{ justify-content:space-between; padding:9px 12px; border-radius:9px; cursor:pointer; transition:background .15s ease; }
+.tures-menu .theme-item:hover{ background:rgba(200,162,74,0.12); }
 .tures-menu .theme-item .sw{ font-size:14px; color:var(--gold-bright); }
+.tures-menu .sep{ height:1px; background:rgba(200,162,74,0.16); margin:6px 6px; }
 .tures-signup{ position:fixed; top:14px; right:16px; z-index:80; text-decoration:none;
   font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
   color:var(--gold-bright); background:rgba(20,15,10,0.58); border:1px solid rgba(200,162,74,0.34);
