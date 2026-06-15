@@ -49,13 +49,21 @@
     transform-origin:left center; backface-visibility:hidden; background-color:#1b130c;
     box-shadow:0 3px 6px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.9);
     animation:float 7.5s ease-in-out infinite;
-    transition:transform 760ms cubic-bezier(.7,.02,.27,1), opacity 560ms ease; }
+    transition:transform 1000ms cubic-bezier(.62,.02,.2,1), opacity 820ms ease; }
   @keyframes float{ 0%,100%{ transform:translateY(0) rotateZ(-.28deg) } 50%{ transform:translateY(-10px) rotateZ(.28deg) } }
   .book::before{ content:""; position:absolute; top:0; bottom:0; left:0; width:30px; z-index:2; border-radius:7px 0 0 7px;
     background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 80%); border-right:1px solid rgba(255,220,150,0.07); }
   .opened .book{ transform:translateY(-10px) rotateY(-122deg) scale(.95); opacity:0; pointer-events:none; animation:none; }
-  /* auto-reveal turns the book slowly & cinematically; a manual tap (no .auto) keeps the quicker timing above */
-  body.auto .book{ transition-duration:2600ms, 1700ms; }
+  /* the cover physically swings open at the spine before the page turns to write.html */
+  .book-opening .book{ transform:translateY(-6px) rotateY(-118deg) scale(.97); opacity:0; pointer-events:none; animation:none; }
+  /* sign-in, top-left — mirrors the ✦ home star's pill so they bookend the top */
+  .signin-link{ position:fixed; top:14px; left:18px; z-index:70; text-decoration:none;
+    font-family:'Inter',sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold-bright); padding:8px 14px; border-radius:99px;
+    background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
+    transition:border-color .2s ease, background .2s ease; }
+  .signin-link:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+  @media (max-width:640px){ .signin-link{ top:10px; left:12px; font-size:11px; padding:7px 11px; } }
   .bframe{ position:absolute; inset:16px; border:1px solid rgba(200,162,74,0.42); border-radius:3px;
     box-shadow:inset 0 0 0 4px rgba(0,0,0,0.22); z-index:3; }
   .bframe.dashed{ inset:23px; border-style:dashed; opacity:0.5; }
@@ -102,6 +110,8 @@
     <span style="animation-delay:27s">Lapland</span>
     <span style="animation-delay:36s">New York</span>
   </div>
+
+  <a class="signin-link" href="auth/login.html">Sign in</a>
 
   <!-- the book you carry -->
   <div class="bookstage">
@@ -156,18 +166,20 @@
   </div>
 
 <script>
-  // Option 1: opening the book turns the page (changes URL) to write.html, where Tures
-  // inscribes the pitch on a blank page. The in-place chooser markup below is left dormant.
+  // Option 1: the cover physically swings open, then the page turns (changes URL) to
+  // write.html, where Tures inscribes the pitch. The dormant chooser markup below is unused.
   var __went = false;
   function openBook(){
     if(__went) return; __went = true;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.body.classList.add('book-opening');             // the cover swings open at the spine
     try{ sessionStorage.setItem('ptDir','next'); }catch(e){}  // write.html's page-turn leaf reads this
-    location.href = 'write.html';
+    setTimeout(function(){ location.href = 'write.html'; }, reduce ? 120 : 900);  // navigate as the open completes
   }
   function closeBook(){ return false; }  // chooser is bypassed in option 1; kept so its inline handler never errors
   window.__turesOnSwipe = function(dir){ if(dir==='next'){ openBook(); return true; } return false; };
 
-  // A tap turns the page now; otherwise it turns on its own after a brand beat (reduced-motion: sooner).
+  // A tap opens the book now; otherwise it opens on its own after a brand beat (reduced-motion: sooner).
   // A "Contents" back-link (index.html#contents) goes straight in.
   var __reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(location.hash === '#contents'){ openBook(); }

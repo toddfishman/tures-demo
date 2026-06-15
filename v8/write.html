@@ -1,8 +1,7 @@
 <!doctype html>
-<!-- PROTOTYPE — "Tures writes the page" landing concept.
-     Reached via a page-turn from the cover; the book opens to a blank page and Tures
-     inscribes the pitch live. Standalone so the shipped index.html cover is untouched.
-     Tap anywhere to skip the writing. -->
+<!-- The landing (option 1). Reached via a page-turn from the cover: the book opens to a
+     blank journal and Tures inscribes the pitch live, then the two paths appear.
+     Tap anywhere to skip the writing. Do NOT untrack — this is the live landing. -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -44,8 +43,9 @@
     background:radial-gradient(135% 120% at 50% 42%, rgba(11,9,7,0.30), rgba(11,9,7,0.55) 55%, rgba(11,9,7,0.82) 100%); }
 
   /* ===== the open journal ===== */
-  .stage{ position:fixed; inset:0; z-index:5; display:grid; place-items:center; padding:20px; }
-  .journal{ position:relative; width:min(92vw,660px); border-radius:6px 10px 10px 6px;
+  .stage{ position:fixed; inset:0; z-index:5; display:grid; justify-items:center; align-content:start;
+    padding:clamp(54px,11vh,120px) 20px 40px; overflow-y:auto; }
+  .journal{ position:relative; width:min(92vw,560px); border-radius:6px 10px 10px 6px;
     background:
       radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
       linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
@@ -74,8 +74,8 @@
   .ruled{ height:1px; background:linear-gradient(90deg, transparent, rgba(125,94,32,0.5), transparent); margin:14px 0 22px; }
 
   /* the ink Tures writes */
-  #ink{ font-family:'Cormorant Garamond',Georgia,serif; color:var(--ink);
-    font-size:clamp(20px,3.4vw,26px); line-height:1.62; min-height:9.5em; }
+  #ink{ font-family:'Cormorant Garamond',Georgia,serif; color:var(--ink); text-align:left;
+    font-size:clamp(20px,3.2vw,25px); line-height:1.6; min-height:8.5em; }
   .k-body{ }
   .k-em{ color:var(--gold-deep); font-style:italic; font-weight:600; }
   .k-sign{ font-style:italic; font-size:1.18em; color:var(--gold-deep); }
@@ -94,6 +94,14 @@
   .paths.in{ opacity:1; transform:none; }
   .skip{ position:fixed; bottom:18px; left:0; right:0; z-index:6; text-align:center;
     font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(236,227,208,0.5); pointer-events:none; }
+  /* sign-in, top-left — mirrors the ✦ home star pill (menu.js puts the star top-right) */
+  .signin-link{ position:fixed; top:14px; left:18px; z-index:70; text-decoration:none;
+    font-family:'Inter',sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold-bright); padding:8px 14px; border-radius:99px;
+    background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
+    transition:border-color .2s ease, background .2s ease; }
+  .signin-link:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+  @media (max-width:640px){ .signin-link{ top:10px; left:12px; font-size:11px; padding:7px 11px; } }
 </style>
 </head>
 <body class="text-canvas">
@@ -107,6 +115,8 @@
     <div class="frame-img" style="background-image:url('assets/img/nyc-1920.webp');animation-delay:36s"></div>
   </div>
   <div class="veil"></div>
+
+  <a class="signin-link" href="auth/login.html">Sign in</a>
 
   <div class="stage">
     <div class="journal" id="journal">
@@ -136,12 +146,12 @@
 
   // The passage Tures inscribes — the cover's promise, in its own hand.
   var SEGMENTS = [
-    {t:'You tell me the trip the way you’d tell a friend.', c:'k-body', pause:420},
-    {t:'\nI handle the rest — the flights, the rooms you actually\nnamed, the table at eight.', c:'k-body', pause:520},
-    {t:'\n\nOther tools end with a list of links.\nI end with ', c:'k-body', pause:80},
-    {t:'confirmation numbers', c:'k-em', pause:460},
+    {t:'You tell me the trip the way you’d tell a friend.', c:'k-body', pause:460},
+    {t:'\n\nI handle the rest — the flights, the rooms you actually named, the table at eight.', c:'k-body', pause:520},
+    {t:'\n\nOther tools end with a list of links. I end with ', c:'k-body', pause:80},
+    {t:'confirmation numbers', c:'k-em', pause:480},
     {t:'.', c:'k-body', pause:560},
-    {t:'\n\nAnd when the world shifts at 2 a.m., I’ve already moved.', c:'k-body', pause:680},
+    {t:'\n\nAnd when the world shifts at 2 a.m., I’ve already moved.', c:'k-body', pause:520},
     {t:'\n\n', c:'k-body', pause:0},
     {t:'Adventures, handled.', c:'k-sign', pause:0}
   ];
@@ -220,5 +230,6 @@
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
 </body>
 </html>
