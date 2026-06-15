@@ -87,7 +87,7 @@
 
   <!-- the book you carry -->
   <div class="bookstage">
-    <div class="book leather-surface grain" id="book" onclick="openBook()">
+    <div class="book leather-surface grain" id="book" onclick="openBook(true)">
       <div class="bframe"></div>
       <div class="bframe dashed"></div>
       <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
@@ -138,11 +138,21 @@
   </div>
 
 <script>
-  function openBook(){ document.body.classList.add('opened'); }
-  function closeBook(){ document.body.classList.remove('opened'); return false; }
-  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
-  // A "Contents" link (index.html#contents) lands you on the opened chooser, not the closed cover.
+  var __userActed = false;
+  function openBook(manual){ if(manual){ __userActed = true; } document.body.classList.add('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); __userActed = true; /* a deliberate close stops the auto-reveal */ return false; }
+  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(true); return true; } return false; };
+
+  // A "Contents" link (index.html#contents) lands you straight on the opened chooser.
   if(location.hash === '#contents'){ openBook(); }
+  else {
+    // Auto-reveal the chooser after a brief brand beat, so a first-time visitor sees the two
+    // paths (the value) without having to discover the tap. Any manual tap/close cancels it.
+    var __reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function(){
+      if(!__userActed && !document.body.classList.contains('opened')){ openBook(); }
+    }, __reduce ? 300 : 1600);
+  }
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
