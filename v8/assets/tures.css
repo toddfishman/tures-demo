@@ -12,11 +12,11 @@
   --obsidian:      #0b0b0d;
   --midnight:      #0f1b2d;
 
-  /* Canvas (pages) */
-  --canvas:        #ece3d0;
-  --canvas-warm:   #f2ead8;
-  --canvas-deep:   #e2d6bd;
-  --canvas-line:   rgba(43,36,28,0.12);
+  /* Canvas (pages) — "Greige" surface (was cream #ece3d0 / #f2ead8 / #e2d6bd; chocolate + brass unchanged) */
+  --canvas:        #e7e2d8;
+  --canvas-warm:   #efeae0;
+  --canvas-deep:   #dad3c5;
+  --canvas-line:   rgba(43,38,30,0.13);
 
   /* Ink */
   --ink:           #2a2118;
@@ -38,6 +38,48 @@
   --confirm-ink:   #4e6a3a;
   --alert-ink:     #8f3f2b;
 }
+
+/* ============================================================
+   DARK MODE — "Midnight leather". Flips the page surface to near-black and the
+   ink to warm cream; chocolate + brass hold. Toggled in assets/menu.js (persisted
+   to localStorage as tures.theme). Covers the core tokens + the main light-literal
+   components. The cover & write.html (the dark "book" pages) are excluded by menu.js.
+   ============================================================ */
+html.dark{
+  --canvas:        #1a1517;
+  --canvas-deep:   #14100f;
+  --canvas-line:   rgba(236,227,208,0.12);
+  --ink:           #ede6dc;
+  --ink-soft:      #b3a99c;
+  --ink-faint:     #9a9082;
+  --gold-deep:     #e6c873;   /* "deep" gold is a TEXT color tuned for cream; on dark it must read light */
+  --confirm-ink:   #a7c293;
+  --alert-ink:     #e39179;
+  /* NB: --canvas-warm is deliberately NOT flipped — it doubles as the light-text colour
+     (.text-canvas) on dark leather sections, which must stay light. */
+}
+html.dark .canvas-surface{ background:linear-gradient(180deg,#1a1517 0%,#14100f 100%); }
+/* cards, inputs & controls that used hardcoded near-white fills */
+html.dark .leaf{ background:rgba(255,255,255,0.045); border-color:rgba(236,227,208,0.12);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 14px 34px -22px rgba(0,0,0,0.7); }
+html.dark .leaf-tab{ background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border-color:rgba(236,227,208,0.12); }
+html.dark .btn-ink{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(236,227,208,0.14); }
+html.dark .btn-ink:hover{ background:rgba(255,255,255,0.12); }
+html.dark .fld{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(236,227,208,0.14); }
+html.dark .opt{ background:rgba(255,255,255,0.05); border-color:rgba(236,227,208,0.12); }
+html.dark .track{ background:rgba(236,227,208,0.14); }
+html.dark .seg{ background:rgba(255,255,255,0.06); border-color:rgba(236,227,208,0.14); }
+html.dark .seg button{ color:rgba(236,227,208,0.6); }
+html.dark .seg button.on{ color:#241a0c; }
+html.dark .seg .thumb{ background:linear-gradient(180deg,#e6c873,#c8a24a); }
+/* light status pills → their bright register on dark */
+html.dark .pill-gold{ color:#e6c873; }
+html.dark .pill-confirm{ color:#a7c293; }
+html.dark .pill-pending{ color:#e6c873; }
+html.dark .pill-alert{ color:#e39179; }
+html.dark .pill-info{ color:#9cc0dc; }
+/* the multiply paper texture would muddy a dark surface */
+html.dark .canvas-surface::after{ mix-blend-mode:soft-light; opacity:0.22; }
 
 /* ---------- type ---------- */
 .font-display{ font-family:'Cormorant Garamond', Georgia, serif; }
@@ -410,6 +452,16 @@ a.quiet{ text-decoration:none; }
 .tures-home-star:hover{ transform:translateY(-1px); border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
 .tures-home-star:active{ transform:translateY(0) scale(.97); }
 @media (max-width:640px){ .tures-home-star{ top:10px; right:12px; font-size:19px; padding:7px 11px; } }
+
+/* theme toggle — a small pill just inboard of the ✦ home star (assets/menu.js) */
+.tures-theme-toggle{ position:fixed; top:15px; right:72px; z-index:70; cursor:pointer;
+  width:34px; height:34px; border-radius:99px; display:grid; place-items:center; font-size:15px; line-height:1;
+  color:var(--gold-bright); background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:transform .14s ease, border-color .2s ease, background .2s ease; }
+.tures-theme-toggle:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+.tures-theme-toggle:active{ transform:scale(.94); }
+@media (max-width:640px){ .tures-theme-toggle{ top:11px; right:60px; width:32px; height:32px; } }
 
 /* ============================================================
    ✦ MENU — legacy overlay styles (unused; kept for safety)
