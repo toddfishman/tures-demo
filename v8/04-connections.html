@@ -147,10 +147,10 @@
 
     <div class="grid lg:grid-cols-2 gap-8">
       <!-- wallet -->
-      <div>
+      <div class="min-w-0">
         <div class="caps text-[11px] text-ink-faint mb-3">Your cards</div>
         <div class="flex gap-2 mb-3">
-          <select id="cardPick" class="flex-1 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)"></select>
+          <select id="cardPick" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)"></select>
           <button id="addCard" class="btn-ink px-4 py-2 rounded-lg text-sm press shrink-0">Add</button>
         </div>
         <div id="walletList" class="space-y-2 mb-4"></div>
@@ -158,13 +158,13 @@
       </div>
 
       <!-- traveler profile -->
-      <div>
+      <div class="min-w-0">
         <div class="caps text-[11px] text-ink-faint mb-3">Traveler details</div>
         <div class="space-y-2.5">
           <input id="pfPassport" placeholder="Passport number" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
           <input id="pfKtn" placeholder="Known Traveler Number (TSA Pre)" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
           <div class="flex gap-2">
-            <input id="pfProgram" placeholder="Loyalty program (e.g. Finnair Plus)" class="flex-1 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
+            <input id="pfProgram" placeholder="Loyalty program (e.g. Finnair Plus)" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
             <input id="pfNumber" placeholder="Number" class="w-28 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
           </div>
           <button id="saveProfile" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save profile</button>
