@@ -26,8 +26,11 @@
   // arrival: the covering leaf peels away on the side matching how we arrived
   function enter() {
     if (REDUCE) { wrap.style.display = 'none'; return; }
-    var dir = 'next';
-    try { dir = sessionStorage.getItem('ptDir') || 'next'; sessionStorage.removeItem('ptDir'); } catch (e) {}
+    var dir = null;
+    try { dir = sessionStorage.getItem('ptDir'); sessionStorage.removeItem('ptDir'); } catch (e) {}
+    // Cold arrival (typed URL, refresh, external link, or the auto-revealing cover): there is no
+    // previous page to turn from, so skip the leaf — it otherwise flashes a stray turn on landing.
+    if (!dir) { wrap.style.display = 'none'; return; }
     wrap.style.display = '';
     leaf.className = (dir === 'prev' ? 'out-prev' : 'out-next') + ' start';
     var reveal = function () { leaf.classList.add('go'); };

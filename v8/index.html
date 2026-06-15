@@ -33,11 +33,13 @@
     transform-origin:left center; backface-visibility:hidden; background-color:#1b130c;
     box-shadow:0 3px 6px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.9);
     animation:float 7.5s ease-in-out infinite;
-    transition:transform 1000ms cubic-bezier(.7,.02,.27,1), opacity 650ms ease; }
+    transition:transform 760ms cubic-bezier(.7,.02,.27,1), opacity 560ms ease; }
   @keyframes float{ 0%,100%{ transform:translateY(0) rotateZ(-.28deg) } 50%{ transform:translateY(-10px) rotateZ(.28deg) } }
   .book::before{ content:""; position:absolute; top:0; bottom:0; left:0; width:30px; z-index:2; border-radius:7px 0 0 7px;
     background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 80%); border-right:1px solid rgba(255,220,150,0.07); }
   .opened .book{ transform:translateY(-10px) rotateY(-122deg) scale(.95); opacity:0; pointer-events:none; animation:none; }
+  /* auto-reveal turns the book slowly & cinematically; a manual tap (no .auto) keeps the quicker timing above */
+  body.auto .book{ transition-duration:2600ms, 1700ms; }
   .bframe{ position:absolute; inset:16px; border:1px solid rgba(200,162,74,0.42); border-radius:3px;
     box-shadow:inset 0 0 0 4px rgba(0,0,0,0.22); z-index:3; }
   .bframe.dashed{ inset:23px; border-style:dashed; opacity:0.5; }
@@ -139,19 +141,23 @@
 
 <script>
   var __userActed = false;
-  function openBook(manual){ if(manual){ __userActed = true; } document.body.classList.add('opened'); }
-  function closeBook(){ document.body.classList.remove('opened'); __userActed = true; /* a deliberate close stops the auto-reveal */ return false; }
+  function openBook(manual){
+    if(manual){ __userActed = true; }              // a tap opens quickly
+    else { document.body.classList.add('auto'); }  // the auto-reveal turns the book slowly
+    document.body.classList.add('opened');
+  }
+  function closeBook(){ document.body.classList.remove('opened','auto'); __userActed = true; /* a deliberate close stops the auto-reveal */ return false; }
   window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(true); return true; } return false; };
 
   // A "Contents" link (index.html#contents) lands you straight on the opened chooser.
   if(location.hash === '#contents'){ openBook(); }
   else {
-    // Auto-reveal the chooser after a brief brand beat, so a first-time visitor sees the two
-    // paths (the value) without having to discover the tap. Any manual tap/close cancels it.
+    // Auto-reveal the chooser after a long brand beat, so a first-time visitor sees the two
+    // paths (the value) on their own. A manual tap opens sooner and quicker; a close cancels it.
     var __reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(function(){
       if(!__userActed && !document.body.classList.contains('opened')){ openBook(); }
-    }, __reduce ? 300 : 1600);
+    }, __reduce ? 300 : 7000);
   }
 </script>
   <script src="assets/ui.js"></script>
