@@ -174,7 +174,7 @@
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.body.classList.add('book-opening');             // the cover swings open at the spine
     try{ sessionStorage.setItem('ptDir','next'); }catch(e){}  // write.html's page-turn leaf reads this
-    setTimeout(function(){ location.href = 'write.html'; }, reduce ? 120 : 900);  // navigate as the open completes
+    setTimeout(function(){ location.href = 'write.html'; }, reduce ? 120 : 450);  // navigate while the book is still visibly opening (write.html's leaf covers the rest)
   }
   function closeBook(){ return false; }  // chooser is bypassed in option 1; kept so its inline handler never errors
   window.__turesOnSwipe = function(dir){ if(dir==='next'){ openBook(); return true; } return false; };

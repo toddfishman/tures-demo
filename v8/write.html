@@ -45,16 +45,17 @@
   /* ===== the open journal ===== */
   .stage{ position:fixed; inset:0; z-index:5; display:grid; justify-items:center; align-content:start;
     padding:clamp(54px,11vh,120px) 20px 40px; overflow-y:auto; }
-  .journal{ position:relative; width:min(92vw,560px); border-radius:6px 10px 10px 6px;
+  /* the leather cover the page is bound into — so the cover never "disappears" */
+  .book-open{ position:relative; width:min(94vw,600px); border-radius:5px 13px 13px 5px;
+    padding:15px 15px 16px 30px;   /* extra left = the spine fold */
+    box-shadow:-18px 0 0 -6px #0a0703, 0 48px 100px -36px rgba(0,0,0,0.92), inset 0 0 0 1px rgba(0,0,0,0.5);
+    animation:rise-in 450ms cubic-bezier(.2,.7,.2,1) both; }
+  .journal{ position:relative; width:100%; border-radius:2px 6px 6px 2px;
     background:
       radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
       linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
-    box-shadow:
-      -12px 0 0 -3px #0a0703,                 /* bound spine */
-      0 40px 90px -30px rgba(0,0,0,0.9),
-      inset 0 0 0 1px rgba(0,0,0,0.35);
-    padding:clamp(34px,6vw,64px) clamp(28px,6vw,72px) clamp(30px,5vw,56px);
-    animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both;
+    box-shadow:0 0 0 1px rgba(125,94,32,0.18), 0 3px 14px -6px rgba(0,0,0,0.5);
+    padding:clamp(30px,5.5vw,56px) clamp(26px,5.5vw,60px) clamp(28px,4.5vw,48px);
     overflow:hidden;
   }
   @keyframes rise-in{ from{ opacity:0; transform:translateY(14px) scale(.985) } to{ opacity:1; transform:none } }
@@ -94,14 +95,16 @@
   .paths.in{ opacity:1; transform:none; }
   .skip{ position:fixed; bottom:18px; left:0; right:0; z-index:6; text-align:center;
     font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(236,227,208,0.5); pointer-events:none; }
-  /* sign-in, top-left — mirrors the ✦ home star pill (menu.js puts the star top-right) */
-  .signin-link{ position:fixed; top:14px; left:18px; z-index:70; text-decoration:none;
+  /* the ✦ home star (menu.js) sits upper-LEFT here; Sign in sits upper-right */
+  .tures-home-star{ left:18px; right:auto; }
+  .signin-link{ position:fixed; top:14px; right:18px; z-index:70; text-decoration:none;
     font-family:'Inter',sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--gold-bright); padding:8px 14px; border-radius:99px;
     background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
     transition:border-color .2s ease, background .2s ease; }
   .signin-link:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
-  @media (max-width:640px){ .signin-link{ top:10px; left:12px; font-size:11px; padding:7px 11px; } }
+  @media (max-width:640px){ .signin-link{ top:10px; right:12px; font-size:11px; padding:7px 11px; }
+    .tures-home-star{ left:12px; right:auto; } }
 </style>
 </head>
 <body class="text-canvas">
@@ -119,6 +122,7 @@
   <a class="signin-link" href="auth/login.html">Sign in</a>
 
   <div class="stage">
+   <div class="book-open leather-surface grain">
     <div class="journal" id="journal">
       <div class="flex items-center justify-between">
         <span class="kicker">The AI Travel Concierge</span>
@@ -137,6 +141,7 @@
         <a href="01-landing.html?demo=1" class="btn-ink px-6 py-3 rounded-sm quiet">What is Tures? →</a>
       </div>
     </div>
+   </div>
   </div>
 
   <div class="skip" id="skipHint">Tap to skip</div>
@@ -178,8 +183,11 @@
     caret.classList.remove('blink'); caret.style.display='none';
     document.getElementById('statusText').textContent = 'Your edition';
     document.querySelector('#status .nib').textContent = '✦';
-    document.getElementById('paths').classList.add('in');
+    var paths = document.getElementById('paths'); paths.classList.add('in');
     var sk=document.getElementById('skipHint'); if(sk) sk.style.display='none';
+    // make sure both buttons are in view even on a short screen (manual scroll also works)
+    var stage = document.querySelector('.stage');
+    if(stage){ try{ stage.scrollTo({ top: stage.scrollHeight, behavior:'smooth' }); }catch(e){ stage.scrollTop = stage.scrollHeight; } }
   }
 
   function jitter(ch){
@@ -226,7 +234,7 @@
   document.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') skip(); });
 
   if(REDUCE){ renderInstant(); finish(); }
-  else { setTimeout(function(){ typeSegments(0); }, 650); }
+  else { setTimeout(function(){ typeSegments(0); }, 480); }
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
