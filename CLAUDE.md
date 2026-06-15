@@ -6,13 +6,13 @@ Tures is Todd's AI travel-concierge product: an **executor**, not a research too
 
 ## First actions on entry
 1. **`git pull --rebase origin main`** — this repo goes stale; a parallel session also pushes here. Always rebase before you push.
-2. Current front-end version is **v7** — work in `v7/`, not the older root files or `v2/`–`v6/`.
+2. Current front-end version is **v8** — work in `v8/`. (`v7/` is the pre-nav-fix snapshot; `v2/`–`v6/` are older.)
 3. Don't re-scan the whole tree to "understand the project" — it's described below.
 
 ## Where the code is
 - **This repo** = `github.com/toddfishman/tures-demo` (the front-end demo + the engine under `engine/`).
-- **Front-end**: versioned static demos `v2/`–`v7/`, served on GitHub Pages. **Current = v7: https://toddfishman.github.io/tures-demo/v7** . `v7/index.html` is the live "Bound Edition" cover (a small leather book floating over a rotating full-bleed world — Tulum/Paris/Tokyo/Lapland/NYC; tap to open → two-door chooser "What is Tures?" / "Plan a trip").
-- **Funnel order (v7)**: `index.html` (cover) → `01-landing.html` → `02-taste-engine.html` → `03-paste-trip.html` (the conversational brief — the heart) → `04-connections` → `05-execution` → `07-itinerary` → `08-concierge`; plus `pricing.html`, `signup.html`, `welcome.html`, `checkout.html`, `auth/`, `legal/`, `account.html`, `admin.html`.
+- **Front-end**: versioned static demos `v2/`–`v8/`, served on GitHub Pages. **Current = v8: https://toddfishman.github.io/tures-demo/v8** . `v8/index.html` is the live "Bound Edition" cover (a small leather book floating over a rotating full-bleed world — Tulum/Paris/Tokyo/Lapland/NYC; tap to open → two-door chooser "What is Tures?" / "Plan a trip").
+- **Funnel order (v8)**: `index.html` (cover) → `01-landing.html` → `02-taste-engine.html` → `03-paste-trip.html` (the conversational brief — the heart) → `04-connections` → `05-execution` → `07-itinerary` → `08-concierge`; plus `pricing.html`, `signup.html`, `welcome.html`, `checkout.html`, `auth/`, `legal/`, `account.html`, `admin.html`.
 - **Back-end**: `engine/` (Node + TypeScript + Fastify, "tures-engine"), **deployed live at https://tures-engine-tf.fly.dev**. The front-end calls it (default engine URL baked into `v7/assets/engine.js`); SSE streams.
 - **Strategy docs live OUTSIDE this repo** (in Todd's local project root, not cloned by a dispatch): BRIEF, ARCHITECTURE, DEMO-FLOW, DESIGN-DIRECTION, OPEN-QUESTIONS, POST-MVP. If you need them, ask Todd to paste them — a dispatch won't have them.
 
@@ -40,7 +40,8 @@ Tures is Todd's AI travel-concierge product: an **executor**, not a research too
 - **Execution dashboard redesign**: a mobile-first single-column, decision-first version was mocked but not built; current `05-execution` is the old dense 2-column.
 - **Resilience-aware planning** (Hiccup Handler as a *planning* input) — deferred; must be invisible/no-toggle (Todd's friction rule).
 - Voice is only on `03-paste-trip`, not the cover/landing yet.
-- **Known conversion issues flagged in review (2026-06-14, not yet fixed)**: cover hides all value behind the book-open click; "start" CTAs split between the planner and `signup.html` (should all go to the planner); `index.html#contents` is a dead anchor used in most navs; nav set differs page-to-page; per-trip $99 vs Concierge $99/mo collide; no social proof / trust badge at checkout; Tailwind loaded via CDN (use a compiled build for prod); Unsplash images hotlinked; no OG/meta tags.
+- **Fixed in v8 (2026-06-14)**: `index.html#contents` now auto-opens the chooser (was a dead anchor across ~15 nav + back-links — verified in preview); every funnel page's terminal nav CTA unified to gold "Start free → 03-paste-trip" (value-first); pricing's nav CTA moved off the `signup.html` wall to the planner. `05-execution` keeps its distinct in-app nav (avatar + chapter tabs) by design.
+- **Still open from the review (not done)**: cover hides all value behind the book-open click (highest-leverage — test auto-revealing the chooser); in-page *body* "Start free" CTAs on `07-itinerary`/`08-concierge` + the pricing-card CTAs still point to `signup.html` — decide planner-first vs the deliberate booking-gate (`Subscribe` legitimately needs signup); per-trip $99 vs Concierge $99/mo collide; no social proof / trust badge at checkout; Tailwind loaded via CDN (compile a static build for prod); Unsplash images hotlinked; no OG/meta tags.
 
 ## Guardrails
 - Never flip the real-money switches (`ALLOW_LIVE_BOOKING`, `STRIPE_CHARGE_CARDS`, live Duffel) without explicit instruction from Todd.

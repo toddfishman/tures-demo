@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Create account</title>
+<meta name="description" content="Create your Tures account. Invitation only, magic link or passkey — no passwords." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="../assets/tures.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:120px; }
+  .field{ width:100%; background:rgba(255,253,247,.55); border:1px solid var(--canvas-line); border-radius:12px;
+    padding:14px 16px; font-size:15px; color:var(--ink); min-height:52px; transition:border-color .18s ease, background .18s ease; }
+  .field::placeholder{ color:var(--ink-faint); }
+  .field:focus{ outline:none; border-color:rgba(200,162,74,.55); background:#fff; box-shadow:0 0 0 3px rgba(200,162,74,.12); }
+  .field.locked{ background:rgba(200,162,74,.08); border-color:rgba(200,162,74,.3); color:var(--ink); font-weight:500; }
+  .method{ display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:16px; border-radius:14px; cursor:pointer;
+    transition:transform .14s cubic-bezier(.34,1.56,.64,1), border-color .16s ease, background .16s ease; }
+  .method:active{ transform:scale(.98); }
+  .method-mark{ width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:19px; flex-shrink:0; }
+  .ios-prompt{ position:fixed; inset:0; z-index:140; display:none; align-items:flex-end; justify-content:center; }
+  .ios-prompt.open{ display:flex; }
+  .ios-prompt .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(3px); opacity:0; transition:opacity .3s ease; }
+  .ios-prompt.open .scrim{ opacity:1; }
+  .ios-card{ position:relative; z-index:2; width:calc(100% - 20px); max-width:380px; margin-bottom:10px;
+    background:rgba(245,243,240,.86); backdrop-filter:blur(30px) saturate(180%); -webkit-backdrop-filter:blur(30px) saturate(180%);
+    border-radius:20px; box-shadow:0 30px 70px -20px rgba(0,0,0,.6); overflow:hidden; color:#1c1c1e;
+    font-family:-apple-system,'Inter',sans-serif; transform:translateY(20px) scale(.96); opacity:0;
+    transition:transform .34s cubic-bezier(.32,1.3,.5,1), opacity .3s ease; }
+  .ios-prompt.open .ios-card{ transform:none; opacity:1; }
+  .ios-card .body{ padding:20px 20px 6px; text-align:center; }
+  .ios-card .faceid{ width:54px; height:54px; margin:4px auto 12px; border-radius:14px; display:grid; place-items:center; font-size:26px;
+    background:linear-gradient(160deg,#3a3a3c,#1c1c1e); color:#fff; }
+  .ios-card .row{ display:flex; }
+  .ios-card .row button{ flex:1; padding:14px; font-size:17px; background:transparent; border:0; border-top:.5px solid rgba(60,60,67,.29); cursor:pointer; color:#007aff; }
+  .ios-card .row button:first-child{ border-right:.5px solid rgba(60,60,67,.29); }
+  .ios-card .row button.bold{ font-weight:600; }
+  .ios-card .scanning{ font-size:13px; color:#8e8e93; padding-bottom:14px; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../index.html" class="text-sm quiet flex items-center gap-2"><span>←</span> Home</a>
+    <a href="../index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-16 right-0 text-[40vw] sm:text-[26vw] z-0" data-parallax="0.1">✦</div>
+ <div class="relative z-10 max-w-md mx-auto px-6 pt-16 pb-10 text-center">
+   <div class="caps text-[11px] text-gold/80 mb-4 inline-flex items-center gap-2"><span class="dot dot-gold"></span>By invitation</div>
+   <h1 class="font-display text-5xl leading-[1.0]">Create your<br>account</h1>
+   <p class="mt-4 text-canvas/70 leading-relaxed">Describe a trip in plain English. We book every leg, and watch it while you sleep.</p>
+ </div>
+</section>
+
+<main class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-md mx-auto px-6 py-10">
+
+  <!-- invite banner -->
+  <div class="leaf p-4 mb-4 flex items-center gap-3" style="background:rgba(200,162,74,.06)">
+    <span class="method-mark" style="background:linear-gradient(160deg,#241910,#15100a);color:var(--gold-bright);border:1px solid rgba(200,162,74,.3)">✦</span>
+    <div class="flex-1">
+      <div class="caps text-[10px] text-ink-faint">Invited by</div>
+      <div class="font-display text-lg text-ink leading-tight">Andy Rockwell</div>
+    </div>
+    <span class="pill pill-confirm">Verified</span>
+  </div>
+
+  <!-- name + email -->
+  <div class="space-y-2.5 mb-3">
+    <input class="field" type="text" autocomplete="name" placeholder="Your name" />
+    <input class="field" type="email" inputmode="email" autocomplete="email" placeholder="Email address" />
+    <label class="block">
+      <span class="caps text-[10px] text-ink-faint ml-1">Invitation code</span>
+      <input class="field locked mt-1" type="text" value="ANDY-WEDGE-2026" readonly />
+    </label>
+  </div>
+
+  <!-- PRIMARY: magic link -->
+  <button onclick="sentLink(this)" class="btn-gold w-full px-5 py-3.5 rounded-xl font-semibold press">Email me a magic link to finish →</button>
+  <p class="text-xs text-ink-faint mt-2 leading-relaxed text-center">No password to set. We email a secure link that creates your account and signs you in.</p>
+
+  <!-- divider -->
+  <div class="flex items-center gap-3 my-6">
+    <div class="flex-1 rule-ink"></div>
+    <span class="caps text-[10px] text-ink-faint">or set up a passkey now</span>
+    <div class="flex-1 rule-ink"></div>
+  </div>
+
+  <!-- SECONDARY: passkey -->
+  <button class="method leaf" onclick="openPasskey()">
+    <span class="method-mark" style="background:linear-gradient(160deg,#241910,#15100a);color:var(--gold-bright);border:1px solid rgba(200,162,74,.3)">⚷</span>
+    <span class="flex-1">
+      <span class="block font-display text-lg text-ink leading-tight">Create a passkey</span>
+      <span class="caps text-[10px] text-ink-faint">Face ID · Touch ID · most secure</span>
+    </span>
+    <span class="text-gold-deep">›</span>
+  </button>
+
+  <!-- DE-EMPHASIZED: password -->
+  <details class="leaf mt-3">
+    <summary class="flex items-center justify-between p-4">
+      <span class="text-sm text-ink-soft">Use a password instead</span>
+      <span class="chev text-gold-deep">›</span>
+    </summary>
+    <div class="px-4 pb-4 space-y-2.5">
+      <input class="field" type="password" autocomplete="new-password" placeholder="Create a password" />
+      <button class="btn-ink w-full px-5 py-3 rounded-xl press">Create account</button>
+    </div>
+  </details>
+
+  <p class="text-center text-sm text-ink-soft mt-8">Already have an account? <a href="login.html" class="text-gold-deep font-medium underline quiet">Sign in →</a></p>
+  <p class="text-center text-xs text-ink-faint mt-3 leading-relaxed">By creating an account you agree to our <a href="../legal/terms.html" class="underline quiet">Terms</a> &amp; <a href="../legal/privacy.html" class="underline quiet">Privacy Policy</a>, including how the agent acts on your behalf.</p>
+ </div>
+</main>
+
+<footer class="bg-obsidian border-t border-gold/15 py-8 text-center">
+  <a href="../index.html" class="wordmark foil text-lg quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">First Edition · MMXXVI</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar canvas">
+  <div class="max-w-md mx-auto w-full">
+    <button onclick="openPasskey()" class="btn-gold w-full text-center px-6 py-3.5 rounded-xl quiet font-semibold press">Create account with passkey</button>
+  </div>
+</div>
+
+<!-- iOS-style passkey prompt -->
+<div class="ios-prompt" id="passkey">
+  <div class="scrim" onclick="closePasskey()"></div>
+  <div class="ios-card">
+    <div class="body">
+      <div class="faceid" id="faceMark">⚷</div>
+      <div style="font-size:17px;font-weight:600">Create a passkey for Tures</div>
+      <div style="font-size:13px;color:#3c3c43;opacity:.7;margin-top:3px">A passkey lets you sign in with Face ID. Nothing to remember, nothing to phish.</div>
+      <div style="font-size:12px;color:#8e8e93;margin-top:10px">Saved to iCloud Keychain · iPhone</div>
+    </div>
+    <div class="scanning" id="scanLine">&nbsp;</div>
+    <div class="row" id="iosRow">
+      <button onclick="closePasskey()">Cancel</button>
+      <button class="bold" onclick="scanFace()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function sentLink(btn){ btn.textContent='Link sent — check your inbox ✓'; btn.style.filter='brightness(.96)'; }
+  var pk=document.getElementById('passkey');
+  function openPasskey(){ pk.classList.add('open'); document.body.style.overflow='hidden'; reset(); }
+  function closePasskey(){ pk.classList.remove('open'); document.body.style.overflow=''; }
+  function reset(){ var f=document.getElementById('faceMark'); f.textContent='⚷'; f.style.background='linear-gradient(160deg,#3a3a3c,#1c1c1e)'; document.getElementById('scanLine').innerHTML='&nbsp;'; var r=document.getElementById('iosRow'); r.style.opacity=''; r.style.pointerEvents=''; }
+  function scanFace(){
+    var row=document.getElementById('iosRow'); row.style.opacity='.4'; row.style.pointerEvents='none';
+    document.getElementById('faceMark').textContent='◠';
+    document.getElementById('scanLine').textContent='Creating passkey…';
+    setTimeout(function(){
+      var f=document.getElementById('faceMark'); f.textContent='✓'; f.style.background='linear-gradient(160deg,#34c759,#248a3d)';
+      document.getElementById('scanLine').textContent='Passkey created';
+      setTimeout(function(){ window.location.href='../02-taste-engine.html'; }, 700);
+    }, 1300);
+  }
+</script>
+<script src="../assets/ui.js"></script>
+<script src="../assets/pageturn.js"></script>
+<script src="../assets/menu.js"></script>
+</body>
+</html>

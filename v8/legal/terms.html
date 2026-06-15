@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Terms of Service</title>
+<meta name="description" content="The terms that govern letting an agent book on your behalf — in plain language." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="../assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .doc{ font-size:15px; line-height:1.72; color:var(--ink-soft); }
+  .doc h2{ font-family:'DM Serif Display',serif; color:var(--ink); font-size:1.9rem; line-height:1.1; margin:2.4rem 0 .5rem; scroll-margin-top:90px; }
+  .doc h3{ font-family:'DM Serif Display',serif; color:var(--ink); font-size:1.2rem; margin:1.5rem 0 .4rem; }
+  .doc p{ margin-bottom:.9rem; }
+  .doc ul{ margin:.4rem 0 1rem; padding-left:1.1rem; }
+  .doc li{ margin-bottom:.45rem; list-style:disc; }
+  .doc strong{ color:var(--ink); }
+  .doc a{ color:var(--gold-deep); text-decoration:underline; }
+  .doc .lead-roman{ font-family:'Cormorant Garamond',serif; color:var(--gold-deep); font-weight:600; margin-right:.35rem; }
+  .toc-link{ display:block; padding:6px 0 6px 12px; font-size:13px; color:var(--ink-faint); border-left:2px solid var(--canvas-line); transition:color .15s ease, border-color .15s ease; }
+  .toc-link:hover, .toc-link.active{ color:var(--gold-deep); border-left-color:var(--gold-deep); }
+  .clause{ border-radius:12px; padding:18px 20px; margin:1.4rem 0; background:rgba(200,162,74,.08); border:1px solid rgba(200,162,74,.32); }
+  .clause .doc-quote{ font-family:'Cormorant Garamond',serif; font-size:1.08rem; line-height:1.6; color:var(--ink); font-style:italic; }
+  .reading-rule{ position:fixed; top:0; left:0; height:3px; z-index:50; background:linear-gradient(90deg,#a8842f,#e6c873); width:0; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+<div class="reading-rule" id="rule"></div>
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="text-sm quiet flex items-center gap-2"><span>←</span> Legal</a>
+    <a href="../index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-14 right-0 text-[34vw] sm:text-[20vw] z-0" data-parallax="0.1">§</div>
+ <div class="relative z-10 max-w-5xl mx-auto px-6 pt-16 pb-10">
+   <div class="caps text-[11px] text-gold/80 mb-4">Terms of Service</div>
+   <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Letting an agent<br>act for you.</h1>
+   <p class="mt-4 max-w-xl text-canvas/70 leading-relaxed text-lg">When you authorize Tures, software enters into real, binding commitments in your name. Here's exactly what that means — and where the lines are.</p>
+   <div class="caps text-[10px] text-gold/50 mt-5">Effective June 2026 · Version 1.0</div>
+ </div>
+</section>
+
+<main class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-10">
+
+  <!-- sticky TOC (desktop) -->
+  <aside class="hidden lg:block lg:col-span-3">
+    <div class="sticky" style="top:90px">
+      <div class="caps text-[10px] text-ink-faint mb-3">On this page</div>
+      <nav id="toc">
+        <a class="toc-link" href="#about">1 · The service</a>
+        <a class="toc-link" href="#agent">4 · Agent authorization</a>
+        <a class="toc-link" href="#inbox">5 · Inbox access</a>
+        <a class="toc-link" href="#refunds">6 · Refund policy</a>
+        <a class="toc-link" href="#liability">7 · Liability cap</a>
+        <a class="toc-link" href="#forcemajeure">8 · Force majeure</a>
+        <a class="toc-link" href="#disputes">9 · Disputes</a>
+      </nav>
+      <div class="rule-ink my-5"></div>
+      <a href="privacy.html" class="text-sm text-gold-deep underline quiet">Read the Privacy Policy →</a>
+    </div>
+  </aside>
+
+  <!-- document -->
+  <article class="lg:col-span-9 doc">
+
+    <p class="text-ink" style="font-size:16px"><strong>The short version:</strong> You tell Tures what trip you want and grant the permissions it needs. Our agent then makes real bookings in your name, using your payment methods, within the brief you gave. You're responsible for those commitments — unless we caused the error, in which case we make it right. Our liability is capped, disputes go to arbitration, and you can revoke anything at any time. The detail follows.</p>
+
+    <h2 id="about"><span class="lead-roman">I</span>The service</h2>
+    <p>Tures is an AI travel concierge that books and manages travel on your behalf. We charge a subscription fee for the concierge service; travel charges (flights, hotels, activities) pass through from suppliers at cost, with any commission we earn disclosed on your receipt. You must be 18+ and authorized to use the payment methods you connect.</p>
+
+    <h3>2 · Your account &amp; eligibility</h3>
+    <p>You're responsible for keeping your account secure. We offer passkeys and magic links precisely so there's no password to phish. Tell us promptly if you suspect unauthorized access.</p>
+
+    <h3>3 · Fees &amp; billing</h3>
+    <p>The concierge subscription is billed in advance on the cycle you choose. Applicable sales tax is added to the fee where your jurisdiction requires it. Travel charges are billed as incurred, in your name, through the payment method you connected.</p>
+
+    <h2 id="agent"><span class="lead-roman">IV</span>Agent execution authorization</h2>
+    <p>This is the clause that makes Tures different from a search engine. When you grant a permission, you are authorizing our software to act:</p>
+    <div class="clause">
+      <p class="doc-quote" style="margin-bottom:0">By granting Tures any integration permission, you authorize Tures and its automated agents to take actions on your behalf within the scope of that permission. Specifically: (a) to read messages, calendar events, and account data from connected services; (b) to initiate, modify, and cancel reservations with the payment instruments you have connected; (c) to communicate with travel vendors on your behalf, including providing your contact information, loyalty numbers, and special-request preferences. Tures will only take actions that are reasonably necessary to fulfill the trip brief you have provided or to recover from disruptions you have authorized us to handle. You may revoke any permission at any time through the Account Activity page; revocation is effective immediately for new actions, but bookings already confirmed remain your contractual responsibility with the underlying vendor. You will not be charged for any booking we initiate outside the scope of the brief you provided, except where the booking is a good-faith recovery action under your standing rebooking instructions.</p>
+    </div>
+    <p><strong>Standing instructions.</strong> You may pre-authorize the agent to rebook under defined conditions — for example, "if a flight is cancelled, put me on the cleanest same-class alternative without asking first." You set these, and you can withdraw them at any time.</p>
+
+    <h2 id="inbox"><span class="lead-roman">V</span>Inbox access disclosure</h2>
+    <div class="clause">
+      <p class="text-ink" style="margin-bottom:0; font-weight:500"><strong>If you connect your inbox, Tures may read messages from airlines, hotels, and other travel-related senders. We will not read messages outside this scope without your express consent.</strong> You can revoke inbox access at any time, and we purge cached inbox content within 30 days of revocation or trip completion. This also appears at the moment you grant access — see the <a href="privacy.html#inbox">Privacy Policy §II</a> for the full treatment.</p>
+    </div>
+
+    <h2 id="refunds"><span class="lead-roman">VI</span>Refund policy</h2>
+    <p>Three categories, no ambiguity about which applies:</p>
+    <ul>
+      <li><strong>Tures-caused</strong> — we booked the wrong thing: full refund within 24 hours, no action needed from you, plus rebooking of your intended itinerary at our expense where available (see §VII).</li>
+      <li><strong>Vendor-caused</strong> — the airline cancels, the hotel oversells: we rebook first, then pursue the vendor's refund as your advocate and credit you when it clears. You get a status page to watch.</li>
+      <li><strong>Customer-caused</strong> — change of mind or emergency: governed by the underlying vendor's policy, which we surface to you at booking time. We don't absorb vendor change fees by default, but may waive our concierge fee as a goodwill gesture.</li>
+    </ul>
+
+    <h2 id="liability"><span class="lead-roman">VII</span>Limitation of liability</h2>
+    <p>Automated agents make travel arrangements for you, and despite our best efforts, errors will occasionally occur. This clause sets out what happens and caps our exposure:</p>
+    <div class="clause">
+      <p class="doc-quote" style="margin-bottom:0">Tures uses automated agents to make travel arrangements on your behalf. Despite our best efforts, errors will occur. If Tures causes a material booking error — wrong date, wrong destination, wrong traveler, wrong room category — we will refund the affected booking in full and rebook you at the originally agreed itinerary at our expense, subject to availability. If the originally agreed itinerary is no longer available, we will offer the closest reasonable equivalent and credit the difference. Tures' total liability for any single error or for any series of related errors arising from a single trip is capped at the lesser of (i) total fees you have paid Tures in the prior 12 months or (ii) ten thousand US dollars (USD 10,000), regardless of legal theory. This cap does not apply to liability that cannot be limited by law (gross negligence, willful misconduct, bodily injury). The cap reflects the agreed allocation of risk between you and Tures.</p>
+    </div>
+    <p>Specifically excluded from our liability: vendor-caused losses (an airline cancellation is between you and the airline — we'll help), force majeure (§VIII), and customer-caused losses.</p>
+
+    <h2 id="forcemajeure"><span class="lead-roman">VIII</span>Force majeure</h2>
+    <p>Pandemics, strikes, weather, war, and government action are beyond anyone's control. When they strike, the Hiccup Handler will work to recover your trip — often before the airline emails you — but <strong>Tures is your concierge, not your insurer.</strong> We are not liable for losses caused by events outside our reasonable control. For trip-cancellation or medical coverage, we recommend dedicated travel insurance.</p>
+
+    <h2 id="disputes"><span class="lead-roman">IX</span>Dispute resolution</h2>
+    <p>Most issues are resolved by talking to us. If we can't, you and Tures agree to <strong>binding arbitration under JAMS rules</strong>, with a carve-out preserving your right to bring a qualifying claim in small-claims court. Arbitration takes place in your state of residence. Nothing here waives any right that cannot be waived by law.</p>
+
+    <h3>10 · Changes to these terms</h3>
+    <p>We'll post material changes here and notify you before they take effect. Continuing to use Tures after a change means you accept the updated terms.</p>
+
+    <div class="clause" style="background:rgba(43,33,20,.05); border-color:var(--canvas-line)">
+      <p class="text-ink-soft" style="margin-bottom:0; font-size:13px"><em>This is a plain-language preview of terms that a travel-, AI-, and consumer-specialty attorney reviews before deployment. The agent-authorization, inbox, and liability clauses above are the ones template legal kits don't capture — they get a specialist's final blessing before launch. This document is not, by itself, legal advice.</em></p>
+    </div>
+
+    <div class="rule-gold my-10"></div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <a href="privacy.html" class="text-gold-deep font-medium text-sm underline quiet">Read the Privacy Policy →</a>
+      <a href="index.html" class="text-ink-faint text-sm quiet">← All legal documents</a>
+    </div>
+  </article>
+ </div>
+</main>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="../index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Terms of Service · v1.0 · June 2026</div>
+  <div class="mt-3 flex items-center justify-center gap-4 text-xs text-canvas/40">
+    <a href="privacy.html" class="quiet hover:text-gold-bright">Privacy</a>
+    <a href="../faq.html" class="quiet hover:text-gold-bright">FAQ</a>
+    <a href="../account.html" class="quiet hover:text-gold-bright">Account</a>
+  </div>
+</footer>
+
+<script>
+  var rule=document.getElementById('rule');
+  window.addEventListener('scroll', function(){
+    var h=document.documentElement; var max=h.scrollHeight-h.clientHeight;
+    rule.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  }, {passive:true});
+  var links=[].slice.call(document.querySelectorAll('.toc-link'));
+  var secs=links.map(function(l){ return document.querySelector(l.getAttribute('href')); });
+  if('IntersectionObserver' in window){
+    var spy=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ var id='#'+e.target.id;
+        links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href')===id); }); } });
+    }, {rootMargin:'-40% 0px -55% 0px'});
+    secs.forEach(function(s){ if(s) spy.observe(s); });
+  }
+</script>
+<script src="../assets/ui.js"></script>
+<script src="../assets/pageturn.js"></script>
+<script src="../assets/menu.js"></script>
+</body>
+</html>
