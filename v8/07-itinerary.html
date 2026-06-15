@@ -117,7 +117,17 @@ function mapThumb(seed){
     '</svg>';
 }
 
-var IMG = function(id){ return 'https://images.unsplash.com/photo-'+id+'?w=160&q=80&auto=format&fit=crop'; };
+/* self-hosted, optimized webp thumbnails (see assets/img/) keyed by original Unsplash id */
+var TMAP = {
+  '1502602898657-3e91760cbb34':'paris',
+  '1431274172761-fca41d930114':'stay-paris',
+  '1483347756197-71ef80e95f73':'aurora',
+  '1538970272646-f61fabb3a8a2':'lapland-cabin',
+  '1513622470522-26c3c8a854bc':'fly-cph',
+  '1552410260-0fd9b577afa6':'stay-cph',
+  '1502175353174-a7a70e73b362':'fly-sea',
+};
+var IMG = function(id){ return 'assets/img/'+TMAP[id]+'-320.webp'; };
 var STOPS = [
   {kind:'fly', photo:IMG('1502602898657-3e91760cbb34'), place:'Paris', status:['pill-confirm','Verified'], title:'AA 142 · SEA → CDG', dates:'Dec 3 → 4 · non-stop',
    detail:'Business · seat 5A · non-stop · <span class="font-mono">PNR LXJ7Q3</span><br>AAdvantage credited · 25,200 EQM.'},

@@ -168,7 +168,16 @@ const DIMS = [
 ];
 
 /* ---------- the 6 swipe cards (one per dimension) ---------- */
-const TIMG = function(id){ return 'https://images.unsplash.com/photo-'+id+'?w=720&q=80&auto=format&fit=crop'; };
+/* self-hosted, optimized webp (see assets/img/) keyed by the original Unsplash id */
+const TTASTE = {
+  '1566073771259-6a8506099945':'taste-register',
+  '1507525428034-b723cf961d3e':'tulum',
+  '1618221195710-dd6b41faaea6':'taste-aesthetic',
+  '1517248135467-4c7edcad34c4':'taste-palate',
+  '1529417305485-480f579e7578':'taste-energy',
+  '1469854523086-cc02fe5d8800':'taste-planning',
+};
+const TIMG = function(id){ return 'assets/img/'+TTASTE[id]+'-960.webp'; };
 const CARDS = [
   { dim:'register', prompt:'Where you sleep.',
     photo:TIMG('1566073771259-6a8506099945'),
