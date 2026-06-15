@@ -464,6 +464,46 @@ a.quiet{ text-decoration:none; }
 @media (max-width:640px){ .tures-theme-toggle{ top:11px; right:60px; width:32px; height:32px; } }
 
 /* ============================================================
+   ✦ TOP CHROME — logo + Contents dropdown (left) · Sign Up (right) (assets/menu.js)
+   ============================================================ */
+.tures-chrome-logo{ position:fixed; top:13px; left:16px; z-index:80; }
+.tures-logo{ appearance:none; cursor:pointer; display:inline-flex; align-items:center; gap:0;
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:21px; line-height:1; letter-spacing:.02em;
+  color:var(--gold-bright); background:rgba(20,15,10,0.58); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); padding:7px 13px; border-radius:99px; box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:border-color .2s ease, background .2s ease, transform .14s ease; }
+.tures-logo:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.72); }
+.tures-logo:active{ transform:scale(.97); }
+.tures-logo .spark{ font-size:0.6em; vertical-align:super; margin:0 0.02em; }
+.tures-logo .car{ font-size:10px; opacity:.65; margin-left:5px; }
+.tures-menu{ position:absolute; top:calc(100% + 8px); left:0; min-width:252px; z-index:81;
+  background:linear-gradient(160deg, rgba(36,25,16,0.97), rgba(15,11,7,0.98)); backdrop-filter:blur(12px);
+  border:1px solid rgba(200,162,74,0.3); border-radius:14px; box-shadow:0 26px 64px -20px rgba(0,0,0,0.85);
+  padding:8px; opacity:0; transform:translateY(-6px) scale(.98); pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease; }
+.tures-menu.open{ opacity:1; transform:none; pointer-events:auto; }
+.tures-menu a, .tures-menu .theme-item{ display:flex; align-items:center; justify-content:space-between; gap:14px;
+  width:100%; text-decoration:none; text-align:left; appearance:none; cursor:pointer; background:transparent; border:0;
+  padding:9px 12px; border-radius:9px; color:var(--canvas-warm); font-family:'Inter',sans-serif; font-size:13.5px;
+  transition:background .15s ease, padding-left .15s ease; }
+.tures-menu a:hover, .tures-menu .theme-item:hover{ background:rgba(200,162,74,0.12); padding-left:15px; }
+.tures-menu a.here{ color:var(--gold-bright); }
+.tures-menu .pg{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; color:var(--gold); opacity:.7; margin-right:7px; }
+.tures-menu .sep{ height:1px; background:rgba(200,162,74,0.16); margin:6px 6px; }
+.tures-menu .theme-item .sw{ font-size:14px; color:var(--gold-bright); }
+.tures-signup{ position:fixed; top:14px; right:16px; z-index:80; text-decoration:none;
+  font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
+  color:var(--gold-bright); background:rgba(20,15,10,0.58); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); padding:8px 16px; border-radius:99px; box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:border-color .2s ease, background .2s ease, transform .14s ease; }
+.tures-signup:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.72); transform:translateY(-1px); }
+@media(max-width:640px){
+  .tures-chrome-logo{ top:10px; left:11px; } .tures-logo{ font-size:18px; padding:6px 11px; }
+  .tures-signup{ top:11px; right:11px; font-size:12px; padding:7px 13px; }
+  .tures-menu{ min-width:236px; }
+}
+
+/* ============================================================
    ✦ MENU — legacy overlay styles (unused; kept for safety)
    ============================================================ */
 .menu-star{ appearance:none; cursor:pointer; color:var(--gold-bright);

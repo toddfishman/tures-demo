@@ -44,7 +44,7 @@
 
   /* ===== the open journal ===== */
   .stage{ position:fixed; inset:0; z-index:5; display:grid; justify-items:center; align-content:start;
-    padding:clamp(54px,11vh,120px) 20px 40px; overflow-y:auto; }
+    padding:clamp(54px,11vh,120px) 20px 104px; overflow-y:auto; }
   /* the leather cover the page is bound into — so the cover never "disappears" */
   .book-open{ position:relative; width:min(94vw,600px); border-radius:5px 13px 13px 5px;
     padding:15px 15px 16px 30px;   /* extra left = the spine fold */
@@ -95,6 +95,12 @@
   .paths.in{ opacity:1; transform:none; }
   .skip{ position:fixed; bottom:18px; left:0; right:0; z-index:6; text-align:center;
     font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(236,227,208,0.5); pointer-events:none; }
+  /* persistent forward CTA — always on screen while Tures writes */
+  .write-cta{ position:fixed; left:0; right:0; bottom:0; z-index:7; display:flex; align-items:center; justify-content:center; gap:20px;
+    padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(11,9,7,0) 0%, rgba(11,9,7,0.5) 40%, rgba(11,9,7,0.9) 100%); }
+  .write-cta-link{ color:var(--gold-bright); font-size:13px; text-decoration:none; opacity:.85; }
+  .write-cta-link:hover{ opacity:1; text-decoration:underline; }
   /* the ✦ home star (menu.js) sits upper-LEFT here; Sign in sits upper-right */
   .tures-home-star{ left:18px; right:auto; }
   .signin-link{ position:fixed; top:14px; right:18px; z-index:70; text-decoration:none;
@@ -119,8 +125,6 @@
   </div>
   <div class="veil"></div>
 
-  <a class="signin-link" href="auth/login.html">Sign in</a>
-
   <div class="stage">
    <div class="book-open leather-surface grain">
     <div class="journal" id="journal">
@@ -136,15 +140,15 @@
 
       <div class="status" id="status"><span class="nib">✒</span><span id="statusText">Tures is writing your edition…</span></div>
 
-      <div class="paths" id="paths">
-        <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-sm quiet font-semibold">Plan a trip →</a>
-        <a href="01-landing.html?demo=1" class="btn-ink px-6 py-3 rounded-sm quiet">What is Tures? →</a>
-      </div>
     </div>
    </div>
   </div>
 
-  <div class="skip" id="skipHint">Tap to skip</div>
+  <!-- a persistent way forward — visible from the first word, so the reader is never stuck -->
+  <div class="write-cta">
+    <a href="03-paste-trip.html" class="btn-gold px-7 py-3 rounded-full quiet font-semibold">Plan a trip →</a>
+    <a href="01-landing.html?demo=1" class="write-cta-link quiet">What is Tures?</a>
+  </div>
 
 <script>
   var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -183,11 +187,7 @@
     caret.classList.remove('blink'); caret.style.display='none';
     document.getElementById('statusText').textContent = 'Your edition';
     document.querySelector('#status .nib').textContent = '✦';
-    var paths = document.getElementById('paths'); paths.classList.add('in');
     var sk=document.getElementById('skipHint'); if(sk) sk.style.display='none';
-    // make sure both buttons are in view even on a short screen (manual scroll also works)
-    var stage = document.querySelector('.stage');
-    if(stage){ try{ stage.scrollTo({ top: stage.scrollHeight, behavior:'smooth' }); }catch(e){ stage.scrollTop = stage.scrollHeight; } }
   }
 
   function jitter(ch){

@@ -1,59 +1,99 @@
-/* Tures — universal ✦ home button + dark/light toggle.
+/* Tures — universal top chrome: a logo (upper-left) that opens a "Contents" dropdown
+ * listing every page as a page (Cover = the landing, Page 1 = Your edition, …), and a
+ * Sign Up button (upper-right). The dark/light toggle lives inside the dropdown.
+ * Included on every page. Self-contained — use ../assets/menu.js from a subfolder.
  *
- * A gold star (returns to the cover) and a small theme toggle, fixed upper-right on every
- * page EXCEPT the dark "book" pages (the cover index.html and write.html), which are dark
- * by design. The theme choice persists in localStorage ('tures.theme').
- * Self-contained: include this script on any page (use ../assets/menu.js from a subfolder).
+ * The "every URL is a page" model:
+ *   Cover (the landing) = index.html
+ *   Page 1 · Your edition = write.html
+ *   Page 2 · What is Tures = 01-landing.html  … and so on.
  */
 (function () {
-  var here = location.pathname.split('/').pop().split('?')[0].split('#')[0];
-  var isCover = (here === '' || here === 'index.html');       // the cover IS home — no home button
-  var noTheme = isCover || here === 'write.html';             // the dark "book" pages aren't themed/toggled
+  var path = location.pathname;
+  var here = path.split('/').pop().split('?')[0].split('#')[0];
+  if (here === '') here = 'index.html';
+  var inSub = /\/(auth|legal)\//.test(path);
+  var base = inSub ? '../' : '';
+
+  var isCover = (here === 'index.html');
+  var isWrite = (here === 'write.html');
+  var noTheme = isCover || isWrite;            // the dark "book" pages aren't themed
 
   // Apply the saved theme as early as possible (this script runs near </body>).
   try { if (!noTheme && localStorage.getItem('tures.theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
 
-  if (window.__turesHome) return;
-  window.__turesHome = true;
+  if (window.__turesChrome) return;
+  window.__turesChrome = true;
 
-  function makeToggle() {
-    var b = document.createElement('button');
-    b.className = 'tures-theme-toggle';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Toggle dark mode');
-    b.setAttribute('title', 'Dark / light');
-    b.textContent = document.documentElement.classList.contains('dark') ? '☀' : '☾';
-    b.addEventListener('click', function () {
-      var on = document.documentElement.classList.toggle('dark');
-      try { localStorage.setItem('tures.theme', on ? 'dark' : 'light'); } catch (e) {}
-      b.textContent = on ? '☀' : '☾';
+  // The contents / page list.
+  var PAGES = [
+    { p: 'Cover',  t: 'The landing',       f: 'index.html' },
+    { p: 'Page 1', t: 'Your edition',      f: 'write.html' },
+    { p: 'Page 2', t: 'What is Tures',     f: '01-landing.html' },
+    { p: 'Page 3', t: 'The Taste Engine',  f: '02-taste-engine.html' },
+    { p: 'Page 4', t: 'Plan a trip',       f: '03-paste-trip.html' },
+    { p: 'Page 5', t: 'Connections',       f: '04-connections.html' },
+    { p: 'Page 6', t: 'Live execution',    f: '05-execution.html' },
+    { p: 'Page 7', t: 'The Hiccup Handler', f: '06-hiccup-handler.html' },
+    { p: 'Page 8', t: 'The itinerary',     f: '07-itinerary.html' },
+    { p: 'Page 9', t: 'The concierge',     f: '08-concierge.html' },
+    { sep: true },
+    { p: '',       t: 'Pricing',           f: 'pricing.html' }
+  ];
+
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+  function buildMenu() {
+    var menu = el('div', 'tures-menu'); menu.setAttribute('role', 'menu');
+    PAGES.forEach(function (it) {
+      if (it.sep) { menu.appendChild(el('div', 'sep')); return; }
+      var a = el('a', null, '<span>' + (it.p ? '<span class="pg">' + it.p + '</span> ' : '') + it.t + '</span>');
+      a.href = base + it.f;
+      if (it.f === here) a.className = 'here';
+      menu.appendChild(a);
     });
-    return b;
+    if (!noTheme) {
+      menu.appendChild(el('div', 'sep'));
+      var dark = document.documentElement.classList.contains('dark');
+      var tg = el('button', 'theme-item', '<span>Dark mode</span><span class="sw">' + (dark ? '☀' : '☾') + '</span>');
+      tg.type = 'button';
+      tg.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var on = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('tures.theme', on ? 'dark' : 'light'); } catch (er) {}
+        tg.querySelector('.sw').textContent = on ? '☀' : '☾';
+      });
+      menu.appendChild(tg);
+    }
+    return menu;
   }
 
   function init() {
-    if (isCover) return;                                  // cover: no home button, no toggle
-
-    if (!noTheme) document.body.appendChild(makeToggle()); // write.html keeps its logo but no toggle
-
-    var inSub = /\/(auth|legal)\//.test(location.pathname);
-    var home = inSub ? '../index.html' : 'index.html';
-    var a = document.createElement('a');
-    a.href = home;
-    a.className = 'tures-home-star';
-    a.setAttribute('aria-label', 'Home');
-    a.setAttribute('title', 'Home');
-    a.innerHTML = 't<span class="spark">✦</span>';
-    document.body.appendChild(a);
-
-    // Retire any inline nav links for the clean look (the wordmark, if present, stays).
+    // hide any per-page nav so the chrome is the single, consistent header
     var nav = document.querySelector('header nav');
-    if (nav) {
-      var wm = nav.querySelector('.wordmark');
-      Array.prototype.slice.call(nav.children).forEach(function (c) {
-        if (!wm || !c.contains(wm)) c.style.display = 'none';
-      });
-    }
+    if (nav) Array.prototype.slice.call(nav.children).forEach(function (c) { c.style.display = 'none'; });
+
+    // logo + dropdown, upper-left
+    var wrap = el('div', 'tures-chrome-logo');
+    var logo = el('button', 'tures-logo', 't<span class="spark">✦</span>ures<span class="car">▾</span>');
+    logo.type = 'button';
+    logo.setAttribute('aria-label', 'Contents');
+    logo.setAttribute('aria-haspopup', 'true');
+    var menu = buildMenu();
+    wrap.appendChild(logo); wrap.appendChild(menu);
+    document.body.appendChild(wrap);
+
+    function close() { menu.classList.remove('open'); }
+    logo.addEventListener('click', function (e) { e.stopPropagation(); menu.classList.toggle('open'); });
+    document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    // Sign Up (or Account when signed in), upper-right
+    var signed = false;
+    try { signed = !!(window.tures && window.tures.signedIn); } catch (e) {}
+    var act = el('a', 'tures-signup', signed ? 'Account' : 'Sign Up');
+    act.href = base + (signed ? 'account.html' : 'signup.html');
+    document.body.appendChild(act);
   }
 
   if (document.readyState !== 'loading') init();
