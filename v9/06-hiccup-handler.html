@@ -80,20 +80,13 @@
 <!-- HERO -->
 <section class="leather-surface grain relative overflow-hidden">
  <div class="ghost-num absolute -top-10 right-2 text-[26vw] sm:text-[16vw] z-0" data-parallax="0.14">VI</div>
- <div class="relative z-10 max-w-7xl mx-auto px-6 pt-14 pb-8 grid lg:grid-cols-12 gap-8 items-center">
-  <div class="lg:col-span-8">
-    <div class="caps text-[11px] text-gold/80 mb-3 flex items-center gap-2"><span class="dot dot-alert beat" style="color:var(--alert)"></span>The Hiccup Handler · Always watching <span class="pill pill-d-gold normal-case tracking-normal">Sample trip</span></div>
+ <div class="relative z-10 max-w-4xl mx-auto px-6 pt-14 pb-8">
+    <div class="caps text-[11px] text-gold/80 mb-3 flex items-center gap-2"><span class="dot dot-alert beat" style="color:var(--alert)"></span>The Hiccup Handler · Always watching</div>
     <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">The Hiccup Handler</h1>
     <p class="mt-4 max-w-xl text-canvas/75 leading-relaxed text-lg">Every booking is a live position in a moving world. We <span class="text-gold-bright">pre-stage the fix before the disruption reaches you.</span></p>
     <button data-sheet="sheet-watch" class="press mt-5 btn-ghost px-5 py-2.5 rounded-full text-sm inline-flex items-center gap-2">◎ What we watch</button>
-  </div>
-  <div class="lg:col-span-4 flex lg:justify-end">
-    <div class="radar"><div class="ring"></div><div class="ring r2"></div>
-      <div class="blip" style="top:30%;left:62%"></div><div class="blip" style="top:58%;left:40%"></div><div class="blip" style="top:44%;left:74%"></div>
-    </div>
-  </div>
  </div>
- <div class="relative z-10 max-w-7xl mx-auto px-6 pb-10 grid grid-cols-3 gap-4">
+ <div class="relative z-10 max-w-4xl mx-auto px-6 pb-10 grid grid-cols-3 gap-4">
    <div class="plate p-5"><div class="caps text-[10px] text-gold/60">Signals today</div><div class="font-mono text-2xl sm:text-3xl text-gold-bright mt-1" id="statScan" data-countup="14208" data-countup-dur="1500">0</div></div>
    <div class="plate p-5"><div class="caps text-[10px] text-gold/60">Pre-empted</div><div class="font-mono text-2xl sm:text-3xl text-gold-bright mt-1" data-countup="3" data-countup-dur="1100">0</div></div>
    <div class="plate p-5"><div class="caps text-[10px] text-gold/60">Lead vs provider</div><div class="font-mono text-2xl sm:text-3xl text-gold-bright mt-1" data-countup="27" data-suffix="h" data-countup-dur="1300">0h</div></div>
@@ -101,116 +94,99 @@
 </section>
 
 <section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 grid lg:grid-cols-12 gap-7">
+ <div class="relative z-10 max-w-4xl mx-auto px-6 py-10 space-y-6">
 
-  <!-- LEFT — live signal stream -->
-  <div class="lg:col-span-5">
-    <div class="leaf overflow-hidden">
-      <header class="leaf-tab px-5 py-3.5 flex items-center justify-between">
-        <div class="flex items-center gap-2"><span class="dot dot-gold pulse"></span><span class="caps text-[11px] text-ink">Signal stream · live</span></div>
-        <span class="text-xs text-ink-faint font-mono">~6/sec</span>
-      </header>
-      <div id="feed" class="p-4 space-y-2 max-h-[480px] overflow-hidden"></div>
-      <div class="leaf-tab px-5 py-3 text-xs text-ink-faint flex justify-between">
-        <span>Only <span class="text-ink">0.3%</span> reach assessment</span>
-        <span class="font-mono" id="feedCount">0</span>
-      </div>
+  <!-- watched trip ribbon -->
+  <div class="leaf p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div class="caps text-[11px] text-ink-faint flex items-center gap-2"><span class="dot dot-green beat" style="color:var(--confirm)"></span>Watching · trip #T-2087</div>
+      <span class="pill pill-gold" id="ribbonStatus">All clear</span>
+    </div>
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <span class="leg">SEA→CDG</span><span class="leg">Real Christine</span><span class="leg">CDG→IVL</span>
+      <span class="leg">Javri Lodge</span><span class="leg">IVL→CPH</span><span class="leg">Hotel Sanders</span>
+      <span class="leg" id="legReturn">CPH→CDG→SEA</span>
     </div>
   </div>
 
-  <!-- RIGHT — the active hiccup -->
-  <div class="lg:col-span-7 space-y-6">
-
-    <!-- watched trip ribbon -->
-    <div class="leaf p-5">
-      <div class="flex items-center justify-between mb-3">
-        <div class="caps text-[11px] text-ink-faint flex items-center gap-2"><span class="dot dot-green beat" style="color:var(--confirm)"></span>Watching · trip #T-2087</div>
-        <span class="pill pill-gold" id="ribbonStatus">All clear</span>
-      </div>
-      <div class="flex gap-2 overflow-x-auto pb-1">
-        <span class="leg">SEA→CDG</span><span class="leg">Real Christine</span><span class="leg">CDG→IVL</span>
-        <span class="leg">Javri Lodge</span><span class="leg">IVL→CPH</span><span class="leg">Hotel Sanders</span>
-        <span class="leg" id="legReturn">CPH→CDG→SEA</span>
-      </div>
-    </div>
-
-    <!-- featured scenario -->
-    <div class="leaf overflow-hidden">
-      <header class="leaf-tab px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
+  <!-- the active hiccup, the whole story in one card -->
+  <div class="leaf overflow-hidden">
+    <header class="leaf-tab px-5 py-4">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
         <div>
           <div class="caps text-[11px] text-ink-faint">Active watch</div>
           <h3 class="font-display text-2xl text-ink leading-tight">French ATC strike — risk to your CDG connection</h3>
         </div>
         <span class="pill" id="scPill">—</span>
-      </header>
-
-      <div class="p-5 grid sm:grid-cols-12 gap-6">
-        <!-- tap-to-expand stepper -->
-        <div class="sm:col-span-7">
-          <div class="caps text-[10px] text-ink-faint mb-4">Tap a step for the reasoning</div>
-          <div class="timeline" id="timeline">
-            <div class="tstep exp" data-step="0"><div class="tnode"></div>
-              <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
-                <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Detected</span><span class="font-mono text-[11px] text-ink-faint">t-31h</span></div>
-                  <div class="text-ink font-medium mt-0.5">Union chatter surfaces on X</div></div>
-                <span class="exp-chev text-gold-deep">›</span></div>
-              <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">A French controllers' union signals action around Dec 12–13. One post, low reach — logged for watch.</p></div>
-            </div>
-            <div class="tstep exp" data-step="1"><div class="tnode"></div>
-              <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
-                <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Assessed</span><span class="font-mono text-[11px] text-ink-faint">t-26h</span></div>
-                  <div class="text-ink font-medium mt-0.5">Pattern matches prior actions</div></div>
-                <span class="exp-chev text-gold-deep">›</span></div>
-              <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">Cross-referenced two aviation reporters and an early NOTAM precursor. Matches the Mar &amp; Jun strikes. Probability rising.</p></div>
-            </div>
-            <div class="tstep exp" data-step="2"><div class="tnode"></div>
-              <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
-                <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Pre-staged</span><span class="font-mono text-[11px] text-ink-faint">t-18h</span></div>
-                  <div class="text-ink font-medium mt-0.5">Contingency drafted &amp; held</div></div>
-                <span class="exp-chev text-gold-deep">›</span></div>
-              <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">DGAC orders 25% flight reductions at CDG. Tures drafts and <strong>holds</strong> a route that avoids CDG entirely — not booked, not charged, ready in one tap.</p></div>
-            </div>
-            <div class="tstep exp" data-step="3"><div class="tnode"></div>
-              <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
-                <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Handled</span><span class="font-mono text-[11px] text-ink-faint">t-3h</span></div>
-                  <div class="text-ink font-medium mt-0.5">Rebooked before AF emailed</div></div>
-                <span class="exp-chev text-gold-deep">›</span></div>
-              <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">AF 1351 (CPH→CDG) cancelled. Held contingency executed instantly. Confirmed before AF's own cancellation email arrived.</p></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- side: probability + held fix -->
-        <div class="sm:col-span-5 space-y-4">
-          <div>
-            <div class="flex justify-between text-[11px] caps text-ink-faint mb-1.5"><span>Disruption probability</span><span class="font-mono text-ink" id="probLabel">0.18</span></div>
-            <div class="prob-track"><div class="prob-fill" id="probFill" style="width:18%"></div></div>
-          </div>
-          <div class="rounded-lg p-4" style="background:rgba(200,162,74,0.08); border:1px solid rgba(200,162,74,0.25)">
-            <div class="caps text-[10px] text-ink-faint mb-1">Held contingency</div>
-            <div class="font-display text-lg text-ink leading-tight">CPH → AMS → SEA · KLM/DL</div>
-            <div class="text-xs text-ink-soft mt-1">Same day · avoids CDG · seats held · $0 until triggered</div>
-          </div>
-          <div class="rounded-lg p-4" style="background:rgba(95,125,79,0.1); border:1px solid rgba(95,125,79,0.3)" id="outcomeBox">
-            <div class="caps text-[10px] text-ink-faint mb-1">Lead time over the airline</div>
-            <div class="font-mono text-3xl text-ink" id="leadTime">—</div>
-            <div class="text-xs text-ink-soft mt-1" id="outcomeNote">Watching…</div>
-          </div>
-        </div>
       </div>
+      <div class="flex justify-between text-[11px] caps text-ink-faint mb-1.5"><span>Disruption probability</span><span class="font-mono text-ink" id="probLabel">0.18</span></div>
+      <div class="prob-track"><div class="prob-fill" id="probFill" style="width:18%"></div></div>
+    </header>
 
-      <div class="leaf-tab px-5 py-3 flex items-center justify-end flex-wrap gap-3">
-        <button onclick="runScenario()" class="btn-gold px-4 py-2 rounded-sm text-xs press" id="replayBtn">▸ Replay the watch</button>
-        <a href="07-itinerary.html" class="btn-ink px-4 py-2 rounded-sm text-xs quiet">See updated itinerary →</a>
+    <div class="p-5">
+      <div class="caps text-[10px] text-ink-faint mb-4">Tap a step for the reasoning</div>
+      <div class="timeline" id="timeline">
+        <div class="tstep exp" data-step="0"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Detected</span><span class="font-mono text-[11px] text-ink-faint">t-31h</span></div>
+              <div class="text-ink font-medium mt-0.5">Union chatter surfaces on X</div></div>
+            <span class="exp-chev text-gold-deep">›</span></div>
+          <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">A French controllers' union signals action around Dec 12–13. One post, low reach — logged for watch.</p></div>
+        </div>
+        <div class="tstep exp" data-step="1"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Assessed</span><span class="font-mono text-[11px] text-ink-faint">t-26h</span></div>
+              <div class="text-ink font-medium mt-0.5">Pattern matches prior actions</div></div>
+            <span class="exp-chev text-gold-deep">›</span></div>
+          <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">Cross-referenced two aviation reporters and an early NOTAM precursor. Matches the Mar &amp; Jun strikes. Probability rising.</p></div>
+        </div>
+        <div class="tstep exp" data-step="2"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Pre-staged</span><span class="font-mono text-[11px] text-ink-faint">t-18h</span></div>
+              <div class="text-ink font-medium mt-0.5">Contingency drafted &amp; held</div></div>
+            <span class="exp-chev text-gold-deep">›</span></div>
+          <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">DGAC orders 25% flight reductions at CDG. Tures drafts and <strong>holds</strong> a route that avoids CDG entirely — not booked, not charged, ready in one tap.</p>
+            <div class="rounded-lg p-4 mb-1" style="background:rgba(200,162,74,0.08); border:1px solid rgba(200,162,74,0.25)">
+              <div class="caps text-[10px] text-ink-faint mb-1">Held contingency</div>
+              <div class="font-display text-lg text-ink leading-tight">CPH → AMS → SEA · KLM/DL</div>
+              <div class="text-xs text-ink-soft mt-1">Same day · avoids CDG · seats held · $0 until triggered</div>
+            </div></div>
+        </div>
+        <div class="tstep exp" data-step="3"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="caps text-[10px] text-ink-faint">Handled</span><span class="font-mono text-[11px] text-ink-faint">t-3h</span></div>
+              <div class="text-ink font-medium mt-0.5">Rebooked before AF emailed</div></div>
+            <span class="exp-chev text-gold-deep">›</span></div>
+          <div class="exp-body"><p class="text-sm text-ink-soft leading-relaxed pb-3">AF 1351 (CPH→CDG) cancelled. Held contingency executed instantly. Confirmed before AF's own cancellation email arrived.</p>
+            <div class="rounded-lg p-4" style="background:rgba(95,125,79,0.1); border:1px solid rgba(95,125,79,0.3)" id="outcomeBox">
+              <div class="caps text-[10px] text-ink-faint mb-1">Lead time over the airline</div>
+              <div class="font-mono text-2xl text-ink" id="leadTime">—</div>
+              <div class="text-xs text-ink-soft mt-1" id="outcomeNote">Watching…</div>
+            </div></div>
+        </div>
       </div>
     </div>
 
-    <!-- THE LINE — given air -->
-    <div class="text-center py-8">
-      <div class="foil-line w-16 mx-auto mb-5"></div>
-      <p class="font-display italic text-2xl sm:text-3xl text-ink leading-snug max-w-lg mx-auto">"Andy was notified once —<br>after it was already fixed."</p>
-      <div class="foil-line w-16 mx-auto mt-5"></div>
+    <div class="leaf-tab px-5 py-3 flex items-center justify-end flex-wrap gap-3">
+      <button onclick="runScenario()" class="btn-gold px-4 py-2 rounded-sm text-xs press" id="replayBtn">▸ Replay the watch</button>
+      <a href="07-itinerary.html" class="btn-ink px-4 py-2 rounded-sm text-xs quiet">See updated itinerary →</a>
     </div>
+  </div>
+
+  <!-- live signal stream — slim, secondary -->
+  <div class="leaf overflow-hidden">
+    <header class="leaf-tab px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2"><span class="dot dot-gold pulse"></span><span class="caps text-[11px] text-ink">What Tures is scanning</span></div>
+      <span class="text-xs text-ink-faint font-mono"><span id="feedCount">0</span> seen · 0.3% assessed</span>
+    </header>
+    <div id="feed" class="p-4 space-y-2 max-h-[220px] overflow-hidden"></div>
+  </div>
+
+  <!-- THE LINE -->
+  <div class="text-center py-6">
+    <div class="foil-line w-16 mx-auto mb-5"></div>
+    <p class="font-display italic text-2xl sm:text-3xl text-ink leading-snug max-w-lg mx-auto">"Andy was notified once —<br>after it was already fixed."</p>
+    <div class="foil-line w-16 mx-auto mt-5"></div>
   </div>
  </div>
 </section>
@@ -275,20 +251,20 @@ function pushSignal(s){
     <span class="pill ${verdict==='noise'?'pill-gold':'pill-pending'} shrink-0">${verdictLabel[verdict]}</span>`;
   feed.prepend(el);
   requestAnimationFrame(()=> el.classList.add('in'));
-  while(feed.children.length > 8) feed.lastChild.remove();
+  while(feed.children.length > 5) feed.lastChild.remove();
   feedN++; document.getElementById('feedCount').textContent = feedN;
 }
 /* skeleton first, then live feed */
 (function bootFeed(){
   for(let i=0;i<5;i++){ const s=document.createElement('div'); s.className='flex gap-3 pl-3 py-2'; s.innerHTML='<span class="skel h-4 w-4 rounded-full"></span><div class="flex-1 space-y-1.5"><div class="skel h-3 w-full"></div><div class="skel h-2.5 w-1/3"></div></div>'; feed.appendChild(s); }
-  setTimeout(()=>{ feed.innerHTML=''; let ai=0; [0,2,4].forEach((i,k)=> setTimeout(()=>pushSignal(SOURCES[i]), k*200)); setInterval(()=>{ pushSignal(SOURCES[ai % SOURCES.length]); ai++; }, 1700); }, 900);
+  setTimeout(()=>{ feed.innerHTML=''; let ai=0; [0,2,4].forEach((i,k)=> setTimeout(()=>pushSignal(SOURCES[i]), k*260)); setInterval(()=>{ pushSignal(SOURCES[ai % SOURCES.length]); ai++; }, 2800); }, 900);
 })();
 /* keep the big number ticking up after the count-up settles */
 setTimeout(function(){
   setInterval(function(){
     var el=document.getElementById('statScan'); var v=parseInt(el.textContent.replace(/,/g,''))||14208;
     el.textContent=(v+Math.floor(20+Math.random()*60)).toLocaleString();
-  }, 1700);
+  }, 2800);
 }, 1700);
 
 /* ---------- scripted scenario ---------- */
