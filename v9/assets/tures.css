@@ -621,8 +621,13 @@ html[data-theme="parchment"]{
   --gold:#bb8d3a; --gold-bright:#cf9f49; --gold-deep:#6f561d;
 }
 html[data-theme="parchment"] body{ background:var(--canvas); }
-html[data-theme="parchment"] .text-canvas,
-html[data-theme="parchment"] [class~="text-canvas/85"]{ color:var(--ink); }
+/* Only the LIGHTENED surfaces carry dark ink text. Dark sections (.photo-hero, .bg-obsidian,
+   .bg-leather, .dest cards, footers) keep the light body default so light-on-dark stays readable. */
+html[data-theme="parchment"] .leather-surface,
+html[data-theme="parchment"] .canvas-surface{ color:var(--ink); }
+html[data-theme="parchment"] .leather-surface .text-canvas,
+html[data-theme="parchment"] .canvas-surface .text-canvas,
+html[data-theme="parchment"] .leather-surface [class~="text-canvas/85"]{ color:var(--ink); }
 html[data-theme="parchment"] .leather-surface{
   background:
     radial-gradient(120% 90% at 25% 12%, rgba(255,242,212,0.55), transparent 55%),
@@ -645,8 +650,11 @@ html[data-theme="oxblood"]{
   --gold:#4a0a05; --gold-bright:#7a3128; --gold-deep:#4a0a05;
 }
 html[data-theme="oxblood"] body{ background:var(--canvas); }
-html[data-theme="oxblood"] .text-canvas,
-html[data-theme="oxblood"] [class~="text-canvas/85"]{ color:#4a0a05; }
+html[data-theme="oxblood"] .leather-surface,
+html[data-theme="oxblood"] .canvas-surface{ color:#4a0a05; }
+html[data-theme="oxblood"] .leather-surface .text-canvas,
+html[data-theme="oxblood"] .canvas-surface .text-canvas,
+html[data-theme="oxblood"] .leather-surface [class~="text-canvas/85"]{ color:#4a0a05; }
 html[data-theme="oxblood"] .leather-surface{ background:linear-gradient(155deg,#fafaf9 0%,#f2f0e8 100%); }
 html[data-theme="oxblood"] .leather-surface::after{ opacity:0; }
 html[data-theme="oxblood"] .leaf{ border-radius:0; background:#fffefb; }
