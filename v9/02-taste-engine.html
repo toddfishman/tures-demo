@@ -26,44 +26,104 @@
 <link rel="stylesheet" href="assets/tures.css">
 <link rel="stylesheet" href="assets/tw.css">
 <style>
-  body{ background:var(--obsidian); }
-
-  /* ---- swipe deck ---- */
-  .deck{ position:relative; height:440px; max-width:360px; margin:0 auto; touch-action:pan-y; }
-  .card{
-    position:absolute; inset:0; border-radius:18px; overflow:hidden; cursor:grab;
-    border:1px solid rgba(200,162,74,0.25);
-    box-shadow:0 30px 60px -28px rgba(0,0,0,.85);
-    will-change:transform; user-select:none;
+  /* ============================================================
+     JETON — "Coral sunrise over white paper." This page only.
+     White canvas, warm coral hero, OUTLINED coral CTAs (never solid-filled),
+     Brandwood ink, three functional accents (mint / cobalt / magenta).
+     Self-contained; overrides the parchment theme on this page.
+     ============================================================ */
+  :root{
+    --j-coral-a:#f8a4a4; --j-coral-b:#f73b20; --j-brandwood:#360802;
+    --j-sunset:#fef5f3; --j-blush:#fbdfd9; --j-mint:#34c771; --j-cobalt:#477ee9; --j-magenta:#fb2d54;
+    --j-ink-soft:#7a5048; --j-ink-faint:#a98c85; --j-line:rgba(54,8,2,0.12);
   }
-  .card:active{ cursor:grabbing; }
-  .card .veil{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,10,0.12) 0%, rgba(8,8,10,0.86) 100%); }
-  .card .body{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:22px; }
-  /* swipe verdict stamps */
-  .stamp{ position:absolute; top:22px; z-index:3; font-family:'DM Serif Display',serif; font-size:20px;
-    letter-spacing:.04em; padding:6px 14px; border-radius:8px; border:2px solid; opacity:0; transform:rotate(-8deg);
-    transition:opacity .1s; text-transform:uppercase; }
-  .stamp.yes{ left:20px; color:#a7c293; border-color:#a7c293; }
-  .stamp.no{ right:20px; color:#e39179; border-color:#e39179; transform:rotate(8deg); }
+  html, body.jeton{ background:#ffffff !important; }
+  body.jeton{ color:var(--j-brandwood); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .j-display{ font-family:'Inter',sans-serif; font-weight:500; letter-spacing:0.012em; line-height:1.05; color:var(--j-brandwood); }
+  .j-eyebrow{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--j-coral-b); }
+  .j-sub{ color:var(--j-ink-soft); }
+  /* make tures-classed content the JS injects read in Jeton ink/accents */
+  body.jeton .text-ink{ color:var(--j-brandwood); } body.jeton .text-ink-soft{ color:var(--j-ink-soft); }
+  body.jeton .text-ink-faint{ color:var(--j-ink-faint); }
+  body.jeton .text-gold,body.jeton .text-gold-bright,body.jeton .text-gold-deep{ color:var(--j-coral-b); }
+  body.jeton .caps{ letter-spacing:.14em; text-transform:uppercase; }
 
-  /* pole hints on the card edges */
-  .pole{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; font-size:11px; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--gold-bright); opacity:.8; }
+  .j-hero{ position:relative; background:linear-gradient(180deg, #f8a4a4 0%, #fbdfd9 44%, #fef5f3 72%, #ffffff 100%); }
+
+  /* the signature outlined coral CTA — white fill, coral border, 16px radius, warm shadow on hover */
+  .j-btn{ display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--j-coral-b);
+    border:1.5px solid var(--j-coral-b); border-radius:16px; padding:13px 22px; font-weight:500; font-size:15px; cursor:pointer; text-decoration:none;
+    transition:transform .16s cubic-bezier(.34,1.4,.64,1), background .18s ease, box-shadow .2s ease; }
+  .j-btn:hover{ transform:translateY(-1px); background:var(--j-sunset); box-shadow:rgba(247,59,32,0.1) 0 8px 24px 0, rgba(247,59,32,0.05) 0 2px 8px 0; }
+  .j-btn-ghost{ background:transparent; color:var(--j-ink-soft); border-color:var(--j-line); }
+  .j-btn-ghost:hover{ border-color:var(--j-brandwood); color:var(--j-brandwood); background:transparent; box-shadow:none; }
+
+  .j-card{ background:#fff; border:1px solid var(--j-line); border-radius:16px; box-shadow:rgba(0,0,0,0.05) 0 -4px 16px 0, rgba(247,59,32,0.06) 0 14px 36px -18px; }
+  .j-surface{ background:var(--j-sunset); }
+
+  /* tracks → coral */
+  body.jeton .track,.j-track{ height:6px; border-radius:99px; background:var(--j-blush); overflow:hidden; }
+  body.jeton .track .fill,.j-track .fill{ height:100%; background:linear-gradient(90deg,var(--j-coral-a),var(--j-coral-b)); transition:width .5s ease; }
+
+  /* starting-vibe segmented (outlined; ui.js still wires segchange) */
+  body.jeton .seg{ display:inline-flex; gap:6px; padding:0; background:transparent; border:0; }
+  body.jeton .seg button{ position:relative; z-index:2; background:#fff; border:1.5px solid var(--j-line); color:var(--j-ink-soft);
+    border-radius:12px; padding:9px 18px; min-height:0; font-size:13px; font-weight:500; }
+  body.jeton .seg button.on{ border-color:var(--j-coral-b); color:var(--j-coral-b); background:var(--j-sunset); }
+  body.jeton .seg .thumb{ display:none; }
+
+  /* ---- swipe deck (photos kept; verdicts use the functional accents) ---- */
+  .deck{ position:relative; height:440px; max-width:360px; margin:0 auto; touch-action:pan-y; }
+  .card{ position:absolute; inset:0; border-radius:16px; overflow:hidden; cursor:grab;
+    border:1px solid rgba(54,8,2,0.10); box-shadow:rgba(247,59,32,0.12) 0 20px 48px -18px, rgba(0,0,0,0.20) 0 10px 30px -16px;
+    will-change:transform; user-select:none; }
+  .card:active{ cursor:grabbing; }
+  .card .veil{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(54,8,2,0.04) 0%, rgba(54,8,2,0.84) 100%); }
+  .card .body{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:22px; color:#fff; }
+  .stamp{ position:absolute; top:22px; z-index:3; font-family:'Inter',sans-serif; font-weight:600; font-size:15px;
+    letter-spacing:.06em; padding:6px 14px; border-radius:10px; border:2px solid; opacity:0; transform:rotate(-8deg);
+    transition:opacity .1s; text-transform:uppercase; background:#fff; }
+  .stamp.yes{ left:20px; color:#1f8f50; border-color:var(--j-mint); }
+  .stamp.no{ right:20px; color:var(--j-magenta); border-color:var(--j-magenta); transform:rotate(8deg); }
+  .pole{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; font-size:11px; letter-spacing:.10em;
+    text-transform:uppercase; color:#fff; opacity:.85; }
   .pole.l{ left:14px; } .pole.r{ right:14px; text-align:right; }
 
-  .dim-track{ height:6px; border-radius:99px; background:rgba(236,227,208,0.12); position:relative; }
-  .dim-mark{ position:absolute; top:50%; width:14px; height:14px; border-radius:99px;
-    background:linear-gradient(180deg,#e6c873,#c8a24a); border:1px solid #8a6a26;
-    transform:translate(-50%,-50%); left:50%; transition:left .6s cubic-bezier(.6,.02,.2,1);
-    box-shadow:0 2px 6px rgba(0,0,0,.5); }
-  .tag-chip{ opacity:0; transform:translateY(6px); transition:opacity .4s ease, transform .4s ease; }
-  .tag-chip.in{ opacity:1; transform:none; }
+  .j-swipe{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; font-size:22px; cursor:pointer; background:#fff;
+    transition:transform .16s cubic-bezier(.34,1.4,.64,1), background .18s ease; }
+  .j-swipe.no{ border:1.5px solid var(--j-magenta); color:var(--j-magenta); }
+  .j-swipe.no:hover{ background:#fff0f2; transform:scale(1.06); }
+  .j-swipe.yes{ border:1.5px solid var(--j-mint); color:#1f8f50; }
+  .j-swipe.yes:hover{ background:#f0fbf4; transform:scale(1.06); }
+  .j-swipe:active{ transform:scale(.95); }
+
+  .dim-track{ height:6px; border-radius:99px; background:var(--j-blush); position:relative; }
+  .dim-mark{ position:absolute; top:50%; width:14px; height:14px; border-radius:99px; background:var(--j-coral-b);
+    border:2px solid #fff; transform:translate(-50%,-50%); left:50%; transition:left .6s cubic-bezier(.6,.02,.2,1); box-shadow:0 1px 5px rgba(247,59,32,0.4); }
+
+  .j-chip{ font-size:12px; padding:5px 12px; border-radius:99px; border:1.5px solid var(--j-coral-b); color:var(--j-coral-b); background:#fff;
+    opacity:0; transform:translateY(6px); transition:opacity .4s ease, transform .4s ease; }
+  .j-chip.in{ opacity:1; transform:none; }
 
   .fp{ opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease; }
   .fp.in{ opacity:1; transform:none; }
+
+  /* chrome: fit the white page; the parchment Season switch is irrelevant here */
+  body.jeton .tures-theme-switch{ display:none !important; }
+  body.jeton .tures-logo, body.jeton .tures-signup, body.jeton .tures-pageno{
+    background:#fff !important; color:var(--j-coral-b) !important; border:1.5px solid var(--j-coral-b) !important;
+    box-shadow:rgba(247,59,32,0.1) 0 6px 18px -10px !important; }
+  body.jeton .tures-logo .spark, body.jeton .tures-logo .car{ color:var(--j-coral-b) !important; }
+  body.jeton .tures-menu{ background:#fff !important; border:1px solid var(--j-line) !important; box-shadow:rgba(247,59,32,0.12) 0 26px 64px -22px !important; }
+  body.jeton .tures-menu a, body.jeton .tures-menu .grp-head, body.jeton .tures-menu a.sub, body.jeton .tures-menu a.small{ color:var(--j-brandwood) !important; }
+  body.jeton .tures-menu a .pg{ color:var(--j-ink-faint) !important; }
+  body.jeton .tures-menu a:hover, body.jeton .tures-menu .chev:hover{ background:var(--j-sunset) !important; }
+  body.jeton .tures-menu a.here, body.jeton .tures-menu a.here .pg{ color:var(--j-coral-b) !important; }
+  body.jeton .tures-menu .sep{ background:var(--j-line) !important; }
+  body.jeton .tures-menu .socials a{ color:var(--j-coral-b) !important; border-color:var(--j-coral-b) !important; background:#fff !important; }
 </style>
 </head>
-<body class="text-canvas antialiased min-h-screen">
+<body class="jeton antialiased min-h-screen">
 
 <!-- CHROME -->
 <header class="chrome sticky top-0 z-30">
@@ -80,16 +140,15 @@
   </nav>
 </header>
 
-<!-- INTRO — trimmed -->
-<section class="leather-surface grain relative overflow-hidden">
-  <div class="ghost-num absolute -top-8 right-2 text-[30vw] sm:text-[20vw] z-0" data-parallax="0.16">II</div>
-  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-16 pb-10">
-    <div class="caps text-[11px] text-gold/80 mb-3">The Taste Engine · Calibrate</div>
-    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Swipe how you travel.</h1>
-    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Six cards. No forms. We assemble your <span class="text-gold-bright">Taste Print</span> as you go.</p>
-    <div class="mt-6">
-      <div class="caps text-[10px] text-gold/60 mb-2">Set a starting vibe</div>
-      <div class="seg dark" id="vibeSeg">
+<!-- HERO — coral sunrise dissolving into white -->
+<section class="j-hero">
+  <div class="max-w-6xl mx-auto px-6 pt-20 pb-12">
+    <div class="j-eyebrow mb-4">The Taste Engine · Calibrate</div>
+    <h1 class="j-display" style="font-size:clamp(40px,7vw,72px)">Swipe how you travel.</h1>
+    <p class="j-sub mt-5 max-w-md" style="font-size:17px;line-height:1.5">Six cards. No forms. We assemble your <span style="color:var(--j-coral-b);font-weight:500">Taste Print</span> as you go.</p>
+    <div class="mt-7">
+      <div class="j-eyebrow mb-2" style="color:var(--j-ink-faint)">Set a starting vibe</div>
+      <div class="seg" id="vibeSeg">
         <button data-v="casual">Casual</button>
         <button class="on" data-v="mix">Mix</button>
         <button data-v="fine">Fine</button>
@@ -99,38 +158,36 @@
 </section>
 
 <!-- ENGINE -->
-<section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-10 items-start">
+<section style="background:#fff">
+ <div class="max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-10 items-start">
 
   <!-- LEFT — swipe deck -->
   <div class="lg:col-span-7" id="deckCol">
     <div class="flex items-center justify-between mb-4">
-      <div class="caps text-[11px] text-ink-faint">Card <span id="qNum">1</span> of 6</div>
-      <div class="track w-40"><div class="fill" id="qProg" style="width:8%"></div></div>
+      <div class="j-eyebrow" style="color:var(--j-ink-faint)">Card <span id="qNum">1</span> of 6</div>
+      <div class="j-track w-40"><div class="fill" id="qProg" style="width:8%"></div></div>
     </div>
 
-    <!-- deck -->
     <div class="deck" id="deck" data-noswipe></div>
 
-    <!-- swipe controls -->
     <div class="flex items-center justify-center gap-5 mt-6" id="controls">
-      <button class="press w-14 h-14 rounded-full grid place-items-center text-2xl" style="border:1px solid var(--alert);color:#8f3f2b;background:rgba(181,84,58,0.08)" onclick="swipe('left')" aria-label="left pole">↤</button>
-      <span class="caps text-[10px] text-ink-faint">Drag or tap</span>
-      <button class="press w-14 h-14 rounded-full grid place-items-center text-2xl" style="border:1px solid var(--confirm);color:#43603a;background:rgba(95,125,79,0.08)" onclick="swipe('right')" aria-label="right pole">↦</button>
+      <button class="j-swipe no" onclick="swipe('left')" aria-label="not us">↤</button>
+      <span class="j-eyebrow" style="color:var(--j-ink-faint)">Drag or tap</span>
+      <button class="j-swipe yes" onclick="swipe('right')" aria-label="this is us">↦</button>
     </div>
 
-    <!-- FINISH — taste fingerprint -->
+    <!-- FINISH — taste print -->
     <div id="finish" class="hidden">
-      <div class="leaf p-7">
-        <div class="caps text-[11px] text-ink-faint mb-2">Calibration complete</div>
-        <h2 class="font-display text-4xl text-ink leading-tight">Your Taste Print.</h2>
-        <p class="mt-3 text-ink-soft leading-relaxed text-[15px]" id="signature">—</p>
-        <div class="rule-gold my-6"></div>
-        <div class="caps text-[11px] text-ink-faint mb-3">So Tures will</div>
-        <ul class="space-y-2.5 text-sm text-ink" id="behaviors"></ul>
+      <div class="j-card p-7">
+        <div class="j-eyebrow mb-2" style="color:var(--j-ink-faint)">Calibration complete</div>
+        <h2 class="j-display" style="font-size:34px">Your Taste Print.</h2>
+        <p class="j-sub mt-3" style="font-size:15px;line-height:1.6" id="signature">—</p>
+        <div style="height:1px;background:var(--j-line);margin:24px 0"></div>
+        <div class="j-eyebrow mb-3" style="color:var(--j-ink-faint)">So Tures will</div>
+        <ul class="space-y-2.5" style="font-size:14px;color:var(--j-brandwood)" id="behaviors"></ul>
         <div class="mt-7 flex flex-wrap gap-3">
-          <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-sm quiet">Describe a trip →</a>
-          <button onclick="restart()" class="btn-ink px-6 py-3 rounded-sm">Recalibrate</button>
+          <a href="03-paste-trip.html" class="j-btn">Describe a trip →</a>
+          <button onclick="restart()" class="j-btn j-btn-ghost">Recalibrate</button>
         </div>
       </div>
     </div>
@@ -138,28 +195,27 @@
 
   <!-- RIGHT — live Taste Print -->
   <aside class="lg:col-span-5">
-    <div class="leaf p-6 sticky top-24">
+    <div class="j-card j-surface p-6 sticky top-24">
       <div class="flex items-center justify-between mb-1">
-        <div class="font-display text-2xl text-ink">Taste Print</div>
-        <span class="pill pill-gold flex items-center gap-1.5"><span class="dot dot-gold pulse"></span>Live</span>
+        <div class="j-display" style="font-size:24px">Taste Print</div>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--j-coral-b);border:1.5px solid var(--j-coral-b);border-radius:99px;padding:4px 10px"><span class="pulse" style="width:6px;height:6px;border-radius:50%;background:var(--j-coral-b)"></span>Live</span>
       </div>
-      <div class="flex items-center gap-2 text-xs text-ink-faint mb-5">
-        <span class="caps">Confidence</span>
-        <span class="font-mono text-ink" id="confLabel">0.18</span>
-        <div class="track flex-1"><div class="fill" id="confBar" style="width:18%"></div></div>
+      <div class="flex items-center gap-2 mb-5" style="font-size:12px;color:var(--j-ink-faint)">
+        <span style="letter-spacing:.12em;text-transform:uppercase">Confidence</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:var(--j-brandwood)" id="confLabel">0.18</span>
+        <div class="j-track flex-1"><div class="fill" id="confBar" style="width:18%"></div></div>
       </div>
 
-      <!-- fingerprint radar -->
       <div class="flex justify-center mb-5">
         <svg id="radar" viewBox="0 0 200 200" width="190" height="190" style="overflow:visible"></svg>
       </div>
 
       <div class="space-y-3.5" id="dims"></div>
 
-      <div class="rule-ink my-5"></div>
-      <div class="caps text-[11px] text-ink-faint mb-3">Reading you as</div>
+      <div style="height:1px;background:var(--j-line);margin:20px 0"></div>
+      <div class="j-eyebrow mb-3" style="color:var(--j-ink-faint)">Reading you as</div>
       <div class="flex flex-wrap gap-2" id="tags">
-        <span class="text-xs text-ink-faint italic">tags appear as you swipe…</span>
+        <span style="font-size:12px;color:var(--j-ink-faint);font-style:italic">tags appear as you swipe…</span>
       </div>
     </div>
   </aside>
@@ -167,9 +223,9 @@
  </div>
 </section>
 
-<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
-  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
-  <div class="text-canvas/45 text-xs mt-2 caps">The Taste Engine</div>
+<footer style="background:#fff;border-top:1px solid var(--j-line)" class="py-10 text-center">
+  <a href="01-landing.html" class="j-display quiet" style="font-size:22px;text-decoration:none">t<span style="color:var(--j-coral-b)">✦</span>ures</a>
+  <div class="j-eyebrow mt-2" style="color:var(--j-ink-faint)">The Taste Engine</div>
 </footer>
 
 <script>
@@ -247,20 +303,20 @@ function drawRadar(){
   // rings
   [0.33,0.66,1].forEach(s=>{
     let pts = DIMS.map((d,i)=>{ const a=(-90+i*60)*Math.PI/180; return (CX+R*s*Math.cos(a))+','+(CY+R*s*Math.sin(a)); }).join(' ');
-    g += `<polygon points="${pts}" fill="none" stroke="rgba(43,33,20,0.12)" />`;
+    g += `<polygon points="${pts}" fill="none" stroke="rgba(54,8,2,0.10)" />`;
   });
   // axes + labels
   DIMS.forEach((d,i)=>{
     const a=(-90+i*60)*Math.PI/180;
     const ex=CX+R*Math.cos(a), ey=CY+R*Math.sin(a);
-    g += `<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="rgba(43,33,20,0.10)" />`;
+    g += `<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="rgba(54,8,2,0.08)" />`;
     const lx=CX+(R+15)*Math.cos(a), ly=CY+(R+15)*Math.sin(a);
-    g += `<text x="${lx}" y="${ly}" font-size="9" fill="#97886f" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase;letter-spacing:.08em">${d.label}</text>`;
+    g += `<text x="${lx}" y="${ly}" font-size="9" fill="#a98c85" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase;letter-spacing:.08em">${d.label}</text>`;
   });
   // value polygon
   let vpts = DIMS.map((d,i)=> radarPoint(i, d.v).join(',')).join(' ');
-  g += `<polygon id="radarFill" points="${vpts}" fill="rgba(200,162,74,0.22)" stroke="#c8a24a" stroke-width="1.5" style="transition:all .6s cubic-bezier(.6,.02,.2,1)" />`;
-  DIMS.forEach((d,i)=>{ const p=radarPoint(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#e6c873" />`; });
+  g += `<polygon id="radarFill" points="${vpts}" fill="rgba(247,59,32,0.13)" stroke="#f73b20" stroke-width="1.5" style="transition:all .6s cubic-bezier(.6,.02,.2,1)" />`;
+  DIMS.forEach((d,i)=>{ const p=radarPoint(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#f73b20" />`; });
   radar.innerHTML = g;
 }
 function updateRadar(){
@@ -376,7 +432,7 @@ let firstTag=true;
 function addTag(text){
   const tagsEl=document.getElementById('tags');
   if(firstTag){ tagsEl.innerHTML=''; firstTag=false; }
-  const c=document.createElement('span'); c.className='pill pill-gold tag-chip'; c.textContent=text;
+  const c=document.createElement('span'); c.className='j-chip'; c.textContent=text;
   tagsEl.appendChild(c); requestAnimationFrame(()=>c.classList.add('in'));
 }
 function setConf(v){ v=Math.min(0.94,v); document.getElementById('confLabel').textContent=v.toFixed(2); document.getElementById('confBar').style.width=(v*100)+'%'; }
@@ -427,7 +483,7 @@ function finishUp(){
 function restart(){
   qi=0; firstTag=true;
   DIMS.forEach(d=>{ d.v=50; const m=document.getElementById('mark-'+d.key); if(m) m.style.left='50%'; });
-  document.getElementById('tags').innerHTML='<span class="text-xs text-ink-faint italic">tags appear as you swipe…</span>';
+  document.getElementById('tags').innerHTML='<span style="font-size:12px;color:var(--j-ink-faint);font-style:italic">tags appear as you swipe…</span>';
   setConf(0.18); updateRadar();
   document.getElementById('finish').classList.add('hidden');
   document.getElementById('deck').style.display='';
