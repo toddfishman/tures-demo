@@ -90,6 +90,21 @@
   .chatwin .chip{ background:rgba(255,255,255,0.05) !important; color:rgba(236,227,208,0.85) !important; border-color:rgba(200,162,74,0.32) !important; }
   .chatwin .chip.on{ background:var(--gold) !important; color:#241a0c !important; }
   .chatwin .qr{ background:rgba(255,255,255,0.05) !important; color:var(--gold-bright) !important; border-color:rgba(200,162,74,0.4) !important; }
+
+  /* options walkthrough — curated decision cards inside the chat (fixed colors, theme-proof) */
+  .slate{ display:grid; gap:10px; margin:4px 0 2px; }
+  .opt-card{ position:relative; background:#fdfbf6; border:1px solid rgba(125,94,32,0.2); border-radius:14px; padding:13px 14px; }
+  .opt-card.pick{ border-color:rgba(200,162,74,0.75); box-shadow:0 0 0 1px rgba(200,162,74,0.35), 0 0 32px -12px rgba(230,200,115,0.45); }
+  .opt-card .nm{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:19px; color:#241c14; line-height:1.1; }
+  .opt-card .meta{ color:#6b5d49; font-size:12.5px; margin-top:1px; }
+  .opt-card .price{ font-family:'JetBrains Mono',monospace; font-size:13px; color:#241c14; white-space:nowrap; }
+  .opt-card .pickbadge{ display:inline-block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#241a0c; background:linear-gradient(180deg,#e6c873,#c8a24a); border-radius:99px; padding:2px 9px; margin-bottom:6px; }
+  .opt-tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .opt-tag{ font-size:10.5px; color:#7d5e20; background:rgba(200,162,74,0.12); border:1px solid rgba(200,162,74,0.28); border-radius:99px; padding:2px 8px; }
+  .opt-actions{ display:flex; align-items:center; gap:12px; margin-top:11px; }
+  .opt-link{ font-size:12px; color:#7d5e20; text-decoration:underline; }
+  .hold-btn{ font-size:12.5px; font-weight:600; color:#241a0c; background:linear-gradient(180deg,#e6c873,#c8a24a 55%,#a8842f); border:1px solid #8a6a26; border-radius:99px; padding:6px 15px; cursor:pointer; }
+  .hold-btn:active{ transform:scale(.97); }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -667,8 +682,10 @@ function onSend(){
     if(reply){ addMsg(reply.replace(/</g,'&lt;'), 't'); convoHistory.push({ role:'assistant', content:reply }); }
     if(status) status.textContent = 'Booking concierge · online';
     if(c && c.ready && c.brief){
-      // checklist complete — hand the assembled brief to the planner (same path voice uses)
-      setTimeout(function(){ composer.value = c.brief; autoGrow(); sendBrief(); }, 650);
+      // checklist complete — present a curated lodging slate first (the Taste Engine earns its keep),
+      // then the chosen stay flows into the planner.
+      window.__readyBrief = c.brief; window.__slots = c.slots || {};
+      setTimeout(function(){ presentLodging(c.slots || {}); }, 650);
     }
   }).catch(function(){ t.remove(); if(status) status.textContent='Booking concierge · online'; addMsg('The agent hiccuped — say that again?', 't'); });
 }
@@ -678,6 +695,69 @@ function composerSend(){
   if(DEMO || DEMO_TRIP || planned || !(window.tures && tures.configured)){ sendBrief(); return; }
   onSend();
 }
+
+/* ---------- options walkthrough (the differentiator) ----------
+   When the brief is ready, Tures doesn't dump a finished plan — it presents a curated slate and
+   recommends one, with the reason tied to the Taste Print. v1: lodging. (Flights / dinners /
+   excursions slates + real engine ranking + mem0-backed history are the next layers.) */
+var HOTELS = {
+  maui:[
+    {name:'Andaz Maui, Wailea', area:'Wailea · beachfront', price:'$890/nt', tags:['Beach','Design-forward','Lively']},
+    {name:'Hotel Wailea, Relais & Châteaux', area:'Wailea · adults-only hillside', price:'$780/nt', tags:['Adults-only','Intimate','Ocean views'], pick:true},
+    {name:'Four Seasons Maui', area:'Wailea · oceanfront', price:'$1,150/nt', tags:['Grand','Spa','Serenity pool']}
+  ],
+  paris:[
+    {name:'Le Pavillon de la Reine', area:'Le Marais · hidden courtyard', price:'€520/nt', tags:['Hidden gem','Garden','Quiet'], pick:true},
+    {name:'Hôtel des Grands Boulevards', area:'2nd · design', price:'€340/nt', tags:['Design','Buzzy','Central']},
+    {name:'Le Bristol', area:'8th · palace', price:'€1,200/nt', tags:['Grand','Michelin','Rooftop pool']}
+  ],
+  tokyo:[
+    {name:'Trunk Hotel, Shibuya', area:'Shibuya · design', price:'¥78,000/nt', tags:['Design','Walkable','Scene'], pick:true},
+    {name:'Hoshinoya Tokyo', area:'Otemachi · ryokan tower', price:'¥120,000/nt', tags:['Ryokan','Onsen','Serene']},
+    {name:'Aman Tokyo', area:'Otemachi · grand', price:'¥230,000/nt', tags:['Grand','Spa','Views']}
+  ],
+  lisbon:[
+    {name:'Santa Clara 1728', area:'Alfama · design guesthouse', price:'€390/nt', tags:['Hidden gem','Minimal','Light'], pick:true},
+    {name:'Memmo Alfama', area:'Alfama · views', price:'€260/nt', tags:['Rooftop','Walkable','Boutique']},
+    {name:'Bairro Alto Hotel', area:'Chiado · classic', price:'€450/nt', tags:['Central','Rooftop','Polished']}
+  ],
+  default:[
+    {name:'A characterful boutique stay', area:'central · hidden gem', price:'$420/nt', tags:['Hidden gem','Walkable'], pick:true},
+    {name:'A design hotel', area:'central · modern', price:'$360/nt', tags:['Design-forward','Buzzy']},
+    {name:'A grand hotel', area:'central · landmark', price:'$680/nt', tags:['Grand','Service']}
+  ]
+};
+function destKey(d){ d=(d||'').toLowerCase(); if(/maui|hawaii|kona|big island/.test(d))return 'maui'; if(/paris/.test(d))return 'paris'; if(/tokyo|japan|kyoto/.test(d))return 'tokyo'; if(/lisbon|portugal/.test(d))return 'lisbon'; return 'default'; }
+function tasteReason(){ try{ var tp=JSON.parse(localStorage.getItem('tures.tastePrint')||'null'); if(tp&&tp.signature) return 'it matches your Taste Print — '+tp.signature.replace(/^You read as\s*/i,'').replace(/\.$/,''); }catch(_){}
+  return 'it’s the hidden-gem-with-a-quiet-outlook register travelers like you choose'; }
+function presentLodging(slots){
+  var opts = HOTELS[destKey(slots && slots.destination)] || HOTELS.default;
+  var pick = opts.filter(function(o){return o.pick;})[0] || opts[0];
+  setStep(2);
+  var pill = actingPill('Checking availability against your taste…');
+  setTimeout(function(){
+    pill.remove();
+    addMsg('Three stays have availability and fit your brief.', 't');
+    var cards = opts.map(function(o){
+      return '<div class="opt-card'+(o.pick?' pick':'')+'">'+
+        (o.pick?'<div class="pickbadge">✦ Tures’ pick</div>':'')+
+        '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="nm">'+o.name+'</div><div class="meta">'+o.area+'</div></div><div class="price">'+o.price+'</div></div>'+
+        '<div class="opt-tags">'+o.tags.map(function(t){return '<span class="opt-tag">'+t+'</span>';}).join('')+'</div>'+
+        '<div class="opt-actions"><a class="opt-link" href="#" onclick="return false">View details ↗</a><button class="hold-btn" data-hold="'+o.name.replace(/"/g,'')+'">Hold this →</button></div>'+
+      '</div>';
+    }).join('');
+    var wrap=document.createElement('div'); wrap.className='msg'; wrap.innerHTML='<div class="slate">'+cards+'</div>';
+    chat.appendChild(wrap); requestAnimationFrame(function(){ wrap.classList.add('in'); }); wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+    addMsg('I’d book <strong>'+pick.name+'</strong> — '+tasteReason()+'. Hold it, or tell me to look again.', 't');
+  }, 1100);
+}
+function holdHotel(name){
+  document.querySelectorAll('#chat [data-hold]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
+  addMsg('Hold '+name.replace(/</g,'&lt;')+'.', 'me');
+  addMsg('Held '+name.replace(/</g,'&lt;')+'. Now I’ll line up flights, dinners, and the rest around it — and once it’s booked, the Hiccup Handler watches every leg.', 't');
+  setTimeout(function(){ composer.value = (window.__readyBrief||'') + ' Staying at '+name+'.'; autoGrow(); planned=false; sendBrief(); }, 750);
+}
+document.addEventListener('click', function(e){ var h=e.target.closest('[data-hold]'); if(h && !h.disabled){ e.preventDefault(); holdHotel(h.getAttribute('data-hold')); } });
 
 /* composer behavior */
 function autoGrow(){ composer.style.height = 'auto'; composer.style.height = Math.min(160, composer.scrollHeight) + 'px'; }
