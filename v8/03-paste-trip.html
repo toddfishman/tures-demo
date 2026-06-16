@@ -105,6 +105,12 @@
   .opt-link{ font-size:12px; color:#7d5e20; text-decoration:underline; }
   .hold-btn{ font-size:12.5px; font-weight:600; color:#241a0c; background:linear-gradient(180deg,#e6c873,#c8a24a 55%,#a8842f); border:1px solid #8a6a26; border-radius:99px; padding:6px 15px; cursor:pointer; }
   .hold-btn:active{ transform:scale(.97); }
+  .add-btn{ font-size:12.5px; font-weight:600; color:#7d5e20; background:rgba(200,162,74,0.1); border:1px solid rgba(200,162,74,0.4); border-radius:99px; padding:6px 14px; cursor:pointer; }
+  .add-btn.on{ color:#1f2a18; background:linear-gradient(180deg,#a7c293,#7fa06a); border-color:#5f7d4f; }
+  .opt-card.added{ border-color:rgba(95,125,79,0.6); box-shadow:0 0 0 1px rgba(95,125,79,0.3); }
+  .slate-foot{ display:flex; align-items:center; gap:16px; margin-top:2px; padding-left:2px; }
+  .slate-skip{ font-size:12.5px; color:rgba(236,227,208,0.6); cursor:pointer; }
+  .slate-skip:hover{ color:var(--gold-bright); text-decoration:underline; }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -754,10 +760,106 @@ function presentLodging(slots){
 function holdHotel(name){
   document.querySelectorAll('#chat [data-hold]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
   addMsg('Hold '+name.replace(/</g,'&lt;')+'.', 'me');
-  addMsg('Held '+name.replace(/</g,'&lt;')+'. Now I’ll line up flights, dinners, and the rest around it — and once it’s booked, the Hiccup Handler watches every leg.', 't');
-  setTimeout(function(){ composer.value = (window.__readyBrief||'') + ' Staying at '+name+'.'; autoGrow(); planned=false; sendBrief(); }, 750);
+  addMsg('Held '+name.replace(/</g,'&lt;')+'. Now the flights around it.', 't');
+  window.__chosen = { hotel:name, flight:null, dinners:[], excursions:[] };
+  setTimeout(function(){ presentTransport(window.__slots||{}); }, 750);
 }
-document.addEventListener('click', function(e){ var h=e.target.closest('[data-hold]'); if(h && !h.disabled){ e.preventDefault(); holdHotel(h.getAttribute('data-hold')); } });
+
+/* ---- shared slate renderers ---- */
+function slate(html){ var wrap=document.createElement('div'); wrap.className='msg'; wrap.innerHTML='<div class="slate">'+html+'</div>'; chat.appendChild(wrap); requestAnimationFrame(function(){ wrap.classList.add('in'); }); wrap.scrollIntoView({behavior:'smooth',block:'nearest'}); return wrap; }
+function optCard(o, action){ return '<div class="opt-card'+(o.pick?' pick':'')+'">'+(o.pick?'<div class="pickbadge">✦ Tures’ pick</div>':'')+
+  '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="nm">'+o.name+'</div><div class="meta">'+(o.sub||'')+'</div></div>'+(o.price?'<div class="price">'+o.price+'</div>':'')+'</div>'+
+  (o.tags&&o.tags.length?'<div class="opt-tags">'+o.tags.map(function(t){return '<span class="opt-tag">'+t+'</span>';}).join('')+'</div>':'')+
+  '<div class="opt-actions"><a class="opt-link" href="#" onclick="return false">View details ↗</a>'+action+'</div></div>'; }
+
+/* ---- transportation (single pick) ---- */
+function presentTransport(slots){
+  var biz=/business|first/i.test(slots.style||''), prem=/premium/i.test(slots.style||'');
+  var cabin=biz?'Business':prem?'Premium economy':'Economy';
+  var o=(slots.origin||'home').split(',')[0], d=(slots.destination||'there').split(',')[0];
+  var opts=[
+    {name:cabin+' · non-stop', sub:o+' → '+d+' · cleanest timing', price:'$'+(biz?'4,200':'1,150'), tags:['Non-stop','Best arrival'], pick:true},
+    {name:cabin+' · 1-stop', sub:o+' → '+d+' · one connection, ~25% less', price:'$'+(biz?'3,150':'820'), tags:['1 stop','Cheaper']},
+    {name:'Premium economy · non-stop', sub:o+' → '+d+' · step down a cabin', price:'$'+(biz?'1,900':'690'), tags:['Non-stop','Lower fare']}
+  ];
+  var pill=actingPill('Pricing flights from your home airport…');
+  setTimeout(function(){ pill.remove(); window.__flights=opts;
+    addMsg('Flights, '+o+' → '+d+'.', 't');
+    slate(opts.map(function(o,i){ return optCard(o, '<button class="hold-btn" data-flight="'+i+'">Book this →</button>'); }).join(''));
+    addMsg('I’d take the <strong>'+opts[0].name+'</strong> — non-stop keeps it friction-free, and I’ll watch the fare and rebook you if it wobbles.', 't');
+  }, 1000);
+}
+function pickFlight(i){
+  var f=window.__flights[i]; window.__chosen.flight=f.name;
+  document.querySelectorAll('#chat [data-flight]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
+  addMsg('Book '+f.name+'.', 'me'); addMsg('Locked. On to the table.', 't');
+  setTimeout(function(){ presentDinners(window.__slots||{}); }, 700);
+}
+
+/* ---- dinners & excursions (multi-select) ---- */
+var DINNERS={
+  maui:[{name:'Mama’s Fish House',sub:'Seafood · Paia · the institution',price:'$$$$',pick:true,tags:['Iconic','Books out']},{name:'Merriman’s Kapalua',sub:'Farm-to-table · sunset point',price:'$$$'},{name:'Migrant Wailea',sub:'Hawaiian-Filipino · Sheldon Simeon',price:'$$$'},{name:'Morimoto Maui',sub:'Japanese · at the Andaz',price:'$$$'}],
+  paris:[{name:'Le Bistrot Paul Bert',sub:'Bistro · the steak-frites benchmark',price:'$$$',pick:true,tags:['Classic']},{name:'Septime',sub:'Modern · 11th · 1 Michelin star',price:'$$$'},{name:'Clamato',sub:'Seafood · Septime’s walk-in sibling',price:'$$'},{name:'Le Comptoir du Relais',sub:'Saint-Germain · Camdeborde',price:'$$'}],
+  tokyo:[{name:'Den',sub:'Modern kaiseki · the joy of dining',price:'$$$$',pick:true,tags:['Iconic','Books out']},{name:'Sukiyabashi Jiro Roppongi',sub:'Sushi',price:'$$$$'},{name:'Narisawa',sub:'Innovative · satoyama',price:'$$$$'},{name:'Bar High Five',sub:'Cocktails · Ginza',price:'$$'}],
+  lisbon:[{name:'Belcanto',sub:'José Avillez · 2 Michelin stars',price:'$$$$',pick:true,tags:['Tasting']},{name:'Cervejaria Ramiro',sub:'Seafood · the classic',price:'$$$'},{name:'Taberna da Rua das Flores',sub:'No-reservations · petiscos',price:'$$'},{name:'A Cevicheria',sub:'Ceviche · Chiado',price:'$$'}],
+  default:[{name:'The chef’s-table standout',sub:'the dish locals queue for',price:'$$$',pick:true},{name:'A dependable neighborhood great',sub:'no-reservations, always good',price:'$$'},{name:'A special-occasion room',sub:'for one big night',price:'$$$$'}]
+};
+var EXCURSIONS={
+  maui:[{name:'Road to Hana, private driver',sub:'Full day · waterfalls, no rental stress',pick:true},{name:'Molokini snorkel sail',sub:'Morning · crater reef, small boat'},{name:'Haleakalā sunrise',sub:'Pre-dawn · above the clouds at 10,000 ft'}],
+  paris:[{name:'Louvre, after-hours small group',sub:'Evening · the rooms without the crowds',pick:true},{name:'Marché des Enfants Rouges food walk',sub:'Late morning'},{name:'Sainte-Chapelle + Île de la Cité',sub:'Afternoon'}],
+  tokyo:[{name:'teamLab Planets, early entry',sub:'Morning · before the lines',pick:true},{name:'Tsukiji outer market, guided',sub:'Dawn · the good stalls'},{name:'Private tea ceremony',sub:'Afternoon · Omotesandō'}],
+  lisbon:[{name:'Sintra palaces, private day',sub:'Full day · Pena + Quinta da Regaleira',pick:true},{name:'Tram 28 + Alfama on foot',sub:'Half day'},{name:'Time Out Market tasting',sub:'Evening'}],
+  default:[{name:'The signature half-day',sub:'the thing you’d regret missing',pick:true},{name:'A local, off-path morning',sub:'small group'},{name:'A sunset something',sub:'evening'}]
+};
+function presentDinners(slots){
+  var opts=DINNERS[destKey(slots.destination)]||DINNERS.default; window.__dinners=opts;
+  var pill=actingPill('Checking tables against your taste…');
+  setTimeout(function(){ pill.remove();
+    addMsg('Dinners — add the ones you want and I’ll get the tables.', 't');
+    var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="dinners:'+i+'">+ Add</button>'); }).join('');
+    slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="dinners">Done →</button><a class="slate-skip" data-next="dinners">Skip dinners</a></div>');
+    addMsg('If you only do one, make it <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+  }, 1000);
+}
+function presentExcursions(slots){
+  var opts=EXCURSIONS[destKey(slots.destination)]||EXCURSIONS.default; window.__excursions=opts;
+  var pill=actingPill('Pulling things to do…');
+  setTimeout(function(){ pill.remove();
+    addMsg('Excursions — same idea, add what appeals.', 't');
+    var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="excursions:'+i+'">+ Add</button>'); }).join('');
+    slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="excursions">Done →</button><a class="slate-skip" data-next="excursions">Skip excursions</a></div>');
+    addMsg('My pick: <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+  }, 900);
+}
+function toggleAdd(kind, i){
+  var arr=window.__chosen[kind], list=(kind==='dinners'?window.__dinners:window.__excursions), name=list[i].name;
+  var btn=document.querySelector('[data-add="'+kind+':'+i+'"]'), card=btn.closest('.opt-card');
+  var pos=arr.indexOf(name);
+  if(pos>-1){ arr.splice(pos,1); btn.classList.remove('on'); btn.textContent='+ Add'; card.classList.remove('added'); }
+  else { arr.push(name); btn.classList.add('on'); btn.textContent='✓ Added'; card.classList.add('added'); }
+}
+function nextCategory(kind){
+  document.querySelectorAll('[data-next="'+kind+'"]').forEach(function(b){ b.style.pointerEvents='none'; b.style.opacity=.5; });
+  var chosen=window.__chosen[kind];
+  addMsg(chosen.length ? (chosen.join(' · ')+' — added.') : ('Skip '+kind+' for now.'), 'me');
+  if(kind==='dinners'){ addMsg(chosen.length?'Tables requested. Now a couple of things to do.':'No problem — a couple of things to do, then.', 't'); setTimeout(function(){ presentExcursions(window.__slots||{}); }, 700); }
+  else { setTimeout(finalizeTrip, 500); }
+}
+function finalizeTrip(){
+  var c=window.__chosen, lines=['⌂ '+c.hotel, '✈ '+(c.flight||'flights')];
+  if(c.dinners.length) lines.push('✦ '+c.dinners.length+' dinner'+(c.dinners.length>1?'s':''));
+  if(c.excursions.length) lines.push('◎ '+c.excursions.length+' excursion'+(c.excursions.length>1?'s':''));
+  addMsg('Here’s your trip:<br>'+lines.join('<br>')+'<br><br>Everything above is held, nothing booked — I verify each twice before anything says “Booked.”', 't');
+  setStep(3);
+  setTimeout(function(){ composer.value=(window.__readyBrief||'')+' Staying at '+c.hotel+'.'; autoGrow(); planned=false; sendBrief(); }, 1000);
+}
+
+document.addEventListener('click', function(e){
+  var h=e.target.closest('[data-hold]'); if(h && !h.disabled){ e.preventDefault(); holdHotel(h.getAttribute('data-hold')); return; }
+  var f=e.target.closest('[data-flight]'); if(f && !f.disabled){ e.preventDefault(); pickFlight(+f.getAttribute('data-flight')); return; }
+  var a=e.target.closest('[data-add]'); if(a){ e.preventDefault(); var p=a.getAttribute('data-add').split(':'); toggleAdd(p[0], +p[1]); return; }
+  var nx=e.target.closest('[data-next]'); if(nx && nx.style.pointerEvents!=='none'){ e.preventDefault(); nextCategory(nx.getAttribute('data-next')); return; }
+});
 
 /* composer behavior */
 function autoGrow(){ composer.style.height = 'auto'; composer.style.height = Math.min(160, composer.scrollHeight) + 'px'; }
