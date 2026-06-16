@@ -530,6 +530,31 @@ a.quiet{ text-decoration:none; }
 @media(max-width:640px){ .tures-pageno{ bottom:10px; right:12px; font-size:10px; padding:4px 10px; } }
 
 /* ============================================================
+   ✦ DESTINATION BACKDROP — opt-in interior pages
+   Injected by menu.js on a fixed set of pages. Sits behind all
+   content (z-index:-1); a heavy veil keeps body copy legible.
+   The page opts in via html.tures-scene-on, which turns the
+   normally-opaque obsidian body transparent so the photos show.
+   ============================================================ */
+html.tures-scene-on body{ background:transparent !important; }
+.tures-bg{ position:fixed; inset:0; z-index:-1; overflow:hidden; background:var(--obsidian); }
+.tures-bg .fi{ position:absolute; inset:0; background-size:cover; background-position:center;
+  opacity:0; animation:tbgslide 90s infinite; will-change:opacity,transform; }
+@keyframes tbgslide{
+  0%{ opacity:0; transform:scale(1.05) } 1.5%{ opacity:1 } 8.5%{ opacity:1 }
+  10%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
+}
+.tures-bg .tbg-veil{ position:absolute; inset:0;
+  background:radial-gradient(135% 125% at 50% 28%, rgba(11,11,13,0.74), rgba(11,11,13,0.88) 58%, rgba(11,11,13,0.96) 100%); }
+html.dark .tures-bg{ background:#060608; }
+html.dark .tures-bg .tbg-veil{
+  background:radial-gradient(135% 125% at 50% 28%, rgba(6,6,8,0.80), rgba(6,6,8,0.92) 58%, rgba(6,6,8,0.98) 100%); }
+@media (prefers-reduced-motion: reduce){
+  .tures-bg .fi{ animation:none; }
+  .tures-bg .fi:first-child{ opacity:1; transform:none; }
+}
+
+/* ============================================================
    ✦ MENU — legacy overlay styles (unused; kept for safety)
    ============================================================ */
 .menu-star{ appearance:none; cursor:pointer; color:var(--gold-bright);

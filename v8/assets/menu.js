@@ -22,6 +22,40 @@
 
   try { if (!noTheme && localStorage.getItem('tures.theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
 
+  /* Pages that wear the rotating destination backdrop behind their content.
+     The cover and write.html carry their own inline scene, so they're excluded. */
+  var SCENE_PAGES = {
+    '01-landing.html': 1, '02-taste-engine.html': 1, '04-connections.html': 1,
+    '06-hiccup-handler.html': 1, '07-itinerary.html': 1, 'been.html': 1, 'pricing.html': 1
+  };
+  var wantsScene = !noTheme && !inSub && SCENE_PAGES[here] === 1;
+  // Add the opt-in class as early as possible so the body never flashes opaque obsidian.
+  if (wantsScene) document.documentElement.classList.add('tures-scene-on');
+
+  // 10 destinations on a 90s loop — same set as the cover (5 local + 5 Unsplash).
+  var SCENE_IMGS = [
+    base + 'assets/img/tulum-1920.webp', base + 'assets/img/paris-1920.webp',
+    base + 'assets/img/tokyo-1920.webp', base + 'assets/img/aurora-1920.webp',
+    base + 'assets/img/nyc-1920.webp',
+    'https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1920&q=80&auto=format&fit=crop'
+  ];
+  function injectScene() {
+    if (!wantsScene || document.querySelector('.tures-bg')) return;
+    var bg = document.createElement('div'); bg.className = 'tures-bg'; bg.setAttribute('aria-hidden', 'true');
+    SCENE_IMGS.forEach(function (src, i) {
+      var f = document.createElement('div'); f.className = 'fi';
+      f.style.backgroundImage = "url('" + src + "')";
+      f.style.animationDelay = (i * 9) + 's';
+      bg.appendChild(f);
+    });
+    var veil = document.createElement('div'); veil.className = 'tbg-veil'; bg.appendChild(veil);
+    document.body.insertBefore(bg, document.body.firstChild);
+  }
+
   if (window.__turesChrome) return;
   window.__turesChrome = true;
 
@@ -116,6 +150,7 @@
   }
 
   function init() {
+    injectScene();
     var nav = document.querySelector('header nav');
     if (nav) Array.prototype.slice.call(nav.children).forEach(function (c) { c.style.display = 'none'; });
 
