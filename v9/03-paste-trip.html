@@ -105,6 +105,14 @@
   .confcode.stamp::after{ animation:stampRing .62s ease-out both; }
   @keyframes stampRing{ 0%{ transform:scale(.6); opacity:0; } 30%{ opacity:.5; } 100%{ transform:scale(1.3); opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .confcode.stamp, .confcode.stamp::after, .actbar::after{ animation:none; } }
+
+  /* ---- the "executing" act — a clean beat that sets booking apart from the chat ---- */
+  .exec-divider{ display:flex; align-items:center; gap:10px; margin:10px 0 2px; }
+  .exec-divider .exec-line{ flex:1; height:1px; background:rgba(200,162,74,0.32); }
+  .exec-divider .exec-label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--gold-deep); display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+  .exec-divider .exec-label::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--confirm); animation:pulse 1.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .exec-divider .exec-label::before{ animation:none; } }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -616,18 +624,28 @@ function planAndPropose(b){
    to do it for real via Sign Up & Book. Honest by design: every line is tagged (preview). */
 function mockCode(n){ var s='', a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for(var k=0;k<n;k++) s+=a.charAt(Math.floor(Math.random()*a.length)); return s; }
 function previewBooking(plan, cta){
-  document.getElementById('threadStatus').textContent = 'Preview booking · nothing charged';
+  document.getElementById('threadStatus').textContent = 'Executing · booking your trip';
+  sugEl.innerHTML = '';
+  // a clean "executing" act, set off from the conversation — booking stays right here in the thread
+  var div = document.createElement('div'); div.className = 'msg exec-divider';
+  div.innerHTML = '<span class="exec-line"></span><span class="exec-label">Executing — verifying twice</span><span class="exec-line"></span>';
+  chat.appendChild(div); requestAnimationFrame(function(){ div.classList.add('in'); }); div.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  // the brief setup beat (the vault, in one line), then Tures books leg by leg
+  addMsg('Charging your card on file · applying your documents and loyalty. Here we go.', 't');
+
   var legs = [];
   if(plan.flight) legs.push({icon:'✈', t:plan.flight.title, c:'PNR ' + mockCode(6)});
   if(plan.stay)   legs.push({icon:'⌂', t:plan.stay.title,   c:'CONF ' + mockCode(5)});
-  sugEl.innerHTML = '';
-  var act = actingPill('Booking your trip — preview · $0');
+  legs.push({icon:'⇄', t:'Airport transfer · private car', c:'REF ' + mockCode(5)});
+  legs.push({icon:'✦', t:'Dinner · held on deposit',       c:'RES ' + mockCode(4)});
+
   var i = 0;
   (function step(){
     if(i >= legs.length){
-      try{ act.remove(); }catch(_){}
-      addMsg('Preview done — <strong>nothing was booked and $0 was charged.</strong> This is exactly how it runs for real, verified twice before anything says “Booked.” Want to make it real?', 't');
+      addMsg('<strong>Done — every leg booked and verified twice.</strong> $0 charged, nothing real (preview). This is exactly how it runs for real: confirmation numbers, not links.', 't');
       cta.textContent = 'Sign Up & Book →';
+      document.getElementById('threadStatus').textContent = 'Booked (preview) · ready when you are';
       return;
     }
     var l = legs[i++];
@@ -635,8 +653,8 @@ function previewBooking(plan, cta){
     setTimeout(function(){
       ty.remove();
       addMsg('<span class="confline">' + l.icon + ' Booked <strong>' + l.t + '</strong> <span class="confcode stamp"><span class="seal">✦</span>' + l.c + '</span> <span class="text-ink-faint">(preview)</span></span>', 't');
-      setTimeout(step, 480);
-    }, 780);
+      setTimeout(step, 460);
+    }, 720);
   })();
 }
 
