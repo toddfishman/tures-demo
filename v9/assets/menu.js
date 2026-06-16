@@ -21,12 +21,10 @@
 
   // v9 theme sandbox: two switchable directions (parchment | oxblood), applied on EVERY page
   // incl. the cover. Replaces v8's dark-mode toggle. Persisted to localStorage 'tures.v9theme'.
-  var THEME_KEY = 'tures.v9theme';
-  var theme = 'parchment';
-  try { var _t = localStorage.getItem(THEME_KEY); if (_t === 'oxblood' || _t === 'parchment') theme = _t; } catch (e) {}
-  document.documentElement.setAttribute('data-theme', theme);
+  // v9 is Parchment all the way — the Oxblood direction was retired.
+  document.documentElement.setAttribute('data-theme', 'parchment');
 
-  // Seasonal accent (Parchment only): swaps the accent tokens; paper stays constant.
+  // Seasonal accent: swaps the accent tokens; the parchment paper stays constant.
   var ACCENT_KEY = 'tures.v9accent';
   var accent = 'autumn';
   try { var _a = localStorage.getItem(ACCENT_KEY); if (['spring', 'summer', 'autumn', 'winter'].indexOf(_a) > -1) accent = _a; } catch (e) {}
@@ -139,22 +137,12 @@
     var num = pageNumber();
     if (num) document.body.appendChild(el('div', 'tures-pageno', 'Page ' + num));
 
-    // v9 theme sandbox — floating Parchment | Oxblood switch, lower-left, on every page
+    // floating seasonal-accent picker, lower-left (Parchment is the only theme now)
     var sw = el('div', 'tures-theme-switch');
-    sw.setAttribute('role', 'group'); sw.setAttribute('aria-label', 'Theme');
-    [['parchment', 'Parchment'], ['oxblood', 'Oxblood']].forEach(function (o) {
-      var b = el('button', theme === o[0] ? 'on' : null, o[1]); b.type = 'button';
-      b.addEventListener('click', function () {
-        theme = o[0];
-        document.documentElement.setAttribute('data-theme', theme);
-        try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
-        Array.prototype.forEach.call(sw.children, function (c) { c.className = (c === b ? 'on' : ''); });
-      });
-      sw.appendChild(b);
-    });
-    // seasonal accent dots — CSS shows this row only under Parchment
+    sw.setAttribute('role', 'group'); sw.setAttribute('aria-label', 'Seasonal accent');
+    sw.appendChild(el('span', 'ts-label', 'Season'));
     var SEASONS = [['spring', 'Spring', '#6f8f4a'], ['summer', 'Summer', '#c06a3e'], ['autumn', 'Autumn', '#bb8d3a'], ['winter', 'Winter', '#5b7790']];
-    var arow = el('div', 'tures-accent'); arow.setAttribute('role', 'group'); arow.setAttribute('aria-label', 'Seasonal accent');
+    var arow = el('div', 'tures-accent');
     SEASONS.forEach(function (s) {
       var b = el('button', accent === s[0] ? 'on' : null); b.type = 'button'; b.title = s[1]; b.setAttribute('aria-label', s[1]); b.style.background = s[2];
       b.addEventListener('click', function () {
