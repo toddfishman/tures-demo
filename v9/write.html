@@ -1,0 +1,245 @@
+<!doctype html>
+<!-- The landing (option 1). Reached via a page-turn from the cover: the book opens to a
+     blank journal and Tures inscribes the pitch live, then the two paths appear.
+     Tap anywhere to skip the writing. Do NOT untrack — this is the live landing. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Your edition</title>
+<meta name="description" content="Tures writes your edition — describe a trip and watch it come together, then booked end to end." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v8/write.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Your edition" />
+<meta property="og:description" content="Tures writes your edition — describe a trip and watch it come together, then booked end to end." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v8/write.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Your edition" />
+<meta name="twitter:description" content="Tures writes your edition — describe a trip and watch it come together, then booked end to end." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  html,body{ background:#0b0907; min-height:100%; }
+
+  /* ===== the same living world behind the book ===== */
+  .scene{ position:fixed; inset:0; z-index:0; overflow:hidden; background:#0b0907; }
+  .scene .frame-img{ position:absolute; inset:0; background-size:cover; background-position:center;
+    opacity:0; animation:slide 45s infinite; }
+  @keyframes slide{
+    0%{ opacity:0; transform:scale(1.05) } 3%{ opacity:1 } 17%{ opacity:1 }
+    20%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
+  }
+  .veil{ position:fixed; inset:0; z-index:1;
+    background:radial-gradient(135% 120% at 50% 42%, rgba(11,9,7,0.30), rgba(11,9,7,0.55) 55%, rgba(11,9,7,0.82) 100%); }
+
+  /* ===== the open journal ===== */
+  .stage{ position:fixed; inset:0; z-index:5; display:grid; justify-items:center; align-content:start;
+    padding:clamp(54px,11vh,120px) 20px 104px; overflow-y:auto; }
+  /* the leather cover the page is bound into — so the cover never "disappears" */
+  /* ONE fixed size — the book never grows; the writing fills a constant area (a book doesn't grow as you read it) */
+  .book-open{ position:relative; width:min(94vw,600px); height:min(80vh,640px); display:flex; border-radius:5px 13px 13px 5px;
+    padding:15px 15px 16px 30px;   /* extra left = the spine fold */
+    box-shadow:-18px 0 0 -6px #0a0703, 0 48px 100px -36px rgba(0,0,0,0.92), inset 0 0 0 1px rgba(0,0,0,0.5);
+    animation:rise-in 450ms cubic-bezier(.2,.7,.2,1) both; }
+  .journal{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; border-radius:2px 6px 6px 2px;
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
+      linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
+    box-shadow:0 0 0 1px rgba(125,94,32,0.18), 0 3px 14px -6px rgba(0,0,0,0.5);
+    padding:clamp(26px,5vw,48px) clamp(26px,5.5vw,56px) clamp(22px,4vw,40px);
+    overflow:hidden;
+  }
+  @keyframes rise-in{ from{ opacity:0; transform:translateY(14px) scale(.985) } to{ opacity:1; transform:none } }
+  /* paper grain */
+  .journal::after{ content:""; position:absolute; inset:0; pointer-events:none; opacity:0.5; border-radius:inherit;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply; }
+  /* gilt edge + binding shadow at the gutter */
+  .journal::before{ content:""; position:absolute; top:0; bottom:0; left:0; width:26px; z-index:2; border-radius:6px 0 0 6px;
+    background:linear-gradient(90deg, rgba(0,0,0,0.22), rgba(0,0,0,0) 85%); }
+  .journal > *{ position:relative; z-index:3; }
+
+  /* pre-printed letterpress header (already on the page) */
+  .kicker{ letter-spacing:0.16em; text-transform:uppercase; font-size:11px; color:var(--gold-deep); }
+  .edition{ font-family:'Cormorant Garamond',Georgia,serif; font-size:12px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-faint); }
+  .ruled{ height:1px; background:linear-gradient(90deg, transparent, rgba(125,94,32,0.5), transparent); margin:14px 0 22px; }
+
+  /* the ink Tures writes */
+  #ink{ font-family:'Cormorant Garamond',Georgia,serif; color:var(--ink); text-align:left;
+    flex:1 1 auto; min-height:0; overflow-y:auto;
+    font-size:clamp(16px,2.6vw,21px); line-height:1.55; }
+  .k-body{ }
+  .k-em{ color:var(--gold-deep); font-style:italic; font-weight:600; }
+  .k-sign{ font-style:italic; font-size:1.18em; color:var(--gold-deep); }
+  /* the nib / caret */
+  #caret{ display:inline-block; width:2px; height:1.05em; transform:translateY(0.18em);
+    background:var(--gold-deep); margin-left:1px; border-radius:1px; }
+  #caret.blink{ animation:caret 1s steps(1,end) infinite; }
+  @keyframes caret{ 50%{ opacity:0 } }
+
+  /* writing status + reveal of the paths */
+  .status{ display:inline-flex; align-items:center; gap:8px; margin-top:26px;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+  .status .nib{ color:var(--gold-deep); }
+  .paths{ display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; opacity:0; transform:translateY(8px);
+    transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
+  .paths.in{ opacity:1; transform:none; }
+  .skip{ position:fixed; bottom:18px; left:0; right:0; z-index:6; text-align:center;
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(236,227,208,0.5); pointer-events:none; }
+  /* persistent forward CTA — always on screen while Tures writes */
+  .write-cta{ position:fixed; left:0; right:0; bottom:0; z-index:7; display:flex; align-items:center; justify-content:center; gap:20px;
+    padding:14px 20px calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(11,9,7,0) 0%, rgba(11,9,7,0.5) 40%, rgba(11,9,7,0.9) 100%); }
+  .write-cta-link{ color:var(--gold-bright); font-size:13px; text-decoration:none; opacity:.85; }
+  .write-cta-link:hover{ opacity:1; text-decoration:underline; }
+  /* the ✦ home star (menu.js) sits upper-LEFT here; Sign in sits upper-right */
+  .tures-home-star{ left:18px; right:auto; }
+  .signin-link{ position:fixed; top:14px; right:18px; z-index:70; text-decoration:none;
+    font-family:'Inter',sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold-bright); padding:8px 14px; border-radius:99px;
+    background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
+    transition:border-color .2s ease, background .2s ease; }
+  .signin-link:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+  @media (max-width:640px){ .signin-link{ top:10px; right:12px; font-size:11px; padding:7px 11px; }
+    .tures-home-star{ left:12px; right:auto; } }
+</style>
+</head>
+<body class="text-canvas">
+
+  <!-- the rotating, drifting world (identical to the cover) -->
+  <div class="scene" aria-hidden="true">
+    <div class="frame-img" style="background-image:url('assets/img/tulum-1920.webp');animation-delay:0s"></div>
+    <div class="frame-img" style="background-image:url('assets/img/paris-1920.webp');animation-delay:9s"></div>
+    <div class="frame-img" style="background-image:url('assets/img/tokyo-1920.webp');animation-delay:18s"></div>
+    <div class="frame-img" style="background-image:url('assets/img/aurora-1920.webp');animation-delay:27s"></div>
+    <div class="frame-img" style="background-image:url('assets/img/nyc-1920.webp');animation-delay:36s"></div>
+  </div>
+  <div class="veil"></div>
+
+  <div class="stage">
+   <div class="book-open leather-surface grain">
+    <div class="journal" id="journal">
+      <div class="flex items-center justify-between">
+        <span class="kicker">The AI Travel Concierge</span>
+        <span class="edition">First Edition · MMXXVI</span>
+      </div>
+      <div class="wordmark foil" style="font-size:46px;line-height:1;margin-top:6px">t<span class="spark">✦</span>ures</div>
+      <div class="ruled"></div>
+
+      <!-- Tures writes here -->
+      <div id="ink"><span id="caret" class="blink"></span></div>
+
+      <div class="status" id="status"><span class="nib">✒</span><span id="statusText">Tures is writing your edition…</span></div>
+
+    </div>
+   </div>
+  </div>
+
+  <!-- a persistent way forward — visible from the first word, so the reader is never stuck -->
+  <div class="write-cta">
+    <a href="03-paste-trip.html" class="btn-gold px-7 py-3 rounded-full quiet font-semibold">Plan a trip →</a>
+    <a href="01-landing.html?demo=1" class="write-cta-link quiet">What is Tures?</a>
+  </div>
+
+<script>
+  var REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // The passage Tures inscribes — the cover's promise, in its own hand.
+  var SEGMENTS = [
+    {t:'You tell me the trip the way you’d tell a friend.', c:'k-body', pause:460},
+    {t:'\n\nI handle the rest — the flights, the rooms you actually named, the table at eight.', c:'k-body', pause:520},
+    {t:'\n\nOther tools end with a list of links. I end with ', c:'k-body', pause:80},
+    {t:'confirmation numbers', c:'k-em', pause:480},
+    {t:'.', c:'k-body', pause:560},
+    {t:'\n\nAnd when the world shifts at 2 a.m., I’ve already moved.', c:'k-body', pause:520},
+    {t:'\n\n', c:'k-body', pause:0},
+    {t:'Adventures, handled.', c:'k-sign', pause:0}
+  ];
+
+  var ink = document.getElementById('ink');
+  var caret = document.getElementById('caret');
+  var done = false;
+
+  function put(node){ ink.insertBefore(node, caret); }
+  function newline(){ put(document.createElement('br')); }
+
+  function renderInstant(){
+    SEGMENTS.forEach(function(seg){
+      var parts = seg.t.split('\n');
+      parts.forEach(function(p, i){
+        if(i) newline();
+        if(p){ var s=document.createElement('span'); s.className=seg.c; s.textContent=p; put(s); }
+      });
+    });
+  }
+
+  function finish(){
+    if(done) return; done = true;
+    caret.classList.remove('blink'); caret.style.display='none';
+    document.getElementById('statusText').textContent = 'Your edition';
+    document.querySelector('#status .nib').textContent = '✦';
+    var sk=document.getElementById('skipHint'); if(sk) sk.style.display='none';
+  }
+
+  function jitter(ch){
+    if(ch === ' ') return 26;
+    if('.,—'.indexOf(ch) >= 0) return 150;     // a beat at punctuation, like composing
+    return 20 + Math.floor( (Math.sin(ink.childNodes.length * 12.9898) * 0.5 + 0.5) * 34 );
+  }
+
+  function typeSegments(idx){
+    if(done) return;
+    if(idx >= SEGMENTS.length){ finish(); return; }
+    var seg = SEGMENTS[idx];
+    var span = null;
+    var parts = seg.t.split('\n');
+    var pi = 0, ci = 0;
+
+    function ensureSpan(){
+      if(parts[pi] === ''){ return; }
+      if(!span){ span = document.createElement('span'); span.className = seg.c; put(span); }
+    }
+    function step(){
+      if(done) return;
+      if(pi >= parts.length){
+        setTimeout(function(){ typeSegments(idx+1); }, seg.pause || 0);
+        return;
+      }
+      var part = parts[pi];
+      if(ci === 0 && pi > 0){ newline(); span = null; }
+      if(ci < part.length){
+        ensureSpan();
+        var ch = part[ci++];
+        span.appendChild(document.createTextNode(ch));
+        setTimeout(step, jitter(ch));
+      } else {
+        pi++; ci = 0; span = null;
+        setTimeout(step, 12);
+      }
+    }
+    step();
+  }
+
+  function skip(){ if(!done){ ink.innerHTML=''; ink.appendChild(caret); renderInstant(); finish(); } }
+  document.addEventListener('click', function(e){ if(e.target.closest('a')) return; skip(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') skip(); });
+
+  if(REDUCE){ renderInstant(); finish(); }
+  else { setTimeout(function(){ typeSegments(0); }, 480); }
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>
