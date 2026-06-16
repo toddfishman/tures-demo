@@ -51,128 +51,17 @@
 
 <section class="leather-surface grain relative overflow-hidden">
   <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">IV</div>
-  <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-9">
-    <div class="caps text-[11px] text-gold/80 mb-3">Tures Vault Setup · Connect</div>
-    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Grant the access.<br><span class="foil">Pull it any time.</span></h1>
-    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Scoped, revocable, logged. Exactly what's needed to book and watch — nothing speculative.</p>
+  <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
+    <div class="caps text-[11px] text-gold/80 mb-3">Tures Vault Setup</div>
+    <h1 id="vHero" class="font-display text-5xl sm:text-6xl leading-[1.0]">Set up your vault.</h1>
+    <p id="vSub" class="mt-4 max-w-md text-canvas/70 leading-relaxed">One step at a time — a card, your documents, your programs. Saved as you go; pick up wherever you left off.</p>
   </div>
 </section>
 
-<section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
-
-  <div class="lg:col-span-2 space-y-3">
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="card">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">▦</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Payment · AmEx ··1004</div>
-        <div class="text-xs text-ink-faint mt-0.5">Per-trip cap you set · <button class="text-gold-deep underline" data-sheet="sheet-card">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="loyalty">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">✦</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Loyalty &amp; status</div>
-        <div class="text-xs text-ink-faint mt-0.5">AAdvantage · Flying Blue · Virtuoso · <button class="text-gold-deep underline" data-sheet="sheet-loyalty">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="calendar">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Calendar</div>
-        <div class="text-xs text-ink-faint mt-0.5">Route around what's booked · <button class="text-gold-deep underline" data-sheet="sheet-calendar">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="inbox">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Inbox · read confirmations</div>
-        <div class="text-xs text-ink-faint mt-0.5">Travel senders only, read-only · <button class="text-gold-deep underline" data-sheet="sheet-inbox">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="messaging">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Messaging · WhatsApp / Telegram</div>
-        <div class="text-xs text-ink-faint mt-0.5">Optional — the daily channel · coming soon · <button class="text-gold-deep underline" data-sheet="sheet-messaging">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <button id="grantAll" class="btn-gold w-full px-5 py-3.5 rounded-xl mt-2 font-semibold">⚡ Connect required (4) in sequence</button>
-  </div>
-
-  <aside class="space-y-4">
-    <div class="leaf p-6">
-      <div class="flex items-center justify-between mb-3">
-        <div class="caps text-[11px] text-ink-faint">Status</div>
-        <span class="pill" id="statusPill"><span class="dot dot-amber"></span> Not ready</span>
-      </div>
-      <div class="flex items-baseline gap-2 mb-4">
-        <span class="font-mono text-4xl text-ink" id="connCount">0</span>
-        <span class="text-ink-soft text-sm">of 5 connected</span>
-      </div>
-      <div class="track mb-5"><div class="fill" id="connBar" style="width:0%"></div></div>
-      <div class="caps text-[11px] text-ink-faint mb-3">Your guarantees</div>
-      <ul class="space-y-2.5 text-sm text-ink/85">
-        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged beyond your cap.</li>
-        <li class="flex gap-2.5"><span class="text-gold">✓</span> Read-only inbox, travel senders only.</li>
-        <li class="flex gap-2.5"><span class="text-gold">✓</span> Every action in an exportable log.</li>
-        <li class="flex gap-2.5"><span class="text-gold">✓</span> Revoke in one tap — bookings stay yours.</li>
-      </ul>
-    </div>
-  </aside>
- </div>
-</section>
-
-<!-- ===== WALLET & TRAVELER PROFILE (live with the engine) ===== -->
-<section class="canvas-surface text-ink border-t" style="border-color:var(--canvas-line)">
- <div class="max-w-5xl mx-auto px-6 py-12">
-  <div id="walletPanel" class="leaf p-6 sm:p-8" style="display:none">
-    <div class="flex items-center justify-between mb-1">
-      <div class="caps text-[11px] text-ink-faint">Wallet &amp; traveler profile</div>
-      <span class="pill pill-confirm text-[11px]"><span class="dot dot-green"></span> Live engine</span>
-    </div>
-    <h2 class="font-display text-3xl text-ink leading-tight mb-2">The things a real booking needs.</h2>
-    <p class="text-sm text-ink-soft leading-relaxed max-w-2xl mb-6">Add the cards you carry and your travel documents. Tures charges each leg to whichever card earns the most on that kind of spend — and applies your passport, Known Traveler Number, and loyalty programs at booking.</p>
-
-    <div class="grid lg:grid-cols-2 gap-8">
-      <!-- wallet -->
-      <div class="min-w-0">
-        <div class="caps text-[11px] text-ink-faint mb-3">Your cards</div>
-        <div class="flex gap-2 mb-3">
-          <select id="cardPick" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)"></select>
-          <button id="addCard" class="btn-ink px-4 py-2 rounded-lg text-sm press shrink-0">Add</button>
-        </div>
-        <div id="walletList" class="space-y-2 mb-4"></div>
-        <div id="walletRec" class="text-[13px] text-ink-soft rounded-lg p-3" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28);display:none"></div>
-      </div>
-
-      <!-- traveler profile -->
-      <div class="min-w-0">
-        <div class="caps text-[11px] text-ink-faint mb-3">Traveler details</div>
-        <div class="space-y-2.5">
-          <input id="pfPassport" placeholder="Passport number" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          <input id="pfKtn" placeholder="Known Traveler Number (TSA Pre)" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          <div class="flex gap-2">
-            <input id="pfProgram" placeholder="Loyalty program (e.g. Finnair Plus)" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-            <input id="pfNumber" placeholder="Number" class="w-28 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          </div>
-          <button id="saveProfile" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save profile</button>
-          <div id="profileStatus" class="text-[13px] text-ink-soft"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="canvas-surface text-ink" style="min-height:60vh">
+ <div class="relative z-10 max-w-3xl mx-auto px-6 py-10">
+   <nav id="vCrumbs" class="flex items-center flex-wrap gap-1.5 text-[12px] text-ink-faint mb-6"></nav>
+   <div id="vView"></div>
  </div>
 </section>
 
@@ -231,133 +120,126 @@
 
 <script src="assets/engine.js"></script>
 <script>
-var REQUIRED = ['card','loyalty','calendar','inbox'];
-function rowFor(name){ return document.querySelector('.perm[data-perm="'+name+'"]'); }
+/* The Vault — one category at a time. Click a category, add its entries, save, come back
+   any time. Stored locally (tures.vault) so progress persists; sensitive values are masked
+   on display and raw values are never re-rendered. */
+var VCATS = [
+  { k:'payment',  mk:'$',  label:'Payment',              blurb:'Cards Tures charges — best card per spend, capped per trip.' },
+  { k:'identity', mk:'ID', label:'Identity & documents', blurb:'Passport and Known Traveler Number — applied at booking.' },
+  { k:'loyalty',  mk:'✦',  label:'Loyalty & status',     blurb:'Airline, hotel and Virtuoso numbers — credited automatically.' },
+  { k:'access',   mk:'⚙',  label:'Access',               blurb:'Calendar, inbox and messaging — scoped, revocable, logged.' }
+];
+function vLoad(){ try{ return JSON.parse(localStorage.getItem('tures.vault')||'{}'); }catch(e){ return {}; } }
+function vSave(){ try{ localStorage.setItem('tures.vault', JSON.stringify(VAULT)); }catch(e){} }
+var VAULT = vLoad();
+var vView=document.getElementById('vView'), vCrumbs=document.getElementById('vCrumbs'),
+    vHero=document.getElementById('vHero'), vSub=document.getElementById('vSub');
+function vCat(k){ for(var i=0;i<VCATS.length;i++) if(VCATS[i].k===k) return VCATS[i]; return null; }
+function digits(s){ return (s||'').replace(/\D/g,''); }
+function mask4(s){ var d=digits(s); return d? '···· '+d.slice(-4) : ''; }
+function maskDoc(s){ s=(s||'').trim(); return s.length>2 ? '·····'+s.slice(-2).toUpperCase() : (s?'·····':''); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function vMark(mk){ return '<span class="shrink-0 grid place-items-center font-mono text-[13px]" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--canvas-line);color:var(--gold-deep);background:rgba(200,162,74,0.08)">'+mk+'</span>'; }
+function vCrumb(parts){ vCrumbs.innerHTML = parts.map(function(p,i){ return i===parts.length-1 ? '<span class="text-ink">'+p.label+'</span>' : '<a href="'+p.hash+'" class="quiet hover:text-gold-deep" style="color:inherit">'+p.label+'</a><span class="text-ink-faint">/</span>'; }).join(' '); }
+function vFade(){ [].forEach.call(vView.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); }
 
-/* When an engine is configured, the toggles connect/revoke real vault grants (kept additive —
-   the scripted UX is unchanged either way). */
-var ENGINE_KIND = { card:'payment', loyalty:'loyalty', calendar:'calendar', inbox:'email' };
-var ENGINE_LABEL = { card:'AmEx ··1004', loyalty:'Loyalty programs', calendar:'Calendar', inbox:'Travel inbox' };
-var ENGINE_SECRET = { card:{ customerId:'cus_demo', paymentMethodId:'pm_demo' } };
-var _connIds = {};
-function syncEngine(name, on){
-  if(!(window.tures && tures.configured)) return;
-  var kind = ENGINE_KIND[name]; if(!kind) return; // messaging has no vault kind
-  if(on){
-    tures.connections.connect({ kind:kind, label:ENGINE_LABEL[name]||name, secret:ENGINE_SECRET[name]||{ token:'demo' }, meta:{ source:'demo' } })
-      .then(function(c){ _connIds[name] = c.id; })
-      .catch(function(e){ console.warn('[tures] connect failed', name, e); });
-  } else if(_connIds[name]){
-    tures.connections.revoke(_connIds[name]).catch(function(e){ console.warn('[tures] revoke failed', name, e); });
-    delete _connIds[name];
-  }
+function catState(k){
+  var v=VAULT[k];
+  if(k==='payment') return (v&&v.length)? v.length+(v.length===1?' card':' cards') : null;
+  if(k==='loyalty') return (v&&v.length)? v.length+(v.length===1?' program':' programs') : null;
+  if(k==='identity') return (v&&(v.passport||v.ktn))? 'On file' : null;
+  if(k==='access'){ if(!v) return null; var n=['calendar','inbox','messaging'].filter(function(x){return v[x];}).length; return n? n+' of 3 on' : null; }
+  return null;
 }
-function setGranted(name, on){
-  var row = rowFor(name); if(!row) return;
-  var sw = row.querySelector('.switch');
-  sw.classList.toggle('on', on); sw.classList.toggle('off', !on);
-  row.classList.toggle('granted', on);
-  if(on){ row.classList.remove('grant-flash'); void row.offsetWidth; row.classList.add('grant-flash'); }
-  update();
-  syncEngine(name, on);
-}
-function update(){
-  var on = [].slice.call(document.querySelectorAll('.switch.on')).length;
-  document.getElementById('connCount').textContent = on;
-  document.getElementById('connBar').style.width = (on/5*100)+'%';
-  var ready = REQUIRED.every(function(n){ return rowFor(n).querySelector('.switch').classList.contains('on'); });
-  var pill = document.getElementById('statusPill');
-  pill.innerHTML = ready ? '<span class="dot dot-green"></span> Ready to book' : '<span class="dot dot-amber"></span> Not ready';
-  pill.className = 'pill ' + (ready ? 'pill-confirm' : 'pill-pending');
-  var cta = document.getElementById('execCta');
+function updateCta(){
+  var cta=document.getElementById('execCta'); if(!cta) return;
+  var ready = catState('payment') && catState('identity');
   if(ready){ cta.style.opacity=1; cta.style.pointerEvents='auto'; cta.textContent='Begin execution →'; }
-  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Connect 4 required to begin →'; }
+  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Add a card & your documents to begin →'; }
 }
-// individual toggles
-document.querySelectorAll('[data-toggle]').forEach(function(sw){
-  sw.addEventListener('click', function(){
-    var name = sw.closest('.perm').getAttribute('data-perm');
-    setGranted(name, !sw.classList.contains('on'));
+function renderOverview(){
+  vHero.textContent='Set up your vault.';
+  vSub.textContent='One step at a time — a card, your documents, your programs. Saved as you go; pick up wherever you left off.';
+  vCrumb([{label:'Vault'}]);
+  var done=VCATS.filter(function(c){ return catState(c.k); }).length;
+  var h='<div class="leaf p-5 mb-5"><div class="flex items-center justify-between mb-2"><div class="caps text-[11px] text-ink-faint">Progress</div><span class="text-[12px] text-ink-soft">'+done+' of '+VCATS.length+' set up</span></div>'+
+    '<div class="track"><div class="fill" style="width:'+(done/VCATS.length*100)+'%"></div></div>'+
+    '<div class="text-[12px] text-ink-faint mt-3 flex items-center gap-2"><span class="text-gold-deep">✦</span> Tokenized &amp; encrypted · raw values never shown again · revoke any time.</div></div><div class="space-y-3">';
+  VCATS.forEach(function(c,i){
+    var st=catState(c.k);
+    h+='<a href="#'+c.k+'" class="legcard leaf lift flex items-center gap-3 p-4 quiet" style="transition-delay:'+(i*45)+'ms">'+vMark(c.mk)+
+      '<div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">'+c.label+'</div><div class="text-[12px] text-ink-faint mt-0.5">'+c.blurb+'</div></div>'+
+      (st? '<span class="pill pill-confirm shrink-0"><span class="dot dot-green"></span>'+st+'</span>' : '<span class="pill pill-pending shrink-0">Add</span>')+
+      '<span class="exp-chev text-gold-deep text-xl shrink-0">›</span></a>';
   });
-});
-// sequential grant
-document.getElementById('grantAll').addEventListener('click', function(){
-  var btn=this; btn.disabled=true; btn.style.opacity=.7; btn.textContent='Connecting…';
-  REQUIRED.forEach(function(name, i){
-    setTimeout(function(){
-      setGranted(name, true);
-      if(i===REQUIRED.length-1){ btn.textContent='✓ Connected'; setTimeout(function(){ btn.style.display='none'; }, 700); }
-    }, 350 + i*420);
-  });
-});
-update();
-</script>
-
-<!-- wallet & traveler profile — only active when an engine is configured -->
-<script>
-(function(){
-  if(!(window.tures && tures.configured)) return;        // scripted demo: leave panel hidden
-  var panel = document.getElementById('walletPanel');
-  panel.style.display = '';
-
-  var pick = document.getElementById('cardPick');
-  // populate card types from the engine catalog
-  tures.wallet.catalog().then(function(cat){
-    (cat.cards || []).forEach(function(c){
-      var o = document.createElement('option'); o.value = c.key; o.textContent = c.name; pick.appendChild(o);
-    });
-  }).catch(function(){});
-
-  function refresh(){
-    tures.connections.list().then(function(res){
-      var cards = (res.connections || []).filter(function(c){ return c.kind === 'payment'; });
-      var list = document.getElementById('walletList');
-      list.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — add one above.</div>';
-      cards.forEach(function(c){
-        var row = document.createElement('div');
-        row.className = 'flex items-center justify-between rounded-lg px-3 py-2 text-sm';
-        row.style = 'border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
-        row.innerHTML = '<span class="text-ink">' + c.label + '</span><button class="text-[12px] text-gold-deep hover:underline" data-revoke="' + c.id + '">remove</button>';
-        list.appendChild(row);
-      });
-      list.querySelectorAll('[data-revoke]').forEach(function(b){
-        b.onclick = function(){ tures.connections.revoke(b.getAttribute('data-revoke')).then(refresh); };
-      });
-      // recommend preview: who wins airfare vs hotel
-      if(cards.length){
-        Promise.all([
-          tures.wallet.recommend('airfare', 5000),
-          tures.wallet.recommend('hotel', 2000)
-        ]).then(function(rs){
-          var rec = document.getElementById('walletRec');
-          rec.style.display = '';
-          rec.innerHTML = '<strong>How Tures would charge:</strong><br>✈ Airfare → ' + (rs[0].name||'—') + '<br>⌂ Hotel → ' + (rs[1].name||'—');
-        }).catch(function(){});
-      } else {
-        document.getElementById('walletRec').style.display = 'none';
-      }
-    });
+  vView.innerHTML=h+'</div>'; vFade(); updateCta();
+}
+function fld(id,ph,extra){ return '<input id="'+id+'" placeholder="'+ph+'" '+(extra||'')+' class="w-full rounded-lg border px-3 py-2.5 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />'; }
+function savedRow(title, sub, onRemove){ return '<div class="flex items-center justify-between rounded-lg px-3 py-2.5 mb-2" style="border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)"><div class="min-w-0"><div class="text-sm text-ink font-mono truncate">'+title+'</div>'+(sub?'<div class="text-[11px] text-ink-faint">'+sub+'</div>':'')+'</div>'+(onRemove?'<button class="text-[12px] text-gold-deep hover:underline shrink-0 ml-3" onclick="'+onRemove+'">remove</button>':'')+'</div>'; }
+function renderCategory(c){
+  vHero.textContent=c.label; vSub.textContent=c.blurb;
+  vCrumb([{label:'Vault', hash:'#'}, {label:c.label}]);
+  var h='';
+  if(c.k==='payment'){
+    var cards=VAULT.payment||[];
+    if(cards.length){ h+='<div class="mb-4">'; cards.forEach(function(x,idx){ h+=savedRow(x.label,'Per-trip cap '+(x.cap?'$'+x.cap:'—'),"vRemove('payment',"+idx+")"); }); h+='</div>'; }
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Add a card</div>'+
+      fld('pCard','Card number','inputmode="numeric"')+'<div class="flex gap-2">'+fld('pName','Name on card')+fld('pCap','Per-trip cap (USD)','inputmode="numeric"')+'</div>'+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="addPayment()">Save card</button></div>';
+  } else if(c.k==='identity'){
+    var id=VAULT.identity||{};
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Travel documents</div>';
+    if(id.passport) h+=savedRow('Passport '+id.passport,'On file');
+    if(id.ktn) h+=savedRow('Known Traveler '+id.ktn,'On file');
+    h+=fld('iPass','Passport number')+fld('iKtn','Known Traveler Number (TSA Pre✓)')+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="saveIdentity()">Save documents</button></div>';
+  } else if(c.k==='loyalty'){
+    var progs=VAULT.loyalty||[];
+    if(progs.length){ h+='<div class="mb-4">'; progs.forEach(function(x,idx){ h+=savedRow(x.program,x.number,"vRemove('loyalty',"+idx+")"); }); h+='</div>'; }
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Add a program</div>'+
+      '<div class="flex gap-2">'+fld('lProg','Program (e.g. AAdvantage)')+fld('lNum','Number')+'</div>'+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="addLoyalty()">Save program</button></div>';
+  } else if(c.k==='access'){
+    var a=VAULT.access||{};
+    h+='<div class="leaf p-5"><div class="caps text-[11px] text-ink-faint mb-3">Scoped access · revocable</div><div class="space-y-3">'+
+      accessRow('calendar','Calendar','Route around what’s already booked', a.calendar)+
+      accessRow('inbox','Inbox','Read travel confirmations only', a.inbox)+
+      accessRow('messaging','Messaging','WhatsApp / Telegram · optional', a.messaging)+'</div></div>';
   }
-  refresh();
-
-  document.getElementById('addCard').onclick = function(){
-    var key = pick.value; var name = pick.options[pick.selectedIndex].textContent;
-    tures.connections.connect({ kind:'payment', label:name, secret:{ customerId:'cus_demo', paymentMethodId:'pm_'+key }, meta:{ cardKey:key, last4:'0000' } }).then(refresh);
-  };
-
-  document.getElementById('saveProfile').onclick = function(){
-    var profile = {
-      passport: document.getElementById('pfPassport').value ? { number: document.getElementById('pfPassport').value, country:'US' } : undefined,
-      knownTravelerNumber: document.getElementById('pfKtn').value || undefined,
-      memberships: document.getElementById('pfProgram').value ? [{ kind:'airline', program: document.getElementById('pfProgram').value, number: document.getElementById('pfNumber').value }] : []
-    };
-    tures.profile.set(profile)
-      .then(function(c){
-        document.getElementById('profileStatus').innerHTML = '✓ Saved · passport ' + (c.meta && c.meta.passportMasked || '—') + (c.meta && c.meta.ktnOnFile ? ' · KTN on file' : '');
-      }).catch(function(e){ document.getElementById('profileStatus').textContent = 'Save failed: ' + e; });
-  };
-})();
+  h+='<a href="#" class="inline-flex items-center gap-2 text-gold-deep text-sm quiet mt-5">← Save &amp; back to vault</a>';
+  vView.innerHTML=h;
+}
+function accessRow(key,label,desc,on){
+  return '<div class="flex items-center gap-3"><div class="flex-1 min-w-0"><div class="text-ink text-sm">'+label+'</div><div class="text-[11px] text-ink-faint">'+desc+'</div></div>'+
+    '<div class="switch '+(on?'on':'off')+'" onclick="toggleAccess(\''+key+'\',this)"><span class="knob"></span></div></div>';
+}
+window.addPayment=function(){
+  var card=document.getElementById('pCard').value, cap=digits(document.getElementById('pCap').value);
+  if(!digits(card)){ document.getElementById('pCard').focus(); return; }
+  VAULT.payment=VAULT.payment||[]; VAULT.payment.push({ label:mask4(card), cap:cap||null }); vSave(); renderCategory(vCat('payment'));
+};
+window.saveIdentity=function(){
+  var p=document.getElementById('iPass').value, k=document.getElementById('iKtn').value;
+  VAULT.identity=VAULT.identity||{};
+  if(p) VAULT.identity.passport=maskDoc(p);
+  if(k) VAULT.identity.ktn=mask4(k);
+  vSave(); renderCategory(vCat('identity'));
+};
+window.addLoyalty=function(){
+  var prog=document.getElementById('lProg').value.trim(), num=document.getElementById('lNum').value;
+  if(!prog){ document.getElementById('lProg').focus(); return; }
+  VAULT.loyalty=VAULT.loyalty||[]; VAULT.loyalty.push({ program:esc(prog), number:mask4(num)||'—' }); vSave(); renderCategory(vCat('loyalty'));
+};
+window.toggleAccess=function(key,el){
+  VAULT.access=VAULT.access||{}; VAULT.access[key]=!VAULT.access[key];
+  el.classList.toggle('on', VAULT.access[key]); el.classList.toggle('off', !VAULT.access[key]); vSave();
+};
+window.vRemove=function(kind,idx){ if(VAULT[kind]){ VAULT[kind].splice(idx,1); vSave(); renderCategory(vCat(kind)); } };
+function vRoute(){ var hs=(location.hash||'').replace(/^#/,''); var c=hs?vCat(hs):null; if(c) renderCategory(c); else renderOverview(); window.scrollTo(0,0); }
+window.addEventListener('hashchange', vRoute);
+vRoute();
 </script>
+
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
   <script src="assets/menu.js"></script>
