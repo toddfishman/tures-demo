@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Taste Print · LE CAMP</title>
+<meta name="description" content="Read the terrain. Six field calls map your expedition profile — one signal-red line across the ridge." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Agrandir→Bricolage Grotesque · DM Sans · DM Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#fe3a3a; --ink:#000; --white:#fff; --ridge:#767676;
+  --mist:#f5f5f5; --cream:#f5f0e8; --dark:#0a1628;
+  --disp:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --sans:'DM Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:var(--sans); color:var(--ink); background:var(--white); -webkit-font-smoothing:antialiased; }
+.wrap{ max-width:1200px; margin:0 auto; padding:0 30px; }
+.mono{ font-family:var(--mono); font-size:10px; line-height:1.3; letter-spacing:.04em; text-transform:uppercase; }
+.disp{ font-family:var(--disp); font-weight:800; line-height:1; letter-spacing:-.01em; }
+
+/* —— nav —— */
+nav{ position:absolute; top:0; left:0; right:0; z-index:20; }
+nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding-top:15px; padding-bottom:15px; }
+.brand{ display:flex; align-items:center; gap:10px; color:var(--white); text-decoration:none; font-family:var(--disp); font-weight:800; font-size:20px; letter-spacing:.02em; }
+.tri{ width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent; border-bottom:16px solid var(--red); }
+.pill{ display:inline-block; background:var(--red); color:var(--white); text-decoration:none; font-size:14px;
+  border-radius:35px; padding:10px 20px; box-shadow:0 2px 12px rgba(254,58,58,.25); }
+.pill.ink{ background:var(--ink); box-shadow:none; }
+
+/* —— hero —— */
+.hero{ position:relative; background:var(--dark); color:var(--white); overflow:hidden;
+  padding:150px 0 90px; }
+.hero .ph{ position:absolute; inset:0; background:url('assets/img/aurora-1920.webp') center/cover; opacity:.45; }
+.hero .ph::after{ content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(10,22,40,.55) 0%, rgba(10,22,40,.78) 60%, var(--dark) 100%); }
+.hero .wrap{ position:relative; z-index:2; }
+.hero .label{ color:var(--white); opacity:.85; }
+.hero h1{ font-size:clamp(54px,11vw,90px); margin-top:18px; max-width:12ch; }
+.hero p{ font-size:16px; line-height:1.4; max-width:46ch; margin-top:22px; opacity:.85; }
+/* floating program patches */
+.patches{ position:absolute; right:30px; top:120px; z-index:2; display:flex; gap:14px; }
+.patch{ width:96px; height:112px; border:2px solid; border-radius:14px 14px 14px 14px;
+  clip-path:polygon(0 0,100% 0,100% 72%,50% 100%,0 72%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px;
+  text-align:center; padding:10px; box-shadow:0 4px 20px rgba(10,22,40,.4); background:rgba(10,22,40,.35); }
+.patch svg{ width:30px; height:30px; }
+.patch .pn{ font-family:var(--mono); font-size:9px; letter-spacing:.04em; text-transform:uppercase; }
+.patch.red{ border-color:var(--red); color:var(--red); }
+.patch.white{ border-color:var(--white); color:var(--white); }
+@media(max-width:820px){ .patches{ display:none; } }
+
+/* —— calibration —— */
+.calib{ padding:60px 0; }
+.calib .head{ display:flex; align-items:baseline; gap:14px; }
+.calib h2{ font-size:clamp(34px,6vw,56px); }
+.grid{ display:grid; grid-template-columns:1.15fr .85fr; gap:48px; margin-top:36px; align-items:start; }
+@media(max-width:900px){ .grid{ grid-template-columns:1fr; gap:34px; } }
+
+/* decision card */
+.fieldcard{ border:1px solid var(--ink); border-radius:20px; overflow:hidden; }
+.fieldcard .top{ display:flex; align-items:center; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--ink); }
+.fieldcard .prompt{ font-family:var(--disp); font-weight:600; font-size:24px; padding:22px 22px 6px; }
+.opts{ display:grid; grid-template-columns:1fr 1fr; }
+.opt{ cursor:pointer; background:var(--white); border:none; text-align:left; padding:22px; font-family:var(--sans);
+  border-top:1px solid var(--ink); transition:background .2s,color .2s; }
+.opt:first-child{ border-right:1px solid var(--ink); }
+.opt .ol{ font-family:var(--disp); font-weight:600; font-size:20px; line-height:1.05; }
+.opt .os{ font-size:14px; line-height:1.4; margin-top:8px; color:#333; }
+.opt .pick{ font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--ridge); margin-bottom:12px; display:block; }
+.opt:hover{ background:var(--red); color:var(--white); }
+.opt:hover .os,.opt:hover .pick{ color:rgba(255,255,255,.9); }
+.opt.chosen{ background:var(--red); color:var(--white); }
+.fieldcard.gone{ opacity:0; transform:translateY(20px); transition:opacity .45s ease, transform .45s ease; }
+.steps{ display:flex; gap:6px; margin-top:18px; }
+.steps i{ flex:1; height:3px; background:#e3e0d8; border-radius:2px; }
+.steps i.on{ background:var(--red); }
+
+/* —— profile readout —— */
+.profile{ background:var(--mist); border-radius:20px; padding:30px; }
+.profile h3{ font-family:var(--disp); font-weight:600; font-size:22px; }
+.ridge-wrap{ margin:18px 0 6px; }
+#ridge{ width:100%; height:auto; display:block; }
+.traits{ display:flex; flex-direction:column; gap:0; margin-top:10px; }
+.trait{ display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-top:1px solid #e3e0d8; }
+.trait .tk{ font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:#000; }
+.trait .tv{ font-family:var(--sans); font-size:14px; font-weight:500; }
+.trait .tv.hot{ color:var(--red); }
+.confline{ display:flex; align-items:center; gap:12px; margin-top:20px; }
+.confline .ct{ flex:1; height:4px; background:#e3e0d8; border-radius:2px; overflow:hidden; }
+.confline .cf{ height:100%; width:18%; background:var(--red); transition:width .5s ease; }
+.confline .cn{ font-family:var(--mono); font-size:10px; letter-spacing:.04em; }
+
+/* earned patches row */
+.earned{ margin-top:22px; }
+.earned .lab{ color:var(--ridge); margin-bottom:10px; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{ font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase;
+  border:1px solid var(--ink); border-radius:35px; padding:6px 12px; opacity:0; transform:translateY(4px);
+  transition:opacity .35s, transform .35s; }
+.chip.in{ opacity:1; transform:none; }
+.chip.hot{ border-color:var(--red); color:var(--red); }
+
+/* —— finish —— */
+.finish{ display:none; padding:0 0 80px; }
+.finish.show{ display:block; }
+.feature{ background:var(--cream); border-radius:20px; padding:48px; }
+.feature .label{ color:var(--ink); }
+.feature h2{ font-family:var(--disp); font-weight:600; color:var(--red); font-size:clamp(30px,5vw,48px); line-height:1.05; margin-top:14px; }
+.feature .sig{ font-size:18px; line-height:1.45; margin-top:18px; max-width:60ch; }
+.checks{ list-style:none; margin-top:30px; display:grid; gap:14px; }
+.checks li{ display:flex; gap:12px; font-size:16px; line-height:1.4; }
+.checks li .bx{ flex:none; width:18px; height:18px; border:2px solid var(--red); border-radius:5px; position:relative; margin-top:2px; }
+.checks li .bx::after{ content:''; position:absolute; left:4px; top:0px; width:6px; height:11px; border:solid var(--red); border-width:0 2px 2px 0; transform:rotate(45deg); }
+.frow{ display:flex; gap:12px; margin-top:34px; flex-wrap:wrap; }
+.btn-sec{ font-family:var(--sans); cursor:pointer; background:transparent; color:var(--ink); border:1px solid var(--ink); border-radius:10px; padding:10px 20px; font-size:14px; text-decoration:none; }
+.foot{ border-top:1px solid var(--ink); padding:26px 0; }
+.foot .wrap{ display:flex; justify-content:space-between; align-items:center; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="01-landing.html"><span class="tri"></span>TURES</a>
+    <a class="pill" href="03-paste-trip.html">Start free</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="ph"></div>
+  <div class="patches">
+    <div class="patch red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20l6-12 4 7 3-5 5 10z"/></svg><span class="pn">Ridge</span></div>
+    <div class="patch white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg><span class="pn">Globe</span></div>
+  </div>
+  <div class="wrap">
+    <div class="mono label">Field calibration · 06 calls</div>
+    <h1 class="disp">Read the terrain.</h1>
+    <p>Six field calls. Each maps one axis of how you move. We plot the line; the concierge follows it on every trip.</p>
+  </div>
+</header>
+
+<main class="wrap calib">
+  <div class="head">
+    <span class="mono">Section 01</span>
+    <h2 class="disp">The field log</h2>
+  </div>
+
+  <div class="grid">
+    <!-- decision card -->
+    <section>
+      <div class="fieldcard" id="card"></div>
+      <div class="steps" id="steps"></div>
+    </section>
+
+    <!-- live profile -->
+    <aside class="profile">
+      <h3>Expedition profile</h3>
+      <div class="ridge-wrap"><svg id="ridge" viewBox="0 0 360 130"></svg></div>
+      <div class="traits" id="traits"></div>
+      <div class="confline">
+        <span class="mono">Signal lock</span>
+        <div class="ct"><div class="cf" id="cf"></div></div>
+        <span class="cn" id="cn">0.18</span>
+      </div>
+      <div class="earned">
+        <div class="mono lab">Patches earned</div>
+        <div class="chips" id="chips"><span class="mono" style="color:#aaa">— none yet —</span></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- finish -->
+<section class="wrap finish" id="finish">
+  <div class="feature">
+    <div class="mono label">Profile locked</div>
+    <h2 id="fhead">Your line across the ridge.</h2>
+    <p class="sig" id="sig">—</p>
+    <ul class="checks" id="behaviors"></ul>
+    <div class="frow">
+      <a class="pill" href="03-paste-trip.html">Describe a trip →</a>
+      <button class="btn-sec" onclick="restart()">Recalibrate</button>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" style="color:#000" href="01-landing.html"><span class="tri"></span>TURES</a>
+    <span class="mono" style="color:var(--ridge)">LE CAMP · expedition cartography</span>
+  </div>
+</footer>
+
+<script src="assets/taste-core.js"></script>
+<script>
+/* ---- LE CAMP renderer: topographic ridgeline + mono trait readout ---- */
+function ridgePts(){
+  return DIMS.map((d,i)=>{ const x=20+i*(320/5), y=115-(d.v/100)*95; return [x,y]; });
+}
+function renderFingerprint(){
+  const pts=ridgePts();
+  const line=pts.map(p=>p.join(',')).join(' ');
+  const area=`20,120 ${line} ${20+5*(320/5)},120`;
+  let g=`<polygon points="${area}" fill="rgba(254,58,58,.08)"/>`;
+  // baseline + faint grid
+  g+=`<line x1="20" y1="120" x2="340" y2="120" stroke="#d8d4ca"/>`;
+  g+=`<polyline points="${line}" fill="none" stroke="#fe3a3a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="transition:all .5s cubic-bezier(.6,.02,.2,1)"/>`;
+  pts.forEach(p=>{ g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff" stroke="#fe3a3a" stroke-width="2"/>`; });
+  document.getElementById('ridge').innerHTML=g;
+
+  // trait readout
+  const tr=document.getElementById('traits');
+  tr.innerHTML=DIMS.map(d=>{
+    const lean = d.v>54 ? d.right : (d.v<46 ? d.left : 'Balanced');
+    const hot = Math.abs(d.v-50)>14 ? 'hot':'';
+    return `<div class="trait"><span class="tk">${d.label}</span><span class="tv ${hot}">${lean}</span></div>`;
+  }).join('');
+}
+function renderConf(v){ document.getElementById('cf').style.width=(v*100)+'%'; document.getElementById('cn').textContent=v.toFixed(2); }
+function renderTags(list){
+  const el=document.getElementById('chips');
+  if(!list.length){ el.innerHTML='<span class="mono" style="color:#aaa">— none yet —</span>'; return; }
+  el.innerHTML='';
+  list.forEach((t,i)=>{ const c=document.createElement('span'); c.className='chip'+(i%2?' hot':''); c.textContent=t; el.appendChild(c); requestAnimationFrame(()=>c.classList.add('in')); });
+}
+function renderPlate(c){
+  const card=document.getElementById('card');
+  card.classList.remove('gone');
+  card.innerHTML=`
+    <div class="top"><span class="mono">Dimension 0${qi+1} — ${c.dim}</span><span class="mono" style="color:var(--ridge)">${qi+1}/6</span></div>
+    <div class="prompt">${c.prompt}</div>
+    <div class="opts">
+      <button class="opt" onclick="choose('left')"><span class="pick">Field call ←</span><span class="ol">${c.left.label}</span><span class="os">${c.left.sub}</span></button>
+      <button class="opt" onclick="choose('right')"><span class="pick">Field call →</span><span class="ol">${c.right.label}</span><span class="os">${c.right.sub}</span></button>
+    </div>`;
+  renderSteps();
+}
+function renderSteps(){
+  const s=document.getElementById('steps'); let h='';
+  for(let i=0;i<6;i++) h+=`<i class="${i<=qi?'on':''}"></i>`;
+  s.innerHTML=h;
+}
+function flingPlate(dir){
+  const card=document.getElementById('card');
+  const opts=card.querySelectorAll('.opt');
+  if(opts.length){ opts[dir==='right'?1:0].classList.add('chosen'); }
+  setTimeout(()=>card.classList.add('gone'), 180);
+}
+function showFinish(sig, behaviors){
+  document.querySelector('.calib').style.display='none';
+  const fin=document.getElementById('finish'); fin.classList.add('show');
+  document.getElementById('sig').textContent=sig;
+  const ul=document.getElementById('behaviors'); ul.innerHTML='';
+  behaviors.forEach(t=> ul.insertAdjacentHTML('beforeend', `<li><span class="bx"></span><span>${t}</span></li>`));
+}
+function resetView(){
+  document.querySelector('.calib').style.display='';
+  document.getElementById('finish').classList.remove('show');
+}
+startTaste();
+</script>
+</body>
+</html>
