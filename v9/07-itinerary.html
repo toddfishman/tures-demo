@@ -50,57 +50,18 @@
 </header>
 
 <section class="leather-surface grain relative overflow-hidden">
- <div class="ghost-num absolute -top-10 right-2 text-[26vw] sm:text-[16vw] z-0" data-parallax="0.14">VII</div>
- <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9 flex items-end justify-between flex-wrap gap-5">
-  <div>
-   <div class="caps text-[11px] text-gold/70 mb-3 flex items-center gap-2">My Trips <span class="pill pill-d-gold normal-case tracking-normal">Sample trip</span></div>
-   <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Eleven days, booked.</h1>
-   <div class="text-canvas/70 mt-2">Paris · Saariselkä · Copenhagen · Dec 3 – 13</div>
-  </div>
-  <div class="flex gap-2">
-    <span class="pill pill-d-confirm">7 legs verified ×2</span>
-    <span class="pill pill-d-gold">9 dinners</span>
-  </div>
+ <div class="ghost-num absolute -top-10 right-2 text-[26vw] sm:text-[16vw] z-0" data-parallax="0.14">VI</div>
+ <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-9">
+   <div class="caps text-[11px] text-gold/70 mb-3">My Trips</div>
+   <h1 id="heroTitle" class="font-display text-5xl sm:text-6xl leading-[1.0]">Every trip, kept.</h1>
+   <div id="heroSub" class="text-canvas/70 mt-2">Booked, verified twice, and filed. Open a trip to see its receipts.</div>
  </div>
 </section>
 
-<section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8">
-
-  <!-- LEG CARDS -->
-  <div class="lg:col-span-8">
-   <div class="flex items-center justify-between mb-4">
-     <div class="caps text-[11px] text-ink-faint">Your trip · tap any leg for the receipt</div>
-     <span class="refresh-hint"><span class="rh-chev">↓</span> All current</span>
-   </div>
-   <div class="space-y-2.5" id="legs"></div>
-  </div>
-
-  <!-- RECEIPTS -->
-  <aside class="lg:col-span-4 space-y-4">
-    <div class="leaf p-6">
-      <div class="caps text-[11px] text-ink-faint mb-2">Authorized total</div>
-      <div class="font-display text-4xl text-ink">$<span data-countup="25763" data-countup-dur="1600">0</span></div>
-      <div class="text-sm text-ink-soft mt-1">AmEx ··1004 · itemized</div>
-      <div class="rule-ink my-4"></div>
-      <ul class="space-y-2 text-sm text-ink/85">
-        <li class="flex justify-between"><span>Flights (4 segments)</span><span class="font-mono">$14,980</span></li>
-        <li class="flex justify-between"><span>Hotels (9 nights)</span><span class="font-mono">$9,491</span></li>
-        <li class="flex justify-between"><span>Dinners &amp; deposits</span><span class="font-mono">$1,643</span></li>
-        <li class="flex justify-between" style="color:var(--confirm-ink)"><span>Rate-protect credit</span><span class="font-mono">−$351</span></li>
-        <li class="flex justify-between" style="color:var(--confirm-ink)"><span>ATC reroute fee</span><span class="font-mono">$0</span></li>
-      </ul>
-    </div>
-    <div class="leaf p-5">
-      <div class="caps text-[11px] text-ink-faint mb-2">Handled while you traveled</div>
-      <div class="flex items-baseline gap-2"><span class="font-display text-3xl text-ink" data-countup="3" data-countup-dur="1000">0</span><span class="text-sm text-ink-soft">disruptions pre-empted</span></div>
-      <a href="06-hiccup-handler.html" class="text-xs text-gold-deep hover:underline quiet">See the watch log →</a>
-    </div>
-    <div class="leaf p-5">
-      <div class="caps text-[11px] text-ink-faint mb-2">Loyalty earned</div>
-      <div class="text-sm text-ink/85">OneWorld <strong>Emerald</strong> mid-trip · 86,200 tier pts.</div>
-    </div>
-  </aside>
+<section class="canvas-surface text-ink" style="min-height:62vh">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 py-10">
+   <nav id="crumbs" class="flex items-center flex-wrap gap-1.5 text-[12px] text-ink-faint mb-6"></nav>
+   <div id="view"></div>
  </div>
 </section>
 
@@ -119,69 +80,151 @@
 </div>
 
 <script>
-/* stylized, self-contained SVG "map" thumbnails (no external tiles) */
-function mapThumb(seed){
-  var r=(n)=>{ var x=Math.sin(seed*99+n*37)*10000; return x-Math.floor(x); };
-  var px=8+r(1)*40, py=8+r(2)*40;
-  var ax=8+r(3)*48, ay=44+r(4)*12;
-  var grid='';
-  for(var i=1;i<4;i++){ grid+='<line x1="'+(i*16)+'" y1="0" x2="'+(i*16)+'" y2="64" stroke="rgba(43,33,20,0.07)"/>'; grid+='<line x1="0" y1="'+(i*16)+'" x2="64" y2="'+(i*16)+'" stroke="rgba(43,33,20,0.07)"/>'; }
-  return '<svg class="mapthumb" viewBox="0 0 64 64" width="56" height="56">'+grid+
-    '<path d="M'+ax+' '+ay+' Q '+((ax+px)/2)+' '+(ay-18)+' '+px+' '+py+'" fill="none" stroke="#c8a24a" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7"/>'+
-    '<circle cx="'+ax+'" cy="'+ay+'" r="2.2" fill="#97886f"/>'+
-    '<circle cx="'+px+'" cy="'+py+'" r="3.4" fill="#c8a24a"/><circle cx="'+px+'" cy="'+py+'" r="6" fill="none" stroke="#c8a24a" opacity="0.4"/>'+
-    '</svg>';
-}
-
-/* self-hosted, optimized webp thumbnails (see assets/img/) keyed by original Unsplash id */
-var TMAP = {
-  '1502602898657-3e91760cbb34':'paris',
-  '1431274172761-fca41d930114':'stay-paris',
-  '1483347756197-71ef80e95f73':'aurora',
-  '1538970272646-f61fabb3a8a2':'lapland-cabin',
-  '1513622470522-26c3c8a854bc':'fly-cph',
-  '1552410260-0fd9b577afa6':'stay-cph',
-  '1502175353174-a7a70e73b362':'fly-sea',
-};
-var IMG = function(id){ return 'assets/img/'+TMAP[id]+'-320.webp'; };
-var STOPS = [
-  {kind:'fly', photo:IMG('1502602898657-3e91760cbb34'), place:'Paris', status:['pill-confirm','Verified'], title:'AA 142 · SEA → CDG', dates:'Dec 3 → 4 · non-stop',
-   detail:'Business · seat 5A · non-stop · <span class="font-mono">PNR LXJ7Q3</span><br>AAdvantage credited · 25,200 EQM.'},
-  {kind:'stay', photo:IMG('1431274172761-fca41d930114'), place:'Paris', status:['pill-confirm','Verified'], title:'Real Christine, Paris', dates:'Dec 4 → 7 · 3 nights',
-   detail:'Junior Suite · garden view · breakfast · <span class="font-mono">CONF 8849-RCP</span><br>Virtuoso: €100 F&amp;B credit + upgrade at check-in.'},
-  {kind:'fly', photo:IMG('1483347756197-71ef80e95f73'), place:'Finnish Lapland', status:['pill-gold','Approved alt'], title:'AY 1574 · CDG → HEL → IVL', dates:'Dec 7 · 10:25 → 21:00',
-   detail:'Business · 1h 50m HEL connection · approved alternative to the non-existent non-stop · 4,300 tier pts.'},
-  {kind:'stay', photo:IMG('1538970272646-f61fabb3a8a2'), place:'Saariselkä', status:['pill-confirm','Verified'], title:'Javri Lodge, Saariselkä', dates:'Dec 7 → 10 · 3 nights',
-   detail:'Aurora Suite · private terrace · half-board · airport transfer · <span class="font-mono">CONF JL-12041</span>.'},
-  {kind:'fly', photo:IMG('1513622470522-26c3c8a854bc'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'AY 945 · IVL → HEL → CPH', dates:'Dec 10 · 14:20 → 19:15',
-   detail:'Business · refundable fare D · <span class="font-mono">PNR 5RT2QK</span>.'},
-  {kind:'stay', photo:IMG('1552410260-0fd9b577afa6'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'Hotel Sanders, Copenhagen', dates:'Dec 10 → 13 · 3 nights',
-   detail:'Junior Suite · booked direct · <span class="font-mono" style="color:var(--confirm-ink)">rate-protected −$351</span> · <span class="font-mono">CONF SAN-3398</span>.'},
-  {kind:'flag', photo:IMG('1502175353174-a7a70e73b362'), place:'Seattle', status:['pill-confirm','Rerouted'], title:'KL 1130 + DL 9302 · CPH → AMS → SEA', dates:'Dec 13 · 11:05 → 17:40',
-   detail:'Business · <strong>re-routed around the CDG ATC strike</strong> by the Hiccup Handler · fare protected · $0 change fee · <span class="font-mono">PNR 7QZ2RB</span>.'},
+/* My Trips — high-level → drill down. Trips → category (Flights/Lodging/Dining/
+   Transportation/Excursions) → items. Hash-routed (#trip, #trip/category). Mock data. */
+var TRIPS = [
+ { id:'nordic', title:'The Nordic Aurora', places:'Paris · Saariselkä · Copenhagen', dates:'Dec 3 – 13, 2026', status:['pill-gold','Upcoming'], blurb:'Eleven days, booked and verified twice.',
+   cats:{
+     flights:[
+       {title:'AA 142 · SEA → CDG', meta:'Dec 3 · non-stop · Business 5A', status:['pill-confirm','Verified'], detail:'AAdvantage credited · 25,200 EQM · <span class="font-mono">PNR LXJ7Q3</span>'},
+       {title:'AY 1574 · CDG → HEL → IVL', meta:'Dec 7 · 1h50 connection · Business', status:['pill-gold','Approved alt'], detail:'Approved alternative to the non-existent non-stop · 4,300 tier pts.'},
+       {title:'AY 945 · IVL → HEL → CPH', meta:'Dec 10 · refundable D · Business', status:['pill-confirm','Verified'], detail:'<span class="font-mono">PNR 5RT2QK</span>'},
+       {title:'KL 1130 + DL 9302 · CPH → AMS → SEA', meta:'Dec 13 · Business', status:['pill-confirm','Rerouted'], detail:'Re-routed around the CDG ATC strike by the Hiccup Handler · $0 change fee · <span class="font-mono">PNR 7QZ2RB</span>'}
+     ],
+     lodging:[
+       {title:'Real Christine, Paris', meta:'Dec 4 → 7 · Junior Suite · garden', status:['pill-confirm','Verified'], detail:'Breakfast · Virtuoso €100 F&amp;B credit + upgrade · <span class="font-mono">CONF 8849-RCP</span>'},
+       {title:'Javri Lodge, Saariselkä', meta:'Dec 7 → 10 · Aurora Suite', status:['pill-confirm','Verified'], detail:'Private terrace · half-board · airport transfer · <span class="font-mono">CONF JL-12041</span>'},
+       {title:'Hotel Sanders, Copenhagen', meta:'Dec 10 → 13 · Junior Suite', status:['pill-confirm','Verified'], detail:'Booked direct · <span class="font-mono" style="color:var(--confirm-ink)">rate-protected −$351</span> · <span class="font-mono">CONF SAN-3398</span>'}
+     ],
+     dining:[
+       {title:'Septime, Paris', meta:'Dec 5 · 20:00 · 2 guests', status:['pill-confirm','Confirmed'], detail:'Tasting menu · held on deposit · window table requested.'},
+       {title:'Frenchie, Paris', meta:'Dec 6 · 21:00 · 2 guests', status:['pill-confirm','Confirmed'], detail:'Counter seats · wine pairing.'},
+       {title:'Aurora dinner, Javri Lodge', meta:'Dec 8 · in-lodge', status:['pill-confirm','Included'], detail:'Half-board — reindeer &amp; cloudberry tasting.'},
+       {title:'Kadeau, Copenhagen', meta:'Dec 11 · 19:30 · 2 guests', status:['pill-pending','Requested'], detail:'On the list — Tures is holding for confirmation.'}
+     ],
+     transportation:[
+       {title:'CDG → Real Christine', meta:'Dec 4 · private car', status:['pill-confirm','Booked'], detail:'Mercedes E-Class · meet &amp; greet.'},
+       {title:'Ivalo airport → Javri Lodge', meta:'Dec 7 · lodge transfer', status:['pill-confirm','Included'], detail:'Heated transfer · 35 min.'},
+       {title:'Copenhagen airport → Hotel Sanders', meta:'Dec 10 · private car', status:['pill-confirm','Booked'], detail:'Confirmed with the hotel.'}
+     ],
+     excursions:[
+       {title:'Louvre after-hours', meta:'Dec 5 · 18:30 · private', status:['pill-confirm','Booked'], detail:'Skip-the-line · docent-led · 90 min.'},
+       {title:'Aurora snowmobile safari', meta:'Dec 8 · 21:00', status:['pill-confirm','Booked'], detail:'Guided · thermal suits · hot berry juice.'},
+       {title:'Husky sled morning', meta:'Dec 9 · 09:00', status:['pill-confirm','Booked'], detail:'Your own team of six · 8 km trail.'}
+     ]
+   }
+ },
+ { id:'tokyo', title:'Tokyo, in the rain', places:'Tokyo · Hakone', dates:'Apr 2 – 9, 2026', status:['pill-confirm','Completed'], blurb:'Seven days. Every reservation kept.',
+   cats:{
+     flights:[ {title:'NH 175 · SFO → HND', meta:'Apr 2 · Business · The Room', status:['pill-confirm','Flown'], detail:'<span class="font-mono">PNR NH8821</span>'}, {title:'NH 110 · HND → SFO', meta:'Apr 9 · Business', status:['pill-confirm','Flown'], detail:'<span class="font-mono">PNR NH9120</span>'} ],
+     lodging:[ {title:'Aman Tokyo', meta:'Apr 2 → 6 · Deluxe', status:['pill-confirm','Stayed'], detail:'Otemachi · onsen · <span class="font-mono">CONF AMN-7741</span>'}, {title:'Gora Kadan, Hakone', meta:'Apr 6 → 9 · ryokan', status:['pill-confirm','Stayed'], detail:'Private onsen suite · kaiseki.'} ],
+     dining:[ {title:'Sukiyabashi Jiro', meta:'Apr 3 · 17:30', status:['pill-confirm','Dined'], detail:'Counter · omakase.'}, {title:'Den, Tokyo', meta:'Apr 4 · 19:00', status:['pill-confirm','Dined'], detail:'The famous "Dentucky".'} ],
+     transportation:[ {title:'HND → Aman · private car', meta:'Apr 2', status:['pill-confirm','Done'], detail:'Toyota Century.'}, {title:'Romancecar → Hakone', meta:'Apr 6 · reserved', status:['pill-confirm','Done'], detail:'Front car, Mt Fuji side.'} ],
+     excursions:[ {title:'teamLab Planets', meta:'Apr 4 · 10:00', status:['pill-confirm','Done'], detail:'Pre-dawn private entry.'}, {title:'Hakone Open-Air Museum', meta:'Apr 7', status:['pill-confirm','Done'], detail:'Guided.'} ]
+   }
+ },
+ { id:'bigisland', title:'The Big Island', places:'Kona · Hilo', dates:'Oct 12 – 19, 2026', status:['pill-pending','Planning'], blurb:'Held and ready — your word turns it real.',
+   cats:{
+     flights:[ {title:'AS 824 · SEA → KOA', meta:'Oct 12 · First', status:['pill-pending','Held'], detail:'Two seats held for 48h.'} ],
+     lodging:[ {title:'Four Seasons Hualālai', meta:'Oct 12 → 19 · Ocean view', status:['pill-pending','Held'], detail:'Hold expires Friday.'} ],
+     dining:[ {title:'ULU Ocean Grill', meta:'Oct 13 · 19:00', status:['pill-pending','Suggested'], detail:'Tures’ pick for night one.'} ],
+     transportation:[ {title:'Kona airport · SUV', meta:'Oct 12', status:['pill-pending','Suggested'], detail:'4x4 for the volcano road.'} ],
+     excursions:[ {title:'Mauna Kea summit &amp; stars', meta:'Oct 15 · evening', status:['pill-pending','Suggested'], detail:'Private guide · telescopes.'}, {title:'Manta night snorkel', meta:'Oct 16', status:['pill-pending','Suggested'], detail:'Small group.'} ]
+   }
+ }
+];
+var CATS = [
+  {k:'flights', label:'Flights', mk:'F'},
+  {k:'lodging', label:'Lodging', mk:'L'},
+  {k:'dining', label:'Dining', mk:'D'},
+  {k:'transportation', label:'Transportation', mk:'T'},
+  {k:'excursions', label:'Excursions', mk:'E'}
 ];
 
-var legsEl = document.getElementById('legs');
-STOPS.forEach(function(s, i){
-  var icon = s.kind==='stay'?'⌂':s.kind==='flag'?'⚑':'✈';
-  var titleCls = s.kind==='stay' ? 'font-display text-lg' : 'font-mono text-[15px]';
-  var flagStyle = s.kind==='flag' ? ' style="border-color:rgba(95,125,79,0.4)"' : '';
-  var html = '<div class="exp legcard leaf"'+flagStyle+' style="transition-delay:'+(i*55)+'ms">'+
-    '<div class="exp-head flex items-center gap-3 p-3 cursor-pointer">'+
-      '<img class="mapthumb" src="'+s.photo+'" alt="'+s.place+'" loading="lazy">'+
-      '<div class="flex-1 min-w-0">'+
-        '<div class="'+titleCls+' text-ink leading-tight truncate">'+s.title+'</div>'+
-        '<div class="text-xs text-ink-faint mt-0.5">'+s.dates+'</div>'+
+var viewEl = document.getElementById('view');
+var crumbsEl = document.getElementById('crumbs');
+var heroTitle = document.getElementById('heroTitle');
+var heroSub = document.getElementById('heroSub');
+
+function tripById(id){ for(var i=0;i<TRIPS.length;i++) if(TRIPS[i].id===id) return TRIPS[i]; return null; }
+function catByKey(k){ for(var i=0;i<CATS.length;i++) if(CATS[i].k===k) return CATS[i]; return null; }
+function pill(s){ return s ? '<span class="pill '+s[0]+' shrink-0">'+s[1]+'</span>' : ''; }
+function mark(mk){ return '<span class="shrink-0 grid place-items-center font-mono text-sm" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--canvas-line);color:var(--gold-deep);background:rgba(200,162,74,0.08)">'+mk+'</span>'; }
+function setHero(t,s){ heroTitle.textContent=t; heroSub.textContent=s; }
+function crumbs(parts){
+  crumbsEl.innerHTML = parts.map(function(p,i){
+    if(i===parts.length-1) return '<span class="text-ink">'+p.label+'</span>';
+    return '<a href="'+p.hash+'" class="quiet hover:text-gold-deep" style="color:inherit">'+p.label+'</a><span class="text-ink-faint">/</span>';
+  }).join(' ');
+}
+function fade(){ [].forEach.call(viewEl.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); }
+
+function renderTrips(){
+  setHero('Every trip, kept.', 'Booked, verified twice, and filed. Open a trip to see its receipts.');
+  crumbs([{label:'Trips'}]);
+  var html = '<div class="caps text-[11px] text-ink-faint mb-4">'+TRIPS.length+' trips · tap to open</div><div class="space-y-3">';
+  TRIPS.forEach(function(t,i){
+    var counts = CATS.map(function(c){ var n=(t.cats[c.k]||[]).length; return n? n+' '+c.label.toLowerCase() : null; }).filter(Boolean).join(' · ');
+    html += '<a href="#'+t.id+'" class="legcard leaf lift block p-5 quiet" style="transition-delay:'+(i*55)+'ms">'+
+      '<div class="flex items-start gap-4">'+
+        '<div class="flex-1 min-w-0">'+
+          '<div class="flex items-center gap-2 flex-wrap"><span class="font-display text-2xl text-ink leading-tight">'+t.title+'</span>'+pill(t.status)+'</div>'+
+          '<div class="text-sm text-ink-soft mt-1">'+t.places+' · '+t.dates+'</div>'+
+          '<div class="text-[12px] text-ink-faint mt-2">'+counts+'</div>'+
+        '</div>'+
+        '<span class="exp-chev text-gold-deep text-xl shrink-0">›</span>'+
+      '</div></a>';
+  });
+  viewEl.innerHTML = html + '</div>'; fade();
+}
+
+function renderTrip(t){
+  setHero(t.title, t.places+' · '+t.dates);
+  crumbs([{label:'Trips', hash:'#'}, {label:t.title}]);
+  var html = '<div class="caps text-[11px] text-ink-faint mb-4">'+t.blurb+'</div><div class="grid sm:grid-cols-2 gap-3">';
+  CATS.forEach(function(c,i){
+    var n=(t.cats[c.k]||[]).length;
+    html += '<a href="#'+t.id+'/'+c.k+'" class="legcard leaf lift flex items-center gap-3 p-4 quiet" style="transition-delay:'+(i*45)+'ms">'+
+      mark(c.mk)+
+      '<div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">'+c.label+'</div>'+
+      '<div class="text-[12px] text-ink-faint mt-0.5">'+(n? n+(n===1?' item':' items') : 'Nothing yet')+'</div></div>'+
+      '<span class="exp-chev text-gold-deep text-xl shrink-0">›</span></a>';
+  });
+  viewEl.innerHTML = html + '</div>'; fade();
+}
+
+function renderCategory(t,c){
+  var items = t.cats[c.k]||[];
+  setHero(t.title, c.label+' · '+t.dates);
+  crumbs([{label:'Trips', hash:'#'}, {label:t.title, hash:'#'+t.id}, {label:c.label}]);
+  var html = '<div class="caps text-[11px] text-ink-faint mb-4">'+c.label+' · '+items.length+(items.length===1?' item':' items')+'</div><div class="space-y-2.5">';
+  if(!items.length) html += '<div class="leaf p-5 text-sm text-ink-soft">Nothing here yet.</div>';
+  items.forEach(function(it,i){
+    html += '<div class="exp legcard leaf" style="transition-delay:'+(i*50)+'ms">'+
+      '<div class="exp-head flex items-center gap-3 p-4 cursor-pointer">'+
+        '<div class="flex-1 min-w-0"><div class="font-mono text-[14px] text-ink leading-tight">'+it.title+'</div>'+
+        '<div class="text-[12px] text-ink-faint mt-0.5">'+it.meta+'</div></div>'+
+        pill(it.status)+'<span class="exp-chev text-gold-deep">›</span>'+
       '</div>'+
-      '<span class="pill '+s.status[0]+' shrink-0 hidden sm:inline-flex">'+s.status[1]+'</span>'+
-      '<span class="exp-chev text-gold-deep">›</span>'+
-    '</div>'+
-    '<div class="exp-body"><div class="px-3 pb-3"><div class="rule-ink mb-3"></div>'+
-      '<p class="text-[13px] text-ink-soft leading-relaxed pl-1">'+s.detail+'</p></div></div>'+
-  '</div>';
-  legsEl.insertAdjacentHTML('beforeend', html);
-});
-[].forEach.call(legsEl.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); if(window.turesWatch) window.turesWatch(c); });
+      '<div class="exp-body"><div class="px-4 pb-4"><div class="rule-ink mb-3"></div>'+
+        '<p class="text-[13px] text-ink-soft leading-relaxed">'+it.detail+'</p></div></div>'+
+    '</div>';
+  });
+  viewEl.innerHTML = html + '</div>'; fade();
+}
+
+function route(){
+  var h = (location.hash||'').replace(/^#/, '');
+  if(!h){ renderTrips(); window.scrollTo(0,0); return; }
+  var parts = h.split('/');
+  var t = tripById(parts[0]);
+  if(!t){ renderTrips(); window.scrollTo(0,0); return; }
+  var c = parts[1] ? catByKey(parts[1]) : null;
+  if(c){ renderCategory(t,c); } else { renderTrip(t); }
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', route);
+route();
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>

@@ -161,7 +161,7 @@
   /* ---------- gentle bounded parallax on decorative numerals (.ghost-num) ----------
      Skips any numeral that already uses transform for layout, so centering never breaks. */
   var ghosts = [].slice.call(document.querySelectorAll('.ghost-num')).filter(function (el) {
-    return getComputedStyle(el).transform === 'none';
+    return !el.hasAttribute('data-parallax') && getComputedStyle(el).transform === 'none';
   });
   if (ghosts.length && !RM) {
     var gtick = false;
