@@ -88,6 +88,23 @@
   .chatwin .chip{ background:rgba(255,255,255,0.05) !important; color:rgba(236,227,208,0.85) !important; border-color:rgba(200,162,74,0.32) !important; }
   .chatwin .chip.on{ background:var(--gold) !important; color:#241a0c !important; }
   .chatwin .qr{ background:rgba(255,255,255,0.05) !important; color:var(--gold-bright) !important; border-color:rgba(200,162,74,0.4) !important; }
+
+  /* ---- executor choreography: live acting + stamped confirmations ---- */
+  .actbar{ position:relative; width:36px; height:3px; border-radius:3px; overflow:hidden; background:rgba(200,162,74,0.18); margin-left:2px; }
+  .actbar::after{ content:""; position:absolute; top:0; bottom:0; left:-45%; width:45%; border-radius:3px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent); animation:actslide 1.05s linear infinite; }
+  @keyframes actslide{ to{ left:100%; } }
+  .confline{ display:inline-flex; align-items:center; flex-wrap:wrap; gap:7px; }
+  .confcode{ position:relative; display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; letter-spacing:.05em; color:var(--gold-deep); background:rgba(200,162,74,0.12);
+    border:1px solid rgba(200,162,74,0.42); padding:4px 10px; border-radius:8px; }
+  .confcode .seal{ font-family:'Cormorant Garamond',serif; font-size:13px; line-height:1; color:var(--gold); }
+  .confcode.stamp{ animation:stampIn .52s cubic-bezier(.2,1.5,.4,1) both; transform-origin:center; }
+  @keyframes stampIn{ 0%{ transform:scale(1.7) rotate(-7deg); opacity:0; } 55%{ opacity:1; } 72%{ transform:scale(.93) rotate(1.5deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  .confcode::after{ content:""; position:absolute; inset:-6px; border-radius:11px; border:1.5px solid var(--gold); opacity:0; pointer-events:none; }
+  .confcode.stamp::after{ animation:stampRing .62s ease-out both; }
+  @keyframes stampRing{ 0%{ transform:scale(.6); opacity:0; } 30%{ opacity:.5; } 100%{ transform:scale(1.3); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .confcode.stamp, .confcode.stamp::after, .actbar::after{ animation:none; } }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -316,7 +333,7 @@ function typing(){
 function actingPill(label){
   var el = document.createElement('div');
   el.className = 'msg';
-  el.innerHTML = '<span class="acting"><span class="dot dot-amber pulse"></span><span id="reasonLine">'+label+'</span></span>';
+  el.innerHTML = '<span class="acting"><span class="dot dot-amber beat"></span><span id="reasonLine">'+label+'</span><span class="actbar"></span></span>';
   chat.appendChild(el);
   requestAnimationFrame(function(){ el.classList.add('in'); });
   el.scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -617,7 +634,7 @@ function previewBooking(plan, cta){
     var ty = typing();
     setTimeout(function(){
       ty.remove();
-      addMsg(l.icon + ' Booked <strong>' + l.t + '</strong> · <span class="font-mono text-ink-faint">' + l.c + '</span> <span class="text-ink-faint">(preview)</span>', 't');
+      addMsg('<span class="confline">' + l.icon + ' Booked <strong>' + l.t + '</strong> <span class="confcode stamp"><span class="seal">✦</span>' + l.c + '</span> <span class="text-ink-faint">(preview)</span></span>', 't');
       setTimeout(step, 480);
     }, 780);
   })();
