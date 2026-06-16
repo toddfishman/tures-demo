@@ -32,15 +32,15 @@
   /* ===== the living world behind the book ===== */
   .scene{ position:fixed; inset:0; z-index:0; overflow:hidden; background:#0b0907; }
   .scene .frame-img{ position:absolute; inset:0; background-size:cover; background-position:center;
-    opacity:0; animation:slide 45s infinite; }
+    opacity:0; animation:slide 90s infinite; }
   @keyframes slide{
-    0%{ opacity:0; transform:scale(1.05) } 3%{ opacity:1 } 17%{ opacity:1 }
-    20%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
+    0%{ opacity:0; transform:scale(1.05) } 1.5%{ opacity:1 } 8.5%{ opacity:1 }
+    10%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
   }
   .veil{ position:fixed; inset:0; z-index:1;
     background:radial-gradient(135% 115% at 50% 42%, rgba(11,9,7,0.04), rgba(11,9,7,0.22) 58%, rgba(11,9,7,0.62) 100%); }
   .placecap{ position:fixed; left:0; right:0; bottom:26px; z-index:6; text-align:center; pointer-events:none; }
-  .placecap span{ position:absolute; left:0; right:0; opacity:0; animation:slide 45s infinite;
+  .placecap span{ position:absolute; left:0; right:0; opacity:0; animation:slide 90s infinite;
     font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:rgba(230,200,115,0.85); }
 
   /* ===== the small leather book — the constant ===== */
@@ -101,6 +101,11 @@
     <div class="frame-img" style="background-image:url('assets/img/tokyo-1920.webp');animation-delay:18s"></div>
     <div class="frame-img" style="background-image:url('assets/img/aurora-1920.webp');animation-delay:27s"></div>
     <div class="frame-img" style="background-image:url('assets/img/nyc-1920.webp');animation-delay:36s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=1920&q=80&auto=format&fit=crop');animation-delay:45s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1920&q=80&auto=format&fit=crop');animation-delay:54s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1920&q=80&auto=format&fit=crop');animation-delay:63s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80&auto=format&fit=crop');animation-delay:72s"></div>
+    <div class="frame-img" style="background-image:url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1920&q=80&auto=format&fit=crop');animation-delay:81s"></div>
   </div>
   <div class="veil"></div>
   <div class="placecap">
@@ -109,6 +114,11 @@
     <span style="animation-delay:18s">Tokyo</span>
     <span style="animation-delay:27s">Lapland</span>
     <span style="animation-delay:36s">New York</span>
+    <span style="animation-delay:45s">Amalfi</span>
+    <span style="animation-delay:54s">Santorini</span>
+    <span style="animation-delay:63s">Kyoto</span>
+    <span style="animation-delay:72s">Swiss Alps</span>
+    <span style="animation-delay:81s">Venice</span>
   </div>
 
   <!-- the book you carry -->
