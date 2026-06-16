@@ -482,7 +482,14 @@ a.quiet{ text-decoration:none; }
   padding:8px; opacity:0; transform:translateY(-6px) scale(.98); pointer-events:none;
   transition:opacity .18s ease, transform .18s ease; }
 .tures-menu.open{ opacity:1; transform:none; pointer-events:auto; }
-.tures-menu{ max-height:min(82vh,600px); overflow-y:auto; }
+.tures-menu{ max-height:min(82vh,600px); overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:thin; scrollbar-color:rgba(200,162,74,0.32) transparent; overscroll-behavior:contain; }
+.tures-menu::-webkit-scrollbar{ width:6px; }
+.tures-menu::-webkit-scrollbar-track{ background:transparent; margin:8px 0; }
+.tures-menu::-webkit-scrollbar-thumb{ background:rgba(200,162,74,0.3); border-radius:99px; }
+.tures-menu::-webkit-scrollbar-thumb:hover{ background:rgba(200,162,74,0.5); }
+html[data-theme="parchment"] .tures-menu{ scrollbar-color:rgba(160,120,50,0.32) transparent; }
+html[data-theme="parchment"] .tures-menu::-webkit-scrollbar-thumb{ background:rgba(160,120,50,0.3); }
 .tures-menu a, .tures-menu .theme-item, .tures-menu .grp-head{ display:flex; align-items:center; gap:10px; width:100%;
   text-decoration:none; text-align:left; appearance:none; background:transparent; border:0;
   color:var(--canvas-warm); font-family:'Inter',sans-serif; font-size:13.5px; }
