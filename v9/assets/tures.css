@@ -848,3 +848,31 @@ html[data-theme="parchment"] .chatwin{
     0 30px 72px -30px rgba(45,35,20,0.55) !important; }
 
 @media (prefers-reduced-motion: reduce){ html[data-theme="parchment"] .wordmark.foil{ animation:none; } }
+
+/* ============================================================
+   FEEL · 2 — MOTION POLISH (site-wide)
+   Considered easing, more travel on reveals (staggered in ui.js), richer hover
+   lift with depth. The spring curve is the through-line.
+   ============================================================ */
+:root{ --ease-spring:cubic-bezier(.34,1.4,.64,1); --ease-out:cubic-bezier(.2,.7,.2,1); }
+
+/* reveals settle in with a touch of spring and a little more travel */
+.rise{ transform:translateY(15px); transition:opacity .6s var(--ease-out), transform .7s var(--ease-spring); }
+.reveal{ transition:opacity .55s var(--ease-out), transform .62s var(--ease-spring); }
+.legcard{ transition:opacity .5s var(--ease-out), transform .58s var(--ease-spring); }
+
+/* hover lift now carries a warm shadow, not just translation */
+.lift{ transition:transform .26s var(--ease-out), box-shadow .26s var(--ease-out), border-color .2s ease; }
+.lift:hover{ transform:translateY(-4px); box-shadow:0 26px 52px -28px rgba(45,35,20,0.6); }
+.tile{ transition:transform .22s var(--ease-out), box-shadow .22s var(--ease-out), border-color .2s ease; }
+.tile:hover{ transform:translateY(-4px); box-shadow:0 24px 48px -28px rgba(45,35,20,0.55); }
+
+/* primary button: spring on press (existing), lift + glow on hover */
+.btn-gold{ transition:transform .18s var(--ease-spring), box-shadow .22s var(--ease-out), filter .2s ease; }
+.btn-gold:hover{ transform:translateY(-2px); }
+.btn-ghost, .btn-ink{ transition:transform .18s var(--ease-spring), background .18s ease, border-color .18s ease, color .18s ease; }
+.btn-ghost:hover, .btn-ink:hover{ transform:translateY(-1px); }
+
+/* chrome pills get the same spring on hover */
+.tures-logo, .tures-signup, .tures-theme-switch button, .tures-accent button{ transition:transform .16s var(--ease-spring), background .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease; }
+.tures-signup:hover{ transform:translateY(-1px); }
