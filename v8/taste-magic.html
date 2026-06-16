@@ -4,32 +4,31 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Tures — Taste Print · International Magic</title>
-<meta name="description" content="Accept or decline six plates. The Taste Print assembles itself — a single piece of work, lit in the dark." />
+<meta name="description" content="One plate at a time, lit in the dark. Accept or decline, and the Taste Print assembles itself." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Wand UI Pro substitute: Inter (geometric grotesk, tall x-height) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Wand UI Pro substitute: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;550;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --void:#0a0a0a; --chalk:#f7f7f7; --ivory:#ebebeb; --ash:#7c7c7c;
   --graphite:#4d4d4d; --smoke:#707070; --steel:#616161; --charcoal:#585858;
-  --shadow-xl:rgba(0,0,0,0.55) 0px 64px 72px 0px;
+  --shadow-xl:rgba(0,0,0,0.6) 0px 64px 72px 0px;
   --col:640px;
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body{ background:var(--void); }
 body{
-  font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
-  color:var(--chalk); -webkit-font-smoothing:antialiased;
-  min-height:100vh; padding:0 24px 160px;
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif; color:var(--chalk);
+  -webkit-font-smoothing:antialiased; min-height:100vh; padding:0 24px 200px;
   font-feature-settings:"ss01" on;
 }
 .col{ max-width:var(--col); margin:0 auto; }
 
 /* —— top bar: a sentence, not a bar —— */
-.topbar{ display:flex; align-items:baseline; justify-content:center; gap:26px;
-  padding:30px 0 0; font-size:11px; font-weight:550; letter-spacing:.25px; }
-.topbar a{ color:var(--chalk); text-decoration:none; opacity:.62; transition:opacity .3s; }
+.topbar{ display:flex; align-items:baseline; justify-content:center; gap:26px; padding:30px 0 0;
+  font-size:11px; font-weight:550; letter-spacing:.25px; }
+.topbar a{ color:var(--chalk); text-decoration:none; opacity:.6; transition:opacity .3s; }
 .topbar a:hover{ opacity:1; }
 .topbar .brand{ font-size:14px; font-weight:500; letter-spacing:-.16px; opacity:1; }
 .topbar .brand .spark{ color:var(--ash); }
@@ -37,66 +36,82 @@ body{
 /* —— hero —— */
 .hero{ text-align:center; padding-top:120px; }
 .badge{ display:inline-flex; align-items:center; gap:7px; font-size:10px; font-weight:475;
-  letter-spacing:.25px; color:var(--smoke); border:1px solid var(--steel);
-  border-radius:9999px; padding:4px 12px; text-transform:uppercase; }
+  letter-spacing:.25px; color:var(--smoke); border:1px solid var(--steel); border-radius:9999px;
+  padding:4px 12px; text-transform:uppercase; }
 .badge .tick{ width:4px; height:4px; border-radius:9999px; background:var(--smoke); }
-.display{ font-weight:300; font-size:clamp(54px,12vw,96px); line-height:1; letter-spacing:-1.632px;
-  margin-top:26px; }
+.display{ font-weight:300; font-size:clamp(56px,13vw,96px); line-height:1; letter-spacing:-1.632px; margin-top:26px; }
 .subtitle{ font-size:16px; line-height:1.6; letter-spacing:-.16px; color:var(--ash);
-  margin-top:14px; max-width:30ch; margin-left:auto; margin-right:auto; }
+  margin-top:14px; max-width:30ch; margin-inline:auto; }
 
-/* —— the work: evolving fingerprint, lifted in the dark —— */
-.stage{ margin-top:108px; display:flex; flex-direction:column; align-items:center; }
-.artifact{ width:300px; height:300px; border-radius:24px; background:#0c0c0c;
-  display:grid; place-items:center; box-shadow:var(--shadow-xl); position:relative; }
-.artifact svg{ overflow:visible; }
-.conf{ margin-top:26px; font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--smoke); }
-.conf b{ color:var(--ivory); font-weight:500; font-variant-numeric:tabular-nums; }
+/* —— the exhibit —— */
+.exhibit{ text-align:center; padding-top:120px; }
+.counter{ font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--graphite); }
+.prompt{ font-weight:300; font-size:clamp(28px,6vw,32px); line-height:1.25; letter-spacing:-.384px; margin-top:14px; }
 
-/* —— the current plate —— */
-.plate-wrap{ margin-top:80px; display:flex; flex-direction:column; align-items:center; }
-.counter{ font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--graphite); margin-bottom:22px; }
-.plate{ width:100%; max-width:420px; aspect-ratio:5/4; border-radius:24px; overflow:hidden;
-  position:relative; box-shadow:var(--shadow-xl); background:#111; }
-.plate .ph{ position:absolute; inset:0; background-size:cover; background-position:center;
-  filter:grayscale(1) brightness(.72) contrast(1.05); }
-.plate .veil{ position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(10,10,10,.25) 0%, rgba(10,10,10,.92) 100%); }
-.plate .pbody{ position:absolute; inset:0; z-index:2; padding:28px; display:flex; flex-direction:column; justify-content:flex-end; }
-.plate .prompt{ font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--smoke); margin-bottom:auto; }
-.plate .reading{ font-weight:300; font-size:30px; line-height:1.05; letter-spacing:-.5px; }
-.plate .vs{ font-size:11px; color:var(--ash); margin:8px 0; letter-spacing:.1em; }
-.flash{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:3;
-  font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--chalk);
-  border:1px solid var(--ivory); border-radius:9999px; padding:5px 14px; opacity:0; transition:opacity .12s; }
+/* device mockup — imagery is a window, not a scene */
+.stage{ position:relative; width:max-content; margin:64px auto 0; }
+.phone{ position:relative; width:min(70vw,278px); aspect-ratio:9/19.3; border-radius:42px;
+  background:#040404; padding:9px; box-shadow:var(--shadow-xl); }
+.screen{ position:relative; width:100%; height:100%; border-radius:33px; overflow:hidden; background:#101010; }
+.screen .ph{ position:absolute; inset:0; background-size:cover; background-position:center;
+  filter:grayscale(1) brightness(.82) contrast(1.04); transition:opacity .4s ease; }
+.screen .scrim{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,8,.5) 0%, rgba(8,8,8,0) 26%, rgba(8,8,8,0) 58%, rgba(8,8,8,.82) 100%); }
+.notch{ position:absolute; top:12px; left:50%; transform:translateX(-50%); width:34%; height:20px;
+  background:#040404; border-radius:0 0 16px 16px; z-index:4; }
+.scr-tag{ position:absolute; top:26px; left:18px; z-index:3; font-size:9px; letter-spacing:.25px;
+  text-transform:uppercase; color:var(--ivory); opacity:.7; }
+.scr-foot{ position:absolute; left:16px; right:16px; bottom:18px; z-index:3; display:flex;
+  align-items:center; justify-content:space-between; }
+.ctl{ display:inline-flex; align-items:center; gap:6px; font-size:9px; letter-spacing:.25px; color:var(--ivory);
+  border:1px solid rgba(235,235,235,.55); border-radius:9999px; padding:4px 10px; }
+.scr-time{ font-size:9px; letter-spacing:.25px; color:rgba(235,235,235,.7); font-variant-numeric:tabular-nums; }
+
+/* circular portrait thumbnail — the next plate, on deck, lower-left */
+.thumb{ position:absolute; left:-34px; bottom:-26px; z-index:6; text-align:center; }
+.thumb .frame{ width:84px; height:84px; border-radius:22px; overflow:hidden; background:#0c0c0c; display:grid; place-items:center; }
+.thumb .frame .pp{ width:72px; height:72px; border-radius:9999px; background-size:cover; background-position:center; filter:grayscale(1) brightness(.78); }
+.thumb .lab{ font-size:9px; letter-spacing:.25px; text-transform:uppercase; color:var(--graphite); margin-top:8px; }
+@media(max-width:520px){ .thumb{ left:-14px; bottom:-30px; } }
+
+.flash{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:7;
+  font-size:11px; letter-spacing:.25px; text-transform:uppercase; color:var(--chalk);
+  border:1px solid var(--ivory); border-radius:9999px; padding:7px 18px; opacity:0; transition:opacity .12s;
+  background:rgba(10,10,10,.6); backdrop-filter:blur(3px); }
 
 /* ghost pole buttons */
-.poles{ display:flex; gap:14px; margin-top:30px; }
+.poles{ display:flex; gap:14px; justify-content:center; margin-top:72px; flex-wrap:wrap; }
 .ghost{ font-family:inherit; cursor:pointer; font-size:15px; font-weight:475; color:var(--ivory);
-  background:transparent; border:1px solid var(--ivory); border-radius:9999px; padding:11px 26px;
-  letter-spacing:-.16px; transition:background .25s, color .25s; min-width:170px; }
+  background:transparent; border:1px solid var(--ivory); border-radius:9999px; padding:12px 24px;
+  letter-spacing:-.16px; transition:background .25s,color .25s; min-width:188px; text-align:center; }
 .ghost:hover{ background:var(--ivory); color:var(--void); }
-.ghost .k{ display:block; font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--smoke); margin-bottom:3px; }
+.ghost .k{ display:block; font-size:9px; letter-spacing:.25px; text-transform:uppercase; color:var(--smoke); margin-bottom:4px; }
 .ghost:hover .k{ color:var(--charcoal); }
+.ghost .sub{ display:block; font-size:11px; color:var(--ash); margin-top:4px; font-weight:400; }
+.ghost:hover .sub{ color:var(--graphite); }
+
+/* live wall-label: tiny hexagon + confidence */
+.label-piece{ margin-top:84px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.label-piece svg{ overflow:visible; }
+.conf{ font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--smoke); }
+.conf b{ color:var(--ivory); font-weight:500; font-variant-numeric:tabular-nums; }
 
 /* —— finish —— */
-.finish{ display:none; text-align:center; margin-top:30px; }
+.finish{ display:none; text-align:center; padding-top:120px; }
 .finish.show{ display:block; }
-.sig{ font-size:16px; line-height:1.65; letter-spacing:-.16px; color:var(--ash);
-  max-width:42ch; margin:18px auto 0; }
-.behaviors{ list-style:none; margin:54px auto 0; max-width:430px; text-align:left;
-  display:flex; flex-direction:column; gap:0; }
+.piece{ width:300px; height:300px; margin:60px auto 0; border-radius:24px; background:#0c0c0c;
+  display:grid; place-items:center; box-shadow:var(--shadow-xl); }
+.piece svg{ overflow:visible; }
+.sig{ font-size:16px; line-height:1.65; letter-spacing:-.16px; color:var(--ash); max-width:42ch; margin:40px auto 0; }
+.behaviors{ list-style:none; margin:54px auto 0; max-width:430px; text-align:left; }
 .behaviors li{ font-size:15px; line-height:1.5; letter-spacing:-.16px; color:var(--ivory);
   padding:18px 0; border-top:1px solid #1c1c1c; display:flex; gap:14px; }
 .behaviors li .n{ font-size:10px; color:var(--smoke); letter-spacing:.25px; padding-top:4px; font-variant-numeric:tabular-nums; }
 .cta-row{ margin-top:60px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 .cta-fill{ font-family:inherit; cursor:pointer; text-decoration:none; font-size:15px; font-weight:475;
-  color:var(--ivory); background:var(--charcoal); border:none; border-radius:9999px; padding:10px 26px; }
+  color:var(--ivory); background:var(--charcoal); border:none; border-radius:9999px; padding:11px 26px; }
 .cta-ghost{ font-family:inherit; cursor:pointer; font-size:15px; font-weight:475; color:var(--ivory);
-  background:transparent; border:1px solid var(--ivory); border-radius:9999px; padding:10px 26px; }
-.tagline{ margin-top:120px; text-align:center; font-size:10px; letter-spacing:.25px;
-  text-transform:uppercase; color:var(--graphite); }
-.fade{ transition:opacity .5s ease, transform .5s ease; }
+  background:transparent; border:1px solid var(--ivory); border-radius:9999px; padding:11px 26px; }
+.tagline{ margin-top:120px; text-align:center; font-size:10px; letter-spacing:.25px; text-transform:uppercase; color:var(--graphite); }
 </style>
 </head>
 <body>
@@ -112,22 +127,42 @@ body{
   <header class="hero">
     <span class="badge"><span class="tick"></span>Calibration · 06 plates</span>
     <h1 class="display">Taste Print.</h1>
-    <p class="subtitle">Six plates. Accept or decline. The work assembles itself.</p>
+    <p class="subtitle">One plate at a time, lit in the dark. Accept or decline — the work assembles itself.</p>
   </header>
 
-  <!-- the artifact in the spotlight -->
-  <section class="stage">
-    <div class="artifact"><svg id="radar" viewBox="0 0 200 200" width="240" height="240"></svg></div>
-    <div class="conf">Confidence&nbsp;&nbsp;<b id="conf">0.18</b></div>
-  </section>
-
-  <!-- the plate -->
-  <section class="plate-wrap" id="plateWrap">
+  <!-- the exhibit -->
+  <section class="exhibit" id="exhibit">
     <div class="counter">Plate <span id="qn">1</span> / 6</div>
-    <div class="plate" id="plate"></div>
-    <div class="poles" id="poles">
+    <h2 class="prompt" id="prompt">—</h2>
+
+    <div class="stage">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="ph" id="screenPh"></div>
+          <div class="scrim"></div>
+          <div class="scr-tag" id="scrTag">REGISTER</div>
+          <div class="scr-foot">
+            <span class="ctl">▷ &nbsp;Plate</span>
+            <span class="scr-time" id="scrTime">01 / 06</span>
+          </div>
+        </div>
+        <span class="flash" id="flash"></span>
+      </div>
+      <div class="thumb" id="thumb">
+        <div class="frame"><div class="pp" id="thumbPp"></div></div>
+        <div class="lab">next</div>
+      </div>
+    </div>
+
+    <div class="poles">
       <button class="ghost" id="bL" onclick="choose('left')"></button>
       <button class="ghost" id="bR" onclick="choose('right')"></button>
+    </div>
+
+    <div class="label-piece">
+      <svg id="radar" viewBox="0 0 200 200" width="132" height="132"></svg>
+      <div class="conf">Confidence&nbsp;&nbsp;<b id="conf">0.18</b></div>
     </div>
   </section>
 
@@ -135,6 +170,7 @@ body{
   <section class="finish" id="finish">
     <span class="badge"><span class="tick"></span>The print is complete</span>
     <h2 class="display" style="font-size:clamp(40px,9vw,72px);margin-top:24px">Yours.</h2>
+    <div class="piece"><svg id="radarBig" viewBox="0 0 200 200" width="236" height="236"></svg></div>
     <p class="sig" id="sig">—</p>
     <ol class="behaviors" id="behaviors"></ol>
     <div class="cta-row">
@@ -143,16 +179,16 @@ body{
     </div>
   </section>
 
-  <div class="tagline">International Magic · the work, lit in the dark</div>
+  <div class="tagline">International Magic · one piece of work, lit in the dark</div>
 </div>
 
 <script src="assets/taste-core.js"></script>
 <script>
-/* ---- International Magic renderer: achromatic hexagon radar ---- */
+/* ---- International Magic renderer: device mockup + achromatic hexagon ---- */
 const CX=100,CY=100,R=70;
 function pt(i,val){ const a=(-90+i*60)*Math.PI/180, r=(val/100)*R; return [CX+r*Math.cos(a), CY+r*Math.sin(a)]; }
-function renderFingerprint(){
-  const radar=document.getElementById('radar'); let g='';
+function drawHex(el, labels){
+  let g='';
   [0.34,0.67,1].forEach(s=>{
     let p=DIMS.map((d,i)=>{const a=(-90+i*60)*Math.PI/180;return (CX+R*s*Math.cos(a))+','+(CY+R*s*Math.sin(a));}).join(' ');
     g+=`<polygon points="${p}" fill="none" stroke="#262626"/>`;
@@ -160,49 +196,46 @@ function renderFingerprint(){
   DIMS.forEach((d,i)=>{
     const a=(-90+i*60)*Math.PI/180, ex=CX+R*Math.cos(a), ey=CY+R*Math.sin(a);
     g+=`<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="#1f1f1f"/>`;
-    const lx=CX+(R+20)*Math.cos(a), ly=CY+(R+20)*Math.sin(a);
-    g+=`<text x="${lx}" y="${ly}" font-size="8" letter-spacing="1" fill="#707070" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase">${d.label}</text>`;
+    if(labels){ const lx=CX+(R+20)*Math.cos(a), ly=CY+(R+20)*Math.sin(a);
+      g+=`<text x="${lx}" y="${ly}" font-size="8" letter-spacing="1" fill="#707070" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase">${d.label}</text>`; }
   });
   let v=DIMS.map((d,i)=>pt(i,d.v).join(',')).join(' ');
   g+=`<polygon points="${v}" fill="rgba(247,247,247,0.10)" stroke="#f7f7f7" stroke-width="1.25" style="transition:all .6s cubic-bezier(.6,.02,.2,1)"/>`;
   DIMS.forEach((d,i)=>{const p=pt(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.2" fill="#ebebeb"/>`;});
-  radar.innerHTML=g;
+  el.innerHTML=g;
 }
+function renderFingerprint(){ drawHex(document.getElementById('radar'), false); }
 function renderConf(v){ document.getElementById('conf').textContent=v.toFixed(2); }
+
 function renderPlate(c){
-  const plate=document.getElementById('plate');
-  plate.style.opacity=1; plate.style.transform='';
-  plate.innerHTML=`
-    <div class="ph" style="background-image:url('${c.photo}')"></div>
-    <div class="veil"></div>
-    <span class="flash" id="flash"></span>
-    <div class="pbody">
-      <div class="prompt">${c.prompt}</div>
-      <div class="reading">${c.left.label}</div>
-      <div class="vs">— or —</div>
-      <div class="reading">${c.right.label}</div>
-    </div>`;
-  document.getElementById('bL').innerHTML=`<span class="k">decline</span>${c.left.label}`;
-  document.getElementById('bR').innerHTML=`<span class="k">accept</span>${c.right.label}`;
+  document.getElementById('prompt').textContent=c.prompt;
+  const ph=document.getElementById('screenPh');
+  ph.style.opacity=0;
+  setTimeout(()=>{ ph.style.backgroundImage=`url('${c.photo}')`; ph.style.opacity=1; }, 60);
+  document.getElementById('scrTag').textContent=c.dim;
+  document.getElementById('scrTime').textContent=('0'+(qi+1))+' / 06';
   document.getElementById('qn').textContent=(qi+1);
+  document.getElementById('bL').innerHTML=`<span class="k">decline</span>${c.left.label}<span class="sub">${c.left.sub}</span>`;
+  document.getElementById('bR').innerHTML=`<span class="k">accept</span>${c.right.label}<span class="sub">${c.right.sub}</span>`;
+  // next-on-deck circular thumbnail
+  const next=CARDS[qi+1], th=document.getElementById('thumb');
+  if(next){ th.style.display=''; document.getElementById('thumbPp').style.backgroundImage=`url('${next.photo}')`; }
+  else th.style.display='none';
 }
 function flingPlate(dir){
-  const plate=document.getElementById('plate');
   const f=document.getElementById('flash');
-  if(f){ f.textContent = dir==='right'?'Accepted':'Declined'; f.style.opacity=1; }
-  plate.style.transition='transform .45s cubic-bezier(.4,0,.2,1), opacity .45s ease';
-  plate.style.transform=`translateY(60px) scale(.94)`; plate.style.opacity=0;
+  if(f){ f.textContent = dir==='right'?'Accepted':'Declined'; f.style.opacity=1; setTimeout(()=>f.style.opacity=0, 380); }
 }
 function showFinish(sig, behaviors){
-  document.getElementById('plateWrap').style.display='none';
+  document.getElementById('exhibit').style.display='none';
   const fin=document.getElementById('finish'); fin.classList.add('show');
+  drawHex(document.getElementById('radarBig'), true);
   document.getElementById('sig').textContent=sig;
   const ol=document.getElementById('behaviors'); ol.innerHTML='';
-  behaviors.forEach((t,i)=> ol.insertAdjacentHTML('beforeend',
-    `<li><span class="n">0${i+1}</span><span>${t}</span></li>`));
+  behaviors.forEach((t,i)=> ol.insertAdjacentHTML('beforeend', `<li><span class="n">0${i+1}</span><span>${t}</span></li>`));
 }
 function resetView(){
-  document.getElementById('plateWrap').style.display='';
+  document.getElementById('exhibit').style.display='';
   document.getElementById('finish').classList.remove('show');
 }
 startTaste();
