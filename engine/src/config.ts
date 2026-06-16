@@ -45,6 +45,9 @@ const Env = z.object({
   VGS_PASSWORD: z.string().optional(),
   // Deepgram speech-to-text (voice input on the brief chat). Unset → /voice/transcribe is off.
   DEEPGRAM_API_KEY: z.string().optional(),
+  // mem0 — managed memory layer for personalization (taste, learned preferences, trip-history
+  // notes), keyed by user_id. Unset → memory is a no-op and the engine runs identically.
+  MEM0_API_KEY: z.string().optional(),
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
@@ -63,6 +66,7 @@ export const config = {
   },
   anthropicKey: parsed.ANTHROPIC_API_KEY,
   deepgramKey: parsed.DEEPGRAM_API_KEY,
+  mem0Key: parsed.MEM0_API_KEY,
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
   rateLimitMax: parsed.RATE_LIMIT_MAX,

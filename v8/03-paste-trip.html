@@ -674,6 +674,14 @@ function convoContext(){
   try{ var tp = JSON.parse(localStorage.getItem('tures.tastePrint')||'null'); if(tp && tp.signature){ bits.push('Their Taste Print: '+tp.signature); } }catch(_){}
   return bits.length ? bits.join(' · ') : undefined;
 }
+/* Stable per-traveler id keying their mem0 memory. Demo persona ties to seeded memories. */
+function turesUid(){
+  try{
+    if(DEMO) return 'todd';
+    if(window.tures && tures.account && tures.account.id) return tures.account.id;
+    var u=localStorage.getItem('tures.uid'); if(!u){ u='guest-'+Math.random().toString(36).slice(2,10); localStorage.setItem('tures.uid', u); } return u;
+  }catch(_){ return undefined; }
+}
 function onSend(){
   var text = composer.value.trim();
   if(!text) return;
@@ -682,7 +690,7 @@ function onSend(){
   composer.value=''; autoGrow(); sugEl.innerHTML=''; setStep(1);
   var status = document.getElementById('threadStatus'); if(status) status.textContent = 'Gathering your trip…';
   var t = typing();
-  tures.converse(convoHistory.slice(-12), undefined, convoContext()).then(function(c){
+  tures.converse(convoHistory.slice(-12), undefined, convoContext(), turesUid()).then(function(c){
     t.remove();
     var reply = (c && c.reply || '').trim();
     if(reply){ addMsg(reply.replace(/</g,'&lt;'), 't'); convoHistory.push({ role:'assistant', content:reply }); }

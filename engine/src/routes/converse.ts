@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
+import { recall, remember } from "../mem0.ts";
 
 // Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
 // to the planner. Not scripted: a strong identity (the system prompt) plus a hard checklist (the
@@ -12,6 +13,8 @@ const Body = z.object({
   // Optional: what we already know about this traveler (home airport, Taste Print, etc.) so the
   // agent skips questions those answer. The front-end fills this from the profile/prefs when present.
   context: z.string().optional(),
+  // Stable id for this traveler — keys their mem0 memory (personalization across sessions).
+  userId: z.string().optional(),
 });
 
 const SYSTEM = `You are Tures — a confident AI travel concierge that BOOKS trips, not just researches them. A traveler describes a trip in plain words; you turn it into a real, booked itinerary that ends in confirmation numbers, not links.
@@ -68,11 +71,17 @@ export async function converseRoutes(app: FastifyInstance) {
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
     if (!msgs.length) msgs.push({ role: "user", content: "Hello — what are you?" });
 
-    const system = p.data.context
-      ? `${SYSTEM}\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${p.data.context}`
-      : SYSTEM;
+    const latestUser = [...msgs].reverse().find((m) => m.role === "user")?.content ?? "";
+    let system = SYSTEM;
+    if (p.data.context) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${p.data.context}`;
 
     try {
+      // Personalize from mem0: what we remember about this traveler (taste, past trips). No-op without a key.
+      const memories = await recall(p.data.userId, latestUser);
+      if (memories.length) {
+        system += `\n\nWHAT YOU REMEMBER about this traveler (from past trips and chats — use it to personalize and to reference what they've loved before, but confirm before assuming):\n- ${memories.join("\n- ")}`;
+      }
+
       const { default: Anthropic } = await import("@anthropic-ai/sdk");
       const client = new Anthropic({ apiKey: config.anthropicKey });
       const resp = await client.messages.create({
@@ -83,6 +92,8 @@ export async function converseRoutes(app: FastifyInstance) {
         messages: msgs,
       });
       const text = resp.content.filter((b) => b.type === "text").map((b: any) => b.text).join(" ").trim();
+      // Learn from this turn (fire-and-forget) so future recommendations sharpen.
+      void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
       const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
       if (tool) {
         const slots = tool.input || {};

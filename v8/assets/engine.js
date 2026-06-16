@@ -111,8 +111,8 @@
 
     /* Conversational Tures. messages: prior turns; text: new user turn; context: known profile/
        Taste Print so the agent skips what it already knows. → { reply, ready?, brief?, slots? } */
-    converse: function (messages, text, context) {
-      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context }) });
+    converse: function (messages, text, context, userId) {
+      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context, userId: userId }) });
     },
 
     /* Voice: transcribe a recorded Blob (Deepgram STT) and speak text (Deepgram Aura TTS → mp3 Blob). */
