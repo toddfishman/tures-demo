@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Tures — Grant permissions</title>
-<meta name="description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<title>Tures — Tures Vault Setup</title>
+<meta name="description" content="Your travel vault — payment, passport, ID, and loyalty — tokenized by VGS the moment you enter it. Tures books in your name; the raw numbers are never stored on our servers and never seen by the AI." />
 <link rel="canonical" href="https://toddfishman.github.io/tures-demo/v8/04-connections.html" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Tures" />
-<meta property="og:title" content="Tures — Grant permissions" />
-<meta property="og:description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<meta property="og:title" content="Tures — Tures Vault Setup" />
+<meta property="og:description" content="Your travel vault — payment, passport, ID, and loyalty — tokenized by VGS. The raw numbers are never seen by the AI." />
 <meta property="og:url" content="https://toddfishman.github.io/tures-demo/v8/04-connections.html" />
 <meta property="og:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Tures — the AI travel concierge" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Tures — Grant permissions" />
-<meta name="twitter:description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<meta name="twitter:title" content="Tures — Tures Vault Setup" />
+<meta name="twitter:description" content="Your travel vault — payment, passport, ID, and loyalty — tokenized by VGS." />
 <meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,10 +27,19 @@
 <link rel="stylesheet" href="assets/tw.css">
 <style>
   body{ background:var(--obsidian); padding-bottom:84px; }
-  .perm{ transition:border-color .3s ease, box-shadow .3s ease; }
+  .fld{ width:100%; border-radius:10px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.75);
+    padding:11px 13px; font-size:14px; color:var(--ink); outline:none; transition:all .14s; }
+  .fld:focus{ border-color:rgba(200,162,74,0.6); box-shadow:0 0 0 3px rgba(200,162,74,0.14); }
+  .vgs-chip{ display:inline-flex; align-items:center; gap:5px; font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+    font-weight:600; color:var(--confirm-ink); background:rgba(95,125,79,0.14); border:1px solid rgba(95,125,79,0.3);
+    padding:3px 9px; border-radius:99px; white-space:nowrap; }
+  .vault-ic{ width:42px; height:42px; border-radius:11px; display:grid; place-items:center; font-size:20px; flex-shrink:0;
+    background:rgba(200,162,74,0.14); color:var(--gold-deep); }
+  .saved{ display:none; align-items:center; gap:8px; font-size:13px; color:var(--confirm-ink);
+    background:rgba(95,125,79,0.1); border:1px solid rgba(95,125,79,0.26); border-radius:10px; padding:9px 12px; margin-top:4px; }
+  .saved.show{ display:flex; }
+  .switch{ width:46px; height:27px; }
   .perm.granted{ border-color:rgba(95,125,79,0.5); box-shadow:0 0 0 1px rgba(95,125,79,0.25); }
-  .grant-flash{ animation:flash .6s ease; }
-  @keyframes flash{ 0%{background:rgba(95,125,79,0)} 40%{background:rgba(95,125,79,0.12)} 100%{background:rgba(95,125,79,0)} }
 </style>
 </head>
 <body class="text-canvas antialiased min-h-screen">
@@ -38,93 +47,167 @@
 <header class="chrome sticky top-0 z-30">
   <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
     <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
-    <div class="hidden md:flex items-center gap-7 text-sm">
-      <a href="02-taste-engine.html">Taste Engine</a>
-      <a href="04-connections.html" class="active">Connections</a>
-      <a href="05-execution.html">Live demo</a>
-      <a href="06-hiccup-handler.html">Hiccup Handler</a>
-      <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
-    </div>
-    <a href="03-paste-trip.html" class="md:hidden text-gold text-sm quiet">Start free</a>
+    <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
   </nav>
 </header>
 
+<!-- HERO -->
 <section class="leather-surface grain relative overflow-hidden">
   <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">IV</div>
   <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-9">
-    <div class="caps text-[11px] text-gold/80 mb-3">Tures Vault Setup · Connect</div>
-    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Grant the access.<br><span class="foil">Pull it any time.</span></h1>
-    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Scoped, revocable, logged. Exactly what's needed to book and watch — nothing speculative.</p>
+    <div class="caps text-[11px] text-gold/80 mb-3">Tures Vault Setup</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Your vault.<br><span class="foil">Locked by VGS.</span></h1>
+    <p class="mt-4 max-w-lg text-canvas/70 leading-relaxed">The things a real booking needs — your card, passport, ID, and loyalty — so Tures can book in your name and credit your miles. Tokenized the moment you enter them.</p>
   </div>
 </section>
 
+<!-- VGS TRUST BANNER -->
 <section class="canvas-surface text-ink">
- <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
-
-  <div class="lg:col-span-2 space-y-3">
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="card">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">▦</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Payment · AmEx ··1004</div>
-        <div class="text-xs text-ink-faint mt-0.5">Per-trip cap you set · <button class="text-gold-deep underline" data-sheet="sheet-card">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
+ <div class="max-w-5xl mx-auto px-6 pt-8">
+  <div class="leaf p-5 sm:p-6 flex items-start gap-4" style="border-color:rgba(95,125,79,0.35);box-shadow:0 0 0 1px rgba(95,125,79,0.18), 0 14px 34px -22px rgba(43,33,20,0.5)">
+    <div class="shrink-0 w-12 h-12 rounded-xl grid place-items-center" style="background:rgba(95,125,79,0.14);color:var(--confirm-ink)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="loyalty">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">✦</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Loyalty &amp; status</div>
-        <div class="text-xs text-ink-faint mt-0.5">AAdvantage · Flying Blue · Virtuoso · <button class="text-gold-deep underline" data-sheet="sheet-loyalty">explain</button></div>
+    <div class="min-w-0">
+      <div class="font-display text-xl text-ink leading-tight">Secured by VGS — Very Good Security</div>
+      <p class="text-sm text-ink-soft leading-relaxed mt-1.5">Every number you add — card, passport, Known Traveler, ID — is <strong>tokenized by VGS the instant you type it</strong>. Tures works only with the tokens. The raw values are never stored on our servers and <strong>never seen by the AI</strong>. We display them masked, always.</p>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <span class="vgs-chip">PCI-DSS Level&nbsp;1</span>
+        <span class="vgs-chip">SOC&nbsp;2 Type&nbsp;II</span>
+        <span class="vgs-chip">Tokenized, not stored</span>
+        <a href="https://www.verygoodsecurity.com" target="_blank" rel="noopener" class="text-[12px] text-gold-deep underline quiet self-center">How VGS works ↗</a>
       </div>
-      <div class="switch off" data-toggle></div>
     </div>
+  </div>
+ </div>
+</section>
 
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="calendar">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Calendar</div>
-        <div class="text-xs text-ink-faint mt-0.5">Route around what's booked · <button class="text-gold-deep underline" data-sheet="sheet-calendar">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="inbox">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Inbox · read confirmations</div>
-        <div class="text-xs text-ink-faint mt-0.5">Travel senders only, read-only · <button class="text-gold-deep underline" data-sheet="sheet-inbox">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <div class="perm leaf p-4 flex items-center gap-4" data-perm="messaging">
-      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display text-xl text-ink leading-tight">Messaging · WhatsApp / Telegram</div>
-        <div class="text-xs text-ink-faint mt-0.5">Optional — the daily channel · coming soon · <button class="text-gold-deep underline" data-sheet="sheet-messaging">explain</button></div>
-      </div>
-      <div class="switch off" data-toggle></div>
-    </div>
-
-    <button id="grantAll" class="btn-gold w-full px-5 py-3.5 rounded-xl mt-2 font-semibold">⚡ Connect required (4) in sequence</button>
+<!-- THE VAULT -->
+<section class="canvas-surface text-ink">
+ <div class="max-w-5xl mx-auto px-6 py-10">
+  <div class="flex items-end justify-between mb-5 flex-wrap gap-2">
+    <h2 class="font-display text-3xl text-ink">The vault</h2>
+    <span class="text-[12px] text-ink-faint" id="vaultProgress">0 of 4 set</span>
   </div>
 
-  <aside class="space-y-4">
+  <div class="grid lg:grid-cols-2 gap-5">
+
+    <!-- PAYMENT -->
+    <div class="vault-card leaf p-5 sm:p-6" data-vault="payment">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="vault-ic">▦</div>
+        <div class="min-w-0"><div class="font-display text-xl text-ink leading-tight">Payment</div>
+          <div class="text-[12px] text-ink-faint">Tures charges each leg to whichever card earns the most.</div></div>
+        <span class="vgs-chip ml-auto">VGS-tokenized</span>
+      </div>
+      <div class="mt-3 space-y-2.5">
+        <div class="flex gap-2">
+          <select id="cardPick" class="fld flex-1"></select>
+          <button id="addCard" class="btn-ink px-4 rounded-lg text-sm press shrink-0">Add</button>
+        </div>
+        <div id="walletList" class="space-y-2"></div>
+        <div id="walletRec" class="text-[12.5px] text-ink-soft rounded-lg p-3" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.26);display:none"></div>
+        <div class="text-[11px] text-ink-faint">Card numbers go straight to VGS — entered into a VGS-hosted field, never our form.</div>
+      </div>
+    </div>
+
+    <!-- TRAVEL DOCUMENTS -->
+    <div class="vault-card leaf p-5 sm:p-6" data-vault="documents">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="vault-ic">🛂</div>
+        <div class="min-w-0"><div class="font-display text-xl text-ink leading-tight">Travel documents</div>
+          <div class="text-[12px] text-ink-faint">Passport — so Tures can ticket international trips.</div></div>
+        <span class="vgs-chip ml-auto">VGS-tokenized</span>
+      </div>
+      <div class="mt-3 space-y-2.5">
+        <input id="pfPassport" class="fld" placeholder="Passport number" autocomplete="off" />
+        <div class="flex gap-2">
+          <input id="pfExpiry" class="fld flex-1" placeholder="Expiry (MM/YYYY)" autocomplete="off" />
+          <input id="pfCountry" class="fld w-28" placeholder="Country" value="US" autocomplete="off" />
+        </div>
+        <button id="saveDocs" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save to vault</button>
+        <div id="docsSaved" class="saved"></div>
+      </div>
+    </div>
+
+    <!-- IDENTITY & TRUSTED TRAVELER -->
+    <div class="vault-card leaf p-5 sm:p-6" data-vault="identity">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="vault-ic">✦</div>
+        <div class="min-w-0"><div class="font-display text-xl text-ink leading-tight">Identity &amp; trusted traveler</div>
+          <div class="text-[12px] text-ink-faint">Known Traveler / Global Entry, applied at booking.</div></div>
+        <span class="vgs-chip ml-auto">VGS-tokenized</span>
+      </div>
+      <div class="mt-3 space-y-2.5">
+        <input id="pfKtn" class="fld" placeholder="Known Traveler Number (TSA PreCheck)" autocomplete="off" />
+        <input id="pfRedress" class="fld" placeholder="Redress number (optional)" autocomplete="off" />
+        <label class="flex items-center gap-2.5 text-[13px] text-ink-soft rounded-lg px-3 py-2.5 cursor-pointer" style="border:1px dashed var(--canvas-line)">
+          <span class="text-gold-deep text-lg">⬆</span><span id="idUploadLabel">Upload a government ID (optional)</span>
+          <input id="pfId" type="file" accept="image/*,application/pdf" class="hidden" />
+        </label>
+        <button id="saveId" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save to vault</button>
+        <div id="idSaved" class="saved"></div>
+      </div>
+    </div>
+
+    <!-- LOYALTY -->
+    <div class="vault-card leaf p-5 sm:p-6" data-vault="loyalty">
+      <div class="flex items-center gap-3 mb-1">
+        <div class="vault-ic">♛</div>
+        <div class="min-w-0"><div class="font-display text-xl text-ink leading-tight">Loyalty &amp; status</div>
+          <div class="text-[12px] text-ink-faint">Credited automatically, status chased mid-trip.</div></div>
+        <span class="vgs-chip ml-auto">VGS-tokenized</span>
+      </div>
+      <div class="mt-3 space-y-2.5">
+        <div class="flex gap-2">
+          <input id="pfProgram" class="fld flex-1" placeholder="Program (e.g. Flying Blue, Bonvoy)" autocomplete="off" />
+          <input id="pfNumber" class="fld w-32" placeholder="Number" autocomplete="off" />
+        </div>
+        <button id="addLoyalty" class="btn-ink px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Add program</button>
+        <div id="loyaltyList" class="space-y-2"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="text-[12px] text-ink-faint text-center mt-7">Powered by <a href="https://www.verygoodsecurity.com" target="_blank" rel="noopener" class="text-gold-deep underline quiet">VGS</a> · revoke anything in one tap — your bookings stay yours.</p>
+ </div>
+</section>
+
+<!-- ACCESS GRANTS (secondary) -->
+<section class="canvas-surface text-ink border-t" style="border-color:var(--canvas-line)">
+ <div class="max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
+  <div class="lg:col-span-2">
+    <h2 class="font-display text-2xl text-ink mb-1">Access grants</h2>
+    <p class="text-sm text-ink-soft mb-5 max-w-xl">Read-access to your own services — scoped, revocable, and logged. Separate from the vault: these are permissions, not stored data.</p>
+    <div class="space-y-3">
+      <div class="perm leaf p-4 flex items-center gap-4" data-perm="calendar">
+        <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
+        <div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">Calendar</div>
+          <div class="text-xs text-ink-faint mt-0.5">Route around what's booked; write trips back · <button class="text-gold-deep underline" data-sheet="sheet-calendar">explain</button></div></div>
+        <div class="switch off" data-toggle></div>
+      </div>
+      <div class="perm leaf p-4 flex items-center gap-4" data-perm="inbox">
+        <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
+        <div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">Travel inbox</div>
+          <div class="text-xs text-ink-faint mt-0.5">Read-only, travel senders only — the second check on every booking · <button class="text-gold-deep underline" data-sheet="sheet-inbox">explain</button></div></div>
+        <div class="switch off" data-toggle></div>
+      </div>
+      <div class="perm leaf p-4 flex items-center gap-4" data-perm="messaging">
+        <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
+        <div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">Messaging · WhatsApp / Telegram</div>
+          <div class="text-xs text-ink-faint mt-0.5">Optional — the daily channel · coming soon · <button class="text-gold-deep underline" data-sheet="sheet-messaging">explain</button></div></div>
+        <div class="switch off" data-toggle></div>
+      </div>
+    </div>
+  </div>
+
+  <aside>
     <div class="leaf p-6">
-      <div class="flex items-center justify-between mb-3">
-        <div class="caps text-[11px] text-ink-faint">Status</div>
-        <span class="pill" id="statusPill"><span class="dot dot-amber"></span> Not ready</span>
-      </div>
-      <div class="flex items-baseline gap-2 mb-4">
-        <span class="font-mono text-4xl text-ink" id="connCount">0</span>
-        <span class="text-ink-soft text-sm">of 5 connected</span>
-      </div>
-      <div class="track mb-5"><div class="fill" id="connBar" style="width:0%"></div></div>
       <div class="caps text-[11px] text-ink-faint mb-3">Your guarantees</div>
       <ul class="space-y-2.5 text-sm text-ink/85">
-        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged beyond your cap.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Card, passport &amp; ID tokenized by VGS — never stored raw, never seen by the AI.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged beyond the cap you set, ever.</li>
         <li class="flex gap-2.5"><span class="text-gold">✓</span> Read-only inbox, travel senders only.</li>
         <li class="flex gap-2.5"><span class="text-gold">✓</span> Every action in an exportable log.</li>
         <li class="flex gap-2.5"><span class="text-gold">✓</span> Revoke in one tap — bookings stay yours.</li>
@@ -134,57 +217,15 @@
  </div>
 </section>
 
-<!-- ===== WALLET & TRAVELER PROFILE (live with the engine) ===== -->
-<section class="canvas-surface text-ink border-t" style="border-color:var(--canvas-line)">
- <div class="max-w-5xl mx-auto px-6 py-12">
-  <div id="walletPanel" class="leaf p-6 sm:p-8" style="display:none">
-    <div class="flex items-center justify-between mb-1">
-      <div class="caps text-[11px] text-ink-faint">Wallet &amp; traveler profile</div>
-      <span class="pill pill-confirm text-[11px]"><span class="dot dot-green"></span> Live engine</span>
-    </div>
-    <h2 class="font-display text-3xl text-ink leading-tight mb-2">The things a real booking needs.</h2>
-    <p class="text-sm text-ink-soft leading-relaxed max-w-2xl mb-6">Add the cards you carry and your travel documents. Tures charges each leg to whichever card earns the most on that kind of spend — and applies your passport, Known Traveler Number, and loyalty programs at booking.</p>
-
-    <div class="grid lg:grid-cols-2 gap-8">
-      <!-- wallet -->
-      <div class="min-w-0">
-        <div class="caps text-[11px] text-ink-faint mb-3">Your cards</div>
-        <div class="flex gap-2 mb-3">
-          <select id="cardPick" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)"></select>
-          <button id="addCard" class="btn-ink px-4 py-2 rounded-lg text-sm press shrink-0">Add</button>
-        </div>
-        <div id="walletList" class="space-y-2 mb-4"></div>
-        <div id="walletRec" class="text-[13px] text-ink-soft rounded-lg p-3" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28);display:none"></div>
-      </div>
-
-      <!-- traveler profile -->
-      <div class="min-w-0">
-        <div class="caps text-[11px] text-ink-faint mb-3">Traveler details</div>
-        <div class="space-y-2.5">
-          <input id="pfPassport" placeholder="Passport number" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          <input id="pfKtn" placeholder="Known Traveler Number (TSA Pre)" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          <div class="flex gap-2">
-            <input id="pfProgram" placeholder="Loyalty program (e.g. Finnair Plus)" class="flex-1 min-w-0 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-            <input id="pfNumber" placeholder="Number" class="w-28 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
-          </div>
-          <button id="saveProfile" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save profile</button>
-          <div id="profileStatus" class="text-[13px] text-ink-soft"></div>
-        </div>
-      </div>
-    </div>
-  </div>
- </div>
-</section>
-
 <footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
   <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
-  <div class="text-canvas/45 text-xs mt-2 caps">Tures Vault Setup</div>
+  <div class="text-canvas/45 text-xs mt-2 caps">Tures Vault Setup · secured by VGS</div>
 </footer>
 
-<!-- sticky CTA -->
 <div class="cta-bar">
   <div class="max-w-5xl mx-auto w-full flex items-center gap-3">
-    <a href="05-execution.html" id="execCta" class="btn-gold flex-1 text-center px-6 py-3 rounded-xl quiet font-semibold" style="opacity:.55;pointer-events:none">Connect 4 required to begin →</a>
+    <a href="03-paste-trip.html" class="btn-gold flex-1 sm:flex-none sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Plan a trip →</a>
+    <a href="05-execution.html" class="btn-ghost px-5 py-3 rounded-xl quiet hidden sm:inline-block">See it book</a>
   </div>
 </div>
 
@@ -193,170 +234,138 @@
   <div class="sheet-handle"></div>
   <div class="caps text-[11px] text-ink-faint mb-1">Payment</div>
   <h3 class="font-display text-2xl text-ink mb-3">How your card is used</h3>
-  <p class="text-sm text-ink-soft leading-relaxed">A per-trip authorization with a ceiling you set. Every charge is itemized and pushed to you the moment it's made. The card is held in a PCI-scope tokenization vault — Tures' agent never sees the raw number. Nothing is charged without an authorization you've approved.</p>
+  <p class="text-sm text-ink-soft leading-relaxed">Card numbers are entered into a <strong>VGS-hosted field</strong> and tokenized before they ever reach Tures — we hold a token, never the PAN. Each booking is a per-trip authorization with a ceiling you set; every charge is itemized and pushed to you the moment it's made. Nothing is charged without an authorization you've approved.</p>
   <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
 </div></div>
-
-<div class="sheet" id="sheet-loyalty"><div class="sheet-backdrop"></div><div class="sheet-panel">
-  <div class="sheet-handle"></div>
-  <div class="caps text-[11px] text-ink-faint mb-1">Loyalty &amp; status</div>
-  <h3 class="font-display text-2xl text-ink mb-3">Applied automatically</h3>
-  <p class="text-sm text-ink-soft leading-relaxed">AAdvantage, Flying Blue, Finnair Plus and your Virtuoso membership are attached to every booking that supports them — credits applied, status chased mid-trip, upgrades requested at check-in. You see exactly which program was used on each leg.</p>
-  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
-</div></div>
-
 <div class="sheet" id="sheet-calendar"><div class="sheet-backdrop"></div><div class="sheet-panel">
   <div class="sheet-handle"></div>
   <div class="caps text-[11px] text-ink-faint mb-1">Calendar</div>
   <h3 class="font-display text-2xl text-ink mb-3">Routes around your life</h3>
-  <p class="text-sm text-ink-soft leading-relaxed">We read availability to avoid booking over what's already on your plate, then write the confirmed trip back in — flights, hotels, dinners — with confirmation numbers attached to each event. Scoped to free/busy and the events we create.</p>
+  <p class="text-sm text-ink-soft leading-relaxed">We read free/busy to avoid booking over what's already on your plate, then write the confirmed trip back in — flights, hotels, dinners — with confirmation numbers attached. Scoped to free/busy and the events we create.</p>
   <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
 </div></div>
-
 <div class="sheet" id="sheet-inbox"><div class="sheet-backdrop"></div><div class="sheet-panel">
   <div class="sheet-handle"></div>
   <div class="caps text-[11px] text-ink-faint mb-1">Inbox</div>
   <h3 class="font-display text-2xl text-ink mb-3">The second source of truth</h3>
-  <p class="text-sm text-ink-soft leading-relaxed">Read-only, scoped to travel senders only — never marketing, never your personal mail. We use the confirmation email as an independent check against the provider receipt. We don't mark anything "Booked" until both agree.</p>
+  <p class="text-sm text-ink-soft leading-relaxed">Read-only, scoped to travel senders only — never marketing, never your personal mail. We use the confirmation email as an independent check against the provider receipt. Nothing is marked "Booked" until both agree.</p>
   <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
 </div></div>
-
 <div class="sheet" id="sheet-messaging"><div class="sheet-backdrop"></div><div class="sheet-panel">
   <div class="sheet-handle"></div>
   <div class="caps text-[11px] text-ink-faint mb-1">Messaging</div>
   <h3 class="font-display text-2xl text-ink mb-3">Where the concierge lives</h3>
-  <p class="text-sm text-ink-soft leading-relaxed">Optional, but it's where most of the relationship happens once you're moving. Connect WhatsApp or Telegram and you can brief Tures the way you'd text a fixer. Same agent, same memory, same permissions as the app.</p>
+  <p class="text-sm text-ink-soft leading-relaxed">Optional, but it's where most of the relationship happens once you're moving. Connect WhatsApp or Telegram and brief Tures the way you'd text a fixer — same agent, same memory, same permissions.</p>
   <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
 </div></div>
 
 <script src="assets/engine.js"></script>
 <script>
-var REQUIRED = ['card','loyalty','calendar','inbox'];
-function rowFor(name){ return document.querySelector('.perm[data-perm="'+name+'"]'); }
+var CONFIGURED = !!(window.tures && tures.configured);
+function mask(v, keep){ v=String(v||'').replace(/\s/g,''); keep=keep||4; return v.length<=keep ? v : '•••• '+v.slice(-keep); }
+var vaultSet = { payment:false, documents:false, identity:false, loyalty:false };
+function markVault(k){ vaultSet[k]=true; var n=Object.keys(vaultSet).filter(function(x){return vaultSet[x];}).length;
+  document.getElementById('vaultProgress').textContent = n+' of 4 set'; }
+function showSaved(id, html){ var e=document.getElementById(id); e.innerHTML='<span style="font-size:15px">✓</span><span>'+html+'</span>'; e.classList.add('show'); }
 
-/* When an engine is configured, the toggles connect/revoke real vault grants (kept additive —
-   the scripted UX is unchanged either way). */
-var ENGINE_KIND = { card:'payment', loyalty:'loyalty', calendar:'calendar', inbox:'email' };
-var ENGINE_LABEL = { card:'AmEx ··1004', loyalty:'Loyalty programs', calendar:'Calendar', inbox:'Travel inbox' };
-var ENGINE_SECRET = { card:{ customerId:'cus_demo', paymentMethodId:'pm_demo' } };
-var _connIds = {};
-function syncEngine(name, on){
-  if(!(window.tures && tures.configured)) return;
-  var kind = ENGINE_KIND[name]; if(!kind) return; // messaging has no vault kind
-  if(on){
-    tures.connections.connect({ kind:kind, label:ENGINE_LABEL[name]||name, secret:ENGINE_SECRET[name]||{ token:'demo' }, meta:{ source:'demo' } })
-      .then(function(c){ _connIds[name] = c.id; })
-      .catch(function(e){ console.warn('[tures] connect failed', name, e); });
-  } else if(_connIds[name]){
-    tures.connections.revoke(_connIds[name]).catch(function(e){ console.warn('[tures] revoke failed', name, e); });
-    delete _connIds[name];
-  }
-}
-function setGranted(name, on){
-  var row = rowFor(name); if(!row) return;
-  var sw = row.querySelector('.switch');
-  sw.classList.toggle('on', on); sw.classList.toggle('off', !on);
-  row.classList.toggle('granted', on);
-  if(on){ row.classList.remove('grant-flash'); void row.offsetWidth; row.classList.add('grant-flash'); }
-  update();
-  syncEngine(name, on);
-}
-function update(){
-  var on = [].slice.call(document.querySelectorAll('.switch.on')).length;
-  document.getElementById('connCount').textContent = on;
-  document.getElementById('connBar').style.width = (on/5*100)+'%';
-  var ready = REQUIRED.every(function(n){ return rowFor(n).querySelector('.switch').classList.contains('on'); });
-  var pill = document.getElementById('statusPill');
-  pill.innerHTML = ready ? '<span class="dot dot-green"></span> Ready to book' : '<span class="dot dot-amber"></span> Not ready';
-  pill.className = 'pill ' + (ready ? 'pill-confirm' : 'pill-pending');
-  var cta = document.getElementById('execCta');
-  if(ready){ cta.style.opacity=1; cta.style.pointerEvents='auto'; cta.textContent='Begin execution →'; }
-  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Connect 4 required to begin →'; }
-}
-// individual toggles
-document.querySelectorAll('[data-toggle]').forEach(function(sw){
-  sw.addEventListener('click', function(){
-    var name = sw.closest('.perm').getAttribute('data-perm');
-    setGranted(name, !sw.classList.contains('on'));
-  });
-});
-// sequential grant
-document.getElementById('grantAll').addEventListener('click', function(){
-  var btn=this; btn.disabled=true; btn.style.opacity=.7; btn.textContent='Connecting…';
-  REQUIRED.forEach(function(name, i){
-    setTimeout(function(){
-      setGranted(name, true);
-      if(i===REQUIRED.length-1){ btn.textContent='✓ Connected'; setTimeout(function(){ btn.style.display='none'; }, 700); }
-    }, 350 + i*420);
-  });
-});
-update();
-</script>
-
-<!-- wallet & traveler profile — only active when an engine is configured -->
-<script>
+/* ---------- PAYMENT (engine wallet when configured; graceful mock otherwise) ---------- */
 (function(){
-  if(!(window.tures && tures.configured)) return;        // scripted demo: leave panel hidden
-  var panel = document.getElementById('walletPanel');
-  panel.style.display = '';
-
   var pick = document.getElementById('cardPick');
-  // populate card types from the engine catalog
-  tures.wallet.catalog().then(function(cat){
-    (cat.cards || []).forEach(function(c){
-      var o = document.createElement('option'); o.value = c.key; o.textContent = c.name; pick.appendChild(o);
+  var list = document.getElementById('walletList');
+  var MOCK_CARDS = [
+    {key:'amex_plat', name:'Amex Platinum'},{key:'csr', name:'Chase Sapphire Reserve'},
+    {key:'amex_gold', name:'Amex Gold'},{key:'venturex', name:'Capital One Venture X'},{key:'generic_cashback', name:'Other card'}
+  ];
+  var localCards = [];
+  function opt(c){ var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; return o; }
+  function renderLocal(){
+    list.innerHTML = localCards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — add one above.</div>';
+    localCards.forEach(function(c,i){
+      var row=document.createElement('div'); row.className='flex items-center justify-between rounded-lg px-3 py-2 text-sm';
+      row.style='border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
+      row.innerHTML='<span class="text-ink">'+c.name+' · <span class="font-mono text-ink-faint">'+mask('400000000000'+(1000+i))+'</span></span><button class="text-[12px] text-gold-deep hover:underline">remove</button>';
+      row.querySelector('button').onclick=function(){ localCards.splice(i,1); renderLocal(); if(!localCards.length) vaultSet.payment=false; };
+      list.appendChild(row);
     });
-  }).catch(function(){});
-
-  function refresh(){
-    tures.connections.list().then(function(res){
-      var cards = (res.connections || []).filter(function(c){ return c.kind === 'payment'; });
-      var list = document.getElementById('walletList');
-      list.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — add one above.</div>';
-      cards.forEach(function(c){
-        var row = document.createElement('div');
-        row.className = 'flex items-center justify-between rounded-lg px-3 py-2 text-sm';
-        row.style = 'border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
-        row.innerHTML = '<span class="text-ink">' + c.label + '</span><button class="text-[12px] text-gold-deep hover:underline" data-revoke="' + c.id + '">remove</button>';
-        list.appendChild(row);
-      });
-      list.querySelectorAll('[data-revoke]').forEach(function(b){
-        b.onclick = function(){ tures.connections.revoke(b.getAttribute('data-revoke')).then(refresh); };
-      });
-      // recommend preview: who wins airfare vs hotel
-      if(cards.length){
-        Promise.all([
-          tures.wallet.recommend('airfare', 5000),
-          tures.wallet.recommend('hotel', 2000)
-        ]).then(function(rs){
-          var rec = document.getElementById('walletRec');
-          rec.style.display = '';
-          rec.innerHTML = '<strong>How Tures would charge:</strong><br>✈ Airfare → ' + (rs[0].name||'—') + '<br>⌂ Hotel → ' + (rs[1].name||'—');
-        }).catch(function(){});
-      } else {
-        document.getElementById('walletRec').style.display = 'none';
-      }
-    });
+    if(localCards.length){
+      var best = localCards[0].name;
+      var rec=document.getElementById('walletRec'); rec.style.display='';
+      rec.innerHTML='<strong>How Tures would charge:</strong><br>✈ Airfare → '+best+'<br>⌂ Hotel → '+best;
+      markVault('payment');
+    } else document.getElementById('walletRec').style.display='none';
   }
-  refresh();
+  if(CONFIGURED){
+    tures.wallet.catalog().then(function(cat){ (cat.cards||[]).forEach(function(c){ pick.appendChild(opt(c)); }); }).catch(function(){ MOCK_CARDS.forEach(function(c){ pick.appendChild(opt(c)); }); });
+    function refresh(){
+      tures.connections.list().then(function(res){
+        var cards=(res.connections||[]).filter(function(c){return c.kind==='payment';});
+        list.innerHTML = cards.length?'':'<div class="text-[13px] text-ink-faint">No cards yet — add one above.</div>';
+        cards.forEach(function(c){ var row=document.createElement('div'); row.className='flex items-center justify-between rounded-lg px-3 py-2 text-sm'; row.style='border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
+          row.innerHTML='<span class="text-ink">'+c.label+'</span><button class="text-[12px] text-gold-deep hover:underline" data-r="'+c.id+'">remove</button>';
+          row.querySelector('button').onclick=function(){ tures.connections.revoke(c.id).then(refresh); }; list.appendChild(row); });
+        if(cards.length){ markVault('payment'); Promise.all([tures.wallet.recommend('airfare',5000),tures.wallet.recommend('hotel',2000)]).then(function(rs){ var rec=document.getElementById('walletRec'); rec.style.display=''; rec.innerHTML='<strong>How Tures would charge:</strong><br>✈ Airfare → '+(rs[0].name||'—')+'<br>⌂ Hotel → '+(rs[1].name||'—'); }).catch(function(){}); }
+        else document.getElementById('walletRec').style.display='none';
+      });
+    }
+    refresh();
+    document.getElementById('addCard').onclick=function(){ var key=pick.value, name=pick.options[pick.selectedIndex].textContent;
+      tures.connections.connect({kind:'payment',label:name,secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key},meta:{cardKey:key,last4:'0000'}}).then(refresh); };
+  } else {
+    MOCK_CARDS.forEach(function(c){ pick.appendChild(opt(c)); });
+    renderLocal();
+    document.getElementById('addCard').onclick=function(){ var name=pick.options[pick.selectedIndex].textContent; localCards.push({key:pick.value,name:name}); renderLocal(); };
+  }
+})();
 
-  document.getElementById('addCard').onclick = function(){
-    var key = pick.value; var name = pick.options[pick.selectedIndex].textContent;
-    tures.connections.connect({ kind:'payment', label:name, secret:{ customerId:'cus_demo', paymentMethodId:'pm_'+key }, meta:{ cardKey:key, last4:'0000' } }).then(refresh);
-  };
+/* ---------- TRAVEL DOCUMENTS ---------- */
+document.getElementById('saveDocs').onclick=function(){
+  var num=document.getElementById('pfPassport').value.trim(); if(!num){ document.getElementById('pfPassport').focus(); return; }
+  var exp=document.getElementById('pfExpiry').value.trim(), country=document.getElementById('pfCountry').value.trim()||'US';
+  function done(maskedNum){ showSaved('docsSaved','Passport '+maskedNum+(exp?' · exp '+exp:'')+' · '+country+' — tokenized by VGS'); markVault('documents');
+    document.getElementById('pfPassport').value=''; }
+  if(CONFIGURED){ tures.profile.set({ passport:{ number:num, country:country, expiry:exp||undefined } })
+      .then(function(c){ done((c.meta&&c.meta.passportMasked)||mask(num)); }).catch(function(){ done(mask(num)); }); }
+  else done(mask(num));
+};
 
-  document.getElementById('saveProfile').onclick = function(){
-    var profile = {
-      passport: document.getElementById('pfPassport').value ? { number: document.getElementById('pfPassport').value, country:'US' } : undefined,
-      knownTravelerNumber: document.getElementById('pfKtn').value || undefined,
-      memberships: document.getElementById('pfProgram').value ? [{ kind:'airline', program: document.getElementById('pfProgram').value, number: document.getElementById('pfNumber').value }] : []
-    };
-    tures.profile.set(profile)
-      .then(function(c){
-        document.getElementById('profileStatus').innerHTML = '✓ Saved · passport ' + (c.meta && c.meta.passportMasked || '—') + (c.meta && c.meta.ktnOnFile ? ' · KTN on file' : '');
-      }).catch(function(e){ document.getElementById('profileStatus').textContent = 'Save failed: ' + e; });
+/* ---------- IDENTITY & TRUSTED TRAVELER ---------- */
+document.getElementById('pfId').addEventListener('change', function(){ var f=this.files&&this.files[0];
+  document.getElementById('idUploadLabel').textContent = f ? (f.name+' — will be encrypted via VGS') : 'Upload a government ID (optional)'; });
+document.getElementById('saveId').onclick=function(){
+  var ktn=document.getElementById('pfKtn').value.trim(), redress=document.getElementById('pfRedress').value.trim();
+  var f=document.getElementById('pfId').files&&document.getElementById('pfId').files[0];
+  if(!ktn && !redress && !f){ document.getElementById('pfKtn').focus(); return; }
+  var parts=[]; if(ktn) parts.push('KTN '+mask(ktn)); if(redress) parts.push('Redress '+mask(redress)); if(f) parts.push('ID “'+f.name+'” vaulted');
+  function done(){ showSaved('idSaved', parts.join(' · ')+' — tokenized by VGS'); markVault('identity'); }
+  if(CONFIGURED){ tures.profile.set({ knownTravelerNumber:ktn||undefined, redressNumber:redress||undefined }).then(done).catch(done); }
+  else done();
+};
+
+/* ---------- LOYALTY ---------- */
+(function(){
+  var progs=[]; var listEl=document.getElementById('loyaltyList');
+  function render(){ listEl.innerHTML=''; progs.forEach(function(p,i){ var row=document.createElement('div');
+    row.className='flex items-center justify-between rounded-lg px-3 py-2 text-sm'; row.style='border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
+    row.innerHTML='<span class="text-ink">'+p.program+' · <span class="font-mono text-ink-faint">'+mask(p.number)+'</span></span><button class="text-[12px] text-gold-deep hover:underline">remove</button>';
+    row.querySelector('button').onclick=function(){ progs.splice(i,1); render(); if(!progs.length) vaultSet.loyalty=false; }; listEl.appendChild(row); });
+    if(progs.length) markVault('loyalty');
+  }
+  document.getElementById('addLoyalty').onclick=function(){
+    var program=document.getElementById('pfProgram').value.trim(), number=document.getElementById('pfNumber').value.trim();
+    if(!program){ document.getElementById('pfProgram').focus(); return; }
+    progs.push({program:program, number:number}); document.getElementById('pfProgram').value=''; document.getElementById('pfNumber').value=''; render();
+    if(CONFIGURED){ tures.profile.set({ memberships:progs.map(function(p){return {kind:'airline',program:p.program,number:p.number};}) }).catch(function(){}); }
   };
 })();
+
+/* ---------- ACCESS GRANTS (calendar / inbox / messaging) ---------- */
+var ENGINE_KIND={ calendar:'calendar', inbox:'email' };
+function setGranted(name,on){
+  var row=document.querySelector('.perm[data-perm="'+name+'"]'); if(!row) return;
+  var sw=row.querySelector('.switch'); sw.classList.toggle('on',on); sw.classList.toggle('off',!on); row.classList.toggle('granted',on);
+  if(CONFIGURED && ENGINE_KIND[name]){ if(on) tures.connections.connect({kind:ENGINE_KIND[name],label:name,secret:{token:'demo'},meta:{source:'demo'}}).catch(function(){}); }
+}
+document.querySelectorAll('[data-toggle]').forEach(function(sw){ sw.addEventListener('click', function(){ var name=sw.closest('.perm').getAttribute('data-perm'); setGranted(name, !sw.classList.contains('on')); }); });
 </script>
   <script src="assets/ui.js"></script>
   <script src="assets/pageturn.js"></script>
