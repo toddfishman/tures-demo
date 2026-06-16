@@ -109,9 +109,10 @@
       remove: function (name) { return api("/places/" + encodeURIComponent(name), { method: "DELETE" }); },
     },
 
-    /* Conversational Tures (spoken). messages: prior turns; text: the new user turn. → { reply } */
-    converse: function (messages, text) {
-      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text }) });
+    /* Conversational Tures. messages: prior turns; text: new user turn; context: known profile/
+       Taste Print so the agent skips what it already knows. → { reply, ready?, brief?, slots? } */
+    converse: function (messages, text, context) {
+      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context }) });
     },
 
     /* Voice: transcribe a recorded Blob (Deepgram STT) and speak text (Deepgram Aura TTS → mp3 Blob). */

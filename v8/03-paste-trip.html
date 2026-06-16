@@ -642,12 +642,47 @@ function restart(){
   greet();
 }
 
+/* ---------- guided conversation (real visitors) ----------
+   The /converse agent gathers a complete brief one question at a time, then hands it to the
+   planner. Demos and post-plan corrections use the direct planner (sendBrief) below. */
+var convoHistory = [];
+function convoContext(){
+  var bits = [];
+  try{ var tp = JSON.parse(localStorage.getItem('tures.tastePrint')||'null'); if(tp && tp.signature){ bits.push('Their Taste Print: '+tp.signature); } }catch(_){}
+  return bits.length ? bits.join(' · ') : undefined;
+}
+function onSend(){
+  var text = composer.value.trim();
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me');
+  convoHistory.push({ role:'user', content:text });
+  composer.value=''; autoGrow(); sugEl.innerHTML=''; setStep(1);
+  var status = document.getElementById('threadStatus'); if(status) status.textContent = 'Gathering your trip…';
+  var t = typing();
+  tures.converse(convoHistory.slice(-12), undefined, convoContext()).then(function(c){
+    t.remove();
+    var reply = (c && c.reply || '').trim();
+    if(reply){ addMsg(reply.replace(/</g,'&lt;'), 't'); convoHistory.push({ role:'assistant', content:reply }); }
+    if(status) status.textContent = 'Booking concierge · online';
+    if(c && c.ready && c.brief){
+      // checklist complete — hand the assembled brief to the planner (same path voice uses)
+      setTimeout(function(){ composer.value = c.brief; autoGrow(); sendBrief(); }, 650);
+    }
+  }).catch(function(){ t.remove(); if(status) status.textContent='Booking concierge · online'; addMsg('The agent hiccuped — say that again?', 't'); });
+}
+/* Route the composer: real first-time gathering → /converse; demos, post-plan corrections,
+   or offline (no engine) → the direct planner. */
+function composerSend(){
+  if(DEMO || DEMO_TRIP || planned || !(window.tures && tures.configured)){ sendBrief(); return; }
+  onSend();
+}
+
 /* composer behavior */
 function autoGrow(){ composer.style.height = 'auto'; composer.style.height = Math.min(160, composer.scrollHeight) + 'px'; }
 composer.addEventListener('input', autoGrow);
-document.getElementById('sendBtn').addEventListener('click', sendBrief);
+document.getElementById('sendBtn').addEventListener('click', composerSend);
 composer.addEventListener('keydown', function(e){
-  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendBrief(); }
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); composerSend(); }
 });
 
 /* ---- trip-time sentiment + budget posture (folds into the brief; budget re-plans) ---- */
