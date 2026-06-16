@@ -13,6 +13,15 @@
   html,body{ height:100%; background:#01030c; overflow:hidden; }
   .stage{ position:fixed; inset:0; overflow:hidden; font-family:'Inter',system-ui,sans-serif; background:#01030c; }
 
+  /* drop-in photo-real time-lapse video; covers the CSS fallback scene once it loads */
+  .scene-fallback{ position:absolute; inset:0; }
+  .bgvideo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:9; background:#01030c; opacity:0; transition:opacity .9s ease; }
+  .bgvideo.on{ opacity:1; }
+  /* keep the centre legible over whatever the video is doing (night or bright day) */
+  .scrim{ position:absolute; inset:0; z-index:18; pointer-events:none; opacity:0; transition:opacity 1.2s ease;
+    background:radial-gradient(120% 90% at 50% 52%, rgba(0,0,0,0.32), transparent 60%); }
+  .stage.logo-in .scrim{ opacity:1; }
+
   /* ===== sky (crossfade night → day) ===== */
   .sky{ position:absolute; inset:0; transition:opacity 6.5s ease; }
   .sky-night{ background:linear-gradient(180deg,#01030c 0%,#050f29 40%,#0a2036 66%,#0c2334 100%); opacity:1; }
@@ -122,6 +131,8 @@
 </head>
 <body>
   <div class="stage" id="stage">
+    <!-- generated CSS scene — the fallback shown until a real time-lapse is dropped at assets/video/dawn.* -->
+    <div class="scene-fallback" id="fallback">
     <div class="sky sky-night"></div>
     <div class="sky sky-day"></div>
     <div class="glow"></div>
@@ -157,7 +168,16 @@
     </svg>
 
     <div class="vignette"></div>
+    </div><!-- /scene-fallback -->
 
+    <!-- DROP-IN: a photo-real night→day time-lapse (Veo / Sora). Muted autoplay, no loop (holds on the
+         day frame). When assets/video/dawn.* loads it replaces the CSS scene and drives the logo timing. -->
+    <video class="bgvideo" id="bg" muted autoplay playsinline preload="auto">
+      <source src="assets/video/dawn.webm" type="video/webm">
+      <source src="assets/video/dawn.mp4" type="video/mp4">
+    </video>
+
+    <div class="scrim"></div>
     <div class="halo"></div>
     <div class="centre">
       <div class="eyebrow">The AI Travel Concierge</div>
@@ -186,19 +206,52 @@
     starsEl.appendChild(s);
   }
 
-  var t = [];
+  var fallback = document.getElementById('fallback');
+  var bg = document.getElementById('bg');
+
+  // ===== tune to YOUR clip once it's dropped in (seconds into the video) =====
+  var LOGO_AT = 1.4;   // the gold logo begins to enter — set just before the clip's sunrise
+  var DAY_AT  = 3.2;   // the halo blooms as the sun breaks
+
+  var mode = '', t = [];
   function clearTimers(){ t.forEach(clearTimeout); t = []; }
-  function play() {
-    clearTimers();
-    stage.classList.remove('logo-in', 'day', 'arrived');
-    void stage.offsetWidth;
+
+  function playFallback() {
+    mode = 'fallback'; clearTimers();
+    fallback.style.display = ''; bg.classList.remove('on');
+    stage.classList.remove('logo-in', 'day', 'arrived'); void stage.offsetWidth;
     if (reduce) { stage.classList.add('logo-in', 'day', 'arrived'); return; }
-    t.push(setTimeout(function(){ stage.classList.add('logo-in'); }, 1800));  // the gold logo enters
-    t.push(setTimeout(function(){ stage.classList.add('day'); }, 4600));       // …and summons the dawn
-    t.push(setTimeout(function(){ stage.classList.add('arrived'); }, 9600));   // the words & the way in
+    t.push(setTimeout(function(){ stage.classList.add('logo-in'); }, 1800));   // the gold logo enters
+    t.push(setTimeout(function(){ stage.classList.add('day'); }, 4600));        // …and summons the dawn
+    t.push(setTimeout(function(){ stage.classList.add('arrived'); }, 9600));    // the words & the way in
   }
-  document.getElementById('replay').addEventListener('click', play);
-  play();
+
+  function startVideo() {
+    mode = 'video';
+    fallback.style.display = 'none'; bg.classList.add('on');
+    stage.classList.remove('logo-in', 'day', 'arrived');
+    bg.addEventListener('timeupdate', function () {
+      if (bg.currentTime >= LOGO_AT) stage.classList.add('logo-in');   // logo enters just before the sunrise
+      if (bg.currentTime >= DAY_AT) stage.classList.add('day');        // halo blooms
+    });
+    bg.addEventListener('ended', function () { stage.classList.add('logo-in', 'day', 'arrived'); });
+    if (reduce) { try { bg.pause(); bg.currentTime = bg.duration || 0; } catch (e) {} stage.classList.add('logo-in', 'day', 'arrived'); return; }
+    var p = bg.play(); if (p && p.catch) p.catch(function(){});
+  }
+
+  // Use the video if it loads; otherwise fall back to the generated CSS scene (so the page works today).
+  var decided = false;
+  function decide(useVideo){ if (decided) return; decided = true; if (useVideo) startVideo(); else playFallback(); }
+  bg.addEventListener('loadeddata', function(){ decide(true); });
+  bg.addEventListener('canplay', function(){ decide(true); });
+  bg.addEventListener('error', function(){ decide(false); });
+  setTimeout(function(){ if (!decided) decide(false); }, 2600);   // no file yet → CSS scene
+
+  document.getElementById('replay').addEventListener('click', function () {
+    stage.classList.remove('logo-in', 'day', 'arrived');
+    if (mode === 'video') { try { bg.currentTime = 0; var p = bg.play(); if (p && p.catch) p.catch(function(){}); } catch (e) {} }
+    else playFallback();
+  });
 </script>
 </body>
 </html>
