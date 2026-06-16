@@ -26,6 +26,12 @@
   try { var _t = localStorage.getItem(THEME_KEY); if (_t === 'oxblood' || _t === 'parchment') theme = _t; } catch (e) {}
   document.documentElement.setAttribute('data-theme', theme);
 
+  // Seasonal accent (Parchment only): swaps the accent tokens; paper stays constant.
+  var ACCENT_KEY = 'tures.v9accent';
+  var accent = 'autumn';
+  try { var _a = localStorage.getItem(ACCENT_KEY); if (['spring', 'summer', 'autumn', 'winter'].indexOf(_a) > -1) accent = _a; } catch (e) {}
+  document.documentElement.setAttribute('data-accent', accent);
+
   if (window.__turesChrome) return;
   window.__turesChrome = true;
 
@@ -146,6 +152,20 @@
       });
       sw.appendChild(b);
     });
+    // seasonal accent dots — CSS shows this row only under Parchment
+    var SEASONS = [['spring', 'Spring', '#6f8f4a'], ['summer', 'Summer', '#c06a3e'], ['autumn', 'Autumn', '#bb8d3a'], ['winter', 'Winter', '#5b7790']];
+    var arow = el('div', 'tures-accent'); arow.setAttribute('role', 'group'); arow.setAttribute('aria-label', 'Seasonal accent');
+    SEASONS.forEach(function (s) {
+      var b = el('button', accent === s[0] ? 'on' : null); b.type = 'button'; b.title = s[1]; b.setAttribute('aria-label', s[1]); b.style.background = s[2];
+      b.addEventListener('click', function () {
+        accent = s[0];
+        document.documentElement.setAttribute('data-accent', accent);
+        try { localStorage.setItem(ACCENT_KEY, accent); } catch (e) {}
+        Array.prototype.forEach.call(arow.children, function (c) { c.className = (c === b ? 'on' : ''); });
+      });
+      arow.appendChild(b);
+    });
+    sw.appendChild(arow);
     document.body.appendChild(sw);
   }
 

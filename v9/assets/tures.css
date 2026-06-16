@@ -759,3 +759,45 @@ html[data-theme="oxblood"] .chatwin .bubble-me{ background:#ffffff !important; c
 html[data-theme="oxblood"] .chatwin .chip{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
 html[data-theme="oxblood"] .chatwin .chip.on{ background:#4a0a05 !important; color:#fafaf9 !important; }
 html[data-theme="oxblood"] .chatwin .qr{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
+
+/* ============================================================
+   SEASONAL ACCENTS — Parchment only. The paper stays constant; the accent
+   (wordmark, buttons, chips, links, rules) shifts with the season. Autumn = the
+   default brass, so the approved Parchment look is unchanged by default. Set via
+   html[data-accent="spring|summer|autumn|winter"] (assets/menu.js, localStorage
+   'tures.v9accent'). Oxblood ignores this (its single oxblood ink is by design).
+   Deep variants clear AA on the parchment canvas.
+   ============================================================ */
+html[data-theme="parchment"][data-accent="spring"]{ --gold:#6f8f4a; --gold-bright:#9bb56b; --gold-deep:#4c6a2c; }
+html[data-theme="parchment"][data-accent="summer"]{ --gold:#c06a3e; --gold-bright:#db8a5c; --gold-deep:#9a4422; }
+html[data-theme="parchment"][data-accent="autumn"]{ --gold:#bb8d3a; --gold-bright:#cf9f49; --gold-deep:#6f561d; }
+html[data-theme="parchment"][data-accent="winter"]{ --gold:#5b7790; --gold-bright:#7e9bb3; --gold-deep:#3c5567; }
+
+/* accent-following touchpoints that were hardcoded brass */
+html[data-theme="parchment"] .foil{
+  background:linear-gradient(92deg, var(--gold-deep), var(--gold-bright) 42%, var(--gold) 66%, var(--gold-deep));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-theme="parchment"] .foil-line{ background:linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-bright), var(--gold-deep), transparent); }
+html[data-theme="parchment"] .rule-gold{ background:linear-gradient(90deg, transparent, var(--gold), transparent); }
+/* small "on" markers: deep fill + warm cream text so they read across all four seasons */
+html[data-theme="parchment"] .step.on .num{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fbf6ea; }
+html[data-theme="parchment"] .chip.on{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fbf6ea; }
+html[data-theme="parchment"] .chatwin .chip.on{ background:var(--gold-deep) !important; border-color:var(--gold-deep) !important; color:#fbf6ea !important; }
+html[data-theme="parchment"] .chatwin .composer-wrap:focus-within{ border-color:var(--gold) !important; box-shadow:0 0 0 3px rgba(40,30,15,0.06) !important; }
+/* non-autumn primary buttons go deep+cream so every season stays legible (autumn keeps its bright gold) */
+html[data-theme="parchment"][data-accent="spring"] .btn-gold,
+html[data-theme="parchment"][data-accent="summer"] .btn-gold,
+html[data-theme="parchment"][data-accent="winter"] .btn-gold{
+  background:linear-gradient(180deg, var(--gold), var(--gold-deep)); color:#fbf6ea; border:1px solid var(--gold-deep);
+  box-shadow:0 8px 20px -12px rgba(40,30,15,0.55), inset 0 1px 0 rgba(255,255,255,0.18); text-shadow:0 1px 0 rgba(0,0,0,0.18); }
+html[data-theme="parchment"][data-accent="spring"] .btn-gold:hover,
+html[data-theme="parchment"][data-accent="summer"] .btn-gold:hover,
+html[data-theme="parchment"][data-accent="winter"] .btn-gold:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+
+/* the 4 seasonal dots — appended to the floating switch, shown only on Parchment */
+.tures-accent{ display:none; align-items:center; gap:6px; margin-left:8px; padding-left:9px; border-left:1px solid rgba(0,0,0,0.18); }
+html[data-theme="parchment"] .tures-accent{ display:inline-flex; }
+.tures-accent button{ width:15px; height:15px; border-radius:50%; padding:0; cursor:pointer;
+  border:1px solid rgba(0,0,0,0.22); transition:transform .14s ease, box-shadow .14s ease; }
+.tures-accent button:hover{ transform:scale(1.14); }
+.tures-accent button.on{ transform:scale(1.2); box-shadow:0 0 0 2px rgba(255,255,255,0.8), 0 0 0 3px rgba(0,0,0,0.32); }
