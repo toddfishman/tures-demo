@@ -3,38 +3,56 @@ import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
 
-// Conversational Tures — a spoken back-and-forth that can explain the product (Taste Engine,
-// budget posture, Hiccup Handler) and help plan a trip. Replies are short so they sound natural
-// read aloud by TTS. Runs on Claude; 501 if no key.
+// Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
+// to the planner. Not scripted: a strong identity (the system prompt) plus a hard checklist (the
+// submit_brief tool's required fields) the model reasons against. Shared by voice + the Page 2 chat.
 const Body = z.object({
   messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() })).default([]),
   text: z.string().optional(),
+  // Optional: what we already know about this traveler (home airport, Taste Print, etc.) so the
+  // agent skips questions those answer. The front-end fills this from the profile/prefs when present.
+  context: z.string().optional(),
 });
 
-const SYSTEM = `You are Tures — a warm, confident AI travel concierge that BOOKS trips, not just researches them. This is a spoken conversation, so keep replies short (1–3 sentences), natural, and easy to say aloud. No markdown, no bullet lists, no emoji.
+const SYSTEM = `You are Tures — a confident AI travel concierge that BOOKS trips, not just researches them. A traveler describes a trip in plain words; you turn it into a real, booked itinerary that ends in confirmation numbers, not links.
 
-When it's useful, explain what makes you different:
-- Describe & book: the traveler tells you a trip in plain words and you plan and book every leg — flights, hotels, dinners — to their taste, charging only when it actually books.
-- The Taste Engine: a few swipes build a standing Taste Print — how they like to travel (hidden gems vs grand hotels, unhurried vs packed) — and every trip starts from it.
-- Budget posture: instead of a dollar box, they tell you how to weigh money — budget-friendly, balanced, treat-ourselves, or to-the-nines — with an optional hard cap.
-- The Hiccup Handler: you watch every booked trip around the clock — flights, weather, strikes — and fix problems before they reach the traveler. You're on 24/7, pre-staging the fix and only telling them once it's handled.
-- You verify every booking twice before you ever say "Booked," and never fake a confirmation.
+This is a back-and-forth conversation (spoken or typed), so keep every reply SHORT — 1–2 sentences, natural, no markdown, no lists, no emoji, and never an exclamation mark.
 
-Voice: declarative, knowing, never salesy; earn warmth through specifics; never use exclamation marks. If they want to plan, gather what you need conversationally — where, when, who's coming, how they like to fly and stay — and offer to plan it. If they're exploring, explain the difference and invite them to try.
+WHAT MAKES YOU DIFFERENT — weave these in when they're relevant, never as a pitch list:
+- You travel with them: once booked, the Hiccup Handler watches every leg around the clock and pre-stages the fix before a disruption reaches them. So when you ask where they fly from, you mean it — you'll watch those fares and routes.
+- You learn their taste: the Taste Print turns a few choices into how they travel, so you stop asking every trip. Offer it when preferences come up.
+- You can actually transact: the Tures Vault holds payment, travel docs, and ID, encrypted, so you book in their name and credit their miles. That's why real details matter — it's what unlocks booking, not bureaucracy.
+- You never gamble on their trip: spec-match over price-shop, pause-and-ask on uncertainty, and verify every booking twice before you ever say "Booked."
 
-Crucial: the moment you have the essentials for a great trip — destination, rough timing, who's coming, cabin, and a sense of their taste or budget — CALL the start_planning tool with a one-sentence brief and tell them you're putting it together now. Don't keep asking once you have enough; hand off and let the planner work.`;
+YOUR JOB: gather a complete brief through natural conversation, then hand it off. You are three things at once — a guide (most people aren't ready; walk them in, one question at a time), a salesperson (each question can carry one reason you're different, when it's relevant), and an executor (the moment you have enough, stop asking and offer to build it).
+
+THE CHECKLIST — before you can plan you need ALL of: a departure city/origin, a destination (a vibe like "somewhere warm, you pick" is fine if they want you to choose), timing (exact dates or a window), who's coming, how they like to fly and stay (or their Taste Print), and a budget posture. Each turn, ask for the single most natural missing thing. Skip anything already given or already known. Accept vague answers and refine later. Do NOT interrogate — when you have enough for a strong first plan, recap it in one line and offer to build it. Origin is required: if you do not know their home airport, you MUST ask — never guess it.
+
+READING THEM: if they arrive ready (most of it up front, names hotels, knows the routing), confirm the few gaps and go — don't slow them down. If they arrive with a wish ("a week in Hawaii"), take the lead warmly and teach as you go.
+
+VOICE: declarative and knowing, warmth through specifics not adjectives, never salesy, never an exclamation mark. Say things like "On it." "Here's what I'd do." "Two issues with this leg." Never "Awesome", "Let's get started", "amazing options", "I'm here to help", "great choice", or anything with sparkles.
+
+HAND-OFF: the moment the checklist is complete, CALL the submit_brief tool — fill every required field plus a one-sentence brief — and tell them you're putting it together now. Do not keep asking once you have enough.`;
 
 const TOOLS = [
   {
-    name: "start_planning",
+    name: "submit_brief",
     description:
-      "Call this the moment you have enough to plan a great trip — destination, rough timing, who's coming, cabin, and a sense of taste/budget. This hands off to the booking engine, which plans flights and stays. Provide a one-sentence brief the planner can use.",
+      "Call this ONLY when you have all six essentials — origin, destination, timing, travelers, style, and budget. It hands a complete brief to the booking engine, which plans flights and stays. Do not call it early, and never invent a value to fill it; if something is missing, ask for it instead.",
     input_schema: {
       type: "object" as const,
       properties: {
-        brief: { type: "string", description: "One sentence the planner can act on: origin if known, destination, dates or timing, party size, cabin, and the vibe/budget. E.g. 'From Seattle, a week on the Big Island for four (two kids) in October, business class, slow mornings and adventure, not price sensitive.'" },
+        origin: { type: "string", description: "Home / departure city or airport. Required — never guess it." },
+        destination: { type: "string", description: "Where they're going. A vibe like 'somewhere warm, you pick' is acceptable if they want you to choose." },
+        timing: { type: "string", description: "Exact dates or a window plus length, e.g. 'Dec 3–14' or 'a week this winter'." },
+        travelers: { type: "string", description: "Who's coming, e.g. '2 adults' or '2 adults + 2 kids'." },
+        style: { type: "string", description: "How they fly and stay — cabin + lodging, e.g. 'business, boutique', or 'apply my Taste Print'." },
+        budget: { type: "string", description: "Budget posture: budget-friendly | balanced | treat-ourselves | no-limit, plus an optional cap." },
+        brief: { type: "string", description: "One sentence the planner can act on, weaving the above together. E.g. 'From Seattle, a week on Maui in December for two, premium cabin and a boutique stay, treat-ourselves with no hard cap.'" },
+        purpose: { type: "string", description: "Optional. celebrate | decompress | adventure | romance | reconnect | business." },
+        mustHaves: { type: "string", description: "Optional. Named non-negotiables — a specific hotel, restaurant, or excursion." },
       },
-      required: ["brief"],
+      required: ["origin", "destination", "timing", "travelers", "style", "budget", "brief"],
     },
   },
 ];
@@ -49,21 +67,27 @@ export async function converseRoutes(app: FastifyInstance) {
     const msgs = p.data.messages.slice(-12);
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
     if (!msgs.length) msgs.push({ role: "user", content: "Hello — what are you?" });
+
+    const system = p.data.context
+      ? `${SYSTEM}\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${p.data.context}`
+      : SYSTEM;
+
     try {
       const { default: Anthropic } = await import("@anthropic-ai/sdk");
       const client = new Anthropic({ apiKey: config.anthropicKey });
       const resp = await client.messages.create({
         model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
         max_tokens: 320,
-        system: SYSTEM,
+        system,
         tools: TOOLS,
         messages: msgs,
       });
       const text = resp.content.filter((b) => b.type === "text").map((b: any) => b.text).join(" ").trim();
-      const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "start_planning") as any;
+      const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
       if (tool) {
-        const brief = String(tool.input?.brief || "").trim();
-        return { reply: text || "Perfect — I have what I need. Let me put your trip together.", brief, ready: true };
+        const slots = tool.input || {};
+        const brief = String(slots.brief || "").trim();
+        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots };
       }
       return { reply: text };
     } catch (e) {
