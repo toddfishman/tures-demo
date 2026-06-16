@@ -28,19 +28,18 @@
   var PAGES = [
     { t: 'The cover', f: 'index.html', cover: true },
     { p: '1',  t: 'What is Tures',        f: '01-landing.html' },
-    { p: '2',  t: 'Plan a trip',          f: '03-paste-trip.html', kids: [
-        { t: 'The Hiccup Handler', f: '06-hiccup-handler.html' }
-    ]},
+    { p: '2',  t: 'Plan a trip',          f: '03-paste-trip.html' },
     { p: '3',  t: 'The Taste Engine',     f: '02-taste-engine.html' },
     { p: '4',  t: 'Tures Vault Setup',    f: '04-connections.html' },
     { p: '5',  t: 'Tures Demo',           f: '05-execution.html' },
     { p: '6',  t: 'My Trips',             f: '07-itinerary.html' },
     { p: '7',  t: 'The Tures Concierge',  f: '08-concierge.html' },
-    { p: '8',  t: 'Where you’ve been',    f: 'been.html' },
-    { p: '9',  t: 'Pricing',              f: 'pricing.html' },
-    { p: '10', t: 'About',                f: 'about.html' },
-    { p: '11', t: 'Contact',              f: 'about.html#contact' },
-    { p: '12', t: 'Privacy & Terms',      f: 'legal/index.html' },
+    { p: '8',  t: 'The Hiccup Handler',   f: '06-hiccup-handler.html' },
+    { p: '9',  t: 'Where you’ve been',    f: 'been.html' },
+    { p: '10', t: 'Pricing',              f: 'pricing.html' },
+    { p: '11', t: 'About',                f: 'about.html' },
+    { p: '12', t: 'Contact',              f: 'about.html#contact' },
+    { p: '13', t: 'Privacy & Terms',      f: 'legal/index.html' },
     { sep: true },
     { socials: true }
   ];
