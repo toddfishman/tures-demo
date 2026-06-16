@@ -18,9 +18,13 @@
 
   var isCover = (here === 'index.html');
   var isWrite = (here === 'write.html');
-  var noTheme = isCover || isWrite;
 
-  try { if (!noTheme && localStorage.getItem('tures.theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
+  // v9 theme sandbox: two switchable directions (parchment | oxblood), applied on EVERY page
+  // incl. the cover. Replaces v8's dark-mode toggle. Persisted to localStorage 'tures.v9theme'.
+  var THEME_KEY = 'tures.v9theme';
+  var theme = 'parchment';
+  try { var _t = localStorage.getItem(THEME_KEY); if (_t === 'oxblood' || _t === 'parchment') theme = _t; } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
 
   if (window.__turesChrome) return;
   window.__turesChrome = true;
@@ -99,19 +103,7 @@
       menu.appendChild(pageLink(it));
     });
 
-    if (!noTheme) {
-      menu.appendChild(el('div', 'sep'));
-      var dark = document.documentElement.classList.contains('dark');
-      var tg = el('button', 'theme-item', '<span>Dark mode</span><span class="sw">' + (dark ? '☀' : '☾') + '</span>');
-      tg.type = 'button';
-      tg.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var on = document.documentElement.classList.toggle('dark');
-        try { localStorage.setItem('tures.theme', on ? 'dark' : 'light'); } catch (er) {}
-        tg.querySelector('.sw').textContent = on ? '☀' : '☾';
-      });
-      menu.appendChild(tg);
-    }
+    // v9: the dark-mode toggle is retired in favour of the Parchment|Oxblood theme switch.
     return menu;
   }
 
@@ -140,6 +132,21 @@
     // book-style page number, lower-right
     var num = pageNumber();
     if (num) document.body.appendChild(el('div', 'tures-pageno', 'Page ' + num));
+
+    // v9 theme sandbox — floating Parchment | Oxblood switch, lower-left, on every page
+    var sw = el('div', 'tures-theme-switch');
+    sw.setAttribute('role', 'group'); sw.setAttribute('aria-label', 'Theme');
+    [['parchment', 'Parchment'], ['oxblood', 'Oxblood']].forEach(function (o) {
+      var b = el('button', theme === o[0] ? 'on' : null, o[1]); b.type = 'button';
+      b.addEventListener('click', function () {
+        theme = o[0];
+        document.documentElement.setAttribute('data-theme', theme);
+        try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+        Array.prototype.forEach.call(sw.children, function (c) { c.className = (c === b ? 'on' : ''); });
+      });
+      sw.appendChild(b);
+    });
+    document.body.appendChild(sw);
   }
 
   if (document.readyState !== 'loading') init();

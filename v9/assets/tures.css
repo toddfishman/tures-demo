@@ -604,3 +604,158 @@ a.quiet{ text-decoration:none; }
   .menu-star, .menu-close{ transition:none; }
   .menu-inner{ transition:opacity .2s ease; transform:none; }
 }
+
+/* ============================================================
+   V9 THEME SANDBOX — two switchable directions over the same markup.
+   Applied via html[data-theme="parchment"|"oxblood"] (set by assets/menu.js,
+   persisted to localStorage 'tures.v9theme'; default parchment). A floating
+   Parchment|Oxblood switch (.tures-theme-switch) is injected on every page.
+   All overrides live HERE so no HTML file needs editing — data-theme adds enough
+   specificity to beat page-local rules (incl. the chat console's !important).
+   ============================================================ */
+
+/* ---------- PARCHMENT · "warm parchment command terminal" (ElevenLabs) ---------- */
+html[data-theme="parchment"]{
+  --canvas:#ece2cd; --canvas-warm:#f7f1e3; --canvas-deep:#e1d6bd; --canvas-line:rgba(45,35,20,0.14);
+  --ink:#241d12; --ink-soft:#5d5139; --ink-faint:#857551;
+  --gold:#bb8d3a; --gold-bright:#cf9f49; --gold-deep:#6f561d;
+}
+html[data-theme="parchment"] body{ background:var(--canvas); }
+html[data-theme="parchment"] .text-canvas,
+html[data-theme="parchment"] [class~="text-canvas/85"]{ color:var(--ink); }
+html[data-theme="parchment"] .leather-surface{
+  background:
+    radial-gradient(120% 90% at 25% 12%, rgba(255,242,212,0.55), transparent 55%),
+    linear-gradient(155deg,#f4ebd8 0%,#ece1ca 55%,#e2d7bd 100%); }
+html[data-theme="parchment"] .leather-surface::after{ opacity:0.12; mix-blend-mode:multiply; }
+html[data-theme="parchment"] .plate{
+  background:linear-gradient(160deg,#f6efdc,#eee4cd); border-color:rgba(45,35,20,0.16); color:var(--ink);
+  box-shadow:0 18px 44px -28px rgba(45,35,20,0.5), inset 0 1px 0 rgba(255,255,255,0.5); }
+html[data-theme="parchment"] #pt-leaf{
+  background:linear-gradient(155deg,#f4ebd8,#e8ddc8); box-shadow:30px 0 70px -10px rgba(45,35,20,0.32); }
+html[data-theme="parchment"] #pt-leaf::after{ background:linear-gradient(90deg, rgba(187,141,58,0.18), transparent 12%, transparent 88%, rgba(187,141,58,0.18)); }
+html[data-theme="parchment"] .btn-ghost{ color:var(--gold-deep); border-color:rgba(187,141,58,0.5); }
+html[data-theme="parchment"] .btn-ghost:hover{ border-color:var(--gold-deep); background:rgba(187,141,58,0.1); }
+html[data-theme="parchment"] ::selection{ background:rgba(187,141,58,0.3); color:#241a0c; }
+
+/* ---------- OXBLOOD · "editorial atelier in oxblood ink" (In Common With) ---------- */
+html[data-theme="oxblood"]{
+  --canvas:#fafaf9; --canvas-warm:#fffefb; --canvas-deep:#f1efe7; --canvas-line:rgba(74,10,5,0.16);
+  --ink:#4a0a05; --ink-soft:#6e2b22; --ink-faint:#9a7b75;
+  --gold:#4a0a05; --gold-bright:#7a3128; --gold-deep:#4a0a05;
+}
+html[data-theme="oxblood"] body{ background:var(--canvas); }
+html[data-theme="oxblood"] .text-canvas,
+html[data-theme="oxblood"] [class~="text-canvas/85"]{ color:#4a0a05; }
+html[data-theme="oxblood"] .leather-surface{ background:linear-gradient(155deg,#fafaf9 0%,#f2f0e8 100%); }
+html[data-theme="oxblood"] .leather-surface::after{ opacity:0; }
+html[data-theme="oxblood"] .leaf{ border-radius:0; background:#fffefb; }
+html[data-theme="oxblood"] .leaf-tab{ border-radius:0; }
+html[data-theme="oxblood"] .plate{ background:#f3f1ea; border:1px solid rgba(74,10,5,0.16); border-radius:0; color:#4a0a05; box-shadow:none; }
+html[data-theme="oxblood"] #pt-leaf{ background:linear-gradient(155deg,#fafaf9,#efece4); box-shadow:30px 0 70px -10px rgba(74,10,5,0.28); }
+html[data-theme="oxblood"] #pt-leaf::before{ opacity:0.1; }
+html[data-theme="oxblood"] #pt-leaf::after{ background:linear-gradient(90deg, rgba(74,10,5,0.12), transparent 12%, transparent 88%, rgba(74,10,5,0.12)); }
+/* single oxblood ink carries buttons, foil, rules; sharp corners are the signature */
+html[data-theme="oxblood"] .foil{ background:none; -webkit-background-clip:border-box; background-clip:border-box; -webkit-text-fill-color:#4a0a05; color:#4a0a05; }
+html[data-theme="oxblood"] .foil-line{ background:linear-gradient(90deg, transparent, #4a0a05, transparent); }
+html[data-theme="oxblood"] .btn-gold{ background:#4a0a05; color:#fafaf9; border:1px solid #4a0a05; border-radius:2px; box-shadow:none; }
+html[data-theme="oxblood"] .btn-gold:hover{ filter:none; background:#380703; transform:translateY(-1px); box-shadow:none; }
+html[data-theme="oxblood"] .btn-ghost{ color:#4a0a05; border:1px solid #4a0a05; border-radius:2px; }
+html[data-theme="oxblood"] .btn-ghost:hover{ background:rgba(74,10,5,0.06); border-color:#4a0a05; }
+html[data-theme="oxblood"] .btn-ink{ border-radius:2px; }
+html[data-theme="oxblood"] .step.on .num{ color:#fafaf9; }
+html[data-theme="oxblood"] .chip.on{ color:#fafaf9; }
+html[data-theme="oxblood"] .pill-gold{ color:#4a0a05; border-color:rgba(74,10,5,0.35); background:rgba(74,10,5,0.06); }
+html[data-theme="oxblood"] ::selection{ background:rgba(74,10,5,0.18); color:#4a0a05; }
+
+/* ---------- chrome (logo / signup / dropdown / page no.) re-skinned per theme ---------- */
+html[data-theme="parchment"] .tures-logo,
+html[data-theme="parchment"] .tures-signup,
+html[data-theme="parchment"] .tures-theme-switch{
+  background:rgba(247,241,227,0.86); color:var(--gold-deep); border-color:rgba(45,35,20,0.2);
+  box-shadow:0 6px 18px -10px rgba(45,35,20,0.45); }
+html[data-theme="parchment"] .tures-logo .spark,
+html[data-theme="parchment"] .tures-logo .car{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu{
+  background:linear-gradient(160deg,#f7f1e3,#ece1ca); border-color:rgba(45,35,20,0.2);
+  box-shadow:0 26px 64px -20px rgba(45,35,20,0.4); }
+html[data-theme="parchment"] .tures-menu a,
+html[data-theme="parchment"] .tures-menu .theme-item,
+html[data-theme="parchment"] .tures-menu .grp-head,
+html[data-theme="parchment"] .tures-menu a.sub,
+html[data-theme="parchment"] .tures-menu a.small{ color:var(--ink); }
+html[data-theme="parchment"] .tures-menu a .pg{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu a.here,
+html[data-theme="parchment"] .tures-menu a.here .pg{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu a:hover,
+html[data-theme="parchment"] .tures-menu .chev:hover,
+html[data-theme="parchment"] .tures-menu .theme-item:hover{ background:rgba(45,35,20,0.07); }
+html[data-theme="parchment"] .tures-menu .sep{ background:rgba(45,35,20,0.14); }
+html[data-theme="parchment"] .tures-menu .socials a{ color:var(--gold-deep); border-color:rgba(45,35,20,0.2); background:rgba(45,35,20,0.04); }
+html[data-theme="parchment"] .tures-pageno{ background:rgba(247,241,227,0.72); color:var(--gold-deep); border-color:rgba(45,35,20,0.2); }
+
+html[data-theme="oxblood"] .tures-logo,
+html[data-theme="oxblood"] .tures-signup,
+html[data-theme="oxblood"] .tures-theme-switch{
+  background:#fafaf9; color:#4a0a05; border-color:#4a0a05; box-shadow:0 6px 18px -12px rgba(74,10,5,0.5); }
+html[data-theme="oxblood"] .tures-logo .spark,
+html[data-theme="oxblood"] .tures-logo .car{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu{
+  background:#fafaf9; border:1px solid #4a0a05; border-radius:2px; box-shadow:0 26px 64px -22px rgba(74,10,5,0.32); }
+html[data-theme="oxblood"] .tures-menu a,
+html[data-theme="oxblood"] .tures-menu .theme-item,
+html[data-theme="oxblood"] .tures-menu .grp-head,
+html[data-theme="oxblood"] .tures-menu a.sub,
+html[data-theme="oxblood"] .tures-menu a.small{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu a .pg{ color:#a2827f; }
+html[data-theme="oxblood"] .tures-menu a.here,
+html[data-theme="oxblood"] .tures-menu a.here .pg{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu a:hover,
+html[data-theme="oxblood"] .tures-menu .chev:hover,
+html[data-theme="oxblood"] .tures-menu .theme-item:hover{ background:rgba(74,10,5,0.06); }
+html[data-theme="oxblood"] .tures-menu .sep{ background:rgba(74,10,5,0.2); }
+html[data-theme="oxblood"] .tures-menu .socials a{ color:#4a0a05; border-color:#4a0a05; background:transparent; }
+html[data-theme="oxblood"] .tures-pageno{ background:#fafaf9; color:#4a0a05; border-color:#4a0a05; }
+
+/* ---------- the floating theme switch itself ---------- */
+.tures-theme-switch{ position:fixed; left:16px; bottom:14px; z-index:82; display:inline-flex; align-items:center; gap:2px;
+  padding:3px; border-radius:99px; background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); box-shadow:0 6px 20px -8px rgba(0,0,0,0.6); }
+.tures-theme-switch button{ appearance:none; border:0; background:transparent; cursor:pointer; line-height:1;
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:currentColor; opacity:.55; padding:6px 12px; border-radius:99px; transition:opacity .15s ease, background .15s ease; }
+.tures-theme-switch button:hover{ opacity:.85; }
+.tures-theme-switch button.on{ opacity:1; background:rgba(187,141,58,0.22); }
+html[data-theme="oxblood"] .tures-theme-switch button.on{ background:#4a0a05; color:#fafaf9; }
+@media(max-width:640px){ .tures-theme-switch{ left:11px; bottom:10px; } .tures-theme-switch button{ font-size:9.5px; padding:5px 10px; } }
+
+/* ---------- chat console (.chatwin) — beats the page-local !important via data-theme specificity ---------- */
+html[data-theme="parchment"] .chatwin{
+  background:linear-gradient(160deg,#f7f1e3,#efe5cf) !important;
+  border:1px solid rgba(45,35,20,0.16) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.6) inset, 0 30px 70px -30px rgba(45,35,20,0.5) !important; }
+html[data-theme="parchment"] .chatwin .text-ink{ color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .text-ink-faint,
+html[data-theme="parchment"] .chatwin .composer::placeholder{ color:var(--ink-faint) !important; }
+html[data-theme="parchment"] .chatwin .text-gold-deep{ color:var(--gold-deep) !important; }
+html[data-theme="parchment"] .chatwin .composer{ color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .composer-wrap{ background:rgba(255,253,247,0.82) !important; border-color:rgba(45,35,20,0.18) !important; }
+html[data-theme="parchment"] .chatwin .bubble-t{ background:#fffdf7 !important; color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .bubble-me{ background:rgba(187,141,58,0.2) !important; color:var(--ink) !important; border:1px solid rgba(187,141,58,0.35) !important; }
+html[data-theme="parchment"] .chatwin .chip{ background:rgba(45,35,20,0.05) !important; color:var(--ink-soft) !important; border-color:rgba(45,35,20,0.18) !important; }
+html[data-theme="parchment"] .chatwin .qr{ background:rgba(255,253,247,0.6) !important; color:var(--gold-deep) !important; border-color:rgba(187,141,58,0.4) !important; }
+
+html[data-theme="oxblood"] .chatwin{
+  background:#fffefb !important; border:1px solid #4a0a05 !important; border-radius:2px !important;
+  box-shadow:0 24px 60px -34px rgba(74,10,5,0.4) !important; }
+html[data-theme="oxblood"] .chatwin .text-ink{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .text-ink-faint,
+html[data-theme="oxblood"] .chatwin .composer::placeholder{ color:#9a7b75 !important; }
+html[data-theme="oxblood"] .chatwin .text-gold-deep{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .composer{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .composer-wrap{ background:#fafaf9 !important; border:1px solid #4a0a05 !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .bubble-t{ background:#f8f7f1 !important; color:#4a0a05 !important; border:1px solid rgba(74,10,5,0.12) !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .bubble-me{ background:#ffffff !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .chip{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .chip.on{ background:#4a0a05 !important; color:#fafaf9 !important; }
+html[data-theme="oxblood"] .chatwin .qr{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
