@@ -84,6 +84,13 @@ html[data-theme="parchment"] ::-webkit-scrollbar-thumb:hover{ background:rgba(15
 .dest .cap,
 .dest .cap [class*="text-canvas"]{ color:#f4ecd9 !important; }
 
+/* ---- SUPPRESS RAW PER-PAGE NAV ----------------------------
+   menu.js replaces every page's own <header><nav> with the global chrome (logo dropdown +
+   Sign Up, both appended to <body> and floating). Hide the raw nav UP FRONT so it can never
+   flash as a stack of unstyled links before — or if — menu.js runs. The injected chrome lives
+   outside this header, so it's unaffected. menu.js's own JS hiding becomes a no-op. */
+header.chrome > nav > *{ display:none; }
+
 /* ---- CONCIERGE DOCK (assets/concierge.js) ------------------
    A tasteful corner presence: the traveller's named concierge medallion, which opens a
    contextual mini-chat about the current screen. Seated above the lower-right page badge. */
