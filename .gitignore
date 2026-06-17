@@ -1,0 +1,4 @@
+.env.local
+.env
+tools/node_modules/
+tools/fonts/
