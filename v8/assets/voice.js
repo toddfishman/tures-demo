@@ -16,10 +16,13 @@
     'font-size:13px;letter-spacing:.02em;box-shadow:0 8px 24px -10px rgba(0,0,0,.6);backdrop-filter:blur(6px);transition:transform .14s ease}',
     '.tv-fab:hover{transform:translateY(-1px);border-color:rgba(230,200,115,.8)}',
     '.tv-fab .d{width:7px;height:7px;border-radius:50%;background:var(--gold-bright,#e6c873)}',
-    '.tv-trigger{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;cursor:pointer;',
-    'white-space:nowrap;border:1px solid rgba(200,162,74,0.5);background:rgba(200,162,74,0.1);color:#7d5e20;font-size:11px;letter-spacing:.02em}',
-    '.tv-trigger:hover{background:rgba(200,162,74,0.18)}',
-    '.tv-trigger .d{width:6px;height:6px;border-radius:50%;background:#7d5e20}',
+    '.tv-trigger{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:99px;cursor:pointer;white-space:nowrap;',
+    'border:1px solid #8a6a26;background:linear-gradient(180deg,#e6c873,#c8a24a 60%,#a8842f);color:#241a0c;font-size:12.5px;font-weight:600;letter-spacing:.01em;',
+    'box-shadow:0 3px 12px -4px rgba(200,162,74,0.7);transition:filter .15s ease, transform .14s ease}',
+    '.tv-trigger:hover{filter:brightness(1.06);transform:translateY(-1px)}',
+    '.tv-trigger:active{transform:scale(.97)}',
+    '.tv-trigger .d{width:7px;height:7px;border-radius:50%;background:#241a0c;animation:tvpulse 1.6s ease-in-out infinite}',
+    '@keyframes tvpulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}',
     '.tv-trigger .ts{display:none}',
     '@media(max-width:430px){.tv-trigger .tl{display:none}.tv-trigger .ts{display:inline}}',
     '.tv-ov{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;',
@@ -55,15 +58,15 @@
   document.head.appendChild(S);
 
   var fab = document.createElement('button');
-  fab.setAttribute('aria-label', 'Talk to Tures');
+  fab.setAttribute('aria-label', 'Talk to me');
   var mount = document.querySelector('[data-voice-mount]');
   if (mount) {
     fab.className = 'tv-trigger';
-    fab.innerHTML = '<span class="d"></span><span class="tl">Talk to Tures</span><span class="ts">Talk</span>';
+    fab.innerHTML = '<span class="d"></span><span class="tl">Talk to me</span><span class="ts">Talk</span>';
     mount.appendChild(fab);
   } else {
     fab.className = 'tv-fab';
-    fab.innerHTML = '<span class="d"></span>Talk to Tures';
+    fab.innerHTML = '<span class="d"></span>Talk to me';
     document.body.appendChild(fab);
   }
 
