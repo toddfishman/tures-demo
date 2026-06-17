@@ -42,15 +42,15 @@
   if (wantsScene) document.documentElement.classList.add('tures-scene-on');
 
   // 10 destinations on a 90s loop — same set as the cover (5 local + 5 Unsplash).
+  // All self-hosted now (was 5 local + 5 Unsplash hotlinks): crisper, faster, no external
+  // dependency. The five former hotlinks are saved under assets/img/ as webp.
   var SCENE_IMGS = [
     base + 'assets/img/tulum-1920.webp', base + 'assets/img/paris-1920.webp',
     base + 'assets/img/tokyo-1920.webp', base + 'assets/img/aurora-1920.webp',
     base + 'assets/img/nyc-1920.webp',
-    'https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?w=1920&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1920&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1920&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1920&q=80&auto=format&fit=crop'
+    base + 'assets/img/amalfi-1920.webp', base + 'assets/img/santorini-2400.webp',
+    base + 'assets/img/kyoto-2400.webp', base + 'assets/img/swiss-alps-2400.webp',
+    base + 'assets/img/venice-2400.webp'
   ];
   function injectScene() {
     if (!wantsScene || document.querySelector('.tures-bg')) return;
