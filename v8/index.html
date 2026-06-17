@@ -90,6 +90,15 @@
   .door.d2 .dveil{ background:radial-gradient(120% 80% at 50% -10%, rgba(230,200,115,0.22), transparent 60%); }
   .kk{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
   .arr{ display:inline-flex; align-items:center; gap:8px; margin-top:13px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+
+  /* FEEL · the cover settles in on load, and the gilt frame breathes */
+  .bookstage{ animation:stageIn 1000ms cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes stageIn{ from{ opacity:0; } to{ opacity:1; } }
+  .bframe{ animation:frameGlow 6.5s ease-in-out infinite; }
+  @keyframes frameGlow{
+    0%,100%{ box-shadow:inset 0 0 0 4px rgba(0,0,0,0.22); }
+    50%{ box-shadow:inset 0 0 0 4px rgba(0,0,0,0.22), 0 0 22px -5px rgba(230,200,115,0.45); } }
+  @media (prefers-reduced-motion: reduce){ .bookstage{ animation:none; } .bframe{ animation:none; } }
 </style>
 </head>
 <body class="text-canvas">

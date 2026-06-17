@@ -46,8 +46,15 @@
     return r.top < (window.innerHeight * 0.92) && r.bottom > 0;
   }
   var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (ents) {
-    ents.forEach(function (e) { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } });
-  }, { threshold: 0.25 }) : null;
+    var k = 0;  // stagger items that cross into view together (a row/grid) by 70ms each
+    ents.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var t = e.target, d = k * 70; k++;
+      if (!RM) { t.style.transitionDelay = d + 'ms'; setTimeout(function () { t.style.transitionDelay = ''; }, 900 + d); }
+      reveal(t);
+      io.unobserve(t);
+    });
+  }, { threshold: 0.18 }) : null;
 
   var pending = [].slice.call(document.querySelectorAll('[data-countup], .rise'));
   function watch(el) {
@@ -149,6 +156,30 @@
       });
     }
     window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  /* ---------- gentle bounded parallax on decorative numerals (.ghost-num) ----------
+     Skips any numeral that already uses transform for layout, so centering never breaks. */
+  var ghosts = [].slice.call(document.querySelectorAll('.ghost-num')).filter(function (el) {
+    return !el.hasAttribute('data-parallax') && getComputedStyle(el).transform === 'none';
+  });
+  if (ghosts.length && !RM) {
+    var gtick = false;
+    function gloop() {
+      if (gtick) return; gtick = true;
+      requestAnimationFrame(function () {
+        var vh = window.innerHeight || 800;
+        ghosts.forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          var center = (r.top + r.height / 2) - vh / 2;
+          el.style.transform = 'translateY(' + (-center * 0.06).toFixed(1) + 'px)';
+        });
+        gtick = false;
+      });
+    }
+    window.addEventListener('scroll', gloop, { passive: true });
+    window.addEventListener('resize', gloop);
+    gloop();
   }
 
   /* ---------- tap-to-expand cards ---------- */

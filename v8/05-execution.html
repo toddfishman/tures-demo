@@ -91,7 +91,6 @@
         <span class="pill pill-confirm" id="chipBooked">3 booked</span>
         <span class="pill pill-pending" id="chipProg">2 in progress</span>
         <span class="pill pill-alert">1 needs you</span>
-        <span class="pill pill-gold">1 queued</span>
       </div>
     </header>
 
@@ -200,7 +199,7 @@
       <span class="refresh-hint"><span class="rh-chev">↓</span> Latest as of <span id="refreshTime">12:51</span></span>
       <span class="text-[10px] text-ink-faint font-mono"><span id="evCount">0</span> events</span>
     </div>
-    <div id="stream" class="p-5 space-y-4 text-sm max-h-[520px] overflow-y-auto"></div>
+    <div id="stream" class="p-5 space-y-4 text-sm max-h-[380px] overflow-y-auto"></div>
    </div>
   </aside>
  </div>
@@ -302,7 +301,7 @@ function drip(){
   if(paused) return;
   if(qi < QUEUE.length){
     pushEvent(QUEUE[qi], true); qi++;
-    timer = setTimeout(drip, 600 + Math.random()*300);  // 600–900ms
+    timer = setTimeout(drip, 950 + Math.random()*500);  // 950–1450ms — calmer cadence
   } else {
     document.getElementById('liveDot').className='dot dot-green';
   }
