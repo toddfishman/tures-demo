@@ -2,3 +2,5 @@
 .env
 tools/node_modules/
 tools/fonts/
+tools/package.json
+tools/package-lock.json
