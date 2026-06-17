@@ -394,6 +394,10 @@ function legCard(l, i){
 /* ---------- conversation flow ---------- */
 var REASONS = ['Reading your brief…','Resolving hotels & dates…','Checking flight schedules…','Flagging what won\'t book…'];
 var planned = false;
+/* The active options-walkthrough stage (null | 'lodging' | 'transport' | 'dinners' | 'excursions').
+   While set, free-text in the composer is interpreted against the slate on screen — an
+   affirmation accepts the recommended pick — instead of restarting the conversation. */
+var walkStage = null;
 /* The running brief. Every user turn is appended so a correction ("sorry, SEA") is
    re-parsed WITH the original trip, not as a brand-new one. */
 var convoText = '';
@@ -701,6 +705,7 @@ function restart(){
   document.getElementById('ctaBar').style.display = 'none';
   document.getElementById('threadStatus').textContent = 'Booking concierge · online';
   planned = false;
+  walkStage = null;
   convoText = '';
   currentBrief = null;
   setStep(1);
@@ -753,8 +758,49 @@ function onSend(){
 /* Route the composer: real first-time gathering → /converse; demos, post-plan corrections,
    or offline (no engine) → the direct planner. */
 function composerSend(){
+  // Mid-walkthrough, free text is a response to the slate on screen — never a new conversation.
+  if(walkStage){ walkReply(composer.value.trim()); return; }
   if(DEMO || DEMO_TRIP || planned || !(window.tures && tures.configured)){ sendBrief(); return; }
   onSend();
+}
+
+/* Interpret free-text replies during the options walkthrough so typing "ok" / "do it" /
+   a hotel name works the same as tapping the slate's button. */
+function isYes(t){ return /\b(ok|okay|yes|yep|yeah|yup|sure|do it|book it|hold it|hold this|hold the pick|go ahead|sounds good|sounds great|looks good|perfect|great|love it|that one|your pick|the pick|first one|let'?s do it)\b/.test(t) || t==='k'; }
+function isAgain(t){ return /\b(look again|other|others|something else|else|different|another|more options|alternativ)\b/.test(t); }
+function matchByName(list, t){
+  for(var i=0;i<list.length;i++){
+    var words=String(list[i].name).toLowerCase().split(/[^a-z0-9]+/).filter(function(w){return w.length>=4;});
+    for(var j=0;j<words.length;j++){ if(t.indexOf(words[j])>-1) return i; }
+  }
+  return -1;
+}
+function walkReply(text){
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me'); composer.value=''; autoGrow(); sugEl.innerHTML='';
+  var t = text.toLowerCase();
+  if(walkStage==='lodging'){
+    var opts=window.__lodgingOpts||[]; var mi=matchByName(opts,t);
+    if(mi>-1){ holdHotel(opts[mi].name); return; }
+    if(isAgain(t)){ addMsg('These three are the stays that fit your brief and have availability — tap one to hold, or say “hold it” and I’ll take my pick, <strong>'+((window.__pick&&window.__pick.name)||'')+'</strong>.', 't'); return; }
+    if(isYes(t)){ holdHotel((window.__pick&&window.__pick.name)||(opts[0]&&opts[0].name)); return; }
+    addMsg('Want me to hold <strong>'+((window.__pick&&window.__pick.name)||'my pick')+'</strong>? Say “hold it”, name another, or tap a card.', 't'); return;
+  }
+  if(walkStage==='transport'){
+    var fl=window.__flights||[]; var fi=matchByName(fl,t);
+    if(fi<0){ if(/non.?stop|direct/.test(t)) fi=0; else if(/1.?stop|one.?stop|cheaper|connection/.test(t)) fi=1; else if(/premium|lower cabin|step down/.test(t)) fi=2; }
+    if(fi>-1){ pickFlight(fi); return; }
+    if(isYes(t)){ pickFlight(0); return; }
+    if(isAgain(t)){ addMsg('Three fares above — the non-stop, a cheaper 1-stop, or a lower cabin. Say “book the non-stop”, or tap one.', 't'); return; }
+    addMsg('Say “book it” for the non-stop, or tap the fare you want.', 't'); return;
+  }
+  if(walkStage==='dinners' || walkStage==='excursions'){
+    var list=(walkStage==='dinners'?window.__dinners:window.__excursions)||[];
+    if(/\b(done|that'?s it|next|move on|nothing|none|skip|no thanks|i'?m good)\b/.test(t) || isYes(t)){ nextCategory(walkStage); return; }
+    var ai=matchByName(list,t);
+    if(ai>-1){ toggleAdd(walkStage, ai); addMsg('Added <strong>'+list[ai].name+'</strong> — anything else, or say “done”.', 't'); return; }
+    addMsg('Tap “+ Add” on what you want, then “Done” — or just say “skip”.', 't'); return;
+  }
 }
 
 /* ---------- options walkthrough (the differentiator) ----------
@@ -810,9 +856,11 @@ function presentLodging(slots){
     var wrap=document.createElement('div'); wrap.className='msg'; wrap.innerHTML='<div class="slate">'+cards+'</div>';
     chat.appendChild(wrap); requestAnimationFrame(function(){ wrap.classList.add('in'); }); wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
     addMsg('I’d book <strong>'+pick.name+'</strong> — '+tasteReason()+'. Hold it, or tell me to look again.', 't');
+    window.__lodgingOpts = opts; window.__pick = { name: pick.name }; walkStage = 'lodging';
   }, 1100);
 }
 function holdHotel(name){
+  walkStage = null;
   document.querySelectorAll('#chat [data-hold]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
   addMsg('Hold '+name.replace(/</g,'&lt;')+'.', 'me');
   addMsg('Held '+name.replace(/</g,'&lt;')+'. Now the flights around it.', 't');
@@ -842,9 +890,11 @@ function presentTransport(slots){
     addMsg('Flights, '+o+' → '+d+'.', 't');
     slate(opts.map(function(o,i){ return optCard(o, '<button class="hold-btn" data-flight="'+i+'">Book this →</button>'); }).join(''));
     addMsg('I’d take the <strong>'+opts[0].name+'</strong> — non-stop keeps it friction-free, and I’ll watch the fare and rebook you if it wobbles.', 't');
+    walkStage = 'transport';
   }, 1000);
 }
 function pickFlight(i){
+  walkStage = null;
   var f=window.__flights[i]; window.__chosen.flight=f.name;
   document.querySelectorAll('#chat [data-flight]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
   addMsg('Book '+f.name+'.', 'me'); addMsg('Locked. On to the table.', 't');
@@ -874,6 +924,7 @@ function presentDinners(slots){
     var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="dinners:'+i+'">+ Add</button>'); }).join('');
     slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="dinners">Done →</button><a class="slate-skip" data-next="dinners">Skip dinners</a></div>');
     addMsg('If you only do one, make it <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+    walkStage = 'dinners';
   }, 1000);
 }
 function presentExcursions(slots){
@@ -884,6 +935,7 @@ function presentExcursions(slots){
     var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="excursions:'+i+'">+ Add</button>'); }).join('');
     slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="excursions">Done →</button><a class="slate-skip" data-next="excursions">Skip excursions</a></div>');
     addMsg('My pick: <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+    walkStage = 'excursions';
   }, 900);
 }
 function toggleAdd(kind, i){
@@ -894,6 +946,7 @@ function toggleAdd(kind, i){
   else { arr.push(name); btn.classList.add('on'); btn.textContent='✓ Added'; card.classList.add('added'); }
 }
 function nextCategory(kind){
+  walkStage = null;
   document.querySelectorAll('[data-next="'+kind+'"]').forEach(function(b){ b.style.pointerEvents='none'; b.style.opacity=.5; });
   var chosen=window.__chosen[kind];
   addMsg(chosen.length ? (chosen.join(' · ')+' — added.') : ('Skip '+kind+' for now.'), 'me');
@@ -901,6 +954,7 @@ function nextCategory(kind){
   else { setTimeout(finalizeTrip, 500); }
 }
 function finalizeTrip(){
+  walkStage = null;
   var c=window.__chosen, lines=['⌂ '+c.hotel, '✈ '+(c.flight||'flights')];
   if(c.dinners.length) lines.push('✦ '+c.dinners.length+' dinner'+(c.dinners.length>1?'s':''));
   if(c.excursions.length) lines.push('◎ '+c.excursions.length+' excursion'+(c.excursions.length>1?'s':''));
