@@ -148,6 +148,13 @@
 
   function init() {
     injectScene();
+
+    // Site-wide motion: the scroll-reveal engine (GSAP-enhanced where present, CSS otherwise).
+    // The chat page already loads motion.js in <head>, so only inject where it's missing.
+    if (!window.tmotion && !document.querySelector('script[src*="assets/motion.js"]')) {
+      var ms = document.createElement('script'); ms.src = base + 'assets/motion.js'; ms.async = false;
+      document.head.appendChild(ms);
+    }
     var nav = document.querySelector('header nav');
     if (nav) Array.prototype.slice.call(nav.children).forEach(function (c) { c.style.display = 'none'; });
 

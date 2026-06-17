@@ -66,6 +66,15 @@ html[data-theme="parchment"] ::-webkit-scrollbar-thumb:hover{ background:rgba(15
   ::view-transition-new(root){ animation:none; }
 }
 
+/* ---- SCROLL REVEAL (drives [data-reveal] via motion.js) -----
+   Initial hidden state is applied by JS (.tm-pre) ONLY to below-fold elements, so there's
+   no flash. The GSAP path animates inline and removes .tm-pre; this CSS transition is the
+   no-GSAP fallback. */
+.tm-pre{ opacity:0; transform:translateY(22px); will-change:opacity, transform; }
+.tm-pre.tm-in{ opacity:1; transform:none;
+  transition:opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
+@media (prefers-reduced-motion:reduce){ .tm-pre{ opacity:1; transform:none; } }
+
 :root{
   /* Leather (covers / chrome) */
   --leather:       #1b130c;
