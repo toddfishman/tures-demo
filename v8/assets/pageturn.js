@@ -7,6 +7,17 @@
 (function () {
   var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* When the browser supports cross-document View Transitions, the navigation itself is
+     tweened on the GPU (see tures.css @view-transition) — so the leaf overlay is suppressed
+     to avoid stacking two transitions. Departure still uses location.href, which triggers the
+     native transition; this script keeps handling keyboard/swipe nav + demo-param carry. */
+  // Gate on CROSS-DOCUMENT support specifically: CSSViewTransitionRule (the @view-transition
+  // at-rule) + the pageswap event both shipped together with cross-doc VT (Chrome/Edge 126+,
+  // Safari 18.2+). Same-document-only browsers (Chrome 111–125) lack these, so they keep the
+  // leaf — never suppress it without a real transition to replace it.
+  var VT = false;
+  try { VT = (typeof window.CSSViewTransitionRule !== 'undefined') && ('onpageswap' in window); } catch (e) {}
+
   var ORDER = [
     'index.html', '01-landing.html', '02-taste-engine.html', '03-paste-trip.html',
     '04-connections.html', '05-execution.html', '06-hiccup-handler.html',
@@ -25,7 +36,7 @@
 
   // arrival: the covering leaf peels away on the side matching how we arrived
   function enter() {
-    if (REDUCE) { wrap.style.display = 'none'; return; }
+    if (REDUCE || VT) { wrap.style.display = 'none'; return; }
     var dir = null;
     try { dir = sessionStorage.getItem('ptDir'); sessionStorage.removeItem('ptDir'); } catch (e) {}
     // Cold arrival (typed URL, refresh, external link, or the auto-revealing cover): there is no

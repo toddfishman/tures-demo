@@ -26,6 +26,46 @@ html[data-theme="parchment"] ::-webkit-scrollbar-thumb{ background:rgba(150,112,
 html[data-theme="parchment"] ::-webkit-scrollbar-thumb:hover{ background:rgba(150,112,46,0.66); }
 @media (prefers-reduced-motion:reduce){ ::-webkit-scrollbar-thumb{ transition:none; } }
 
+/* ---- PAGE TRANSITIONS · View Transitions API ----------------
+   Where supported (Chrome/Edge 126+, Safari 18.2+) the browser tweens the
+   REAL cross-document navigation on the GPU — replacing the leaf overlay
+   (pageturn.js suppresses the leaf when this is live). Elsewhere the leaf
+   is the fallback, so this block is purely additive.
+   Feel: a soft, slightly-scaled crossfade — elegant and continuous, not a
+   hard cut. The persistent chrome + backdrop are NAMED so they hold steady
+   while only the page content turns. */
+@view-transition{ navigation:auto; }
+
+::view-transition-old(root),
+::view-transition-new(root){
+  animation-duration:.52s;
+  animation-timing-function:cubic-bezier(.22,.61,.36,1);   /* gentle ease-out */
+  mix-blend-mode:normal;
+}
+::view-transition-old(root){ animation-name:pt-vt-out; }
+::view-transition-new(root){ animation-name:pt-vt-in; }
+@keyframes pt-vt-out{
+  from{ opacity:1; transform:scale(1); }
+  to  { opacity:0; transform:scale(.988); }
+}
+@keyframes pt-vt-in{
+  from{ opacity:0; transform:scale(1.014) translateY(10px); }
+  to  { opacity:1; transform:scale(1)     translateY(0); }
+}
+
+/* Continuity: these stay put across the turn instead of fading with the page. */
+.tures-chrome-logo{ view-transition-name:tures-logo; }
+.tures-signup     { view-transition-name:tures-signup; }
+.tures-pageno     { view-transition-name:tures-pageno; }
+.tures-theme-switch{ view-transition-name:tures-season; }
+.tures-bg         { view-transition-name:tures-scene; }   /* the world holds; the page turns over it */
+
+/* Honour reduced-motion — instant swap, no animation. */
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){ animation:none; }
+}
+
 :root{
   /* Leather (covers / chrome) */
   --leather:       #1b130c;
