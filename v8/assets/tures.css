@@ -3,6 +3,29 @@
    Dark leather covers · canvas pages · gold foil
    ============================================================ */
 
+/* ---- SITE-WIDE SCROLLBAR ----------------------------------
+   A thin, inset brass pill on a transparent track — replaces the
+   OS default everywhere. Component scrollbars with their own rules
+   (e.g. .tures-menu) stay more specific and win. */
+html{ scrollbar-width:thin; scrollbar-color:rgba(200,162,74,0.42) transparent; }
+::-webkit-scrollbar{ width:12px; height:12px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{
+  background:rgba(200,162,74,0.38);
+  border-radius:99px;
+  border:3px solid transparent;       /* padding-box inset → a floating pill, not edge-to-edge */
+  background-clip:padding-box;
+  transition:background .18s ease; }
+::-webkit-scrollbar-thumb:hover{ background:rgba(200,162,74,0.62); }
+::-webkit-scrollbar-thumb:active{ background:rgba(230,200,115,0.7); }
+::-webkit-scrollbar-corner{ background:transparent; }
+/* Parchment: a slightly deeper brass + the faintest warm track so the pill reads on light paper. */
+html[data-theme="parchment"]{ scrollbar-color:rgba(150,112,46,0.45) rgba(60,42,20,0.04); }
+html[data-theme="parchment"] ::-webkit-scrollbar-track{ background:rgba(60,42,20,0.035); }
+html[data-theme="parchment"] ::-webkit-scrollbar-thumb{ background:rgba(150,112,46,0.42); }
+html[data-theme="parchment"] ::-webkit-scrollbar-thumb:hover{ background:rgba(150,112,46,0.66); }
+@media (prefers-reduced-motion:reduce){ ::-webkit-scrollbar-thumb{ transition:none; } }
+
 :root{
   /* Leather (covers / chrome) */
   --leather:       #1b130c;

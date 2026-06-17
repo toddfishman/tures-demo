@@ -409,20 +409,27 @@ function greet(){
 
 function renderSuggestions(){
   sugEl.innerHTML = '';
+  /* Each chip carries a COMPLETE brief — origin, destination, timing, travelers, style,
+     budget posture, plus concrete wants — so one tap gives the guided agent everything it
+     needs to go straight to options and booking, no back-and-forth required. */
+  var LISBON = 'From New York, two of us, a long weekend in Lisbon over the first weekend of October — fly out Friday, back Monday. Business class. We love a small design-forward hotel in Alfama or Chiado, walkable to dinner. Book us a standout seafood dinner, a wine bar one night, and a half-day out to Sintra. Treating ourselves on this one — comfort over cost.';
+  var HAWAII = 'From San Francisco, two of us, a week on Maui in mid-October — seven nights. Business class over, and an oceanfront resort with a great pool and a quiet adults-side. We want a sunrise trip up Haleakalā, a snorkel day at Molokini, and two memorable dinners on the water. Not price sensitive — book the nicer option.';
+  var JAPAN = 'From Los Angeles, family of four — two adults, two teens — a week in Japan over spring break in early April. Tokyo for four nights then Kyoto for three, with a ryokan and onsen for two of the Kyoto nights. Premium economy if it\'s reasonable. We\'d love a great sushi dinner, a day trip to Nara, and tickets to teamLab. Balanced budget — nice but not silly.';
   var qs = DEMO ? [
     {label:'✦ Use Andy\'s example', fill:ANDY},
-    {label:'A weekend in Lisbon', fill:'Two of us, a long weekend in Lisbon next month. Somewhere design-y to stay, walkable, good seafood. Flexible on flights.'},
-    {label:'Family week in Japan', fill:'Family of four, a week in Japan in spring — Tokyo + Kyoto, ryokan for a couple of nights, premium economy if it\'s not silly money.'},
+    {label:'A weekend in Lisbon', fill:LISBON},
+    {label:'Family week in Japan', fill:JAPAN},
   ] : [
-    {label:'A weekend in Lisbon', fill:'Two of us, a long weekend in Lisbon next month. Somewhere design-y to stay, walkable, good seafood. Flexible on flights.'},
-    {label:'A week in Hawaii', fill:'A week on the Big Island in October for two. Business class, design-y hotels, not price sensitive.'},
-    {label:'Family week in Japan', fill:'Family of four, a week in Japan in spring — Tokyo + Kyoto, ryokan for a couple of nights, premium economy if it\'s not silly money.'},
+    {label:'A weekend in Lisbon', fill:LISBON},
+    {label:'A week in Hawaii', fill:HAWAII},
+    {label:'Family week in Japan', fill:JAPAN},
   ];
   qs.forEach(function(q){
     var b = document.createElement('button');
     b.className = 'qr';
     b.textContent = q.label;
-    b.onclick = function(){ composer.value = q.fill; autoGrow(); composer.focus(); };
+    /* Fill the composer and send it — one tap launches the whole conversation. */
+    b.onclick = function(){ composer.value = q.fill; autoGrow(); composerSend(); };
     sugEl.appendChild(b);
   });
 }
