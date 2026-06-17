@@ -77,6 +77,7 @@
     { p: '5',  t: 'Tures Demo',           f: '05-execution.html' },
     { p: '6',  t: 'My Trips',             f: '07-itinerary.html' },
     { p: '7',  t: 'The Tures Concierge',  f: '08-concierge.html' },
+    {          t: 'Your concierge',       f: 'concierge.html' },
     { p: '8',  t: 'The Hiccup Handler',   f: '06-hiccup-handler.html' },
     { p: '9',  t: 'Where you’ve been',    f: 'been.html' },
     { p: '10', t: 'Pricing',              f: 'pricing.html' },
@@ -154,6 +155,15 @@
     if (!window.tmotion && !document.querySelector('script[src*="assets/motion.js"]')) {
       var ms = document.createElement('script'); ms.src = base + 'assets/motion.js'; ms.async = false;
       document.head.appendChild(ms);
+    }
+
+    // Personal concierge: load the module (if not already) and mount its tasteful corner presence.
+    // mountPresence() self-excludes the cover/write/setup/chat pages.
+    function mountCC() { try { if (window.turesConcierge) window.turesConcierge.mountPresence(); } catch (e) {} }
+    if (window.turesConcierge) { mountCC(); }
+    else if (!document.querySelector('script[src*="assets/concierge.js"]')) {
+      var cs = document.createElement('script'); cs.src = base + 'assets/concierge.js'; cs.async = false;
+      cs.onload = mountCC; document.head.appendChild(cs);
     }
     var nav = document.querySelector('header nav');
     if (nav) Array.prototype.slice.call(nav.children).forEach(function (c) { c.style.display = 'none'; });

@@ -177,10 +177,10 @@
   <div class="leaf chatwin overflow-hidden flex flex-col" style="height:calc(100dvh - 178px); min-height:420px">
     <!-- thread header -->
     <div class="flex items-center gap-3 px-5 py-3 border-b" style="border-color:var(--canvas-line)">
-      <div class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0"
+      <div id="chatAvatar" class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0 overflow-hidden"
            style="background:var(--leather);color:var(--gold-bright);border:1px solid rgba(200,162,74,.4)">t</div>
       <div class="flex-1 min-w-0">
-        <div class="text-sm text-ink">Tures</div>
+        <div class="text-sm text-ink" id="chatName">Tures</div>
         <div class="text-[11px] text-ink-faint" id="threadStatus">Booking concierge · online</div>
       </div>
       <span data-voice-mount class="shrink-0"></span>
@@ -292,11 +292,23 @@
 
 <script src="assets/gsap.min.js"></script>
 <script src="assets/motion.js"></script>
+<script src="assets/concierge.js"></script>
 <script src="assets/engine.js"></script>
 <script>
 var chat = document.getElementById('chat');
 var sugEl = document.getElementById('suggestions');
 var composer = document.getElementById('composer');
+
+/* If the traveller set up a personal concierge, this thread is theirs — show their portrait
+   and name in the header (and greet in their name below). */
+var CC = (window.turesConcierge && turesConcierge.get()) || null;
+function applyConcierge(){
+  if(!CC) return;
+  var av = document.getElementById('chatAvatar');
+  if(av){ av.style.background='transparent'; av.style.border='none'; av.innerHTML = turesConcierge.avatar(CC, 36); }
+  var nm = document.getElementById('chatName'); if(nm) nm.textContent = CC.name;
+}
+applyConcierge();
 
 /* Demo mode (?demo=1 or arriving via the Andy tour) pre-loads Andy's persona + trip. Real
    visitors get a neutral, first-person greeting with no pre-filled stranger's name or trip. */
@@ -408,7 +420,8 @@ function greet(){
   if(DEMO){
     addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
   } else {
-    addMsg("Where are we headed? Just tell me your trip or ask for some ideas. The more you give me, the better my answers will be.<br><br>To begin, you can simply text below, press the 🎤 microphone button for speech-to-text, or — my personal favorite — talk to me. Just press the <strong>“Talk to me”</strong> button above.", 't');
+    var hi = (CC && CC.name) ? ("Hi — I’m " + CC.name + ", your concierge. ") : "";
+    addMsg(hi + "Where are we headed? Just tell me your trip or ask for some ideas. The more you give me, the better my answers will be.<br><br>To begin, you can simply text below, press the 🎤 microphone button for speech-to-text, or — my personal favorite — talk to me. Just press the <strong>“Talk to me”</strong> button above.", 't');
   }
   renderSuggestions();
 }
