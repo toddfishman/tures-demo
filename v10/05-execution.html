@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — See Tures in Action</title>
+<meta name="description" content="Watch Tures think ahead and adapt during a real trip — weather, reservations, cards, routes, prices — so every moment stays effortless." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/05-execution.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — See Tures in Action" />
+<meta property="og:description" content="Watch Tures think ahead and adapt during a real trip — so every moment stays effortless." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/05-execution.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — See Tures in Action" />
+<meta name="twitter:description" content="Watch Tures think ahead and adapt during a real trip — so every moment stays effortless." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* hero floating status cards */
+  .ex-floats{ position:absolute; inset:0; pointer-events:none; }
+  .ex-float{ position:absolute; display:flex; align-items:center; gap:10px; padding:11px 15px; border-radius:14px;
+    background:rgba(8,12,8,0.62); backdrop-filter:blur(18px) saturate(160%); border:1px solid rgba(255,255,255,0.12);
+    box-shadow:0 18px 40px -22px rgba(0,0,0,0.8); font-size:12px; color:var(--gh-cream); }
+  .ex-float .ico{ width:26px; height:26px; border-radius:8px; display:grid; place-items:center; background:rgba(255,255,255,0.06);
+    border:1px solid var(--gold); color:var(--gold); font-size:13px; }
+
+  /* day-in-action band */
+  .ex-band{ background:linear-gradient(180deg,#0F1610,#0A0D08); border-top:1px solid var(--acc-border,rgba(74,222,128,0.24)); border-bottom:1px solid rgba(255,255,255,0.06); }
+
+  /* the 6-step timeline */
+  .ex-track{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(264px,1fr); gap:18px; overflow-x:auto;
+    padding:6px 4px 20px; scroll-snap-type:x proximity; }
+  .ex-track::-webkit-scrollbar{ height:8px; }
+  .ex-step{ scroll-snap-align:start; display:flex; flex-direction:column; gap:14px; }
+  .ex-step-head{ display:flex; align-items:center; gap:12px; }
+  .ex-num{ width:30px; height:30px; flex-shrink:0; border-radius:50%; border:1.5px solid var(--gold); color:var(--gold);
+    display:grid; place-items:center; font-family:'JetBrains Mono',monospace; font-size:13px; }
+  .ex-conn{ flex:1; height:1px; background:linear-gradient(to right, var(--gold), transparent); opacity:.5; }
+  .ex-ico{ font-size:15px; color:var(--gold); }
+  .ex-mini{ background:var(--gh-card); border:1px solid rgba(255,255,255,0.09); border-radius:12px; overflow:hidden; }
+  .ex-mini img{ width:100%; height:84px; object-fit:cover; display:block; }
+  .ex-mini .pad{ padding:11px 13px; }
+  .ex-strike{ text-decoration:line-through; color:var(--gh-cream-dim); }
+
+  @media (max-width:760px){ .ex-track{ grid-auto-columns:84%; } }
+</style>
+</head>
+<body>
+
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ══════════ DEFAULT: the narrated demo (new-user story) ══════════ -->
+<main id="demoMode">
+
+  <!-- HERO -->
+  <section class="gh-hero" style="min-height:auto;">
+    <div class="gh-hero-bg">
+      <img src="assets/img/amalfi-1920.webp" alt="" aria-hidden="true">
+      <div class="gh-fade"></div>
+    </div>
+    <div class="gh-hero-inner" style="padding-top:clamp(64px,9vw,120px);">
+      <div class="gh-split-narrow">
+        <div>
+          <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Tures in action</span></div>
+          <h1 class="gh-h1" style="font-size:clamp(34px,4.6vw,64px);">See Tures<br>in action.</h1>
+          <p class="gh-display gh-accent gh-italic" style="font-size:clamp(20px,2.4vw,30px); margin-top:10px;">Real-time decisions. Smoother trips.</p>
+          <p class="gh-lead" style="margin-top:20px; max-width:34ch;">Tures monitors your trip 24/7 and adapts in real time — so you enjoy every moment while it handles everything behind the scenes.</p>
+          <div style="margin-top:30px; display:flex; flex-wrap:wrap; gap:14px;">
+            <a href="03-paste-trip.html" class="gh-btn gh-btn-lg">Start planning — free →</a>
+            <a href="05-execution.html?live=1" class="gh-btn gh-btn-ghost gh-btn-lg">Watch it happen live →</a>
+          </div>
+        </div>
+
+        <!-- phone + floating cards -->
+        <div style="position:relative; display:flex; justify-content:center;">
+          <div class="gh-phone">
+            <div class="gh-phone-screen">
+              <div class="gh-phone-notch"></div>
+              <div class="gh-phone-bar"><span>9:41</span><span>Tures</span><span>▮▮▮</span></div>
+              <div class="gh-phone-head">
+                <div class="gh-phone-av"><svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#5C2E18"/><ellipse cx="24" cy="14" rx="12" ry="8" fill="#1A0A04"/><rect x="12" y="14" width="24" height="10" fill="#1A0A04"/><ellipse cx="24" cy="24" rx="10" ry="11" fill="#C4784A"/><ellipse cx="20.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><ellipse cx="27.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><path d="M20.5 28.5 Q24 30.5 27.5 28.5" stroke="#8B3A1A" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="24" cy="44" rx="14" ry="6" fill="#1E3A2A"/></svg></div>
+                <div class="gh-phone-meta"><div class="gh-phone-name">Lisbon, Portugal <span class="live"></span></div><div class="gh-phone-sub">Day 2 of 5 · all on track</div></div>
+              </div>
+              <div style="padding:14px 14px 16px;">
+                <p class="gh-display" style="font-size:18px; color:var(--gh-cream); margin:0 0 3px;">Good morning, Jordan.</p>
+                <p style="font-size:11px; color:var(--gh-cream-dim); margin:0 0 14px; letter-spacing:.04em;">YOUR DAY AT A GLANCE</p>
+                <div style="display:flex; flex-direction:column; gap:9px;">
+                  <div style="display:flex; gap:11px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); width:42px;">09:30</span><div style="flex:1;"><div style="font-size:12.5px; color:var(--gh-cream);">Time Out Market</div><div style="font-size:10.5px; color:var(--gh-cream-dim);">Breakfast · 6 min walk</div></div></div>
+                  <div style="display:flex; gap:11px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); width:42px;">13:00</span><div style="flex:1;"><div style="font-size:12.5px; color:var(--gh-cream);">Reservation at Alma</div><div style="font-size:10.5px; color:var(--gold);">Confirmed · TUR-4471</div></div></div>
+                  <div style="display:flex; gap:11px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); width:42px;">18:30</span><div style="flex:1;"><div style="font-size:12.5px; color:var(--gh-cream);">Sunset at Miradouro</div><div style="font-size:10.5px; color:var(--gh-cream-dim);">Driver booked</div></div></div>
+                </div>
+                <div class="gh-status-chip" style="margin-top:14px;"><span class="dot"></span>Tures is monitoring 12 things for you</div>
+              </div>
+            </div>
+          </div>
+          <div class="ex-floats">
+            <div class="ex-float" style="top:8%; left:-6%;"><span class="ico">◎</span>24/7 monitoring</div>
+            <div class="ex-float" style="top:42%; right:-8%;"><span class="ico">✦</span>Proactive adjustments</div>
+            <div class="ex-float" style="bottom:8%; left:-2%;"><span class="ico">♥</span>Personalized to you</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A DAY IN ACTION -->
+  <section class="ex-band">
+    <div class="gh-section">
+      <div style="text-align:center; max-width:48ch; margin:0 auto 52px;">
+        <p class="gh-eyebrow" style="margin-bottom:14px;">A day in action</p>
+        <h2 class="gh-h2">One trip. Many moments.<br><span class="gh-accent gh-italic">All handled.</span></h2>
+        <p class="gh-lead" style="margin-top:16px;">Watch how Tures thinks ahead and adapts — so your trip stays effortless, start to finish.</p>
+      </div>
+
+      <div class="ex-track">
+
+        <!-- 1 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">1</span><span class="ex-ico">☁</span><span class="ex-conn"></span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Weather shift detected</p><p class="gh-h3" style="font-size:19px;">Rain moving in. Tures adjusts your plans.</p></div>
+          <div class="ex-mini"><img src="assets/img/amalfi-1920.webp" alt=""><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">Beach afternoon</p><p style="font-size:11px; color:var(--gh-cream-dim); margin:3px 0 0;">Moved to Thursday</p></div></div>
+          <div class="ex-mini"><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">LX Factory &amp; galleries</p><p style="font-size:11px; color:var(--gold); margin:3px 0 0;">Added for today</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Plan updated</div>
+        </div>
+
+        <!-- 2 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">2</span><span class="ex-ico">◷</span><span class="ex-conn"></span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Reservation optimized</p><p class="gh-h3" style="font-size:19px;">A better table, secured.</p></div>
+          <div class="ex-mini"><img src="assets/img/paris-960.webp" alt=""><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">Alma · 8:30</p><p style="font-size:11px; color:var(--gh-cream-dim); margin:3px 0 0;">Window table · party of 2</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Reservation updated</div>
+        </div>
+
+        <!-- 3 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">3</span><span class="ex-ico">▭</span><span class="ex-conn"></span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Better card found</p><p class="gh-h3" style="font-size:19px;">Tures pays with the card that earns you more.</p></div>
+          <div class="ex-mini"><div class="pad" style="background:linear-gradient(135deg,#1a2418,#0f1410);"><p style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold); margin:0;">Vault Signature</p><p style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gh-cream-dim); margin:8px 0 0;">···· 4242</p><p style="font-size:11px; color:var(--gold); margin:8px 0 0;">5× points on dining</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Payment updated</div>
+        </div>
+
+        <!-- 4 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">4</span><span class="ex-ico">⤳</span><span class="ex-conn"></span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Traffic ahead, rerouted</p><p class="gh-h3" style="font-size:19px;">Heavy traffic detected. Tures finds a faster way.</p></div>
+          <div class="ex-mini"><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">Drive to Sintra</p><p style="font-size:11px; margin:6px 0 0;"><span class="ex-strike">1h 05</span> &nbsp;<span style="color:var(--gold);">→ 47 min</span></p><p style="font-size:11px; color:var(--gh-cream-dim); margin:6px 0 0;">Via the coast road</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Route updated</div>
+        </div>
+
+        <!-- 5 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">5</span><span class="ex-ico">↓</span><span class="ex-conn"></span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Price drop captured</p><p class="gh-h3" style="font-size:19px;">Your return flight got cheaper. Tures rebooks.</p></div>
+          <div class="ex-mini"><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">Lisbon → JFK</p><p style="font-size:13px; margin:6px 0 0;"><span class="ex-strike" style="font-family:'JetBrains Mono',monospace;">$812</span> &nbsp;<span style="font-family:'JetBrains Mono',monospace; color:var(--gold);">$642</span></p><p style="font-size:11px; color:var(--gold); margin:6px 0 0;">Same seat, same cabin</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Saved $170</div>
+        </div>
+
+        <!-- 6 -->
+        <div class="ex-step">
+          <div class="ex-step-head"><span class="ex-num">6</span><span class="ex-ico">✦</span></div>
+          <div><p class="gh-eyebrow" style="margin:0 0 6px;">Local gem recommended</p><p class="gh-h3" style="font-size:19px;">Tures finds a spot you'll love.</p></div>
+          <div class="ex-mini"><img src="assets/img/lisbon-placeholder.webp" onerror="this.style.display='none'" alt=""><div class="pad"><p style="font-size:12.5px; color:var(--gh-cream); margin:0;">A Cevicheria</p><p style="font-size:11px; color:var(--gh-cream-dim); margin:3px 0 0;">Matches your taste · no line at 6pm</p></div></div>
+          <div class="gh-status-chip"><span class="dot"></span>Added to your itinerary</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="gh-wash">
+    <div class="gh-section-tight">
+      <div style="text-align:center; margin-bottom:40px;">
+        <h2 class="gh-h2" style="font-size:clamp(24px,2.8vw,38px);">All in the background.<br><span class="gh-accent">All for you.</span></h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px;">
+        <div class="gh-glass" style="padding:26px 22px; text-align:center;"><div class="gh-display gh-accent" style="font-size:32px;">24/7</div><p class="gh-lead" style="font-size:13px; margin-top:6px;">Monitoring</p></div>
+        <div class="gh-glass" style="padding:26px 22px; text-align:center;"><div class="gh-display gh-accent" style="font-size:32px;">12+</div><p class="gh-lead" style="font-size:13px; margin-top:6px;">Things watched per trip</p></div>
+        <div class="gh-glass" style="padding:26px 22px; text-align:center;"><div class="gh-display gh-accent" style="font-size:32px;">3.2 hrs</div><p class="gh-lead" style="font-size:13px; margin-top:6px;">Saved per day</p></div>
+        <div class="gh-glass" style="padding:26px 22px; text-align:center;"><div class="gh-display gh-accent" style="font-size:32px;">$240+</div><p class="gh-lead" style="font-size:13px; margin-top:6px;">Saved per trip</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="gh-wash-surface">
+    <div class="gh-section" style="text-align:center;">
+      <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">Get started</span><span class="ln"></span></div>
+      <h2 class="gh-h2" style="margin-top:8px;">Experience travel that<br><span class="gh-accent gh-italic">adapts to you.</span></h2>
+      <form class="gh-field" style="margin:28px auto 0;" onsubmit="location.href='03-paste-trip.html';return false;">
+        <input placeholder="Where are you going?" aria-label="Where are you going?">
+        <button type="submit">Plan it →</button>
+      </form>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid rgba(255,255,255,0.08); padding:36px clamp(24px,6vw,80px); display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:center;">
+    <a href="01-landing.html" class="gh-display" style="font-size:22px; color:#fff;">t<span class="gh-accent">✦</span>ures</a>
+    <a href="06-hiccup-handler.html" class="gh-caps" style="font-size:11px; color:var(--gold);">See what's watching your trip →</a>
+  </footer>
+</main>
+
+<!-- ══════════ LIVE: the real execution dashboard (shown for ?trip= / ?live=1; engine wiring preserved) ══════════ -->
+<div id="liveMode" hidden>
+<section class="leather-surface grain relative">
+ <div class="relative z-10 max-w-7xl mx-auto px-6 pt-10 pb-7">
+  <div class="flex items-end justify-between flex-wrap gap-5">
+   <div>
+    <div class="caps text-[11px] text-gold/70 mb-2 flex items-center gap-2"><span class="dot dot-gold pulse"></span>Tures Demo · trip #T-2087 <span class="pill pill-d-gold normal-case tracking-normal">Sample trip</span></div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Paris · Saariselkä · Copenhagen</h1>
+    <div class="text-canvas/70 mt-2">Dec 3 – 13, 2026 · <span class="font-mono">11d</span> · 1 traveler · Business</div>
+   </div>
+   <div class="flex items-center gap-7">
+    <div class="text-right"><div class="caps text-[10px] text-gold/60">Booked</div><div class="font-mono text-2xl text-gold-bright"><span id="progNum">3</span> / 7</div></div>
+    <div class="text-right"><div class="caps text-[10px] text-gold/60">Authorized</div><div class="font-mono text-2xl text-gold-bright">$<span data-countup="26114" data-countup-dur="1600">0</span></div></div>
+   </div>
+  </div>
+  <div class="mt-6 track"><div class="fill" id="progFill" style="width:43%"></div></div>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-7xl mx-auto px-6 py-10 grid lg:grid-cols-12 gap-7">
+  <div class="lg:col-span-8 space-y-6">
+   <div class="leaf overflow-hidden">
+    <header class="leaf-tab px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
+      <div class="caps text-[11px] text-ink-faint">Bookings · execution order</div>
+      <div class="flex gap-2 flex-wrap" id="statChips">
+        <span class="pill pill-confirm" id="chipBooked">3 booked</span>
+        <span class="pill pill-pending" id="chipProg">2 in progress</span>
+        <span class="pill pill-alert">1 needs you</span>
+      </div>
+    </header>
+    <div class="booking-row"><span class="dot dot-green"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-mono text-ink">AA 142 · SEA → CDG</span><span class="caps-sm text-[10px] text-ink-faint">Thu Dec 3 · 18:45 → Fri 13:25</span></div>
+        <div class="text-sm text-ink-soft mt-1">Business · seat 5A · AAdvantage · 25,200 EQM</div>
+        <details class="mt-2 text-xs"><summary class="text-gold-deep"><span class="chev">▸</span> Tures' reasoning</summary>
+          <div class="reasoning mt-2">Only same-day non-stop SEA→CDG in business arriving the 4th without an overnight.</div></details>
+      </div>
+      <div class="col-pnr text-sm text-ink-soft font-mono">PNR · LXJ7Q3</div>
+      <div class="col-stat text-right"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+    </div>
+    <div class="booking-row"><span class="dot dot-green"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-display text-lg text-ink">Real Christine, Paris</span><span class="caps-sm text-[10px] text-ink-faint">Dec 4 → 7 · 3 nights</span></div>
+        <div class="text-sm text-ink-soft mt-1">Junior Suite · garden view · breakfast · €1,640</div>
+        <details class="mt-2 text-xs"><summary class="text-gold-deep"><span class="chev">▸</span> Tures' reasoning</summary>
+          <div class="reasoning mt-2">Booked direct. Junior Suite, Garden View — matches your Taste Print. Virtuoso: €100 F&amp;B credit + upgrade at check-in.</div></details>
+      </div>
+      <div class="col-pnr text-sm text-ink-soft font-mono">CONF · 8849-RCP</div>
+      <div class="col-stat text-right"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+    </div>
+    <div class="booking-row" style="background:rgba(181,84,58,0.06)"><span class="dot dot-alert pulse"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-mono text-ink">AY 1574 · CDG → HEL → IVL</span><span class="caps-sm text-[10px] text-ink-faint">Sun Dec 7 · 10:25 → 21:00</span></div>
+        <div class="text-sm text-ink-soft mt-1">Business · <strong class="text-ink">your decision</strong> — non-stop doesn't exist</div>
+        <details class="mt-2 text-xs" open><summary class="text-gold-deep"><span class="chev">▸</span> Reasoning &amp; options</summary>
+          <div class="reasoning mt-2">That route isn't flown non-stop in December. <strong>Strongest fit:</strong> AY 1574, 1h 50m HEL connection, Schengen-side transfer. Not booked yet.
+            <div class="mt-3 flex gap-2 flex-wrap">
+              <button class="btn-gold px-3 py-1.5 rounded-sm text-xs">Approve AY 1574</button>
+              <button class="btn-ink px-3 py-1.5 rounded-sm text-xs">See AF + AY combo</button>
+            </div>
+          </div></details>
+      </div>
+      <div class="col-pnr text-sm text-ink-faint font-mono">—</div>
+      <div class="col-stat text-right"><span class="pill pill-alert">Needs you</span></div>
+    </div>
+    <div class="booking-row"><span class="dot dot-green"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-display text-lg text-ink">Javri Lodge, Saariselkä</span><span class="caps-sm text-[10px] text-ink-faint">Dec 7 → 10 · 3 nights</span></div>
+        <div class="text-sm text-ink-soft mt-1">Aurora Suite · private terrace · half-board · transfer arranged</div>
+      </div>
+      <div class="col-pnr text-sm text-ink-soft font-mono">CONF · JL-12041</div>
+      <div class="col-stat text-right"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+    </div>
+    <div class="booking-row" id="rowAY945"><span class="dot dot-amber pulse" id="dotAY945"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-mono text-ink">AY 945 · IVL → HEL → CPH</span><span class="caps-sm text-[10px] text-ink-faint">Wed Dec 10 · 14:20 → 19:15</span></div>
+        <div class="text-sm text-ink-soft mt-1" id="subAY945">Business · awaiting fare-class verification from AY</div>
+      </div>
+      <div class="col-pnr text-sm text-ink-faint font-mono" id="pnrAY945">pending</div>
+      <div class="col-stat text-right" id="statAY945"><span class="pill pill-pending">Reserving</span></div>
+    </div>
+    <div class="booking-row" id="rowSanders"><span class="dot dot-amber pulse" id="dotSanders"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-display text-lg text-ink">Hotel Sanders, Copenhagen</span><span class="caps-sm text-[10px] text-ink-faint">Dec 10 → 13 · 3 nights</span></div>
+        <div class="text-sm text-ink-soft mt-1" id="subSanders">Junior Suite — checking property direct</div>
+      </div>
+      <div class="col-pnr text-sm text-ink-faint font-mono" id="pnrSanders">checking</div>
+      <div class="col-stat text-right" id="statSanders"><span class="pill pill-pending">Reserving</span></div>
+    </div>
+    <div class="booking-row"><span class="dot dot-gold"></span>
+      <div>
+        <div class="flex items-baseline gap-3 flex-wrap"><span class="font-mono text-ink">AF 1351 + AF 376 · CPH → CDG → SEA</span><span class="caps-sm text-[10px] text-ink-faint">Sun Dec 13 · 10:35 → 17:10</span></div>
+        <div class="text-sm text-ink-soft mt-1">Business · non-stop CDG→SEA · Flying Blue credited</div>
+      </div>
+      <div class="col-pnr text-sm text-ink-faint font-mono">—</div>
+      <div class="col-stat text-right"><span class="pill pill-gold">Queued</span></div>
+    </div>
+   </div>
+   <div class="leaf p-5">
+     <div class="flex items-center justify-between mb-4">
+       <div><div class="caps text-[11px] text-ink-faint">Dinners</div><h3 class="font-display text-xl text-ink mt-0.5">9 nights · matched to your palate</h3></div>
+       <a href="08-concierge.html" class="text-xs text-gold-deep hover:underline quiet">Edit →</a>
+     </div>
+     <div class="grid sm:grid-cols-3 gap-4 text-sm">
+       <div class="p-4 rounded-lg" style="background:rgba(200,162,74,0.08)"><div class="caps text-[10px] text-ink-faint mb-1">Paris · 3</div><div class="font-display text-base text-ink">Septime · Paul Bert · Frenchie</div></div>
+       <div class="p-4 rounded-lg" style="background:rgba(200,162,74,0.08)"><div class="caps text-[10px] text-ink-faint mb-1">Saariselkä · 3</div><div class="font-display text-base text-ink">Lodge half-board</div></div>
+       <div class="p-4 rounded-lg" style="background:rgba(200,162,74,0.08)"><div class="caps text-[10px] text-ink-faint mb-1">Copenhagen · 3</div><div class="font-display text-base text-ink">Geranium · Apollo · Kadeau</div></div>
+     </div>
+   </div>
+  </div>
+  <aside class="lg:col-span-4">
+   <div class="leaf overflow-hidden sticky top-24">
+    <header class="leaf-tab px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2"><span class="dot dot-gold pulse" id="liveDot"></span><span class="caps text-[11px] text-ink">Agent stream</span></div>
+      <button id="pauseBtn" class="press flex items-center gap-1.5 text-xs text-ink-soft hover:text-ink border border-[var(--canvas-line)] rounded-full px-3 py-1">
+        <span id="pauseIcon">⏸</span><span id="pauseLbl">Pause</span>
+      </button>
+    </header>
+    <div class="px-5 py-2 border-b border-[var(--canvas-line)] flex items-center justify-between">
+      <span class="refresh-hint"><span class="rh-chev">↓</span> Latest as of <span id="refreshTime">12:51</span></span>
+      <span class="text-[10px] text-ink-faint font-mono"><span id="evCount">0</span> events</span>
+    </div>
+    <div id="stream" class="p-5 space-y-4 text-sm max-h-[380px] overflow-y-auto"></div>
+   </div>
+  </aside>
+ </div>
+</section>
+</div>
+
+<style>
+  #liveMode .booking-row{ padding:16px 20px; display:grid; grid-template-columns:26px 1fr 170px 130px; gap:16px; align-items:center; border-bottom:1px solid var(--canvas-line);}
+  #liveMode .booking-row:last-child{ border-bottom:0; }
+  #liveMode .reasoning{ background:rgba(200,162,74,0.09); border-left:2px solid var(--gold); padding:12px 16px; font-size:13px; color:var(--ink); line-height:1.6; border-radius:0 4px 4px 0;}
+  @media(max-width:700px){ #liveMode .booking-row{ grid-template-columns:20px 1fr; } #liveMode .booking-row .col-pnr,#liveMode .booking-row .col-stat{ grid-column:2; } }
+  #liveMode .ev{ opacity:0; transform:translateY(6px); transition:opacity .45s ease, transform .45s ease; }
+  #liveMode .ev.in{ opacity:1; transform:none; }
+  #liveMode .check-pop{ display:inline-grid; place-items:center; width:18px; height:18px; border-radius:99px;
+    background:var(--confirm); color:#fff; font-size:11px; transform:scale(0); animation:pop .45s cubic-bezier(.34,1.56,.64,1) forwards; }
+  @keyframes pop{ to{ transform:scale(1); } }
+  #liveMode .row-confirmed{ animation:rowflash .8s ease; }
+  @keyframes rowflash{ 0%{background:rgba(95,125,79,0)} 35%{background:rgba(95,125,79,0.12)} 100%{background:rgba(95,125,79,0)} }
+</style>
+
+<script src="assets/engine.js"></script>
+<script>
+/* ---------- live agent stream (preserved): runs only in live mode ---------- */
+var SEED = [
+  ['12:46:33','Parsed trip from email. 7 legs · 9 dinners · 1 uncertainty flagged.',''],
+  ['12:47:02','User approved 7-leg plan. Executing in dependency order.',''],
+  ['12:47:55','Booked AA 142 · SEA→CDG · Business · seat 5A. AAdvantage applied.',''],
+  ['12:48:11','Booked Real Christine · Junior Suite · 3 nights. Email matches provider.',''],
+  ['12:49:38','Booked Javri Lodge · Aurora Suite · 3 nights. Provider + email match.','JL-12041 · €4,890 → AmEx ··1004'],
+];
+var QUEUE = [
+  ['12:50:11','Surfaced decision for CDG→IVL. Non-stop unavailable; two staged.','Confidence in stated preference: 0.84'],
+  ['12:50:42','Reserved AY 945 fare class D (Biz, refundable). Awaiting AY email…',''],
+  ['12:51:14','Verifying Hotel Sanders direct inventory, Junior Suite tier.','hotelsanders.com · session warmed · <40s'],
+  ['12:51:48','✓ AY 945 confirmed. Provider + email agree.','PNR 5RT2QK · €2,210', {confirm:'AY945'}],
+  ['12:52:30','✓ Hotel Sanders confirmed direct. Rate-protected −$351.','CONF SAN-3398 · €3,180', {confirm:'Sanders'}],
+];
+
+var stream = document.getElementById('stream');
+var evCount = document.getElementById('evCount');
+var n = 0;
+function lineHTML(e){
+  return '<span class="font-mono text-[11px] text-ink-faint mt-0.5">'+e[0]+'</span>'+
+    '<div class="flex-1"><div class="text-ink">'+e[1]+'</div>'+
+    (e[2]?'<div class="text-xs text-ink-faint">'+e[2]+'</div>':'')+'</div>';
+}
+function pushEvent(e, prepend){
+  var el = document.createElement('div');
+  el.className = 'ev flex gap-3';
+  el.innerHTML = lineHTML(e);
+  if(prepend) stream.insertBefore(el, stream.firstChild); else stream.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  n++; evCount.textContent = n;
+  if(e[3] && e[3].confirm) confirmRow(e[3].confirm);
+}
+function confirmRow(which){
+  var map = {
+    AY945:{row:'rowAY945',dot:'dotAY945',sub:'subAY945',pnr:'pnrAY945',stat:'statAY945',
+           subTxt:'Business · refundable fare D · verified ×2', pnrTxt:'PNR · 5RT2QK'},
+    Sanders:{row:'rowSanders',dot:'dotSanders',sub:'subSanders',pnr:'pnrSanders',stat:'statSanders',
+             subTxt:'Junior Suite · booked direct · rate-protected −$351', pnrTxt:'CONF · SAN-3398'}
+  }[which];
+  if(!map) return;
+  document.getElementById(map.dot).className='dot dot-green';
+  document.getElementById(map.sub).textContent=map.subTxt;
+  document.getElementById(map.pnr).textContent=map.pnrTxt;
+  document.getElementById(map.pnr).className='col-pnr text-sm text-ink-soft font-mono';
+  document.getElementById(map.stat).innerHTML='<span class="pill pill-confirm inline-flex items-center gap-1.5"><span class="check-pop">✓</span> Booked · verified ×2</span>';
+  var row=document.getElementById(map.row); row.classList.add('row-confirmed');
+  bumpProgress();
+}
+var booked = 3, inProgress = 2;
+function bumpProgress(){
+  booked = Math.min(7, booked+1);
+  inProgress = Math.max(0, inProgress-1);
+  document.getElementById('progNum').textContent = booked;
+  document.getElementById('progFill').style.width = (booked/7*100)+'%';
+  document.getElementById('chipBooked').textContent = booked + ' booked';
+  var cp = document.getElementById('chipProg');
+  if(inProgress<=0) cp.style.display='none';
+  else cp.textContent = inProgress + ' in progress';
+}
+function skeleton(){
+  for(var i=0;i<4;i++){
+    var s=document.createElement('div'); s.className='flex gap-3';
+    s.innerHTML='<span class="skel h-3 w-10 mt-1"></span><div class="flex-1 space-y-1.5"><div class="skel h-3 w-full"></div><div class="skel h-3 w-2/3"></div></div>';
+    stream.appendChild(s);
+  }
+}
+var paused=false, qi=0, timer=null;
+function drip(){
+  if(paused) return;
+  if(qi < QUEUE.length){
+    pushEvent(QUEUE[qi], true); qi++;
+    timer = setTimeout(drip, 950 + Math.random()*500);
+  } else {
+    document.getElementById('liveDot').className='dot dot-green';
+  }
+}
+function boot(){
+  skeleton();
+  setTimeout(function(){
+    stream.innerHTML='';
+    SEED.forEach(function(e){ pushEvent(e, true); });
+    timer = setTimeout(drip, 700);
+  }, 900);
+}
+function liveBoot(tripId){
+  document.getElementById('liveDot').className = 'dot dot-gold pulse';
+  skeleton();
+  setTimeout(function(){
+    stream.innerHTML = '';
+    var buffer = [];
+    function renderEv(ev){ pushEvent([ (ev.ts||'').slice(11,19), ev.label, ev.detail||'' ], true); }
+    window._turesFlush = function(){ while(buffer.length){ renderEv(buffer.shift()); } };
+    tures.stream(tripId, function(ev){
+      if(paused){ buffer.push(ev); return; }
+      renderEv(ev);
+      if(ev.kind === 'notify') document.getElementById('liveDot').className = 'dot dot-green';
+    });
+  }, 900);
+}
+
+/* Mode switch: narrative by default; live dashboard for ?trip= or ?live=1 (engine path preserved). */
+(function(){
+  var params = new URLSearchParams(location.search);
+  var tripParam = params.get('trip');
+  var liveFlag = tripParam || params.get('live');
+  if(!liveFlag) return;  // default narrative — leave the live dashboard hidden, no boot
+
+  document.getElementById('demoMode').hidden = true;
+  document.getElementById('liveMode').hidden = false;
+
+  document.getElementById('pauseBtn').addEventListener('click', function(){
+    paused=!paused;
+    document.getElementById('pauseIcon').textContent = paused?'▶':'⏸';
+    document.getElementById('pauseLbl').textContent = paused?'Resume':'Pause';
+    document.getElementById('liveDot').className = paused?'dot dot-amber':'dot dot-gold pulse';
+    if(!paused){ drip(); if(window._turesFlush) window._turesFlush(); }
+  });
+
+  if (window.tures && tures.configured && tripParam) { liveBoot(tripParam); } else { boot(); }
+})();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

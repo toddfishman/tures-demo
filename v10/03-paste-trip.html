@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Describe &amp; book a trip</title>
+<meta name="description" content="Tell Tures your trip in plain English. It plans every leg and books it on your word — pause-and-ask whenever something is unclear." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/03-paste-trip.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Describe &amp; book a trip" />
+<meta property="og:description" content="Tell Tures your trip in plain English. It plans every leg and books it on your word — pause-and-ask whenever something is unclear." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/03-paste-trip.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Describe &amp; book a trip" />
+<meta name="twitter:description" content="Tell Tures your trip in plain English. It plans every leg and books it on your word — pause-and-ask whenever something is unclear." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; padding-bottom:84px; }
+
+  /* ---- conversational brief: bubbles on dark glass (greenhouse) ---- */
+  .bubble-me{ background:var(--gold); color:#06120a; white-space:pre-wrap; }
+  .bubble-t{ background:rgba(255,255,255,0.06); color:var(--gh-cream); border:1px solid rgba(255,255,255,0.09); }
+  .msg{ opacity:0; transform:translateY(10px) scale(.97);
+        transition:opacity .3s ease, transform .34s cubic-bezier(.34,1.5,.64,1); }
+  .msg.in{ opacity:1; transform:none; }
+
+  .typing span{ display:inline-block; width:5px; height:5px; border-radius:99px; background:var(--gh-cream-dim); margin:0 1px; animation:blink 1.2s infinite; }
+  .typing span:nth-child(2){ animation-delay:.2s } .typing span:nth-child(3){ animation-delay:.4s }
+  @keyframes blink{ 0%,60%,100%{opacity:.3} 30%{opacity:1} }
+
+  .acting{ display:inline-flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,255,255,0.05); border:1px solid var(--gold); padding:5px 11px; border-radius:99px; }
+
+  .qr{ padding:7px 13px; border-radius:99px; font-size:12.5px; cursor:pointer; white-space:nowrap;
+    border:1px solid var(--gold); color:var(--gold); background:rgba(255,255,255,0.04); transition:all .14s; }
+  .qr:hover{ background:rgba(255,255,255,0.1); border-color:var(--gold-bright); }
+  .qr:active{ transform:scale(.96); }
+
+  .composer{ width:100%; resize:none; background:transparent; border:0; outline:none; color:var(--gh-cream);
+    font-size:14px; line-height:1.6; max-height:160px; font-family:'DM Sans',sans-serif; }
+  .composer::placeholder{ color:var(--gh-cream-dim); }
+  .composer-wrap{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; transition:all 140ms; }
+  .composer-wrap:focus-within{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,162,74,0.18); }
+
+  .step{ display:flex; align-items:center; gap:8px; }
+  .step .num{ width:22px;height:22px;border-radius:99px;display:grid;place-items:center;font-size:11px;
+    font-family:'JetBrains Mono',monospace; border:1px solid rgba(255,255,255,0.16); color:var(--gh-cream-dim);}
+  .step.on .num{ background:var(--gold); color:#06120a; border-color:var(--gold); font-weight:600;}
+  .step.on .lbl{ color:var(--gh-cream);}
+  .step .lbl{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gh-cream-dim);}
+  .step-sep{ width:22px; height:1px; background:rgba(255,255,255,0.16); }
+
+  .reveal{ opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+  .legcard{ opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; }
+  .legcard.in{ opacity:1; transform:none; }
+  .chip{ padding:7px 14px; border-radius:999px; font-size:13px; cursor:pointer; border:1px solid rgba(255,255,255,0.14);
+    color:var(--gh-cream-dim); background:rgba(255,255,255,0.04); transition:all 140ms; user-select:none; }
+  .chip:hover{ border-color:var(--gold); color:var(--gh-cream); }
+  .chip:active{ transform:scale(.96); }
+  .chip.on{ background:var(--gold); color:#06120a; border-color:var(--gold); font-weight:600; }
+
+  /* ---- the chat console: gold-outlined dark glass on the greenhouse wash ---- */
+  .chatwin{ background:linear-gradient(160deg, rgba(20,28,19,0.82), rgba(15,20,16,0.9)) !important;
+    border:1px solid var(--gold) !important; border-radius:22px !important;
+    box-shadow:0 0 0 1px rgba(200,162,74,0.1), 0 30px 70px -28px rgba(0,0,0,0.9), 0 0 48px -14px rgba(230,200,115,0.22) !important; }
+  .chatwin .text-ink{ color:var(--gh-cream) !important; }
+  .chatwin .text-ink-faint, .chatwin .composer::placeholder{ color:var(--gh-cream-dim) !important; }
+  .chatwin .text-gold-deep{ color:var(--gold-bright) !important; }
+  .chatwin [style*="border-color:var(--canvas-line)"]{ border-color:rgba(255,255,255,0.1) !important; }
+  .chatwin .composer{ color:var(--gh-cream) !important; }
+  .chatwin .composer-wrap{ background:rgba(0,0,0,0.3) !important; border-color:rgba(255,255,255,0.14) !important; }
+  .chatwin .composer-wrap:focus-within{ border-color:var(--gold) !important; box-shadow:0 0 0 3px rgba(200,162,74,0.18) !important; }
+  /* FIXED greenhouse colors so neither dark mode nor anything else can wash the chat out */
+  .chatwin .bubble-t{ background:rgba(255,255,255,0.06) !important; color:var(--gh-cream) !important; border:1px solid rgba(255,255,255,0.1) !important; }
+  .chatwin .bubble-t .text-ink{ color:var(--gh-cream) !important; }
+  .chatwin .bubble-t .text-gold-deep{ color:var(--gold-bright) !important; }
+  .chatwin .bubble-me{ background:var(--gold) !important; color:#06120a !important; border:1px solid var(--gold) !important; }
+  .chatwin .bubble-me .text-ink{ color:#06120a !important; }
+  .chatwin .chip{ background:rgba(255,255,255,0.05) !important; color:var(--gh-cream) !important; border-color:rgba(255,255,255,0.16) !important; }
+  .chatwin .chip.on{ background:var(--gold) !important; color:#06120a !important; }
+  .chatwin .qr{ background:rgba(255,255,255,0.05) !important; color:var(--gold-bright) !important; border-color:var(--gold) !important; }
+
+  /* options walkthrough — curated decision cards inside the chat (fixed colors, theme-proof) */
+  .slate{ display:grid; gap:10px; margin:4px 0 2px; }
+  .opt-card{ position:relative; background:var(--gh-card); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:13px 14px; }
+  .opt-card.pick{ border-color:var(--gold); box-shadow:0 0 0 1px rgba(200,162,74,0.35), 0 0 32px -12px rgba(230,200,115,0.45); }
+  .opt-card .nm{ font-family:'Playfair Display',serif; font-weight:500; font-size:19px; color:var(--gh-cream); line-height:1.1; }
+  .opt-card .meta{ color:var(--gh-cream-dim); font-size:12.5px; margin-top:1px; }
+  .opt-card .price{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--gh-cream); white-space:nowrap; }
+  .opt-card .pickbadge{ display:inline-block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#06120a; background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border-radius:99px; padding:2px 9px; margin-bottom:6px; }
+  .opt-tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .opt-tag{ font-size:10.5px; color:var(--gold); background:rgba(200,162,74,0.12); border:1px solid rgba(200,162,74,0.28); border-radius:99px; padding:2px 8px; }
+  .opt-actions{ display:flex; align-items:center; gap:12px; margin-top:11px; }
+  .opt-link{ font-size:12px; color:var(--gold); text-decoration:underline; }
+  .hold-btn{ font-size:12.5px; font-weight:600; color:#06120a; background:linear-gradient(180deg,var(--gold-bright),var(--gold) 55%,#a8842f); border:1px solid #8a6a26; border-radius:99px; padding:6px 15px; cursor:pointer; }
+  .hold-btn:active{ transform:scale(.97); }
+  .add-btn{ font-size:12.5px; font-weight:600; color:var(--gold); background:rgba(200,162,74,0.1); border:1px solid var(--gold); border-radius:99px; padding:6px 14px; cursor:pointer; }
+  .add-btn.on{ color:#06120a; background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border-color:var(--gold); }
+  .opt-card.added{ border-color:var(--gold); box-shadow:0 0 0 1px rgba(200,162,74,0.3); }
+  .slate-foot{ display:flex; align-items:center; gap:16px; margin-top:2px; padding-left:2px; }
+  .slate-skip{ font-size:12.5px; color:var(--gh-cream-dim); cursor:pointer; }
+  .slate-skip:hover{ color:var(--gold-bright); text-decoration:underline; }
+
+  /* ---- executor choreography: live acting + stamped confirmations ---- */
+  .actbar{ position:relative; width:36px; height:3px; border-radius:3px; overflow:hidden; background:rgba(200,162,74,0.18); margin-left:2px; }
+  .actbar::after{ content:""; position:absolute; top:0; bottom:0; left:-45%; width:45%; border-radius:3px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent); animation:actslide 1.05s linear infinite; }
+  @keyframes actslide{ to{ left:100%; } }
+  .confline{ display:inline-flex; align-items:center; flex-wrap:wrap; gap:7px; }
+  .confcode{ position:relative; display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; letter-spacing:.05em; color:var(--gold-deep); background:rgba(200,162,74,0.12);
+    border:1px solid rgba(200,162,74,0.42); padding:4px 10px; border-radius:8px; }
+  .confcode .seal{ font-family:'Playfair Display',serif; font-size:13px; line-height:1; color:var(--gold); }
+  .confcode.stamp{ animation:stampIn .52s cubic-bezier(.2,1.5,.4,1) both; transform-origin:center; }
+  @keyframes stampIn{ 0%{ transform:scale(1.7) rotate(-7deg); opacity:0; } 55%{ opacity:1; } 72%{ transform:scale(.93) rotate(1.5deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  .confcode::after{ content:""; position:absolute; inset:-6px; border-radius:11px; border:1.5px solid var(--gold); opacity:0; pointer-events:none; }
+  .confcode.stamp::after{ animation:stampRing .62s ease-out both; }
+  @keyframes stampRing{ 0%{ transform:scale(.6); opacity:0; } 30%{ opacity:.5; } 100%{ transform:scale(1.3); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .confcode.stamp, .confcode.stamp::after, .actbar::after{ animation:none; } }
+
+  /* ---- the "executing" act — a clean beat that sets booking apart from the chat ---- */
+  .exec-divider{ display:flex; align-items:center; gap:10px; margin:10px 0 2px; }
+  .exec-divider .exec-line{ flex:1; height:1px; background:rgba(200,162,74,0.32); }
+  .exec-divider .exec-label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--gold-deep); display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+  .exec-divider .exec-label::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px var(--gold); animation:pulse 1.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .exec-divider .exec-label::before{ animation:none; } }
+
+  /* ───── greenhouse surface overrides for this page's structural wrappers ───── */
+  .leather-surface{ background:var(--gh-bg) !important; }
+  .leather-surface .text-gold\/80, .leather-surface .caps.text-gold\/80{ color:var(--gold) !important; }
+  .leather-surface h1.font-display{ font-family:'Playfair Display',serif !important; font-weight:400; color:var(--gh-cream) !important; }
+  /* the chat thread header avatar / name / status */
+  #chatName{ font-family:'Playfair Display',serif; }
+  /* the "this trip, specifically" sentiment panel — dark glass card */
+  #sentiment.leaf{ background:var(--gh-surface) !important; border:1px solid rgba(255,255,255,0.1) !important; border-radius:18px; }
+  #sentiment h2.font-display{ font-family:'Playfair Display',serif !important; color:var(--gh-cream) !important; }
+  #sentiment .text-ink{ color:var(--gh-cream) !important; }
+  #sentiment .text-ink-soft{ color:var(--gh-cream-dim) !important; }
+  #sentiment .text-ink-faint{ color:var(--gh-cream-dim) !important; }
+  #sentiment .text-gold-deep{ color:var(--gold) !important; }
+  #sentiment [style*="border-color:var(--canvas-line)"]{ border-color:rgba(255,255,255,0.14) !important; }
+  #sentiment [style*="background:rgba(255,253,247,0.6)"]{ background:rgba(255,255,255,0.05) !important; }
+  #sentiment input{ color:var(--gh-cream) !important; }
+  /* the live read-back aside */
+  #sentiment aside [style*="background:rgba(200,162,74,0.08)"]{ background:rgba(200,162,74,0.08) !important; border-color:rgba(200,162,74,0.28) !important; }
+  #tripSummary{ color:var(--gh-cream) !important; }
+  /* the seg control (Easy / Balanced / Full) reads on dark */
+  #sentiment .seg button{ color:var(--gh-cream-dim); }
+  #sentiment .seg button.on{ color:#06120a; }
+  /* sticky CTA bar */
+  .cta-bar{ position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px);
+    background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08); }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="03-paste-trip.html" class="active">Book a trip</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+  <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+    <div class="flex items-baseline gap-3 min-w-0">
+      <span class="caps text-[11px] text-gold/80 shrink-0 hidden sm:inline">Plan a trip</span>
+      <h1 class="font-display text-xl sm:text-2xl text-canvas leading-none">Tell Tures the trip.</h1>
+    </div>
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div class="step on" id="stp1"><span class="num">1</span><span class="lbl hidden sm:inline">Describe</span></div>
+      <div class="step-sep hidden sm:block"></div>
+      <div class="step" id="stp2"><span class="num">2</span><span class="lbl hidden sm:inline">Plan</span></div>
+      <div class="step-sep hidden sm:block"></div>
+      <div class="step" id="stp3"><span class="num">3</span><span class="lbl hidden sm:inline">Book</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="leather-surface grain text-canvas">
+ <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-5 space-y-6">
+
+  <!-- ===== CONVERSATIONAL BRIEF (gold-outlined console on chocolate leather) ===== -->
+  <div class="leaf chatwin overflow-hidden flex flex-col" style="height:calc(100dvh - 178px); min-height:420px">
+    <!-- thread header -->
+    <div class="flex items-center gap-3 px-5 py-3 border-b" style="border-color:var(--canvas-line)">
+      <div id="chatAvatar" class="w-9 h-9 rounded-full grid place-items-center font-display text-base shrink-0 overflow-hidden"
+           style="background:var(--leather);color:var(--gold-bright);border:1px solid rgba(200,162,74,.4)">t</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-ink" id="chatName">Tures</div>
+        <div class="text-[11px] text-ink-faint" id="threadStatus">Booking concierge · online</div>
+      </div>
+      <span data-voice-mount class="shrink-0"></span>
+      <button onclick="restart()" class="press text-[11px] text-gold-deep hover:underline shrink-0"><span class="hidden sm:inline">↺ Start over</span><span class="sm:hidden">↺</span></button>
+    </div>
+
+    <!-- messages -->
+    <div id="chat" class="px-4 sm:px-5 py-5 space-y-3 text-[13.5px] flex-1 overflow-y-auto min-h-0" data-noswipe></div>
+
+    <!-- quick replies -->
+    <div class="px-4 sm:px-5 pb-1 flex gap-2 overflow-x-auto" id="suggestions" data-noswipe></div>
+
+    <!-- composer -->
+    <div class="px-4 sm:px-5 py-3 border-t" style="border-color:var(--canvas-line)">
+      <div class="composer-wrap px-4 py-3 flex items-end gap-2">
+        <textarea id="composer" class="composer font-body" rows="1" spellcheck="false" data-noswipe
+          placeholder="Describe your trip — cities, dates, how you fly &amp; stay…"></textarea>
+        <button id="micBtn" title="Dictate — speak your trip into the box (for a back-and-forth, use Talk to Tures above)" aria-label="Dictate your trip" class="w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end" style="display:none;border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">🎤</button>
+        <button id="sendBtn" class="btn-gold w-9 h-9 rounded-full grid place-items-center text-base shrink-0 self-end">↑</button>
+      </div>
+      <div class="text-[11px] text-ink-faint mt-2 px-1" id="composerHint">Enter to send · Shift+Enter for a new line</div>
+    </div>
+  </div>
+
+  <!-- ===== THIS TRIP, SPECIFICALLY (revealed as the conversation continues) ===== -->
+  <div id="sentiment" class="reveal hidden leaf p-6 sm:p-8">
+    <div class="grid lg:grid-cols-12 gap-8">
+      <div class="lg:col-span-7">
+        <div class="caps text-[11px] text-ink-faint mb-2">Before we book</div>
+        <h2 class="font-display text-3xl sm:text-4xl text-ink leading-tight">How are you feeling about <em>this</em> trip?</h2>
+        <p class="mt-2 text-ink-soft text-sm leading-relaxed max-w-xl">Your <a href="02-taste-engine.html" class="text-gold-deep underline quiet">Taste Print</a> is who you are. This is who you are <em>this week</em>.</p>
+
+        <div class="mt-6 space-y-6">
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">What's this trip for? <span class="normal-case tracking-normal text-ink-faint/70">· any</span></div>
+            <div class="flex flex-wrap gap-2" data-group="purpose" data-mode="multi">
+              <span class="chip" data-v="celebrate">Celebrate</span>
+              <span class="chip" data-v="decompress">Decompress</span>
+              <span class="chip" data-v="adventure">Adventure</span>
+              <span class="chip" data-v="romance">Romance</span>
+              <span class="chip" data-v="reconnect">Reconnect</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Pace, this time</div>
+            <div class="seg" id="paceSeg">
+              <button data-v="easy">Easy</button>
+              <button class="on" data-v="balanced">Balanced</button>
+              <button data-v="full">Full</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Budget, this trip <span class="normal-case tracking-normal text-ink-faint/70">· changing this re-plans</span></div>
+            <div class="flex flex-wrap gap-2" data-group="budget" data-mode="single">
+              <span class="chip" data-v="thrifty">Budget-friendly</span>
+              <span class="chip on" data-v="balanced">Balanced</span>
+              <span class="chip" data-v="premium">Treat ourselves</span>
+              <span class="chip" data-v="no_limit">To the nines</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="text-xs text-ink-soft">Optional hard cap</span>
+              <div class="flex items-center rounded-lg px-2.5 py-1.5" style="border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)">
+                <span class="text-ink-faint text-sm">$</span>
+                <input id="capInput" inputmode="numeric" placeholder="—" class="w-20 bg-transparent outline-none text-sm text-ink ml-1" data-noswipe />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="caps text-[11px] text-ink-faint mb-3">Not feeling this time <span class="normal-case tracking-normal text-ink-faint/70">· any</span></div>
+            <div class="flex flex-wrap gap-2" data-group="avoid" data-mode="multi">
+              <span class="chip" data-v="late nights">Late nights</span>
+              <span class="chip" data-v="long days">Long days</span>
+              <span class="chip" data-v="touristy spots">Touristy spots</span>
+              <span class="chip" data-v="big crowds">Big crowds</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- live read-back -->
+      <aside class="lg:col-span-5">
+        <div class="rounded-xl p-5 sticky top-24" style="background:rgba(200,162,74,0.08); border:1px solid rgba(200,162,74,0.28)">
+          <div class="caps text-[11px] text-ink-faint mb-2">For this trip, Tures will</div>
+          <p id="tripSummary" class="text-ink leading-relaxed text-[15px]">Pick a few and I'll read it back — then tune the plan before anything is booked.</p>
+          <div class="rule-gold my-4"></div>
+          <div class="text-xs text-ink-soft">Sits on top of your standing Taste Print · trip #T-2087.</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Plan a trip</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar" id="ctaBar" style="display:none">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="04-connections.html" class="btn-gold flex-1 text-center px-6 py-3 rounded-xl quiet font-semibold">Approve &amp; book 7 legs →</a>
+  </div>
+</div>
+
+<script src="assets/gsap.min.js"></script>
+<script src="assets/motion.js"></script>
+<script src="assets/concierge.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+var chat = document.getElementById('chat');
+var sugEl = document.getElementById('suggestions');
+var composer = document.getElementById('composer');
+
+/* If the traveller set up a personal concierge, this thread is theirs — show their portrait
+   and name in the header (and greet in their name below). */
+var CC = (window.turesConcierge && turesConcierge.get()) || null;
+function applyConcierge(){
+  if(!CC) return;
+  var av = document.getElementById('chatAvatar');
+  if(av){ av.style.background='transparent'; av.style.border='none'; av.innerHTML = turesConcierge.avatar(CC, 36); }
+  var nm = document.getElementById('chatName'); if(nm) nm.textContent = CC.name;
+}
+applyConcierge();
+
+/* Demo mode (?demo=1 or arriving via the Andy tour) pre-loads Andy's persona + trip. Real
+   visitors get a neutral, first-person greeting with no pre-filled stranger's name or trip. */
+var _q = new URLSearchParams(location.search);
+var DEMO = _q.get('demo') === '1';
+var DEMO_TRIP = _q.get('trip');   // landing cards play a specific trip's demo
+var DEMO_EMAIL = 'andy@arrowfish.com';
+
+/* Single-destination demos the landing cards launch — each plays its own conversation through
+   the live engine, so Tokyo plans a real Tokyo trip, Paris a Paris trip, etc. */
+var TRIPS = {
+  paris:   'From Seattle, a long weekend in Paris for two in March, business class, a design hotel near the Marais, walkable, good dinners.',
+  tokyo:   'From Seattle, 48 hours in Tokyo for two in April, business class, a design-forward hotel in Shibuya, every dinner reservation handled.',
+  newyork: 'From Seattle, a weekend in New York for two, business class, a boutique hotel downtown, and a table at Carbone.',
+  lapland: 'From Seattle, a week in Finnish Lapland in December for two, business class, an aurora lodge with a sauna, not price sensitive.'
+};
+
+/* Andy's example brief — offered as a one-tap quick reply that fills the composer. */
+var ANDY = `Leave Thursday December 3rd — fly direct into Paris, arrive the 4th. Business.
+Paris the 4–5–6th at Real Christine.
+Paris → Ivalo on the 7th. Should be non-stop on Finnair?
+Javri Lodge the 7–8–9th.
+Ivalo → Copenhagen on the 10th.
+Hotel Sanders the 10–11–12.
+Home the 13th — probably through Paris to keep both ways non-stop on business.`;
+
+/* the parsed legs — each renders as a tap-to-expand card (ui.js .exp delegation) */
+var LEGS = [
+  {type:'fly', title:'AA 142 · SEA → CDG', meta:'12/03 · Biz · non-stop',
+   detail:'Only same-day non-stop in business arriving the 4th. Seat 5A held.'},
+  {type:'stay', title:'Real Christine, Paris', meta:'12/04 – 07 · 3 nts',
+   detail:'Junior Suite, garden view — matches your Taste Print. Virtuoso amenities applied.'},
+  {type:'flag', title:'CDG → IVL', meta:'12/07 · needs you',
+   detail:'Finnair does <strong>not</strong> fly this non-stop in December. Two clean alternatives staged — won\'t book until you choose.',
+   pill:['pill-alert','Verify']},
+  {type:'stay', title:'Javri Lodge, Saariselkä', meta:'12/07 – 10 · 3 nts',
+   detail:'Aurora Suite for December\'s season. IVL transfer locked to your arrival window.'},
+  {type:'fly', title:'AY 945 · IVL → CPH', meta:'12/10 · via HEL',
+   detail:'Business, refundable fare. Schengen-side connection at HEL.'},
+  {type:'stay', title:'Hotel Sanders, Copenhagen', meta:'12/10 – 13 · 3 nts',
+   detail:'Junior Suite booked direct — Booking.com sold out at tier.'},
+  {type:'fly', title:'AF 376 · CPH → CDG → SEA', meta:'12/13 · Biz',
+   detail:'Non-stop CDG→SEA on the back half. Flying Blue credited.'},
+];
+
+/* ---------- chat primitives (paper-warm adaptation of the concierge thread) ---------- */
+function addMsg(html, who){
+  var el = document.createElement('div');
+  el.className = 'msg ' + (who==='me'
+    ? 'max-w-[82%] ml-auto rounded-2xl rounded-tr-sm px-3.5 py-2.5 bubble-me'
+    : 'max-w-[90%] rounded-2xl rounded-tl-sm px-3.5 py-2.5 bubble-t');
+  el.innerHTML = html;
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+function typing(){
+  var el = document.createElement('div');
+  el.className = 'msg max-w-[60%] rounded-2xl rounded-tl-sm px-3.5 py-3 bubble-t typing';
+  el.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+function actingPill(label){
+  var el = document.createElement('div');
+  el.className = 'msg';
+  el.innerHTML = '<span class="acting"><span class="dot dot-amber beat"></span><span id="reasonLine">'+label+'</span><span class="actbar"></span></span>';
+  chat.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return el;
+}
+
+function setStep(n){ ['stp1','stp2','stp3'].forEach(function(id,i){ document.getElementById(id).classList.toggle('on', i < n); }); }
+
+function legCard(l, i){
+  var icon = l.type==='stay' ? '⌂' : l.type==='flag' ? '⚑' : '✈';
+  var titleCls = l.type==='stay' ? 'font-display text-lg' : 'font-mono text-[15px]';
+  var pill = l.pill ? '<span class="pill '+l.pill[0]+' ml-2">'+l.pill[1]+'</span>' : '';
+  var alert = l.type==='flag' ? ' style="border-color:rgba(181,84,58,0.4);background:rgba(181,84,58,0.05);transition-delay:'+(i*60)+'ms"' : ' style="transition-delay:'+(i*60)+'ms"';
+  return '<div class="exp legcard leaf"'+alert+'>'+
+    '<div class="exp-head flex items-center gap-3 p-4 cursor-pointer">'+
+      '<span class="text-gold-deep w-5 text-center">'+icon+'</span>'+
+      '<span class="flex-1 min-w-0"><span class="'+titleCls+' text-ink">'+l.title+'</span>'+pill+'</span>'+
+      '<span class="text-xs text-ink-faint font-mono whitespace-nowrap">'+l.meta+'</span>'+
+      '<span class="exp-chev text-gold-deep">›</span>'+
+    '</div>'+
+    '<div class="exp-body"><p class="px-4 pb-4 pl-12 text-[13px] text-ink-soft leading-relaxed">'+l.detail+'</p></div>'+
+  '</div>';
+}
+
+/* ---------- conversation flow ---------- */
+var REASONS = ['Reading your brief…','Resolving hotels & dates…','Checking flight schedules…','Flagging what won\'t book…'];
+var planned = false;
+/* The active options-walkthrough stage (null | 'lodging' | 'transport' | 'dinners' | 'excursions').
+   While set, free-text in the composer is interpreted against the slate on screen — an
+   affirmation accepts the recommended pick — instead of restarting the conversation. */
+var walkStage = null;
+/* The running brief. Every user turn is appended so a correction ("sorry, SEA") is
+   re-parsed WITH the original trip, not as a brand-new one. */
+var convoText = '';
+/* The most recent parsed brief — the budget/sentiment controls mutate it and can re-plan. */
+var currentBrief = null;
+
+function greet(){
+  if(DEMO){
+    addMsg("Evening, Andy. Where are we headed? Brief it like you'd text a friend — cities, dates, who's coming, and how you like to fly and stay. I'll turn it into a bookable plan.", 't');
+  } else {
+    var hi = (CC && CC.name) ? ("Hi — I’m " + CC.name + ", your concierge. ") : "";
+    addMsg(hi + "Where are we headed? Just tell me your trip or ask for some ideas. The more you give me, the better my answers will be.<br><br>To begin, you can simply text below, press the 🎤 microphone button for speech-to-text, or — my personal favorite — talk to me. Just press the <strong>“Talk to me”</strong> button above.", 't');
+  }
+  renderSuggestions();
+}
+
+function renderSuggestions(){
+  sugEl.innerHTML = '';
+  /* Each chip carries a COMPLETE brief — origin, destination, timing, travelers, style,
+     budget posture, plus concrete wants — so one tap gives the guided agent everything it
+     needs to go straight to options and booking, no back-and-forth required. */
+  var LISBON = 'From New York, two of us, a long weekend in Lisbon over the first weekend of October — fly out Friday, back Monday. Business class. We love a small design-forward hotel in Alfama or Chiado, walkable to dinner. Book us a standout seafood dinner, a wine bar one night, and a half-day out to Sintra. Treating ourselves on this one — comfort over cost.';
+  var HAWAII = 'From San Francisco, two of us, a week on Maui in mid-October — seven nights. Business class over, and an oceanfront resort with a great pool and a quiet adults-side. We want a sunrise trip up Haleakalā, a snorkel day at Molokini, and two memorable dinners on the water. Not price sensitive — book the nicer option.';
+  var JAPAN = 'From Los Angeles, family of four — two adults, two teens — a week in Japan over spring break in early April. Tokyo for four nights then Kyoto for three, with a ryokan and onsen for two of the Kyoto nights. Premium economy if it\'s reasonable. We\'d love a great sushi dinner, a day trip to Nara, and tickets to teamLab. Balanced budget — nice but not silly.';
+  var qs = DEMO ? [
+    {label:'✦ Use Andy\'s example', fill:ANDY},
+    {label:'A weekend in Lisbon', fill:LISBON},
+    {label:'Family week in Japan', fill:JAPAN},
+  ] : [
+    {label:'A weekend in Lisbon', fill:LISBON},
+    {label:'A week in Hawaii', fill:HAWAII},
+    {label:'Family week in Japan', fill:JAPAN},
+  ];
+  qs.forEach(function(q){
+    var b = document.createElement('button');
+    b.className = 'qr';
+    b.textContent = q.label;
+    /* Fill the composer and send it — one tap launches the whole conversation. */
+    b.onclick = function(){ composer.value = q.fill; autoGrow(); composerSend(); };
+    sugEl.appendChild(b);
+  });
+}
+
+/* The live engine plans one city at a time today. A clearly multi-city brief
+   (several lines or chained legs) runs the guided sample instead of letting the
+   engine mangle it into a single origin→destination guess. */
+function looksMultiLeg(text){
+  var lines = (text.match(/\n/g)||[]).length;
+  var arrows = (text.match(/→|->/g)||[]).length;
+  return lines >= 3 || arrows >= 2;
+}
+
+function sendBrief(){
+  var text = composer.value.trim();
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me');
+  composer.value = ''; autoGrow();
+  sugEl.innerHTML = '';
+  composer.placeholder = 'Describe your trip — cities, dates, how you fly & stay…';
+  setStep(1);
+
+  var isCorrection = convoText !== '';
+  // Append this turn to the running brief so corrections refine the trip in context.
+  convoText = isCorrection ? (convoText + '\n\n[Update] ' + text) : text;
+
+  if (window.tures && tures.configured) {
+    // Only the FIRST message can trigger the multi-city sample; a short correction never should.
+    if (!isCorrection && looksMultiLeg(text)) {
+      addMsg('That reads as a multi-city trip. The live engine books one city at a time today — multi-city is in the works. Here is how a trip like yours runs, on a sample itinerary.', 't');
+      scriptedFlow();
+      return;
+    }
+    if (isCorrection) addMsg('Got it — folding that in.', 't');
+    realFlow(convoText);
+  } else { scriptedFlow(); }
+}
+
+/* ---------- scripted demo flow (no engine configured) ---------- */
+function scriptedFlow(){
+  // typing → thinking (cycling reasons) → plan
+  var t = typing();
+  setTimeout(function(){
+    t.remove();
+    var act = actingPill(REASONS[0]);
+    var ri = 0;
+    var rt = setInterval(function(){
+      ri = (ri+1) % REASONS.length;
+      var rl = document.getElementById('reasonLine');
+      if(rl) rl.textContent = REASONS[ri];
+    }, 440);
+
+    setTimeout(function(){
+      clearInterval(rt);
+      act.remove();
+      addMsg('Parsed. Here\'s your plan — <strong>7 legs, 9 dinners</strong>. Tap any leg to see why I chose it.', 't');
+
+      // render leg cards as a rich assistant turn (full width inside the thread)
+      var wrap = document.createElement('div');
+      wrap.className = 'msg space-y-2.5 mt-1';
+      wrap.innerHTML = LEGS.map(legCard).join('');
+      chat.appendChild(wrap);
+      requestAnimationFrame(function(){
+        wrap.classList.add('in');
+        var cardsEls = wrap.querySelectorAll('.legcard');
+        // GSAP spring-stagger when available; otherwise the CSS '.in' cascade.
+        if(!(window.tmotion && tmotion.revealStagger(cardsEls)))
+          [].forEach.call(cardsEls, function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); });
+      });
+      wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+      setStep(2);
+
+      // follow-up that opens the sentiment tuning
+      setTimeout(function(){
+        addMsg('One flag: the Ivalo leg won\'t book non-stop in December — I\'ve staged two clean alternatives and won\'t touch them until you pick. Before I book the rest, how are you feeling about <em>this</em> one?', 't');
+        var s = document.getElementById('sentiment');
+        s.classList.remove('hidden');
+        requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
+        document.getElementById('ctaBar').style.display = '';
+        s.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 750);
+
+      planned = true;
+      document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
+    }, 1800);
+  }, 950);
+}
+
+/* ---------- live engine flow (?engine=… configured) ---------- */
+function offerCard(o){
+  var reasons = (o.scoreReasons && o.scoreReasons.length) ? ' — ' + o.scoreReasons.join(', ') : '';
+  return {
+    type: o.kind === 'flight' ? 'fly' : 'stay',
+    title: o.title,
+    meta: (o.currency || 'USD') + ' ' + Math.round(o.priceUsd).toLocaleString(),
+    detail: (o.summary || []).join(' · ') + reasons,
+  };
+}
+function realFlow(text){
+  document.getElementById('threadStatus').textContent = 'Live engine · ' + tures.url.replace(/^https?:\/\//, '');
+  var t = typing();
+  tures.parse(text).then(function(p){
+    t.remove();
+    var b = p.brief;
+    var pax = (b.adults || 1) + (b.children || 0);
+    var paxLabel = pax + ' traveler' + (pax > 1 ? 's' : '') + (b.children ? ' (' + b.adults + ' adult' + (b.adults>1?'s':'') + ' + ' + b.children + ' child' + (b.children>1?'ren':'') + ')' : '');
+    var POSTURE = { thrifty:'budget-friendly', balanced:'balanced budget', premium:'treating yourself', no_limit:'to the nines' };
+    var postureLabel = (b.priceSensitivity && b.priceSensitivity!=='balanced') ? ' · ' + POSTURE[b.priceSensitivity] : '';
+    var capLabel = b.budgetUsd ? ' · cap $' + Number(b.budgetUsd).toLocaleString() : '';
+    addMsg('Reading that as <strong>' + b.origin + ' → ' + b.destination + '</strong> · ' + paxLabel + ' · ' + b.cabin + postureLabel + capLabel, 't');
+    var assumed = p.assumptions || [];
+    if(assumed.length){
+      /* When in doubt, ask — an assumption is a question, not a decision. */
+      addMsg('Before I search, I had to assume a few things:<br>' +
+        assumed.map(function(a){ return '· ' + String(a).replace(/</g,'&lt;'); }).join('<br>') +
+        '<br>Correct me below, or tell me to go ahead.', 't');
+      askProceed(b);
+      return;
+    }
+    planAndPropose(b);
+  }).catch(function(err){
+    try{ t.remove(); }catch(_){}
+    addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
+    scriptedFlow();
+  });
+}
+
+function askProceed(b){
+  sugEl.innerHTML = '';
+  var go = document.createElement('button');
+  go.className = 'qr'; go.textContent = '✦ Looks right — go ahead';
+  go.onclick = function(){ sugEl.innerHTML=''; addMsg('Go ahead.', 'me'); planAndPropose(b); };
+  var fix = document.createElement('button');
+  fix.className = 'qr'; fix.textContent = 'Let me fix the details';
+  fix.onclick = function(){ sugEl.innerHTML=''; composer.placeholder = 'Just the correction — e.g. "from Seattle" or "the dates are Dec 3–10"…'; composer.focus(); };
+  sugEl.appendChild(go); sugEl.appendChild(fix);
+  // A launched demo plays itself through — accept the assumptions and proceed to the plan.
+  if(DEMO_TRIP) setTimeout(function(){ go.click(); }, 1900);
+}
+
+function planAndPropose(b){
+  currentBrief = b;
+  // Fold this-trip sentiment (purpose / pace / avoid) into the brief the agent plans against.
+  if(state && (state.purpose.length || state.avoid.length || state.pace)){
+    b.tripSentiment = { purpose: state.purpose, pace: state.pace, avoid: state.avoid };
+  }
+  syncBudgetUI(b);
+  /* Fold in the standing Taste Print (saved by the Taste Engine / onboarding). */
+  var tp = null; try { tp = JSON.parse(localStorage.getItem('tures.tastePrint') || 'null'); } catch(_){}
+  if(tp && tp.placeTypes && tp.placeTypes.length){
+    b.placeTypes = (b.placeTypes || []).concat(tp.placeTypes).filter(function(v,i,a){ return a.indexOf(v)===i; });
+    addMsg('Folding in your <a href="02-taste-engine.html" class="text-gold-deep underline quiet">Taste Print</a> — ' + tp.placeTypes.join(', ') + '.', 't');
+  }
+  var act = actingPill('Searching live inventory…');
+  return tures.plan(b).then(function(plan){
+      // stream the real execution events into the thread as a muted log
+      var logWrap = document.createElement('div'); logWrap.className = 'msg text-[12px] text-ink-faint space-y-1 pl-1';
+      chat.appendChild(logWrap); requestAnimationFrame(function(){ logWrap.classList.add('in'); });
+      var seen = {};
+      var es = tures.stream(plan.tripId, function(ev){
+        var k = ev.kind + ':' + ev.label; if(seen[k]) return; seen[k] = 1;
+        var line = document.createElement('div');
+        line.innerHTML = '· ' + ev.label + (ev.detail ? ' — <span class="text-ink-soft">' + ev.detail + '</span>' : '');
+        logWrap.appendChild(line); logWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+        if(ev.kind === 'propose' || ev.kind === 'notify') setTimeout(function(){ try{es.close();}catch(_){} }, 300);
+      });
+      setTimeout(function(){ try{es.close();}catch(_){} }, 5000);
+
+      act.remove();
+      var cards = []; if(plan.flight) cards.push(offerCard(plan.flight)); if(plan.stay) cards.push(offerCard(plan.stay));
+      addMsg('Here\'s what I\'d book — <strong>' + (plan.withinBudget ? 'within budget' : 'over budget') + '</strong>. ' + (plan.rationale || ''), 't');
+      var wrap = document.createElement('div'); wrap.className = 'msg space-y-2.5 mt-1';
+      wrap.innerHTML = cards.map(legCard).join('');
+      chat.appendChild(wrap);
+      requestAnimationFrame(function(){ wrap.classList.add('in'); var cardsEls=wrap.querySelectorAll('.legcard'); if(!(window.tmotion && tmotion.revealStagger(cardsEls))) [].forEach.call(cardsEls, function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); });
+      wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+      // Planning is free with no signup. Signed-in → checkout. Anonymous → first a FREE mock-book
+      // preview (watch it book, $0, nothing real), then "Sign Up & Book" to do it for real — the
+      // pending trip is saved so it carries through onboarding to checkout.
+      var cta = document.querySelector('#ctaBar a');
+      if(cta){
+        var signedIn = !!(window.tures && tures.signedIn);
+        function savePending(){
+          localStorage.setItem('tures.pendingTrip', JSON.stringify({
+            brief: b,
+            flightId: plan.flight && plan.flight.id, stayId: plan.stay && plan.stay.id,
+            flightTitle: plan.flight && plan.flight.title, stayTitle: plan.stay && plan.stay.title,
+            totalUsd: plan.totalUsd, currency: (plan.flight && plan.flight.currency) || 'USD'
+          }));
+        }
+        if(signedIn){
+          cta.textContent = 'Approve & book →'; cta.href = 'checkout.html';
+          cta.onclick = function(e){ e.preventDefault(); savePending(); location.href = 'checkout.html'; };
+        } else {
+          cta.textContent = 'Watch it book — free →'; cta.href = '#';
+          cta.onclick = function(e){
+            e.preventDefault();
+            if(!cta.__previewed){ cta.__previewed = true; previewBooking(plan, cta); }
+            else { savePending(); location.href = 'signup.html'; }
+          };
+          // The launched demo plays through to the booking (the "execution part").
+          if(DEMO_TRIP && !cta.__previewed){ cta.__previewed = true; setTimeout(function(){ previewBooking(plan, cta); }, 2400); }
+        }
+      }
+      setStep(2);
+      var firstPlan = !planned && !DEMO_TRIP;  // a launched demo plays straight through to booking
+      setTimeout(function(){
+        if(firstPlan){
+          addMsg('Before I book, how are you feeling about <em>this</em> trip? Tune the budget and I\'ll re-plan.', 't');
+          var s = document.getElementById('sentiment'); s.classList.remove('hidden');
+          requestAnimationFrame(function(){ s.classList.add('in'); window.dispatchEvent(new Event('resize')); });
+          document.getElementById('ctaBar').style.display = ''; s.scrollIntoView({behavior:'smooth', block:'center'});
+        }
+      }, 700);
+      planned = true;
+      document.getElementById('threadStatus').textContent = 'Plan ready · tune below';
+    }).catch(function(err){
+      try{ act.remove(); }catch(_){}
+      addMsg('The live engine hit a snag (' + ((err && err.message) || err) + '). Falling back to the demo plan.', 't');
+      scriptedFlow();
+    });
+}
+
+/* Free mock-book preview — watch the trip "book" with $0 charged and nothing real, then offer
+   to do it for real via Sign Up & Book. Honest by design: every line is tagged (preview). */
+function mockCode(n){ var s='', a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for(var k=0;k<n;k++) s+=a.charAt(Math.floor(Math.random()*a.length)); return s; }
+function previewBooking(plan, cta){
+  document.getElementById('threadStatus').textContent = 'Executing · booking your trip';
+  sugEl.innerHTML = '';
+  // a clean "executing" act, set off from the conversation — booking stays right here in the thread
+  var div = document.createElement('div'); div.className = 'msg exec-divider';
+  div.innerHTML = '<span class="exec-line"></span><span class="exec-label">Executing — verifying twice</span><span class="exec-line"></span>';
+  chat.appendChild(div); requestAnimationFrame(function(){ div.classList.add('in'); }); div.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  // the brief setup beat (the vault, in one line), then Tures books leg by leg
+  addMsg('Charging your card on file · applying your documents and loyalty. Here we go.', 't');
+
+  var legs = [];
+  if(plan.flight) legs.push({icon:'✈', t:plan.flight.title, c:'PNR ' + mockCode(6)});
+  if(plan.stay)   legs.push({icon:'⌂', t:plan.stay.title,   c:'CONF ' + mockCode(5)});
+  legs.push({icon:'⇄', t:'Airport transfer · private car', c:'REF ' + mockCode(5)});
+  legs.push({icon:'✦', t:'Dinner · held on deposit',       c:'RES ' + mockCode(4)});
+
+  var i = 0;
+  (function step(){
+    if(i >= legs.length){
+      addMsg('<strong>Done — every leg booked and verified twice.</strong> $0 charged, nothing real (preview). This is exactly how it runs for real: confirmation numbers, not links.', 't');
+      cta.textContent = 'Sign Up & Book →';
+      document.getElementById('threadStatus').textContent = 'Booked (preview) · ready when you are';
+      return;
+    }
+    var l = legs[i++];
+    var ty = typing();
+    setTimeout(function(){
+      ty.remove();
+      addMsg('<span class="confline">' + l.icon + ' Booked <strong>' + l.t + '</strong> <span class="confcode stamp"><span class="seal">✦</span>' + l.c + '</span> <span class="text-ink-faint">(preview)</span></span>', 't');
+      setTimeout(step, 460);
+    }, 720);
+  })();
+}
+
+function restart(){
+  chat.innerHTML = '';
+  composer.value = ''; autoGrow();
+  document.getElementById('sentiment').classList.add('hidden');
+  document.getElementById('sentiment').classList.remove('in');
+  document.getElementById('ctaBar').style.display = 'none';
+  document.getElementById('threadStatus').textContent = 'Booking concierge · online';
+  planned = false;
+  walkStage = null;
+  convoText = '';
+  currentBrief = null;
+  setStep(1);
+  state = { purpose:[], pace:'balanced', avoid:[], budget:'balanced', cap:null };
+  document.querySelectorAll('[data-group="purpose"] .chip.on, [data-group="avoid"] .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('[data-group="budget"] .chip').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-v')==='balanced'); });
+  if(capEl) capEl.value = '';
+  document.getElementById('tripSummary').textContent = "Pick a few and I'll read it back — then tune the plan before anything is booked.";
+  greet();
+}
+
+/* ---------- guided conversation (real visitors) ----------
+   The /converse agent gathers a complete brief one question at a time, then hands it to the
+   planner. Demos and post-plan corrections use the direct planner (sendBrief) below. */
+var convoHistory = [];
+function convoContext(){
+  var bits = [];
+  try{ var tp = JSON.parse(localStorage.getItem('tures.tastePrint')||'null'); if(tp && tp.signature){ bits.push('Their Taste Print: '+tp.signature); } }catch(_){}
+  return bits.length ? bits.join(' · ') : undefined;
+}
+/* Stable per-traveler id keying their mem0 memory. Demo persona ties to seeded memories. */
+function turesUid(){
+  try{
+    if(DEMO) return 'todd';
+    if(window.tures && tures.account && tures.account.id) return tures.account.id;
+    var u=localStorage.getItem('tures.uid'); if(!u){ u='guest-'+Math.random().toString(36).slice(2,10); localStorage.setItem('tures.uid', u); } return u;
+  }catch(_){ return undefined; }
+}
+function onSend(){
+  var text = composer.value.trim();
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me');
+  convoHistory.push({ role:'user', content:text });
+  composer.value=''; autoGrow(); sugEl.innerHTML=''; setStep(1);
+  var status = document.getElementById('threadStatus'); if(status) status.textContent = 'Gathering your trip…';
+  var t = typing();
+  tures.converse(convoHistory.slice(-12), undefined, convoContext(), turesUid()).then(function(c){
+    t.remove();
+    var reply = (c && c.reply || '').trim();
+    if(reply){ addMsg(reply.replace(/</g,'&lt;'), 't'); convoHistory.push({ role:'assistant', content:reply }); }
+    if(status) status.textContent = 'Booking concierge · online';
+    if(c && c.ready && c.brief){
+      // checklist complete — present a curated lodging slate first (the Taste Engine earns its keep),
+      // then the chosen stay flows into the planner.
+      window.__readyBrief = c.brief; window.__slots = c.slots || {};
+      setTimeout(function(){ presentLodging(c.slots || {}); }, 650);
+    }
+  }).catch(function(){ t.remove(); if(status) status.textContent='Booking concierge · online'; addMsg('The agent hiccuped — say that again?', 't'); });
+}
+/* Route the composer: real first-time gathering → /converse; demos, post-plan corrections,
+   or offline (no engine) → the direct planner. */
+function composerSend(){
+  // Mid-walkthrough, free text is a response to the slate on screen — never a new conversation.
+  if(walkStage){ walkReply(composer.value.trim()); return; }
+  if(DEMO || DEMO_TRIP || planned || !(window.tures && tures.configured)){ sendBrief(); return; }
+  onSend();
+}
+
+/* Interpret free-text replies during the options walkthrough so typing "ok" / "do it" /
+   a hotel name works the same as tapping the slate's button. */
+function isYes(t){ return /\b(ok|okay|yes|yep|yeah|yup|sure|do it|book it|hold it|hold this|hold the pick|go ahead|sounds good|sounds great|looks good|perfect|great|love it|that one|your pick|the pick|first one|let'?s do it)\b/.test(t) || t==='k'; }
+function isAgain(t){ return /\b(look again|other|others|something else|else|different|another|more options|alternativ)\b/.test(t); }
+function matchByName(list, t){
+  for(var i=0;i<list.length;i++){
+    var words=String(list[i].name).toLowerCase().split(/[^a-z0-9]+/).filter(function(w){return w.length>=4;});
+    for(var j=0;j<words.length;j++){ if(t.indexOf(words[j])>-1) return i; }
+  }
+  return -1;
+}
+function walkReply(text){
+  if(!text) return;
+  addMsg(text.replace(/</g,'&lt;'), 'me'); composer.value=''; autoGrow(); sugEl.innerHTML='';
+  var t = text.toLowerCase();
+  if(walkStage==='lodging'){
+    var opts=window.__lodgingOpts||[]; var mi=matchByName(opts,t);
+    if(mi>-1){ holdHotel(opts[mi].name); return; }
+    if(isAgain(t)){ addMsg('These three are the stays that fit your brief and have availability — tap one to hold, or say “hold it” and I’ll take my pick, <strong>'+((window.__pick&&window.__pick.name)||'')+'</strong>.', 't'); return; }
+    if(isYes(t)){ holdHotel((window.__pick&&window.__pick.name)||(opts[0]&&opts[0].name)); return; }
+    addMsg('Want me to hold <strong>'+((window.__pick&&window.__pick.name)||'my pick')+'</strong>? Say “hold it”, name another, or tap a card.', 't'); return;
+  }
+  if(walkStage==='transport'){
+    var fl=window.__flights||[]; var fi=matchByName(fl,t);
+    if(fi<0){ if(/non.?stop|direct/.test(t)) fi=0; else if(/1.?stop|one.?stop|cheaper|connection/.test(t)) fi=1; else if(/premium|lower cabin|step down/.test(t)) fi=2; }
+    if(fi>-1){ pickFlight(fi); return; }
+    if(isYes(t)){ pickFlight(0); return; }
+    if(isAgain(t)){ addMsg('Three fares above — the non-stop, a cheaper 1-stop, or a lower cabin. Say “book the non-stop”, or tap one.', 't'); return; }
+    addMsg('Say “book it” for the non-stop, or tap the fare you want.', 't'); return;
+  }
+  if(walkStage==='dinners' || walkStage==='excursions'){
+    var list=(walkStage==='dinners'?window.__dinners:window.__excursions)||[];
+    if(/\b(done|that'?s it|next|move on|nothing|none|skip|no thanks|i'?m good)\b/.test(t) || isYes(t)){ nextCategory(walkStage); return; }
+    var ai=matchByName(list,t);
+    if(ai>-1){ toggleAdd(walkStage, ai); addMsg('Added <strong>'+list[ai].name+'</strong> — anything else, or say “done”.', 't'); return; }
+    addMsg('Tap “+ Add” on what you want, then “Done” — or just say “skip”.', 't'); return;
+  }
+}
+
+/* ---------- options walkthrough (the differentiator) ----------
+   When the brief is ready, Tures doesn't dump a finished plan — it presents a curated slate and
+   recommends one, with the reason tied to the Taste Print. v1: lodging. (Flights / dinners /
+   excursions slates + real engine ranking + mem0-backed history are the next layers.) */
+var HOTELS = {
+  maui:[
+    {name:'Andaz Maui, Wailea', area:'Wailea · beachfront', price:'$890/nt', tags:['Beach','Design-forward','Lively']},
+    {name:'Hotel Wailea, Relais & Châteaux', area:'Wailea · adults-only hillside', price:'$780/nt', tags:['Adults-only','Intimate','Ocean views'], pick:true},
+    {name:'Four Seasons Maui', area:'Wailea · oceanfront', price:'$1,150/nt', tags:['Grand','Spa','Serenity pool']}
+  ],
+  paris:[
+    {name:'Le Pavillon de la Reine', area:'Le Marais · hidden courtyard', price:'€520/nt', tags:['Hidden gem','Garden','Quiet'], pick:true},
+    {name:'Hôtel des Grands Boulevards', area:'2nd · design', price:'€340/nt', tags:['Design','Buzzy','Central']},
+    {name:'Le Bristol', area:'8th · palace', price:'€1,200/nt', tags:['Grand','Michelin','Rooftop pool']}
+  ],
+  tokyo:[
+    {name:'Trunk Hotel, Shibuya', area:'Shibuya · design', price:'¥78,000/nt', tags:['Design','Walkable','Scene'], pick:true},
+    {name:'Hoshinoya Tokyo', area:'Otemachi · ryokan tower', price:'¥120,000/nt', tags:['Ryokan','Onsen','Serene']},
+    {name:'Aman Tokyo', area:'Otemachi · grand', price:'¥230,000/nt', tags:['Grand','Spa','Views']}
+  ],
+  lisbon:[
+    {name:'Santa Clara 1728', area:'Alfama · design guesthouse', price:'€390/nt', tags:['Hidden gem','Minimal','Light'], pick:true},
+    {name:'Memmo Alfama', area:'Alfama · views', price:'€260/nt', tags:['Rooftop','Walkable','Boutique']},
+    {name:'Bairro Alto Hotel', area:'Chiado · classic', price:'€450/nt', tags:['Central','Rooftop','Polished']}
+  ],
+  default:[
+    {name:'A characterful boutique stay', area:'central · hidden gem', price:'$420/nt', tags:['Hidden gem','Walkable'], pick:true},
+    {name:'A design hotel', area:'central · modern', price:'$360/nt', tags:['Design-forward','Buzzy']},
+    {name:'A grand hotel', area:'central · landmark', price:'$680/nt', tags:['Grand','Service']}
+  ]
+};
+function destKey(d){ d=(d||'').toLowerCase(); if(/maui|hawaii|kona|big island/.test(d))return 'maui'; if(/paris/.test(d))return 'paris'; if(/tokyo|japan|kyoto/.test(d))return 'tokyo'; if(/lisbon|portugal/.test(d))return 'lisbon'; return 'default'; }
+function tasteReason(){ try{ var tp=JSON.parse(localStorage.getItem('tures.tastePrint')||'null'); if(tp&&tp.signature) return 'it matches your Taste Print — '+tp.signature.replace(/^You read as\s*/i,'').replace(/\.$/,''); }catch(_){}
+  return 'it’s the hidden-gem-with-a-quiet-outlook register travelers like you choose'; }
+function presentLodging(slots){
+  var opts = HOTELS[destKey(slots && slots.destination)] || HOTELS.default;
+  var pick = opts.filter(function(o){return o.pick;})[0] || opts[0];
+  setStep(2);
+  var pill = actingPill('Checking availability against your taste…');
+  setTimeout(function(){
+    pill.remove();
+    addMsg('Three stays have availability and fit your brief.', 't');
+    var cards = opts.map(function(o){
+      return '<div class="opt-card'+(o.pick?' pick':'')+'">'+
+        (o.pick?'<div class="pickbadge">✦ Tures’ pick</div>':'')+
+        '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="nm">'+o.name+'</div><div class="meta">'+o.area+'</div></div><div class="price">'+o.price+'</div></div>'+
+        '<div class="opt-tags">'+o.tags.map(function(t){return '<span class="opt-tag">'+t+'</span>';}).join('')+'</div>'+
+        '<div class="opt-actions"><a class="opt-link" href="#" onclick="return false">View details ↗</a><button class="hold-btn" data-hold="'+o.name.replace(/"/g,'')+'">Hold this →</button></div>'+
+      '</div>';
+    }).join('');
+    var wrap=document.createElement('div'); wrap.className='msg'; wrap.innerHTML='<div class="slate">'+cards+'</div>';
+    chat.appendChild(wrap); requestAnimationFrame(function(){ wrap.classList.add('in'); }); wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+    addMsg('I’d book <strong>'+pick.name+'</strong> — '+tasteReason()+'. Hold it, or tell me to look again.', 't');
+    window.__lodgingOpts = opts; window.__pick = { name: pick.name }; walkStage = 'lodging';
+  }, 1100);
+}
+function holdHotel(name){
+  walkStage = null;
+  document.querySelectorAll('#chat [data-hold]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
+  addMsg('Hold '+name.replace(/</g,'&lt;')+'.', 'me');
+  addMsg('Held '+name.replace(/</g,'&lt;')+'. Now the flights around it.', 't');
+  window.__chosen = { hotel:name, flight:null, dinners:[], excursions:[] };
+  setTimeout(function(){ presentTransport(window.__slots||{}); }, 750);
+}
+
+/* ---- shared slate renderers ---- */
+function slate(html){ var wrap=document.createElement('div'); wrap.className='msg'; wrap.innerHTML='<div class="slate">'+html+'</div>'; chat.appendChild(wrap); requestAnimationFrame(function(){ wrap.classList.add('in'); if(window.tmotion) tmotion.revealStagger(wrap.querySelectorAll('.opt-card'), {y:14, stagger:0.06}); }); wrap.scrollIntoView({behavior:'smooth',block:'nearest'}); return wrap; }
+function optCard(o, action){ return '<div class="opt-card'+(o.pick?' pick':'')+'">'+(o.pick?'<div class="pickbadge">✦ Tures’ pick</div>':'')+
+  '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="nm">'+o.name+'</div><div class="meta">'+(o.sub||'')+'</div></div>'+(o.price?'<div class="price">'+o.price+'</div>':'')+'</div>'+
+  (o.tags&&o.tags.length?'<div class="opt-tags">'+o.tags.map(function(t){return '<span class="opt-tag">'+t+'</span>';}).join('')+'</div>':'')+
+  '<div class="opt-actions"><a class="opt-link" href="#" onclick="return false">View details ↗</a>'+action+'</div></div>'; }
+
+/* ---- transportation (single pick) ---- */
+function presentTransport(slots){
+  var biz=/business|first/i.test(slots.style||''), prem=/premium/i.test(slots.style||'');
+  var cabin=biz?'Business':prem?'Premium economy':'Economy';
+  var o=(slots.origin||'home').split(',')[0], d=(slots.destination||'there').split(',')[0];
+  var opts=[
+    {name:cabin+' · non-stop', sub:o+' → '+d+' · cleanest timing', price:'$'+(biz?'4,200':'1,150'), tags:['Non-stop','Best arrival'], pick:true},
+    {name:cabin+' · 1-stop', sub:o+' → '+d+' · one connection, ~25% less', price:'$'+(biz?'3,150':'820'), tags:['1 stop','Cheaper']},
+    {name:'Premium economy · non-stop', sub:o+' → '+d+' · step down a cabin', price:'$'+(biz?'1,900':'690'), tags:['Non-stop','Lower fare']}
+  ];
+  var pill=actingPill('Pricing flights from your home airport…');
+  setTimeout(function(){ pill.remove(); window.__flights=opts;
+    addMsg('Flights, '+o+' → '+d+'.', 't');
+    slate(opts.map(function(o,i){ return optCard(o, '<button class="hold-btn" data-flight="'+i+'">Book this →</button>'); }).join(''));
+    addMsg('I’d take the <strong>'+opts[0].name+'</strong> — non-stop keeps it friction-free, and I’ll watch the fare and rebook you if it wobbles.', 't');
+    walkStage = 'transport';
+  }, 1000);
+}
+function pickFlight(i){
+  walkStage = null;
+  var f=window.__flights[i]; window.__chosen.flight=f.name;
+  document.querySelectorAll('#chat [data-flight]').forEach(function(b){ b.disabled=true; b.style.opacity=.5; });
+  addMsg('Book '+f.name+'.', 'me'); addMsg('Locked. On to the table.', 't');
+  setTimeout(function(){ presentDinners(window.__slots||{}); }, 700);
+}
+
+/* ---- dinners & excursions (multi-select) ---- */
+var DINNERS={
+  maui:[{name:'Mama’s Fish House',sub:'Seafood · Paia · the institution',price:'$$$$',pick:true,tags:['Iconic','Books out']},{name:'Merriman’s Kapalua',sub:'Farm-to-table · sunset point',price:'$$$'},{name:'Migrant Wailea',sub:'Hawaiian-Filipino · Sheldon Simeon',price:'$$$'},{name:'Morimoto Maui',sub:'Japanese · at the Andaz',price:'$$$'}],
+  paris:[{name:'Le Bistrot Paul Bert',sub:'Bistro · the steak-frites benchmark',price:'$$$',pick:true,tags:['Classic']},{name:'Septime',sub:'Modern · 11th · 1 Michelin star',price:'$$$'},{name:'Clamato',sub:'Seafood · Septime’s walk-in sibling',price:'$$'},{name:'Le Comptoir du Relais',sub:'Saint-Germain · Camdeborde',price:'$$'}],
+  tokyo:[{name:'Den',sub:'Modern kaiseki · the joy of dining',price:'$$$$',pick:true,tags:['Iconic','Books out']},{name:'Sukiyabashi Jiro Roppongi',sub:'Sushi',price:'$$$$'},{name:'Narisawa',sub:'Innovative · satoyama',price:'$$$$'},{name:'Bar High Five',sub:'Cocktails · Ginza',price:'$$'}],
+  lisbon:[{name:'Belcanto',sub:'José Avillez · 2 Michelin stars',price:'$$$$',pick:true,tags:['Tasting']},{name:'Cervejaria Ramiro',sub:'Seafood · the classic',price:'$$$'},{name:'Taberna da Rua das Flores',sub:'No-reservations · petiscos',price:'$$'},{name:'A Cevicheria',sub:'Ceviche · Chiado',price:'$$'}],
+  default:[{name:'The chef’s-table standout',sub:'the dish locals queue for',price:'$$$',pick:true},{name:'A dependable neighborhood great',sub:'no-reservations, always good',price:'$$'},{name:'A special-occasion room',sub:'for one big night',price:'$$$$'}]
+};
+var EXCURSIONS={
+  maui:[{name:'Road to Hana, private driver',sub:'Full day · waterfalls, no rental stress',pick:true},{name:'Molokini snorkel sail',sub:'Morning · crater reef, small boat'},{name:'Haleakalā sunrise',sub:'Pre-dawn · above the clouds at 10,000 ft'}],
+  paris:[{name:'Louvre, after-hours small group',sub:'Evening · the rooms without the crowds',pick:true},{name:'Marché des Enfants Rouges food walk',sub:'Late morning'},{name:'Sainte-Chapelle + Île de la Cité',sub:'Afternoon'}],
+  tokyo:[{name:'teamLab Planets, early entry',sub:'Morning · before the lines',pick:true},{name:'Tsukiji outer market, guided',sub:'Dawn · the good stalls'},{name:'Private tea ceremony',sub:'Afternoon · Omotesandō'}],
+  lisbon:[{name:'Sintra palaces, private day',sub:'Full day · Pena + Quinta da Regaleira',pick:true},{name:'Tram 28 + Alfama on foot',sub:'Half day'},{name:'Time Out Market tasting',sub:'Evening'}],
+  default:[{name:'The signature half-day',sub:'the thing you’d regret missing',pick:true},{name:'A local, off-path morning',sub:'small group'},{name:'A sunset something',sub:'evening'}]
+};
+function presentDinners(slots){
+  var opts=DINNERS[destKey(slots.destination)]||DINNERS.default; window.__dinners=opts;
+  var pill=actingPill('Checking tables against your taste…');
+  setTimeout(function(){ pill.remove();
+    addMsg('Dinners — add the ones you want and I’ll get the tables.', 't');
+    var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="dinners:'+i+'">+ Add</button>'); }).join('');
+    slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="dinners">Done →</button><a class="slate-skip" data-next="dinners">Skip dinners</a></div>');
+    addMsg('If you only do one, make it <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+    walkStage = 'dinners';
+  }, 1000);
+}
+function presentExcursions(slots){
+  var opts=EXCURSIONS[destKey(slots.destination)]||EXCURSIONS.default; window.__excursions=opts;
+  var pill=actingPill('Pulling things to do…');
+  setTimeout(function(){ pill.remove();
+    addMsg('Excursions — same idea, add what appeals.', 't');
+    var cards=opts.map(function(o,i){ return optCard(o, '<button class="add-btn" data-add="excursions:'+i+'">+ Add</button>'); }).join('');
+    slate(cards+'<div class="slate-foot"><button class="hold-btn" data-next="excursions">Done →</button><a class="slate-skip" data-next="excursions">Skip excursions</a></div>');
+    addMsg('My pick: <strong>'+(opts.filter(function(o){return o.pick;})[0]||opts[0]).name+'</strong>.', 't');
+    walkStage = 'excursions';
+  }, 900);
+}
+function toggleAdd(kind, i){
+  var arr=window.__chosen[kind], list=(kind==='dinners'?window.__dinners:window.__excursions), name=list[i].name;
+  var btn=document.querySelector('[data-add="'+kind+':'+i+'"]'), card=btn.closest('.opt-card');
+  var pos=arr.indexOf(name);
+  if(pos>-1){ arr.splice(pos,1); btn.classList.remove('on'); btn.textContent='+ Add'; card.classList.remove('added'); }
+  else { arr.push(name); btn.classList.add('on'); btn.textContent='✓ Added'; card.classList.add('added'); }
+}
+function nextCategory(kind){
+  walkStage = null;
+  document.querySelectorAll('[data-next="'+kind+'"]').forEach(function(b){ b.style.pointerEvents='none'; b.style.opacity=.5; });
+  var chosen=window.__chosen[kind];
+  addMsg(chosen.length ? (chosen.join(' · ')+' — added.') : ('Skip '+kind+' for now.'), 'me');
+  if(kind==='dinners'){ addMsg(chosen.length?'Tables requested. Now a couple of things to do.':'No problem — a couple of things to do, then.', 't'); setTimeout(function(){ presentExcursions(window.__slots||{}); }, 700); }
+  else { setTimeout(finalizeTrip, 500); }
+}
+function finalizeTrip(){
+  walkStage = null;
+  var c=window.__chosen, lines=['⌂ '+c.hotel, '✈ '+(c.flight||'flights')];
+  if(c.dinners.length) lines.push('✦ '+c.dinners.length+' dinner'+(c.dinners.length>1?'s':''));
+  if(c.excursions.length) lines.push('◎ '+c.excursions.length+' excursion'+(c.excursions.length>1?'s':''));
+  addMsg('Here’s your trip:<br>'+lines.join('<br>')+'<br><br>Everything above is held, nothing booked — I verify each twice before anything says “Booked.”', 't');
+  setStep(3);
+  setTimeout(function(){ composer.value=(window.__readyBrief||'')+' Staying at '+c.hotel+'.'; autoGrow(); planned=false; sendBrief(); }, 1000);
+}
+
+document.addEventListener('click', function(e){
+  var h=e.target.closest('[data-hold]'); if(h && !h.disabled){ e.preventDefault(); holdHotel(h.getAttribute('data-hold')); return; }
+  var f=e.target.closest('[data-flight]'); if(f && !f.disabled){ e.preventDefault(); pickFlight(+f.getAttribute('data-flight')); return; }
+  var a=e.target.closest('[data-add]'); if(a){ e.preventDefault(); var p=a.getAttribute('data-add').split(':'); toggleAdd(p[0], +p[1]); return; }
+  var nx=e.target.closest('[data-next]'); if(nx && nx.style.pointerEvents!=='none'){ e.preventDefault(); nextCategory(nx.getAttribute('data-next')); return; }
+});
+
+/* composer behavior */
+function autoGrow(){ composer.style.height = 'auto'; composer.style.height = Math.min(160, composer.scrollHeight) + 'px'; }
+composer.addEventListener('input', autoGrow);
+document.getElementById('sendBtn').addEventListener('click', composerSend);
+composer.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); composerSend(); }
+});
+
+/* ---- trip-time sentiment + budget posture (folds into the brief; budget re-plans) ---- */
+var state = { purpose:[], pace:'balanced', avoid:[], budget:'balanced', cap:null };
+
+document.querySelectorAll('[data-group]').forEach(function(group){
+  var key = group.getAttribute('data-group');
+  var single = group.getAttribute('data-mode') === 'single';
+  group.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      if(single){
+        group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+        chip.classList.add('on');
+      } else {
+        chip.classList.toggle('on');
+      }
+      if(key === 'budget'){ onBudgetChange(chip.getAttribute('data-v')); return; }
+      state[key] = Array.from(group.querySelectorAll('.chip.on')).map(function(c){ return c.getAttribute('data-v'); });
+      render(); setStep(3);
+    });
+  });
+});
+document.getElementById('paceSeg').addEventListener('segchange', function(e){ state.pace = e.detail.value; render(); setStep(3); });
+
+/* Budget posture changed → update the brief and re-plan with it (the strongest lever). */
+function onBudgetChange(v){
+  state.budget = v;
+  if(!currentBrief) { render(); return; }
+  currentBrief.priceSensitivity = v;
+  var POSTURE = { thrifty:'Make it budget-friendly.', balanced:'Keep the budget balanced.', premium:'Treat us — lean into quality.', no_limit:'Go to the nines — money\'s no object.' };
+  addMsg(POSTURE[v] || ('Budget: '+v), 'me');
+  render();
+  if(window.tures && tures.configured){ planAndPropose(currentBrief); } else { addMsg('On the live engine I\'d re-plan at that budget. (Demo plan shown above.)', 't'); }
+}
+
+/* Optional hard cap. */
+var capEl = document.getElementById('capInput');
+if(capEl){
+  capEl.addEventListener('change', function(){
+    var n = parseInt(String(capEl.value).replace(/[^\d]/g,''), 10);
+    state.cap = isFinite(n) && n>0 ? n : null;
+    if(currentBrief){ currentBrief.budgetUsd = state.cap || undefined; render(); if(window.tures && tures.configured) planAndPropose(currentBrief); }
+  });
+}
+
+/* Reflect the parsed/standing posture in the controls when a plan first appears. */
+function syncBudgetUI(b){
+  if(!b) return;
+  state.budget = b.priceSensitivity || 'balanced';
+  state.cap = b.budgetUsd || null;
+  document.querySelectorAll('[data-group="budget"] .chip').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-v') === state.budget); });
+  if(capEl) capEl.value = state.cap ? String(state.cap) : '';
+}
+
+function listFmt(arr){ if(arr.length===1) return arr[0]; if(arr.length===2) return arr[0]+' and '+arr[1]; return arr.slice(0,-1).join(', ')+', and '+arr[arr.length-1]; }
+function render(){
+  var s = state, out = [];
+  var lead = 'This is ' + (s.purpose.length ? 'a '+listFmt(s.purpose)+' trip' : 'this trip');
+  if(s.pace==='easy') lead += ' at an easy pace — I\'ll hold your mornings and protect the downtime';
+  else if(s.pace==='full') lead += ' run full — earliest sensible reservations, nothing missed';
+  else lead += ' kept balanced';
+  out.push(lead+'.');
+  if(s.avoid.length) out.push('And I\'ll keep '+listFmt(s.avoid)+' off the table.');
+  var BUD = { thrifty:'I\'ll favor value', balanced:'', premium:'I\'ll lean into quality', no_limit:'I\'ll optimize for the best, not the cheapest' };
+  if(BUD[s.budget]) out.push(BUD[s.budget] + (s.cap ? ', capped at $'+Number(s.cap).toLocaleString() : '') + '.');
+  else if(s.cap) out.push('Capped at $'+Number(s.cap).toLocaleString()+'.');
+  document.getElementById('tripSummary').textContent = out.join(' ');
+}
+
+/* voice input (Deepgram) — mic button appears only when the engine has it configured */
+(function(){
+  var micBtn = document.getElementById('micBtn'); if(!micBtn || !(window.tures && tures.configured)) return;
+  tures.health().then(function(h){ if(h && h.capabilities && h.capabilities.voice) micBtn.style.display=''; }).catch(function(){});
+  var hint = document.getElementById('composerHint');
+  var DEFAULT_HINT = 'Enter to send · Shift+Enter for a new line';
+  var rec=null, chunks=[], recording=false;
+
+  /* Record in a container/codec Deepgram reliably decodes. Leaving MediaRecorder on the browser
+     default occasionally produced a clip Deepgram returned an EMPTY transcript for — which the
+     old code swallowed silently, so it looked like nothing happened. */
+  function pickMime(){
+    var prefs = ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4','audio/mpeg'];
+    if(window.MediaRecorder && MediaRecorder.isTypeSupported){
+      for(var i=0;i<prefs.length;i++){ if(MediaRecorder.isTypeSupported(prefs[i])) return prefs[i]; }
+    }
+    return '';
+  }
+  function resetBtn(){ recording=false; micBtn.textContent='🎤'; micBtn.style.background='rgba(255,253,247,0.6)'; }
+
+  micBtn.onclick = function(){
+    if(recording){ if(rec && rec.state!=='inactive') rec.stop(); return; }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
+      hint.textContent='Voice needs a modern browser over https — type your trip instead.'; return;
+    }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      var mime = pickMime();
+      try { rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); }
+      catch(_){ rec = new MediaRecorder(stream); }
+      chunks=[];
+      rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+      rec.onerror=function(){ stream.getTracks().forEach(function(t){t.stop();}); resetBtn(); hint.textContent='Recording failed — type instead.'; };
+      rec.onstop=function(){
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        resetBtn();
+        var blob = new Blob(chunks, { type: (rec.mimeType || mime || 'audio/webm') });
+        if(!blob.size){ hint.textContent="Didn't catch any audio — hold the mic a beat longer."; return; }
+        hint.textContent='Transcribing…';
+        tures.voice.transcribe(blob).then(function(r){
+          var t = (r && r.transcript) ? r.transcript.trim() : '';
+          if(t){ composer.value = (composer.value? composer.value.trim()+' ':'') + t; autoGrow(); composer.focus(); hint.textContent=DEFAULT_HINT; }
+          else { hint.textContent="Didn't catch that — try again, or just type it."; }
+        }).catch(function(err){
+          console.warn('[tures] voice transcribe failed', err && err.status, err && err.body);
+          hint.textContent = (err && err.status===501) ? "Voice isn't enabled on the server yet." : 'Voice failed — type instead.';
+        });
+      };
+      rec.start(250); recording=true; micBtn.textContent='⏹'; micBtn.style.background='rgba(181,84,58,0.15)';
+      hint.textContent='Listening… tap ⏹ when done.';
+    }).catch(function(){ hint.textContent='Mic permission needed — allow the microphone, then tap 🎤 again.'; });
+  };
+})();
+
+/* boot */
+function bootDemo(){
+  if(DEMO){
+    // The demo shows what Andy sees — a persistent "signed in as andy@…" badge in the thread
+    // header (separate from the live status line, which changes as the engine works).
+    var startBtn = document.querySelector('[onclick="restart()"]');
+    if(startBtn && startBtn.parentNode){
+      var chip = document.createElement('span');
+      chip.className = 'text-[11px] text-ink-faint shrink-0 mr-3 hidden sm:inline-flex items-center gap-1.5';
+      chip.innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--confirm)"></span>' + DEMO_EMAIL;
+      startBtn.parentNode.insertBefore(chip, startBtn);
+    }
+  }
+  greet();
+  // Handed a brief from the voice conversation (Talk to Tures) → plan it straight away.
+  var vb = null; try { vb = localStorage.getItem('tures.voiceBrief'); localStorage.removeItem('tures.voiceBrief'); } catch(_){}
+  if(vb){ setTimeout(function(){ composer.value = vb; autoGrow(); sendBrief(); }, 900); return; }
+  // A landing card launched a specific trip → play its conversation: Andy briefs it, Tures plans
+  // it live (the streamed search/score/propose events are the execution), then offers to book.
+  if(DEMO && DEMO_TRIP && TRIPS[DEMO_TRIP]){
+    setTimeout(function(){ composer.value = TRIPS[DEMO_TRIP]; autoGrow(); sendBrief(); }, 1300);
+  }
+}
+bootDemo();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+  <script src="assets/voice.js"></script>
+</body>
+</html>

@@ -1,0 +1,1184 @@
+/* ============================================================
+   TURES v4 — "The Bound Edition"
+   Dark leather covers · canvas pages · gold foil
+   ============================================================ */
+
+/* ---- SITE-WIDE SCROLLBAR ----------------------------------
+   A thin, inset brass pill on a transparent track — replaces the
+   OS default everywhere. Component scrollbars with their own rules
+   (e.g. .tures-menu) stay more specific and win. */
+html{ scrollbar-width:thin; scrollbar-color:rgba(200,162,74,0.42) transparent; }
+::-webkit-scrollbar{ width:12px; height:12px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{
+  background:rgba(200,162,74,0.38);
+  border-radius:99px;
+  border:3px solid transparent;       /* padding-box inset → a floating pill, not edge-to-edge */
+  background-clip:padding-box;
+  transition:background .18s ease; }
+::-webkit-scrollbar-thumb:hover{ background:rgba(200,162,74,0.62); }
+::-webkit-scrollbar-thumb:active{ background:rgba(230,200,115,0.7); }
+::-webkit-scrollbar-corner{ background:transparent; }
+/* Parchment: a slightly deeper brass + the faintest warm track so the pill reads on light paper. */
+html[data-theme="parchment"]{ scrollbar-color:rgba(150,112,46,0.45) rgba(60,42,20,0.04); }
+html[data-theme="parchment"] ::-webkit-scrollbar-track{ background:rgba(60,42,20,0.035); }
+html[data-theme="parchment"] ::-webkit-scrollbar-thumb{ background:rgba(150,112,46,0.42); }
+html[data-theme="parchment"] ::-webkit-scrollbar-thumb:hover{ background:rgba(150,112,46,0.66); }
+@media (prefers-reduced-motion:reduce){ ::-webkit-scrollbar-thumb{ transition:none; } }
+
+/* ---- PAGE TRANSITIONS · View Transitions API ----------------
+   Where supported (Chrome/Edge 126+, Safari 18.2+) the browser tweens the
+   REAL cross-document navigation on the GPU — replacing the leaf overlay
+   (pageturn.js suppresses the leaf when this is live). Elsewhere the leaf
+   is the fallback, so this block is purely additive.
+   Feel: a soft, slightly-scaled crossfade — elegant and continuous, not a
+   hard cut. The persistent chrome + backdrop are NAMED so they hold steady
+   while only the page content turns. */
+@view-transition{ navigation:auto; }
+
+::view-transition-old(root),
+::view-transition-new(root){
+  animation-duration:.52s;
+  animation-timing-function:cubic-bezier(.22,.61,.36,1);   /* gentle ease-out */
+  mix-blend-mode:normal;
+}
+::view-transition-old(root){ animation-name:pt-vt-out; }
+::view-transition-new(root){ animation-name:pt-vt-in; }
+@keyframes pt-vt-out{
+  from{ opacity:1; transform:scale(1); }
+  to  { opacity:0; transform:scale(.988); }
+}
+@keyframes pt-vt-in{
+  from{ opacity:0; transform:scale(1.014) translateY(10px); }
+  to  { opacity:1; transform:scale(1)     translateY(0); }
+}
+
+/* Continuity: these stay put across the turn instead of fading with the page. */
+.tures-chrome-logo{ view-transition-name:tures-logo; }
+.tures-signup     { view-transition-name:tures-signup; }
+.tures-pageno     { view-transition-name:tures-pageno; }
+.tures-theme-switch{ view-transition-name:tures-season; }
+.tures-bg         { view-transition-name:tures-scene; }   /* the world holds; the page turns over it */
+
+/* Honour reduced-motion — instant swap, no animation. */
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){ animation:none; }
+}
+
+/* ---- SCROLL REVEAL (drives [data-reveal] via motion.js) -----
+   Initial hidden state is applied by JS (.tm-pre) ONLY to below-fold elements, so there's
+   no flash. The GSAP path animates inline and removes .tm-pre; this CSS transition is the
+   no-GSAP fallback. */
+.tm-pre{ opacity:0; transform:translateY(22px); will-change:opacity, transform; }
+.tm-pre.tm-in{ opacity:1; transform:none;
+  transition:opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
+@media (prefers-reduced-motion:reduce){ .tm-pre{ opacity:1; transform:none; } }
+
+/* ---- INVERSE TEXT ON PHOTOGRAPHY --------------------------
+   Cards & captions overlaid on photos keep their dark image + veil in EVERY theme, so their
+   text must stay light. Parchment otherwise recolors the surrounding surface to dark ink and
+   the text vanishes against the photo. Gold accents and status pills keep their own colors. */
+.trip-card .body,
+.trip-card .body [class*="text-canvas"],
+.dest .cap,
+.dest .cap [class*="text-canvas"]{ color:#f4ecd9 !important; }
+
+/* ---- SUPPRESS RAW PER-PAGE NAV ----------------------------
+   menu.js replaces every page's own <header><nav> with the global chrome (logo dropdown +
+   Sign Up, both appended to <body> and floating). Hide the raw nav UP FRONT so it can never
+   flash as a stack of unstyled links before — or if — menu.js runs. The injected chrome lives
+   outside this header, so it's unaffected. menu.js's own JS hiding becomes a no-op. */
+header.chrome > nav > *{ display:none; }
+
+/* ---- CONCIERGE DOCK (assets/concierge.js) ------------------
+   A tasteful corner presence: the traveller's named concierge medallion, which opens a
+   contextual mini-chat about the current screen. Seated above the lower-right page badge. */
+.cc-dock{ position:fixed; right:18px; bottom:48px; z-index:84; }
+.cc-fab{ display:inline-flex; align-items:center; padding:0; border:none; background:none; cursor:pointer; position:relative; }
+.cc-fab .cc-portrait{ border-radius:50%; display:block; box-shadow:0 8px 22px -8px rgba(0,0,0,0.5), 0 0 0 2px rgba(200,162,74,0.5);
+  transition:transform .16s ease, box-shadow .2s ease; }
+.cc-fab:hover .cc-portrait{ transform:translateY(-2px) scale(1.04); box-shadow:0 12px 28px -8px rgba(0,0,0,0.55), 0 0 0 2px rgba(230,200,115,0.85); }
+.cc-fab-name{ position:absolute; right:60px; top:50%; transform:translateY(-50%) translateX(6px); opacity:0; pointer-events:none; white-space:nowrap;
+  font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--ink); background:rgba(247,241,227,0.94);
+  border:1px solid rgba(200,162,74,0.4); padding:4px 13px; border-radius:99px; box-shadow:0 6px 16px -8px rgba(0,0,0,0.4);
+  transition:opacity .18s ease, transform .18s ease; }
+.cc-fab:hover .cc-fab-name{ opacity:1; transform:translateY(-50%) translateX(0); }
+.cc-dock.open .cc-fab{ display:none; }
+
+.cc-panel{ position:absolute; right:0; bottom:0; width:340px; max-width:calc(100vw - 36px); height:min(440px,72vh);
+  display:flex; flex-direction:column; overflow:hidden;
+  background:linear-gradient(180deg,#f7f1e3,#efe7d4); border:1px solid rgba(200,162,74,0.42); border-radius:16px;
+  box-shadow:0 30px 70px -24px rgba(0,0,0,0.6);
+  opacity:0; visibility:hidden; transform:translateY(14px) scale(.98); transform-origin:bottom right;
+  transition:opacity .22s ease, transform .24s cubic-bezier(.22,.61,.36,1), visibility 0s linear .24s; }
+.cc-dock.open .cc-panel{ opacity:1; visibility:visible; transform:translateY(0) scale(1);
+  transition:opacity .22s ease, transform .24s cubic-bezier(.22,.61,.36,1); }
+.cc-panel-head{ display:flex; align-items:center; gap:10px; padding:12px; border-bottom:1px solid rgba(200,162,74,0.25); }
+.cc-panel-head .cc-portrait{ border-radius:50%; box-shadow:0 0 0 1.5px rgba(200,162,74,0.5); }
+.cc-ph-meta{ flex:1; min-width:0; }
+.cc-ph-name{ font-family:'Cormorant Garamond',serif; font-size:19px; color:var(--ink); line-height:1.05; }
+.cc-ph-sub{ font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--gold-deep); }
+.cc-x{ background:none; border:none; font-size:22px; line-height:1; color:var(--ink-faint); cursor:pointer; padding:2px 7px; border-radius:8px; }
+.cc-x:hover{ color:var(--ink); background:rgba(0,0,0,0.06); }
+.cc-log{ flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.cc-msg{ max-width:86%; padding:8px 12px; border-radius:14px; font-size:13.5px; line-height:1.45; }
+.cc-c{ align-self:flex-start; background:rgba(255,255,255,0.72); border:1px solid rgba(200,162,74,0.22); color:var(--ink); border-top-left-radius:5px; }
+.cc-me{ align-self:flex-end; background:linear-gradient(180deg,#e6c873,#c8a24a); color:#241a0c; border-top-right-radius:5px; }
+.cc-typing{ opacity:.6; font-style:italic; }
+.cc-compose{ display:flex; gap:8px; padding:10px 12px; border-top:1px solid rgba(200,162,74,0.25); }
+.cc-compose input{ flex:1; min-width:0; background:rgba(255,255,255,0.72); border:1px solid rgba(200,162,74,0.3); border-radius:99px;
+  padding:9px 14px; font-size:13.5px; color:var(--ink); outline:none; }
+.cc-compose input:focus{ border-color:rgba(200,162,74,0.6); }
+.cc-compose button{ width:38px; height:38px; flex-shrink:0; border-radius:50%; border:none; cursor:pointer; font-size:16px;
+  background:linear-gradient(180deg,#e6c873,#c8a24a 60%,#a8842f); color:#241a0c; }
+@media(max-width:640px){ .cc-dock{ right:12px; bottom:64px; } }
+
+:root{
+  /* Leather (covers / chrome) */
+  --leather:       #1b130c;
+  --leather-deep:  #0e0a06;
+  --leather-edge:  #2c1f13;
+  --leather-hi:    #3a2a19;
+  --obsidian:      #0b0b0d;
+  --midnight:      #0f1b2d;
+
+  /* Canvas (pages) — "Greige" surface (was cream #ece3d0 / #f2ead8 / #e2d6bd; chocolate + brass unchanged) */
+  --canvas:        #e7e2d8;
+  --canvas-warm:   #efeae0;
+  --canvas-deep:   #dad3c5;
+  --canvas-line:   rgba(43,38,30,0.13);
+
+  /* Ink */
+  --ink:           #2a2118;
+  --ink-soft:      #6b5d49;
+  --ink-faint:     #6c6149;  /* darkened for AA on cream + tinted info boxes (was #97886f, ~3.0:1) */
+
+  /* Gold foil */
+  --gold:          #c8a24a;
+  --gold-bright:   #e6c873;
+  --gold-deep:     #7d5e20;  /* darkened for AA on cream (was #9c7a2e, ~3.5:1). Use text-gold/bright on dark surfaces. */
+
+  /* Status — muted, leather-bound register */
+  --confirm:       #5f7d4f;
+  --pending:       #b88a2e;
+  --alert:         #b5543a;
+  --info:          #4a6b86;
+  /* Text-on-cream variants — the status hues above are tuned as dots/fills (light enough to read
+     on dark); these darker shades are for status-colored TEXT on cream so it clears AA (4.5:1). */
+  --confirm-ink:   #4e6a3a;
+  --alert-ink:     #8f3f2b;
+}
+
+/* ============================================================
+   DARK MODE — "Midnight leather". Flips the page surface to near-black and the
+   ink to warm cream; chocolate + brass hold. Toggled in assets/menu.js (persisted
+   to localStorage as tures.theme). Covers the core tokens + the main light-literal
+   components. The cover & write.html (the dark "book" pages) are excluded by menu.js.
+   ============================================================ */
+html.dark{
+  --canvas:        #1a1517;
+  --canvas-deep:   #14100f;
+  --canvas-line:   rgba(236,227,208,0.12);
+  --ink:           #ede6dc;
+  --ink-soft:      #b3a99c;
+  --ink-faint:     #9a9082;
+  --gold-deep:     #e6c873;   /* "deep" gold is a TEXT color tuned for cream; on dark it must read light */
+  --confirm-ink:   #a7c293;
+  --alert-ink:     #e39179;
+  /* NB: --canvas-warm is deliberately NOT flipped — it doubles as the light-text colour
+     (.text-canvas) on dark leather sections, which must stay light. */
+}
+html.dark .canvas-surface{ background:linear-gradient(180deg,#1a1517 0%,#14100f 100%); }
+/* cards, inputs & controls that used hardcoded near-white fills */
+html.dark .leaf{ background:rgba(255,255,255,0.045); border-color:rgba(236,227,208,0.12);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 14px 34px -22px rgba(0,0,0,0.7); }
+html.dark .leaf-tab{ background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border-color:rgba(236,227,208,0.12); }
+html.dark .btn-ink{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(236,227,208,0.14); }
+html.dark .btn-ink:hover{ background:rgba(255,255,255,0.12); }
+html.dark .fld{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(236,227,208,0.14); }
+html.dark .opt{ background:rgba(255,255,255,0.05); border-color:rgba(236,227,208,0.12); }
+html.dark .track{ background:rgba(236,227,208,0.14); }
+html.dark .seg{ background:rgba(255,255,255,0.06); border-color:rgba(236,227,208,0.14); }
+html.dark .seg button{ color:rgba(236,227,208,0.6); }
+html.dark .seg button.on{ color:#241a0c; }
+html.dark .seg .thumb{ background:linear-gradient(180deg,#e6c873,#c8a24a); }
+/* light status pills → their bright register on dark */
+html.dark .pill-gold{ color:#e6c873; }
+html.dark .pill-confirm{ color:#a7c293; }
+html.dark .pill-pending{ color:#e6c873; }
+html.dark .pill-alert{ color:#e39179; }
+html.dark .pill-info{ color:#9cc0dc; }
+/* the multiply paper texture would muddy a dark surface */
+html.dark .canvas-surface::after{ mix-blend-mode:soft-light; opacity:0.22; }
+
+/* ---------- type ---------- */
+.font-display{ font-family:'Cormorant Garamond', Georgia, serif; }
+.font-serif  { font-family:'DM Serif Display', Georgia, serif; }
+.font-body   { font-family:'Inter', system-ui, sans-serif; }
+.font-mono   { font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+body{ font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+
+.caps{ letter-spacing:0.16em; text-transform:uppercase; }
+.caps-sm{ letter-spacing:0.12em; text-transform:uppercase; }
+
+/* ---------- color helpers ---------- */
+.text-gold{ color:var(--gold); }
+.text-gold-bright{ color:var(--gold-bright); }
+.text-gold-deep{ color:var(--gold-deep); }  /* was never defined — 113 uses had been silently inheriting */
+.text-ink{ color:var(--ink); }
+.text-ink-soft{ color:var(--ink-soft); }
+.text-ink-faint{ color:var(--ink-faint); }
+.text-canvas{ color:var(--canvas-warm); }
+.bg-leather{ background:var(--leather); }
+.bg-obsidian{ background:var(--obsidian); }
+.bg-midnight{ background:var(--midnight); }
+
+/* ============================================================
+   TEXTURES
+   ============================================================ */
+
+/* fine grain used everywhere */
+.grain::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  opacity:0.5; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* dark leather surface */
+.leather-surface{
+  position:relative;
+  background:
+    radial-gradient(120% 90% at 25% 12%, rgba(255,228,170,0.06), transparent 55%),
+    radial-gradient(140% 120% at 85% 120%, rgba(0,0,0,0.55), transparent 60%),
+    linear-gradient(155deg, #241910 0%, #1b130c 45%, #120c07 100%);
+}
+.leather-surface::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:0.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
+  mix-blend-mode:soft-light;
+}
+
+/* canvas / paper page */
+.canvas-surface{
+  position:relative;
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--canvas-warm), transparent 60%),
+    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
+}
+.canvas-surface::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:0.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+.canvas-surface > *{ position:relative; z-index:1; }
+
+/* ============================================================
+   GOLD FOIL
+   ============================================================ */
+.foil{
+  background:linear-gradient(92deg, #9c7a2e 0%, #e6c873 28%, #fff3c8 46%, #c8a24a 60%, #e6c873 78%, #8a6a26 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.foil-line{ height:1px; border:0;
+  background:linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-bright), var(--gold-deep), transparent); }
+
+/* wordmark */
+.wordmark{ font-family:'Cormorant Garamond', Georgia, serif; font-weight:600; letter-spacing:0.02em; position:relative; }
+.wordmark .spark{ font-size:0.5em; vertical-align:super; }
+
+/* ============================================================
+   BOOK COVER
+   ============================================================ */
+.book{
+  position:relative; border-radius:6px 14px 14px 6px;
+  box-shadow:
+    -10px 0 0 -2px #0a0703,            /* spine shadow */
+    0 30px 80px -28px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(0,0,0,0.6);
+}
+.book::before{ /* spine band */
+  content:""; position:absolute; top:0; bottom:0; left:0; width:30px;
+  background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%);
+  border-right:1px solid rgba(255,220,150,0.06);
+  border-radius:6px 0 0 6px;
+}
+.cover-frame{ /* embossed gold rule */
+  position:absolute; inset:22px;
+  border:1px solid rgba(200,162,74,0.45);
+  border-radius:3px;
+  box-shadow:inset 0 0 0 4px rgba(0,0,0,0.25), 0 1px 0 rgba(255,230,160,0.08);
+}
+.cover-frame.dashed{ border-style:dashed; inset:30px; opacity:0.5; }
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+
+/* page card on canvas */
+.leaf{
+  background:rgba(255,252,244,0.62);
+  border:1px solid var(--canvas-line);
+  box-shadow:0 1px 0 rgba(255,255,255,0.5) inset, 0 14px 34px -22px rgba(43,33,20,0.5);
+  border-radius:4px;
+}
+.leaf-tab{
+  background:linear-gradient(180deg, rgba(255,253,247,0.8), rgba(243,235,219,0.6));
+  border:1px solid var(--canvas-line);
+}
+
+/* dark card on leather */
+.plate{
+  background:linear-gradient(160deg, rgba(38,28,17,0.9), rgba(20,14,8,0.92));
+  border:1px solid rgba(200,162,74,0.18);
+  border-radius:6px;
+  box-shadow:0 20px 50px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,220,150,0.05);
+}
+
+/* gold button */
+.btn-gold{
+  background:linear-gradient(180deg, #e6c873, #c8a24a 55%, #a8842f);
+  color:#241a0c; font-weight:600; border:1px solid #8a6a26;
+  box-shadow:0 1px 0 rgba(255,240,200,0.6) inset, 0 8px 20px -10px rgba(200,162,74,0.6);
+  transition:transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+.btn-gold:hover{ transform:translateY(-1px); filter:brightness(1.05); box-shadow:0 12px 26px -10px rgba(200,162,74,0.75); }
+.btn-ghost{
+  border:1px solid rgba(200,162,74,0.4); color:var(--gold-bright); background:transparent;
+  transition:border-color 140ms ease, background 140ms ease;
+}
+.btn-ghost:hover{ border-color:var(--gold-bright); background:rgba(200,162,74,0.08); }
+.btn-ink{
+  border:1px solid var(--canvas-line); color:var(--ink); background:rgba(255,253,247,0.5);
+  transition:background 140ms ease, transform 140ms ease;
+}
+.btn-ink:hover{ background:#fff; transform:translateY(-1px); }
+
+/* pills */
+.pill{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px;
+  font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600; }
+.pill-confirm{ background:rgba(95,125,79,0.16); color:#43603a; }
+.pill-pending{ background:rgba(184,138,46,0.18); color:#7d5e20; }
+.pill-alert  { background:rgba(181,84,58,0.16); color:#8f3f2b; }
+.pill-info   { background:rgba(74,107,134,0.16); color:#3c5a72; }
+.pill-gold   { background:rgba(200,162,74,0.16); color:#7d5e20; border:1px solid rgba(200,162,74,0.35); }
+/* dark variants for leather backgrounds */
+.pill-d-confirm{ background:rgba(95,125,79,0.2); color:#a7c293; }
+.pill-d-pending{ background:rgba(184,138,46,0.2); color:#e6c873; }
+.pill-d-alert  { background:rgba(181,84,58,0.22); color:#e39179; }
+.pill-d-gold   { background:rgba(200,162,74,0.14); color:#e6c873; border:1px solid rgba(200,162,74,0.3); }
+
+/* dots */
+.dot{ width:8px; height:8px; border-radius:99px; display:inline-block; flex-shrink:0; }
+.dot-gold{ background:var(--gold); } .dot-green{ background:var(--confirm); }
+.dot-amber{ background:var(--pending); } .dot-alert{ background:var(--alert); }
+.dot-info{ background:var(--info); }
+
+/* dividers */
+.rule-ink{ height:1px; background:var(--canvas-line); }
+.rule-gold{ height:1px; background:linear-gradient(90deg, transparent, rgba(200,162,74,0.5), transparent); }
+
+/* hover lift */
+.lift{ transition:transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+.lift:hover{ transform:translateY(-3px); }
+
+/* pulse */
+.pulse{ animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:0.35} }
+.breathe{ animation:breathe 3.5s ease-in-out infinite; }
+@keyframes breathe{ 0%,100%{transform:scale(1);opacity:0.9} 50%{transform:scale(1.04);opacity:1} }
+
+/* fade-rise utility for JS reveals */
+.rise{ opacity:0; transform:translateY(10px); transition:opacity 500ms ease, transform 500ms ease; }
+.rise.in{ opacity:1; transform:none; }
+
+/* details chevron */
+details > summary{ list-style:none; cursor:pointer; }
+details > summary::-webkit-details-marker{ display:none; }
+.chev{ display:inline-block; transition:transform 150ms; }
+details[open] .chev{ transform:rotate(90deg); }
+
+/* progress */
+.track{ height:5px; background:rgba(43,33,20,0.12); border-radius:99px; overflow:hidden; }
+.track .fill{ height:100%; background:linear-gradient(90deg,#a8842f,#e6c873); transition:width 500ms ease; }
+
+::selection{ background:rgba(200,162,74,0.35); color:#1b130c; }
+
+/* shared chrome nav — full bleed: transparent, borderless, floats over the leather hero */
+.chrome{
+  background:transparent;
+  border-bottom:0;
+  backdrop-filter:none;
+  position:absolute !important; top:0; left:0; right:0;
+}
+/* give the hero room to clear the floating nav */
+.chrome + section{ padding-top:6.25rem; }
+.chrome a{ color:rgba(236,227,208,0.78); transition:color 140ms; text-shadow:0 1px 12px rgba(0,0,0,0.4); }
+.chrome a:hover, .chrome a.active{ color:var(--gold-bright); }
+
+/* ============================================================
+   PAGE TURN — a leather leaf swings over the spine between pages
+   ============================================================ */
+#pt-wrap{ position:fixed; inset:0; z-index:9999; perspective:2200px; pointer-events:none; }
+#pt-leaf{
+  position:absolute; inset:0; transform-origin:left center; transform-style:preserve-3d;
+  backface-visibility:hidden; will-change:transform,opacity;
+  background:
+    linear-gradient(105deg, rgba(255,228,170,0.05), transparent 30%),
+    radial-gradient(120% 100% at 0% 50%, rgba(0,0,0,0.5), transparent 60%),
+    linear-gradient(155deg,#241910,#1b130c 45%,#120c07);
+  box-shadow:30px 0 70px -10px rgba(0,0,0,0.6);
+}
+#pt-leaf::before{ /* grain */
+  content:""; position:absolute; inset:0; opacity:0.32; mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='lt'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='3' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23lt)'/%3E%3C/svg%3E");
+}
+#pt-leaf::after{ /* gilt page edges catching light */
+  content:""; position:absolute; top:0; bottom:0; left:0; right:0;
+  background:linear-gradient(90deg, rgba(230,200,115,0.20), transparent 12%, transparent 88%, rgba(230,200,115,0.20));
+}
+
+/* Slide-based page turn — direction is unambiguous.
+   FORWARD (next): the leaf travels RIGHT → LEFT.
+     exit  — leaf slides IN from the right to cover the page we're leaving;
+     enter — leaf slides OFF to the left, revealing the next chapter. */
+#pt-leaf.in-next.start{ transform:translateX(106%) rotateY(-9deg); }
+#pt-leaf.in-next.go{ transform:translateX(0) rotateY(0deg);
+  transition:transform 440ms cubic-bezier(.4,0,.2,1); }
+#pt-leaf.out-next.start{ transform:translateX(0) rotateY(0deg); }
+#pt-leaf.out-next.go{ transform:translateX(-106%) rotateY(7deg);
+  transition:transform 280ms cubic-bezier(.33,0,.2,1); }
+
+/* BACK (prev): the leaf travels LEFT → RIGHT — mirror image. */
+#pt-leaf.in-prev.start{ transform:translateX(-106%) rotateY(9deg); }
+#pt-leaf.in-prev.go{ transform:translateX(0) rotateY(0deg);
+  transition:transform 440ms cubic-bezier(.4,0,.2,1); }
+#pt-leaf.out-prev.start{ transform:translateX(0) rotateY(0deg); }
+#pt-leaf.out-prev.go{ transform:translateX(106%) rotateY(-7deg);
+  transition:transform 280ms cubic-bezier(.33,0,.2,1); }
+@media (prefers-reduced-motion: reduce){ #pt-wrap{ display:none !important; } }
+
+a.quiet{ text-decoration:none; }
+
+/* grid children must be allowed to shrink, or long content blows out the page width on mobile */
+[class*="col-span"]{ min-width:0; }
+
+/* ============================================================
+   APP BEHAVIORS — added in the appy refactor
+   Tactile press, bottom sheets, segmented controls, sticky CTA,
+   skeletons, count-up, expand cards, pull-to-refresh.
+   ============================================================ */
+
+/* ---- haptic-feel button press: spring scale on :active ---- */
+.btn-gold:active, .btn-ghost:active, .btn-ink:active,
+.press:active, .chan-btn:active, .seg button:active, .tile:active{
+  transform:scale(0.97) !important;
+  transition:transform 140ms cubic-bezier(.34,1.56,.64,1) !important;
+}
+.press{ transition:transform 140ms cubic-bezier(.34,1.56,.64,1); }
+
+/* ---- skeleton shimmer (shared) ---- */
+.skel{ background:linear-gradient(90deg, rgba(200,162,74,0.08), rgba(200,162,74,0.22), rgba(200,162,74,0.08));
+  background-size:200% 100%; animation:skel 1.1s linear infinite; border-radius:6px; }
+@keyframes skel{ to{ background-position:-200% 0; } }
+
+/* ---- iOS-style segmented control ---- */
+.seg{ position:relative; display:inline-flex; padding:3px; border-radius:11px;
+  background:rgba(43,33,20,0.08); border:1px solid var(--canvas-line); }
+.seg.dark{ background:rgba(0,0,0,0.34); border-color:rgba(200,162,74,0.22); }
+.seg button{ position:relative; z-index:2; border:0; background:transparent; cursor:pointer;
+  padding:8px 18px; min-height:38px; border-radius:8px; font-weight:600; font-size:12px;
+  letter-spacing:.04em; color:var(--ink-soft); transition:color .25s ease; white-space:nowrap; }
+.seg.dark button{ color:rgba(236,227,208,0.6); }
+.seg button.on{ color:var(--ink); }
+.seg.dark button.on{ color:#241a0c; }
+.seg .thumb{ position:absolute; z-index:1; top:3px; bottom:3px; left:3px; width:0;
+  border-radius:8px; background:#fff; box-shadow:0 1px 5px rgba(0,0,0,.16);
+  transition:left .3s cubic-bezier(.34,1.4,.64,1), width .3s cubic-bezier(.34,1.4,.64,1); }
+.seg.dark .thumb{ background:linear-gradient(180deg,#e6c873,#c8a24a); box-shadow:0 1px 6px rgba(0,0,0,.4); }
+
+/* ---- iOS toggle switch (spring) ---- */
+.switch{ width:46px; height:27px; border-radius:99px; background:rgba(43,33,20,0.22);
+  position:relative; flex-shrink:0; cursor:pointer; transition:background .3s ease; }
+.switch.on{ background:var(--confirm); }
+.switch .knob{ position:absolute; top:2.5px; left:2.5px; width:22px; height:22px; border-radius:99px;
+  background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.35);
+  transition:left .28s cubic-bezier(.34,1.55,.64,1); }
+.switch.on .knob{ left:21px; }
+/* legacy markup used .switch.off for the off state — keep it working */
+.switch.off{ background:rgba(43,33,20,0.22); }
+.switch.off .knob{ left:2.5px; }
+
+/* ---- sticky CTA bar (iOS bottom action) ---- */
+.cta-bar{ position:fixed; left:0; right:0; bottom:0; z-index:80;
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, rgba(11,9,7,0) 0%, rgba(11,9,7,0.82) 32%, rgba(11,9,7,0.96) 100%);
+  display:flex; align-items:center; gap:12px;
+  transform:translateY(0); transition:transform .4s cubic-bezier(.4,0,.2,1); }
+.cta-bar.canvas{ background:linear-gradient(180deg, rgba(236,227,208,0) 0%, rgba(236,227,208,0.85) 34%, rgba(236,227,208,0.97) 100%); }
+.cta-bar.tuck{ transform:translateY(120%); }
+
+/* ---- bottom sheet ---- */
+.sheet{ position:fixed; inset:0; z-index:130; display:none; }
+.sheet.open{ display:block; }
+.sheet-backdrop{ position:absolute; inset:0; background:rgba(11,9,7,0.55);
+  opacity:0; transition:opacity .3s ease; backdrop-filter:blur(2px); }
+.sheet.open .sheet-backdrop{ opacity:1; }
+.sheet-panel{ position:absolute; left:0; right:0; bottom:0; max-height:86vh; overflow-y:auto;
+  background:var(--canvas-warm); color:var(--ink);
+  border-radius:20px 20px 0 0; box-shadow:0 -24px 60px -20px rgba(0,0,0,.65);
+  padding:8px 22px calc(26px + env(safe-area-inset-bottom));
+  transform:translateY(100%); transition:transform .36s cubic-bezier(.32,1.12,.5,1);
+  will-change:transform; }
+.sheet.open .sheet-panel{ transform:none; }
+.sheet-handle{ width:42px; height:4px; border-radius:99px; background:rgba(43,33,20,0.22);
+  margin:8px auto 16px; cursor:grab; }
+
+/* ---- tap-to-expand card body ---- */
+.exp-body{ overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1), opacity .35s ease, margin .4s ease; }
+.exp.open .exp-body{ max-height:600px; opacity:1; }
+.exp-chev{ display:inline-block; transition:transform .3s cubic-bezier(.34,1.4,.64,1); }
+.exp.open .exp-chev{ transform:rotate(90deg); }
+
+/* ---- pull-to-refresh hint ---- */
+.refresh-hint{ display:inline-flex; align-items:center; gap:7px; font-size:11px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+.refresh-hint .rh-chev{ animation:rhBob 1.8s ease-in-out infinite; }
+@keyframes rhBob{ 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(3px);opacity:1} }
+
+/* ---- heartbeat dot (stronger than .pulse for "watching" states) ---- */
+.beat{ position:relative; }
+.beat::after{ content:""; position:absolute; inset:-4px; border-radius:99px;
+  border:1px solid currentColor; opacity:.5; animation:beat 1.8s ease-out infinite; }
+@keyframes beat{ 0%{transform:scale(.6);opacity:.6} 100%{transform:scale(1.8);opacity:0} }
+
+/* ---- parallax-ready hero numeral ---- */
+.ghost-num{ font-family:'Cormorant Garamond',Georgia,serif; line-height:.8;
+  color:rgba(200,162,74,0.13); pointer-events:none; user-select:none; will-change:transform; }
+
+/* ---- generic tap target / now-playing card ---- */
+.tile{ transition:transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease; cursor:pointer; }
+.tile:hover{ transform:translateY(-3px); }
+
+@media (prefers-reduced-motion: reduce){
+  .exp-body{ transition:none; } .sheet-panel{ transition:none; }
+  .beat::after, .refresh-hint .rh-chev{ animation:none; }
+}
+
+/* ============================================================
+   ✦ HOME STAR — universal home button, fixed top-right (assets/menu.js)
+   ============================================================ */
+.tures-home-star{
+  position:fixed; top:14px; right:18px; z-index:70; text-decoration:none;
+  display:inline-flex; align-items:baseline; gap:0;
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:22px; line-height:1;
+  color:var(--gold-bright); letter-spacing:0.02em;
+  padding:8px 13px; border-radius:99px;
+  background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34); backdrop-filter:blur(6px);
+  box-shadow:0 6px 20px -8px rgba(0,0,0,0.6); transition:transform .14s ease, border-color .2s ease, background .2s ease;
+}
+.tures-home-star .spark{ font-size:0.62em; vertical-align:super; color:var(--gold-bright); margin:0 0.02em; }
+.tures-home-star:hover{ transform:translateY(-1px); border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+.tures-home-star:active{ transform:translateY(0) scale(.97); }
+@media (max-width:640px){ .tures-home-star{ top:10px; right:12px; font-size:19px; padding:7px 11px; } }
+
+/* theme toggle — a small pill just inboard of the ✦ home star (assets/menu.js) */
+.tures-theme-toggle{ position:fixed; top:15px; right:72px; z-index:70; cursor:pointer;
+  width:34px; height:34px; border-radius:99px; display:grid; place-items:center; font-size:15px; line-height:1;
+  color:var(--gold-bright); background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:transform .14s ease, border-color .2s ease, background .2s ease; }
+.tures-theme-toggle:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.7); }
+.tures-theme-toggle:active{ transform:scale(.94); }
+@media (max-width:640px){ .tures-theme-toggle{ top:11px; right:60px; width:32px; height:32px; } }
+
+/* ============================================================
+   ✦ TOP CHROME — logo + Contents dropdown (left) · Sign Up (right) (assets/menu.js)
+   ============================================================ */
+.tures-chrome-logo{ position:fixed; top:13px; left:16px; z-index:80; }
+.tures-logo{ appearance:none; cursor:pointer; display:inline-flex; align-items:center; gap:0;
+  font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:21px; line-height:1; letter-spacing:.02em;
+  color:var(--gold-bright); background:rgba(20,15,10,0.58); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); padding:7px 13px; border-radius:99px; box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:border-color .2s ease, background .2s ease, transform .14s ease; }
+.tures-logo:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.72); }
+.tures-logo:active{ transform:scale(.97); }
+.tures-logo .spark{ font-size:0.6em; vertical-align:super; margin:0 0.02em; }
+.tures-logo .car{ font-size:10px; opacity:.65; margin-left:5px; }
+.tures-menu{ position:absolute; top:calc(100% + 8px); left:0; min-width:252px; z-index:81;
+  background:linear-gradient(160deg, rgba(36,25,16,0.97), rgba(15,11,7,0.98)); backdrop-filter:blur(12px);
+  border:1px solid rgba(200,162,74,0.3); border-radius:14px; box-shadow:0 26px 64px -20px rgba(0,0,0,0.85);
+  padding:8px; opacity:0; transform:translateY(-6px) scale(.98); pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease; }
+.tures-menu.open{ opacity:1; transform:none; pointer-events:auto; }
+.tures-menu{ max-height:min(82vh,600px); overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:thin; scrollbar-color:rgba(200,162,74,0.32) transparent; overscroll-behavior:contain; }
+.tures-menu::-webkit-scrollbar{ width:6px; }
+.tures-menu::-webkit-scrollbar-track{ background:transparent; margin:8px 0; }
+.tures-menu::-webkit-scrollbar-thumb{ background:rgba(200,162,74,0.3); border-radius:99px; }
+.tures-menu::-webkit-scrollbar-thumb:hover{ background:rgba(200,162,74,0.5); }
+html[data-theme="parchment"] .tures-menu{ scrollbar-color:rgba(160,120,50,0.32) transparent; }
+html[data-theme="parchment"] .tures-menu::-webkit-scrollbar-thumb{ background:rgba(160,120,50,0.3); }
+.tures-menu a, .tures-menu .theme-item, .tures-menu .grp-head{ display:flex; align-items:center; gap:10px; width:100%;
+  text-decoration:none; text-align:left; appearance:none; background:transparent; border:0;
+  color:var(--canvas-warm); font-family:'Inter',sans-serif; font-size:13.5px; }
+.tures-menu a{ padding:9px 12px; border-radius:9px; cursor:pointer; transition:background .15s ease, padding-left .15s ease; }
+.tures-menu a:hover{ background:rgba(200,162,74,0.12); padding-left:15px; }
+.tures-menu a .pg{ font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.04em; color:var(--gold); opacity:.75; min-width:46px; }
+.tures-menu a.here{ color:var(--gold-bright); } .tures-menu a.here .pg{ color:var(--gold-bright); opacity:1; }
+/* grouped page (Plan a trip ▸ subs) */
+.tures-menu .grp-head{ position:relative; }
+.tures-menu .grp-head a{ flex:1; }
+.tures-menu .chev{ cursor:pointer; color:var(--gold); font-size:17px; line-height:1; padding:6px 10px; border-radius:8px;
+  background:transparent; border:0; transition:transform .2s ease, background .15s ease; }
+.tures-menu .chev:hover{ background:rgba(200,162,74,0.12); }
+.tures-menu .grp.open .chev{ transform:rotate(90deg); }
+.tures-menu .kids{ overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease, opacity .2s ease; }
+.tures-menu .grp.open .kids{ max-height:260px; opacity:1; }
+.tures-menu a.sub{ font-size:12.5px; color:rgba(236,227,208,0.8); padding-left:36px; }
+.tures-menu a.sub:hover{ padding-left:39px; } .tures-menu a.sub.here{ color:var(--gold-bright); }
+.tures-menu a.small{ font-size:12px; color:rgba(236,227,208,0.66); padding:6px 12px; }
+.tures-menu a.small:hover{ color:var(--canvas-warm); }
+.tures-menu .socials{ display:flex; gap:8px; padding:8px 12px 4px; }
+.tures-menu .socials a{ flex:none; font-size:11px; letter-spacing:.03em; color:var(--gold-bright); padding:5px 11px; border-radius:99px;
+  border:1px solid rgba(200,162,74,0.3); background:rgba(200,162,74,0.06); }
+.tures-menu .socials a:hover{ background:rgba(200,162,74,0.14); padding-left:11px; }
+.tures-menu .theme-item{ justify-content:space-between; padding:9px 12px; border-radius:9px; cursor:pointer; transition:background .15s ease; }
+.tures-menu .theme-item:hover{ background:rgba(200,162,74,0.12); }
+.tures-menu .theme-item .sw{ font-size:14px; color:var(--gold-bright); }
+.tures-menu .sep{ height:1px; background:rgba(200,162,74,0.16); margin:6px 6px; }
+.tures-signup{ position:fixed; top:14px; right:16px; z-index:80; text-decoration:none;
+  font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
+  color:var(--gold-bright); background:rgba(20,15,10,0.58); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); padding:8px 16px; border-radius:99px; box-shadow:0 6px 20px -8px rgba(0,0,0,0.6);
+  transition:border-color .2s ease, background .2s ease, transform .14s ease; }
+.tures-signup:hover{ border-color:rgba(230,200,115,0.7); background:rgba(20,15,10,0.72); transform:translateY(-1px); }
+@media(max-width:640px){
+  .tures-chrome-logo{ top:10px; left:11px; } .tures-logo{ font-size:18px; padding:6px 11px; }
+  .tures-signup{ top:11px; right:11px; font-size:12px; padding:7px 13px; }
+  .tures-menu{ min-width:236px; }
+}
+/* book-style page number, lower-right of every numbered page */
+.tures-pageno{ position:fixed; bottom:14px; right:18px; z-index:79; font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-bright); opacity:.82;
+  background:rgba(20,15,10,0.5); border:1px solid rgba(200,162,74,0.26); padding:5px 12px; border-radius:99px;
+  backdrop-filter:blur(5px); pointer-events:none; }
+@media(max-width:640px){ .tures-pageno{ bottom:10px; right:12px; font-size:10px; padding:4px 10px; } }
+
+/* ============================================================
+   ✦ DESTINATION BACKDROP — opt-in interior pages
+   Injected by menu.js on a fixed set of pages. Sits behind all
+   content (z-index:-1); a heavy veil keeps body copy legible.
+   The page opts in via html.tures-scene-on, which turns the
+   normally-opaque obsidian body transparent so the photos show.
+   ============================================================ */
+html.tures-scene-on body{ background:transparent !important; }
+.tures-bg{ position:fixed; inset:0; z-index:-1; overflow:hidden; background:var(--obsidian); }
+.tures-bg .fi{ position:absolute; inset:0; background-size:cover; background-position:center;
+  opacity:0; animation:tbgslide 90s infinite; will-change:opacity,transform; }
+@keyframes tbgslide{
+  0%{ opacity:0; transform:scale(1.05) } 1.5%{ opacity:1 } 8.5%{ opacity:1 }
+  10%{ opacity:0; transform:scale(1.13) } 100%{ opacity:0; transform:scale(1.13) }
+}
+.tures-bg .tbg-veil{ position:absolute; inset:0;
+  background:radial-gradient(135% 125% at 50% 28%, rgba(11,11,13,0.74), rgba(11,11,13,0.88) 58%, rgba(11,11,13,0.96) 100%); }
+html.dark .tures-bg{ background:#060608; }
+html.dark .tures-bg .tbg-veil{
+  background:radial-gradient(135% 125% at 50% 28%, rgba(6,6,8,0.80), rgba(6,6,8,0.92) 58%, rgba(6,6,8,0.98) 100%); }
+@media (prefers-reduced-motion: reduce){
+  .tures-bg .fi{ animation:none; }
+  .tures-bg .fi:first-child{ opacity:1; transform:none; }
+}
+
+/* ============================================================
+   ✦ MENU — legacy overlay styles (unused; kept for safety)
+   ============================================================ */
+.menu-star{ appearance:none; cursor:pointer; color:var(--gold-bright);
+  font-family:'Cormorant Garamond',Georgia,serif; font-size:24px; line-height:1;
+  width:46px; height:46px; border-radius:99px; display:grid; place-items:center;
+  background:rgba(0,0,0,0.18); border:1px solid rgba(200,162,74,0.28); backdrop-filter:blur(4px);
+  text-shadow:0 1px 12px rgba(0,0,0,0.5);
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1), background .2s ease, border-color .2s ease; }
+.menu-star:hover{ background:rgba(200,162,74,0.12); border-color:rgba(200,162,74,0.6); transform:rotate(90deg); }
+.menu-star:active{ transform:rotate(90deg) scale(.94); }
+
+.menu-overlay{ position:fixed; inset:0; z-index:200; visibility:hidden; }
+.menu-overlay.open{ visibility:visible; }
+.menu-overlay .scrim{ position:absolute; inset:0; background:rgba(8,7,5,0.82);
+  backdrop-filter:blur(10px) saturate(1.1); opacity:0; transition:opacity .4s ease; }
+.menu-overlay.open .scrim{ opacity:1; }
+
+.menu-panel{ position:absolute; inset:0; overflow-y:auto;
+  background:
+    radial-gradient(120% 70% at 82% 0%, rgba(200,162,74,0.12), transparent 55%),
+    linear-gradient(160deg, rgba(36,25,16,0.55), rgba(11,9,7,0.25)); }
+.menu-inner{ max-width:560px; margin:0 auto; padding:20px 28px 72px;
+  opacity:0; transform:translateY(14px);
+  transition:opacity .45s ease .05s, transform .5s cubic-bezier(.2,.7,.2,1) .05s; }
+.menu-overlay.open .menu-inner{ opacity:1; transform:none; }
+
+.menu-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
+.menu-close{ appearance:none; background:transparent; border:0; cursor:pointer; color:var(--canvas-warm);
+  font-size:30px; line-height:1; width:44px; height:44px; border-radius:99px; opacity:.7;
+  transition:opacity .2s ease, transform .3s cubic-bezier(.34,1.4,.64,1), color .2s ease; }
+.menu-close:hover{ opacity:1; color:var(--gold-bright); transform:rotate(90deg); }
+
+.menu-cta{ display:flex; align-items:center; justify-content:space-between; gap:16px; text-decoration:none;
+  padding:18px 20px; border-radius:12px; margin-bottom:30px;
+  background:linear-gradient(180deg, rgba(230,200,115,0.15), rgba(200,162,74,0.06));
+  border:1px solid rgba(200,162,74,0.32);
+  transition:border-color .2s ease, transform .2s ease, background .2s ease; }
+.menu-cta:hover{ border-color:rgba(230,200,115,0.7); transform:translateY(-1px);
+  background:linear-gradient(180deg, rgba(230,200,115,0.22), rgba(200,162,74,0.09)); }
+.menu-cta-k{ display:block; font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; line-height:1.1; color:var(--canvas-warm); }
+.menu-cta-s{ display:block; font-size:12.5px; color:rgba(236,227,208,0.62); margin-top:2px; }
+.menu-arrow{ color:var(--gold-bright); font-size:22px; flex-shrink:0; }
+
+.menu-group{ margin-bottom:26px; }
+.menu-label{ font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--gold); opacity:.85; margin-bottom:4px;
+  padding-bottom:10px; border-bottom:1px solid rgba(200,162,74,0.16); }
+.menu-item{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:2px 14px; text-decoration:none;
+  padding:14px 2px; border-bottom:1px solid rgba(255,255,255,0.05);
+  transition:padding-left .2s ease; }
+.menu-item:hover{ padding-left:10px; }
+.menu-item .mi-t{ grid-column:1; font-family:'Cormorant Garamond',Georgia,serif; font-size:22px;
+  line-height:1.15; color:var(--canvas-warm); transition:color .2s ease; }
+.menu-item:hover .mi-t{ color:var(--gold-bright); }
+.menu-item .mi-d{ grid-column:1; font-size:13px; line-height:1.5; color:rgba(236,227,208,0.55); margin-top:2px; }
+.menu-item .mi-c{ grid-column:2; grid-row:1 / span 2; color:var(--gold); font-size:20px; opacity:.55;
+  transition:transform .2s ease, opacity .2s ease; }
+.menu-item:hover .mi-c{ transform:translateX(4px); opacity:1; }
+
+.menu-channels{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 10px; }
+.menu-channels .chan{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:600;
+  color:var(--gold-bright); background:rgba(200,162,74,0.12); border:1px solid rgba(200,162,74,0.3);
+  padding:6px 12px; border-radius:99px; }
+.menu-note{ font-size:13px; line-height:1.6; color:rgba(236,227,208,0.6); }
+
+.menu-foot{ display:flex; gap:22px; flex-wrap:wrap; margin-top:30px; padding-top:18px;
+  border-top:1px solid rgba(200,162,74,0.16); }
+.menu-foot a{ font-size:13px; color:rgba(236,227,208,0.7); text-decoration:none; transition:color .2s ease; }
+.menu-foot a:hover{ color:var(--gold-bright); }
+
+@media (prefers-reduced-motion: reduce){
+  .menu-star, .menu-close{ transition:none; }
+  .menu-inner{ transition:opacity .2s ease; transform:none; }
+}
+
+/* ============================================================
+   V9 THEME SANDBOX — two switchable directions over the same markup.
+   Applied via html[data-theme="parchment"|"oxblood"] (set by assets/menu.js,
+   persisted to localStorage 'tures.v9theme'; default parchment). A floating
+   Parchment|Oxblood switch (.tures-theme-switch) is injected on every page.
+   All overrides live HERE so no HTML file needs editing — data-theme adds enough
+   specificity to beat page-local rules (incl. the chat console's !important).
+   ============================================================ */
+
+/* ---------- PARCHMENT · "warm parchment command terminal" (ElevenLabs) ---------- */
+html[data-theme="parchment"]{
+  --canvas:#ece2cd; --canvas-warm:#f7f1e3; --canvas-deep:#e1d6bd; --canvas-line:rgba(45,35,20,0.14);
+  --ink:#241d12; --ink-soft:#5d5139; --ink-faint:#857551;
+  --gold:#bb8d3a; --gold-bright:#cf9f49; --gold-deep:#6f561d;
+}
+html[data-theme="parchment"] body{ background:var(--canvas); }
+/* Only the LIGHTENED surfaces carry dark ink text. Dark sections (.photo-hero, .bg-obsidian,
+   .bg-leather, .dest cards, footers) keep the light body default so light-on-dark stays readable. */
+html[data-theme="parchment"] .leather-surface,
+html[data-theme="parchment"] .canvas-surface{ color:var(--ink); }
+html[data-theme="parchment"] .leather-surface .text-canvas,
+html[data-theme="parchment"] .canvas-surface .text-canvas,
+html[data-theme="parchment"] .leather-surface [class~="text-canvas/85"]{ color:var(--ink); }
+html[data-theme="parchment"] .leather-surface{
+  background:
+    radial-gradient(120% 90% at 25% 12%, rgba(255,242,212,0.55), transparent 55%),
+    linear-gradient(155deg,#f4ebd8 0%,#ece1ca 55%,#e2d7bd 100%); }
+html[data-theme="parchment"] .leather-surface::after{ opacity:0.12; mix-blend-mode:multiply; }
+html[data-theme="parchment"] .plate{
+  background:linear-gradient(160deg,#f6efdc,#eee4cd); border-color:rgba(45,35,20,0.16); color:var(--ink);
+  box-shadow:0 18px 44px -28px rgba(45,35,20,0.5), inset 0 1px 0 rgba(255,255,255,0.5); }
+html[data-theme="parchment"] #pt-leaf{
+  background:linear-gradient(155deg,#f4ebd8,#e8ddc8); box-shadow:30px 0 70px -10px rgba(45,35,20,0.32); }
+html[data-theme="parchment"] #pt-leaf::after{ background:linear-gradient(90deg, rgba(187,141,58,0.18), transparent 12%, transparent 88%, rgba(187,141,58,0.18)); }
+html[data-theme="parchment"] .btn-ghost{ color:var(--gold-deep); border-color:rgba(187,141,58,0.5); }
+html[data-theme="parchment"] .btn-ghost:hover{ border-color:var(--gold-deep); background:rgba(187,141,58,0.1); }
+html[data-theme="parchment"] ::selection{ background:rgba(187,141,58,0.3); color:#241a0c; }
+
+/* ---------- OXBLOOD · "editorial atelier in oxblood ink" (In Common With) ---------- */
+html[data-theme="oxblood"]{
+  --canvas:#fafaf9; --canvas-warm:#fffefb; --canvas-deep:#f1efe7; --canvas-line:rgba(74,10,5,0.16);
+  --ink:#4a0a05; --ink-soft:#6e2b22; --ink-faint:#9a7b75;
+  --gold:#4a0a05; --gold-bright:#7a3128; --gold-deep:#4a0a05;
+}
+html[data-theme="oxblood"] body{ background:var(--canvas); }
+html[data-theme="oxblood"] .leather-surface,
+html[data-theme="oxblood"] .canvas-surface{ color:#4a0a05; }
+html[data-theme="oxblood"] .leather-surface .text-canvas,
+html[data-theme="oxblood"] .canvas-surface .text-canvas,
+html[data-theme="oxblood"] .leather-surface [class~="text-canvas/85"]{ color:#4a0a05; }
+html[data-theme="oxblood"] .leather-surface{ background:linear-gradient(155deg,#fafaf9 0%,#f2f0e8 100%); }
+html[data-theme="oxblood"] .leather-surface::after{ opacity:0; }
+html[data-theme="oxblood"] .leaf{ border-radius:0; background:#fffefb; }
+html[data-theme="oxblood"] .leaf-tab{ border-radius:0; }
+html[data-theme="oxblood"] .plate{ background:#f3f1ea; border:1px solid rgba(74,10,5,0.16); border-radius:0; color:#4a0a05; box-shadow:none; }
+html[data-theme="oxblood"] #pt-leaf{ background:linear-gradient(155deg,#fafaf9,#efece4); box-shadow:30px 0 70px -10px rgba(74,10,5,0.28); }
+html[data-theme="oxblood"] #pt-leaf::before{ opacity:0.1; }
+html[data-theme="oxblood"] #pt-leaf::after{ background:linear-gradient(90deg, rgba(74,10,5,0.12), transparent 12%, transparent 88%, rgba(74,10,5,0.12)); }
+/* single oxblood ink carries buttons, foil, rules; sharp corners are the signature */
+html[data-theme="oxblood"] .foil{ background:none; -webkit-background-clip:border-box; background-clip:border-box; -webkit-text-fill-color:#4a0a05; color:#4a0a05; }
+html[data-theme="oxblood"] .foil-line{ background:linear-gradient(90deg, transparent, #4a0a05, transparent); }
+html[data-theme="oxblood"] .btn-gold{ background:#4a0a05; color:#fafaf9; border:1px solid #4a0a05; border-radius:2px; box-shadow:none; }
+html[data-theme="oxblood"] .btn-gold:hover{ filter:none; background:#380703; transform:translateY(-1px); box-shadow:none; }
+html[data-theme="oxblood"] .btn-ghost{ color:#4a0a05; border:1px solid #4a0a05; border-radius:2px; }
+html[data-theme="oxblood"] .btn-ghost:hover{ background:rgba(74,10,5,0.06); border-color:#4a0a05; }
+html[data-theme="oxblood"] .btn-ink{ border-radius:2px; }
+html[data-theme="oxblood"] .step.on .num{ color:#fafaf9; }
+html[data-theme="oxblood"] .chip.on{ color:#fafaf9; }
+html[data-theme="oxblood"] .pill-gold{ color:#4a0a05; border-color:rgba(74,10,5,0.35); background:rgba(74,10,5,0.06); }
+html[data-theme="oxblood"] ::selection{ background:rgba(74,10,5,0.18); color:#4a0a05; }
+
+/* ---------- chrome (logo / signup / dropdown / page no.) re-skinned per theme ---------- */
+html[data-theme="parchment"] .tures-logo,
+html[data-theme="parchment"] .tures-signup,
+html[data-theme="parchment"] .tures-theme-switch{
+  background:rgba(247,241,227,0.86); color:var(--gold-deep); border-color:rgba(45,35,20,0.2);
+  box-shadow:0 6px 18px -10px rgba(45,35,20,0.45); }
+html[data-theme="parchment"] .tures-logo .spark,
+html[data-theme="parchment"] .tures-logo .car{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu{
+  background:linear-gradient(160deg,#f7f1e3,#ece1ca); border-color:rgba(45,35,20,0.2);
+  box-shadow:0 26px 64px -20px rgba(45,35,20,0.4); }
+html[data-theme="parchment"] .tures-menu a,
+html[data-theme="parchment"] .tures-menu .theme-item,
+html[data-theme="parchment"] .tures-menu .grp-head,
+html[data-theme="parchment"] .tures-menu a.sub,
+html[data-theme="parchment"] .tures-menu a.small{ color:var(--ink); }
+html[data-theme="parchment"] .tures-menu a .pg{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu a.here,
+html[data-theme="parchment"] .tures-menu a.here .pg{ color:var(--gold-deep); }
+html[data-theme="parchment"] .tures-menu a:hover,
+html[data-theme="parchment"] .tures-menu .chev:hover,
+html[data-theme="parchment"] .tures-menu .theme-item:hover{ background:rgba(45,35,20,0.07); }
+html[data-theme="parchment"] .tures-menu .sep{ background:rgba(45,35,20,0.14); }
+html[data-theme="parchment"] .tures-menu .socials a{ color:var(--gold-deep); border-color:rgba(45,35,20,0.2); background:rgba(45,35,20,0.04); }
+html[data-theme="parchment"] .tures-pageno{ background:rgba(247,241,227,0.72); color:var(--gold-deep); border-color:rgba(45,35,20,0.2); }
+
+html[data-theme="oxblood"] .tures-logo,
+html[data-theme="oxblood"] .tures-signup,
+html[data-theme="oxblood"] .tures-theme-switch{
+  background:#fafaf9; color:#4a0a05; border-color:#4a0a05; box-shadow:0 6px 18px -12px rgba(74,10,5,0.5); }
+html[data-theme="oxblood"] .tures-logo .spark,
+html[data-theme="oxblood"] .tures-logo .car{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu{
+  background:#fafaf9; border:1px solid #4a0a05; border-radius:2px; box-shadow:0 26px 64px -22px rgba(74,10,5,0.32); }
+html[data-theme="oxblood"] .tures-menu a,
+html[data-theme="oxblood"] .tures-menu .theme-item,
+html[data-theme="oxblood"] .tures-menu .grp-head,
+html[data-theme="oxblood"] .tures-menu a.sub,
+html[data-theme="oxblood"] .tures-menu a.small{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu a .pg{ color:#a2827f; }
+html[data-theme="oxblood"] .tures-menu a.here,
+html[data-theme="oxblood"] .tures-menu a.here .pg{ color:#4a0a05; }
+html[data-theme="oxblood"] .tures-menu a:hover,
+html[data-theme="oxblood"] .tures-menu .chev:hover,
+html[data-theme="oxblood"] .tures-menu .theme-item:hover{ background:rgba(74,10,5,0.06); }
+html[data-theme="oxblood"] .tures-menu .sep{ background:rgba(74,10,5,0.2); }
+html[data-theme="oxblood"] .tures-menu .socials a{ color:#4a0a05; border-color:#4a0a05; background:transparent; }
+html[data-theme="oxblood"] .tures-pageno{ background:#fafaf9; color:#4a0a05; border-color:#4a0a05; }
+
+/* ---------- the floating theme switch itself ---------- */
+.tures-theme-switch{ position:fixed; left:16px; bottom:14px; z-index:82; display:inline-flex; align-items:center; gap:2px;
+  padding:3px; border-radius:99px; background:rgba(20,15,10,0.55); border:1px solid rgba(200,162,74,0.34);
+  backdrop-filter:blur(6px); box-shadow:0 6px 20px -8px rgba(0,0,0,0.6); }
+.tures-theme-switch button{ appearance:none; border:0; background:transparent; cursor:pointer; line-height:1;
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:currentColor; opacity:.55; padding:6px 12px; border-radius:99px; transition:opacity .15s ease, background .15s ease; }
+.tures-theme-switch button:hover{ opacity:.85; }
+.tures-theme-switch button.on{ opacity:1; background:rgba(187,141,58,0.22); }
+html[data-theme="oxblood"] .tures-theme-switch button.on{ background:#4a0a05; color:#fafaf9; }
+@media(max-width:640px){ .tures-theme-switch{ left:11px; bottom:10px; } .tures-theme-switch button{ font-size:9.5px; padding:5px 10px; } }
+
+/* ---------- chat console (.chatwin) — beats the page-local !important via data-theme specificity ---------- */
+html[data-theme="parchment"] .chatwin{
+  background:linear-gradient(160deg,#f7f1e3,#efe5cf) !important;
+  border:1px solid rgba(45,35,20,0.16) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.6) inset, 0 30px 70px -30px rgba(45,35,20,0.5) !important; }
+html[data-theme="parchment"] .chatwin .text-ink{ color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .text-ink-faint,
+html[data-theme="parchment"] .chatwin .composer::placeholder{ color:var(--ink-faint) !important; }
+html[data-theme="parchment"] .chatwin .text-gold-deep{ color:var(--gold-deep) !important; }
+html[data-theme="parchment"] .chatwin .composer{ color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .composer-wrap{ background:rgba(255,253,247,0.82) !important; border-color:rgba(45,35,20,0.18) !important; }
+html[data-theme="parchment"] .chatwin .bubble-t{ background:#fffdf7 !important; color:var(--ink) !important; }
+html[data-theme="parchment"] .chatwin .bubble-me{ background:rgba(187,141,58,0.2) !important; color:var(--ink) !important; border:1px solid rgba(187,141,58,0.35) !important; }
+html[data-theme="parchment"] .chatwin .chip{ background:rgba(45,35,20,0.05) !important; color:var(--ink-soft) !important; border-color:rgba(45,35,20,0.18) !important; }
+html[data-theme="parchment"] .chatwin .qr{ background:rgba(255,253,247,0.6) !important; color:var(--gold-deep) !important; border-color:rgba(187,141,58,0.4) !important; }
+
+html[data-theme="oxblood"] .chatwin{
+  background:#fffefb !important; border:1px solid #4a0a05 !important; border-radius:2px !important;
+  box-shadow:0 24px 60px -34px rgba(74,10,5,0.4) !important; }
+html[data-theme="oxblood"] .chatwin .text-ink{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .text-ink-faint,
+html[data-theme="oxblood"] .chatwin .composer::placeholder{ color:#9a7b75 !important; }
+html[data-theme="oxblood"] .chatwin .text-gold-deep{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .composer{ color:#4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .composer-wrap{ background:#fafaf9 !important; border:1px solid #4a0a05 !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .bubble-t{ background:#f8f7f1 !important; color:#4a0a05 !important; border:1px solid rgba(74,10,5,0.12) !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .bubble-me{ background:#ffffff !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; border-radius:2px !important; }
+html[data-theme="oxblood"] .chatwin .chip{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
+html[data-theme="oxblood"] .chatwin .chip.on{ background:#4a0a05 !important; color:#fafaf9 !important; }
+html[data-theme="oxblood"] .chatwin .qr{ background:transparent !important; color:#4a0a05 !important; border:1px solid #4a0a05 !important; }
+
+/* ============================================================
+   SEASONAL ACCENTS — Parchment only. The paper stays constant; the accent
+   (wordmark, buttons, chips, links, rules) shifts with the season. Autumn = the
+   default brass, so the approved Parchment look is unchanged by default. Set via
+   html[data-accent="spring|summer|autumn|winter"] (assets/menu.js, localStorage
+   'tures.v9accent'). Oxblood ignores this (its single oxblood ink is by design).
+   Deep variants clear AA on the parchment canvas.
+   ============================================================ */
+html[data-theme="parchment"][data-accent="spring"]{ --gold:#6f8f4a; --gold-bright:#9bb56b; --gold-deep:#4c6a2c; }
+html[data-theme="parchment"][data-accent="summer"]{ --gold:#c06a3e; --gold-bright:#db8a5c; --gold-deep:#9a4422; }
+html[data-theme="parchment"][data-accent="autumn"]{ --gold:#bb8d3a; --gold-bright:#cf9f49; --gold-deep:#6f561d; }
+html[data-theme="parchment"][data-accent="winter"]{ --gold:#5b7790; --gold-bright:#7e9bb3; --gold-deep:#3c5567; }
+
+/* accent-following touchpoints that were hardcoded brass; the wordmark gets a real foil with a
+   bright highlight that slowly sweeps (the sheen lives in the FEEL block below) */
+html[data-theme="parchment"] .foil{
+  background:linear-gradient(100deg, var(--gold-deep) 0%, var(--gold) 26%, #fff6df 46%, var(--gold-bright) 60%, var(--gold-deep) 100%);
+  background-size:240% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-theme="parchment"] .foil-line{ background:linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-bright), var(--gold-deep), transparent); }
+html[data-theme="parchment"] .rule-gold{ background:linear-gradient(90deg, transparent, var(--gold), transparent); }
+/* small "on" markers: deep fill + warm cream text so they read across all four seasons */
+html[data-theme="parchment"] .step.on .num{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fbf6ea; }
+html[data-theme="parchment"] .chip.on{ background:var(--gold-deep); border-color:var(--gold-deep); color:#fbf6ea; }
+html[data-theme="parchment"] .chatwin .chip.on{ background:var(--gold-deep) !important; border-color:var(--gold-deep) !important; color:#fbf6ea !important; }
+html[data-theme="parchment"] .chatwin .composer-wrap:focus-within{ border-color:var(--gold) !important; box-shadow:0 0 0 3px rgba(40,30,15,0.06) !important; }
+/* non-autumn primary buttons go deep+cream so every season stays legible (autumn keeps its bright gold) */
+html[data-theme="parchment"][data-accent="spring"] .btn-gold,
+html[data-theme="parchment"][data-accent="summer"] .btn-gold,
+html[data-theme="parchment"][data-accent="winter"] .btn-gold{
+  background:linear-gradient(180deg, var(--gold), var(--gold-deep)); color:#fbf6ea; border:1px solid var(--gold-deep);
+  box-shadow:0 8px 20px -12px rgba(40,30,15,0.55), inset 0 1px 0 rgba(255,255,255,0.18); text-shadow:0 1px 0 rgba(0,0,0,0.18); }
+html[data-theme="parchment"][data-accent="spring"] .btn-gold:hover,
+html[data-theme="parchment"][data-accent="summer"] .btn-gold:hover,
+html[data-theme="parchment"][data-accent="winter"] .btn-gold:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+
+/* the 4 seasonal dots + label, inside the floating picker */
+.tures-theme-switch .ts-label{ font-family:'JetBrains Mono',ui-monospace,monospace; font-size:9.5px;
+  letter-spacing:.14em; text-transform:uppercase; opacity:.7; padding:0 6px 0 4px; }
+.tures-accent{ display:inline-flex; align-items:center; gap:7px; }
+.tures-accent button{ width:15px; height:15px; border-radius:50%; padding:0; cursor:pointer;
+  border:1px solid rgba(0,0,0,0.22); transition:transform .14s ease, box-shadow .14s ease; }
+.tures-accent button:hover{ transform:scale(1.14); }
+.tures-accent button.on{ transform:scale(1.2); box-shadow:0 0 0 2px rgba(255,255,255,0.8), 0 0 0 3px rgba(0,0,0,0.32); }
+
+/* ============================================================
+   FEEL · 1 — TEXTURE & MATERIALITY (Parchment)
+   Make it feel hand-bound: a foil that catches light, gilt page edges, embossed
+   rules, warmer paper depth. Tasteful + reduced-motion safe.
+   ============================================================ */
+
+/* foil sheen — a slow bright sweep across the wordmark letters */
+@keyframes foilSweep{ 0%{ background-position:178% 0; } 100%{ background-position:-78% 0; } }
+html[data-theme="parchment"] .wordmark.foil{ animation:foilSweep 9s linear infinite; }
+html[data-theme="parchment"] .wordmark.foil:hover{ animation-duration:2.4s; }
+
+/* paper cards — soft inset highlight, a faint gilt top edge, warmer drop shadow */
+html[data-theme="parchment"] .leaf{
+  background:linear-gradient(180deg, rgba(255,252,244,0.86), rgba(250,244,230,0.72));
+  border:1px solid rgba(45,35,20,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    inset 0 2px 0 -1px rgba(207,159,73,0.28),
+    0 18px 42px -28px rgba(45,35,20,0.55); }
+html[data-theme="parchment"] .leaf-tab{
+  background:linear-gradient(180deg, rgba(255,253,247,0.9), rgba(244,236,220,0.7));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.6); }
+
+/* embossed gold rules — a hair of light beneath the line */
+html[data-theme="parchment"] .foil-line,
+html[data-theme="parchment"] .rule-gold{ box-shadow:0 1px 0 rgba(255,250,235,0.6); }
+
+/* deeper, warmer paper: a low vignette + a touch more tooth in the grain */
+html[data-theme="parchment"] .canvas-surface{
+  background:
+    radial-gradient(120% 80% at 50% -12%, var(--canvas-warm), transparent 60%),
+    radial-gradient(110% 130% at 50% 122%, rgba(45,35,20,0.07), transparent 55%),
+    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%); }
+html[data-theme="parchment"] .canvas-surface::after{ opacity:0.62; }
+html[data-theme="parchment"] .leather-surface::after{ opacity:0.16; }
+
+/* the chat console reads as a thicker leaf of stock */
+html[data-theme="parchment"] .chatwin{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 2px 0 -1px rgba(207,159,73,0.3),
+    0 30px 72px -30px rgba(45,35,20,0.55) !important; }
+
+@media (prefers-reduced-motion: reduce){ html[data-theme="parchment"] .wordmark.foil{ animation:none; } }
+
+/* ============================================================
+   FEEL · 2 — MOTION POLISH (site-wide)
+   Considered easing, more travel on reveals (staggered in ui.js), richer hover
+   lift with depth. The spring curve is the through-line.
+   ============================================================ */
+:root{ --ease-spring:cubic-bezier(.34,1.4,.64,1); --ease-out:cubic-bezier(.2,.7,.2,1); }
+
+/* reveals settle in with a touch of spring and a little more travel */
+.rise{ transform:translateY(15px); transition:opacity .6s var(--ease-out), transform .7s var(--ease-spring); }
+.reveal{ transition:opacity .55s var(--ease-out), transform .62s var(--ease-spring); }
+.legcard{ transition:opacity .5s var(--ease-out), transform .58s var(--ease-spring); }
+
+/* hover lift now carries a warm shadow, not just translation */
+.lift{ transition:transform .26s var(--ease-out), box-shadow .26s var(--ease-out), border-color .2s ease; }
+.lift:hover{ transform:translateY(-4px); box-shadow:0 26px 52px -28px rgba(45,35,20,0.6); }
+.tile{ transition:transform .22s var(--ease-out), box-shadow .22s var(--ease-out), border-color .2s ease; }
+.tile:hover{ transform:translateY(-4px); box-shadow:0 24px 48px -28px rgba(45,35,20,0.55); }
+
+/* primary button: spring on press (existing), lift + glow on hover */
+.btn-gold{ transition:transform .18s var(--ease-spring), box-shadow .22s var(--ease-out), filter .2s ease; }
+.btn-gold:hover{ transform:translateY(-2px); }
+.btn-ghost, .btn-ink{ transition:transform .18s var(--ease-spring), background .18s ease, border-color .18s ease, color .18s ease; }
+.btn-ghost:hover, .btn-ink:hover{ transform:translateY(-1px); }
+
+/* chrome pills get the same spring on hover */
+.tures-logo, .tures-signup, .tures-theme-switch button, .tures-accent button{ transition:transform .16s var(--ease-spring), background .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease; }
+.tures-signup:hover{ transform:translateY(-1px); }
+
+/* ============================================================
+   GREENHOUSE — the dark-botanical direction (data-theme="greenhouse")
+   Ported from the Figma Make "Greenhouse" look. Replaces parchment site-wide.
+   Modelled on the existing dark-mode rules, but botanical greens + a 5-scene
+   accent package (data-scene, set by menu.js). Additive: parchment is untouched
+   and reversible. Per-scene accent rides the --gold token family so every
+   accent-following component recolors for free.
+   ============================================================ */
+html[data-theme="greenhouse"]{
+  /* botanical surfaces */
+  --leather:#0F1410; --leather-deep:#0A0D08; --leather-edge:#1A2418; --leather-hi:#243024;
+  --obsidian:#0A0D08; --midnight:#0F1410;
+  --canvas:#141C13; --canvas-warm:#F0EAD8; --canvas-deep:#0F1410; --canvas-line:rgba(240,234,216,0.12);
+  /* cream ink */
+  --ink:#F0EAD8; --ink-soft:#B8AD96; --ink-faint:#9aa089;
+  /* accent (scene) — default Rainforest; overridden by data-scene below.
+     --gold-deep doubles as a TEXT color (dark on parchment) → on dark it must read light. */
+  --gold:#4ADE80; --gold-bright:#86EFAC; --gold-deep:#86EFAC;
+  /* status — botanical register */
+  --confirm:#6bbf86; --pending:#F59E0B; --alert:#e8866a; --info:#7DD3FC;
+  --confirm-ink:#9ad8ab; --alert-ink:#f0a98f;
+}
+
+/* ── the 5-scene accent package (was the 4 seasons) ── */
+html[data-theme="greenhouse"][data-scene="rainforest"]{ --gold:#4ADE80; --gold-bright:#86EFAC; --gold-deep:#86EFAC; }
+html[data-theme="greenhouse"][data-scene="arctic"]    { --gold:#7DD3FC; --gold-bright:#BAE6FD; --gold-deep:#BAE6FD; }
+html[data-theme="greenhouse"][data-scene="savanna"]   { --gold:#F59E0B; --gold-bright:#FCD34D; --gold-deep:#FCD34D; }
+html[data-theme="greenhouse"][data-scene="beach"]     { --gold:#2DD4BF; --gold-bright:#5EEAD4; --gold-deep:#5EEAD4; }
+html[data-theme="greenhouse"][data-scene="city"]      { --gold:#FFE55C; --gold-bright:#FFF5A0; --gold-deep:#FFF5A0; }
+
+/* ── surfaces ── */
+/* html-level backstop: paints behind everything (incl. overscroll) so no white ever shows,
+   regardless of whether a page sets its own body background. */
+html[data-theme="greenhouse"]{ background:#0A0D08; }
+html[data-theme="greenhouse"] body{ background:#0A0D08; }
+html[data-theme="greenhouse"] .bg-obsidian{ background:#0A0D08; }
+html[data-theme="greenhouse"] .bg-midnight{ background:#0F1410; }
+html[data-theme="greenhouse"] .canvas-surface{ background:linear-gradient(180deg,#141C13 0%,#0F1410 100%); }
+html[data-theme="greenhouse"] .canvas-surface::after{ mix-blend-mode:soft-light; opacity:0.16; }
+html[data-theme="greenhouse"] .leather-surface{
+  background:
+    radial-gradient(120% 90% at 25% 12%, rgba(255,255,255,0.04), transparent 55%),
+    radial-gradient(140% 120% at 85% 120%, rgba(0,0,0,0.6), transparent 60%),
+    linear-gradient(155deg, #182018 0%, #0F1410 45%, #0A0D08 100%);
+}
+
+/* ── cards & controls (mirror dark-mode) ── */
+html[data-theme="greenhouse"] .leaf{ background:rgba(255,255,255,0.045); border-color:rgba(240,234,216,0.12);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 14px 34px -22px rgba(0,0,0,0.7); }
+html[data-theme="greenhouse"] .leaf-tab{ background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); border-color:rgba(240,234,216,0.12); }
+html[data-theme="greenhouse"] .plate{ background:linear-gradient(160deg, rgba(26,36,24,0.92), rgba(15,20,16,0.94)); border-color:rgba(255,255,255,0.09); }
+html[data-theme="greenhouse"] .btn-ink{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(240,234,216,0.14); }
+html[data-theme="greenhouse"] .btn-ink:hover{ background:rgba(255,255,255,0.12); }
+html[data-theme="greenhouse"] .fld{ background:rgba(255,255,255,0.06); color:var(--ink); border-color:rgba(240,234,216,0.14); }
+html[data-theme="greenhouse"] .opt{ background:rgba(255,255,255,0.05); border-color:rgba(240,234,216,0.12); }
+html[data-theme="greenhouse"] .canvas-surface::after{ mix-blend-mode:soft-light; opacity:0.16; }
+
+/* ── accent-following brand pieces (were hardcoded brass) ── */
+html[data-theme="greenhouse"] .foil{
+  background:linear-gradient(92deg, var(--gold) 0%, var(--gold-bright) 42%, #ffffff 52%, var(--gold-bright) 62%, var(--gold) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+html[data-theme="greenhouse"] .btn-gold{
+  background:linear-gradient(180deg, var(--gold-bright), var(--gold)); color:#06120a; border:1px solid var(--gold);
+  box-shadow:0 8px 20px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25); text-shadow:none;
+}
+html[data-theme="greenhouse"] .btn-gold:hover{ filter:brightness(1.07); transform:translateY(-2px); }
+html[data-theme="greenhouse"] .btn-ghost{ border-color:var(--gold); color:var(--gold-bright); }
+html[data-theme="greenhouse"] .btn-ghost:hover{ border-color:var(--gold-bright); background:rgba(255,255,255,0.06); }
+
+/* ── pills on dark ── */
+html[data-theme="greenhouse"] .pill-gold,
+html[data-theme="greenhouse"] .pill-d-gold{ color:var(--gold-bright); background:rgba(255,255,255,0.05); border:1px solid var(--gold); }
+html[data-theme="greenhouse"] .pill-confirm,  html[data-theme="greenhouse"] .pill-d-confirm{ color:var(--confirm-ink); background:rgba(107,191,134,0.16); }
+html[data-theme="greenhouse"] .pill-pending,  html[data-theme="greenhouse"] .pill-d-pending{ color:var(--pending); background:rgba(245,158,11,0.16); }
+html[data-theme="greenhouse"] .pill-alert,    html[data-theme="greenhouse"] .pill-d-alert{ color:var(--alert-ink); background:rgba(232,134,106,0.18); }
+html[data-theme="greenhouse"] .pill-info,     html[data-theme="greenhouse"] .pill-d-info{ color:var(--info); background:rgba(125,211,252,0.16); }
+
+/* ── floating chrome → liquid glass, accent-outlined ── */
+/* Trigger pill matches the dropdown: same dark glass, accent-outlined (was light glass → looked mismatched). */
+html[data-theme="greenhouse"] .tures-logo,
+html[data-theme="greenhouse"] .tures-signup{
+  background:rgba(8,12,8,0.58); backdrop-filter:blur(22px) saturate(180%);
+  border:1.5px solid var(--gold); color:#ffffff;
+  box-shadow:0 4px 22px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.1); }
+html[data-theme="greenhouse"] .tures-logo .spark,
+html[data-theme="greenhouse"] .tures-logo .car{ color:var(--gold); }
+html[data-theme="greenhouse"] .tures-logo:hover,
+html[data-theme="greenhouse"] .tures-signup:hover{ border-color:var(--gold-bright); background:rgba(14,20,14,0.78); }
+html[data-theme="greenhouse"] .tures-menu{
+  background:rgba(8,12,8,0.6); backdrop-filter:blur(40px) saturate(200%);
+  border:1px solid rgba(255,255,255,0.12); border-top:1px solid var(--gold);
+  box-shadow:0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08); }
+/* Stop the side-switching: logo + dropdown live top-RIGHT on every page (matching the cover),
+   the account/sign-up pill moves to top-LEFT. The menu opens aligned to the logo's right edge. */
+html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:16px; }
+html[data-theme="greenhouse"] .tures-menu{ left:auto; right:0; }
+html[data-theme="greenhouse"] .tures-signup{ right:auto; left:16px; }
+@media(max-width:640px){
+  html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:11px; }
+  html[data-theme="greenhouse"] .tures-signup{ right:auto; left:11px; }
+}
+html[data-theme="greenhouse"] .tures-menu a,
+html[data-theme="greenhouse"] .tures-menu .grp-head,
+html[data-theme="greenhouse"] .tures-menu a.sub,
+html[data-theme="greenhouse"] .tures-menu a.small{ color:rgba(240,234,216,0.82); }
+html[data-theme="greenhouse"] .tures-menu a .pg{ color:var(--gold); opacity:.8; }
+html[data-theme="greenhouse"] .tures-menu a.here,
+html[data-theme="greenhouse"] .tures-menu a.here .pg{ color:var(--gold-bright); }
+html[data-theme="greenhouse"] .tures-menu a:hover,
+html[data-theme="greenhouse"] .tures-menu .chev:hover{ background:rgba(255,255,255,0.06); }
+html[data-theme="greenhouse"] .tures-menu .sep{ background:rgba(255,255,255,0.1); }
+html[data-theme="greenhouse"] .tures-menu .socials a{ color:var(--gold-bright); border-color:var(--gold); background:rgba(255,255,255,0.04); }
+html[data-theme="greenhouse"] .tures-pageno{ background:rgba(8,12,8,0.5); color:var(--gold-bright); border:1px solid var(--gold); backdrop-filter:blur(10px); }
+html[data-theme="greenhouse"] .tures-theme-switch{ background:rgba(8,12,8,0.5); border:1px solid rgba(255,255,255,0.12); backdrop-filter:blur(14px); border-radius:99px; padding:5px 10px; }
+html[data-theme="greenhouse"] .tures-theme-switch .ts-label{ color:var(--gold-bright); }
+html[data-theme="greenhouse"] .tures-theme-switch button.on{ background:rgba(255,255,255,0.14); }
+
+/* ── personal concierge dock → dark glass ── */
+html[data-theme="greenhouse"] .cc-fab .cc-portrait{ box-shadow:0 8px 22px -8px rgba(0,0,0,0.6), 0 0 0 2px var(--gold); }
+html[data-theme="greenhouse"] .cc-fab:hover .cc-portrait{ box-shadow:0 12px 28px -8px rgba(0,0,0,0.65), 0 0 0 2px var(--gold-bright); }
+html[data-theme="greenhouse"] .cc-fab-name{ color:var(--cream,#F0EAD8); background:rgba(8,12,8,0.85); border:1px solid var(--gold); }
+html[data-theme="greenhouse"] .cc-panel{ background:rgba(8,12,8,0.92); backdrop-filter:blur(32px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.1); border-top:2px solid var(--gold); box-shadow:0 30px 70px -24px rgba(0,0,0,0.75); }
+html[data-theme="greenhouse"] .cc-panel-head{ border-bottom:1px solid rgba(255,255,255,0.08); }
+html[data-theme="greenhouse"] .cc-ph-name{ color:#F0EAD8; }
+html[data-theme="greenhouse"] .cc-ph-sub{ color:var(--gold-bright); }
+html[data-theme="greenhouse"] .cc-x{ color:rgba(240,234,216,0.6); }
+html[data-theme="greenhouse"] .cc-x:hover{ color:#F0EAD8; background:rgba(255,255,255,0.08); }
+html[data-theme="greenhouse"] .cc-msg.cc-c{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#D8E6CC; }
+html[data-theme="greenhouse"] .cc-msg.cc-me{ background:linear-gradient(180deg, var(--gold-bright), var(--gold)); color:#06120a; }
+html[data-theme="greenhouse"] .cc-compose{ border-top:1px solid rgba(255,255,255,0.1); }
+html[data-theme="greenhouse"] .cc-compose input{ background:rgba(255,255,255,0.06); border:1px solid var(--gold); color:#F0EAD8; }
+html[data-theme="greenhouse"] .cc-compose button{ background:linear-gradient(180deg, var(--gold-bright), var(--gold)); color:#06120a; }

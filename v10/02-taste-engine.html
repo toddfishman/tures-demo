@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The Taste Engine</title>
+<meta name="description" content="Swipe six cards and Tures builds your Taste Print, so &quot;somewhere for dinner&quot; always means the right place." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/02-taste-engine.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — The Taste Engine" />
+<meta property="og:description" content="Swipe six cards and Tures builds your Taste Print, so &quot;somewhere for dinner&quot; always means the right place." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/02-taste-engine.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — The Taste Engine" />
+<meta name="twitter:description" content="Swipe six cards and Tures builds your Taste Print, so &quot;somewhere for dinner&quot; always means the right place." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* ---- swipe deck (kept; JS reads these hooks) ---- */
+  .deck{ position:relative; height:440px; max-width:360px; margin:0 auto; touch-action:pan-y; }
+  .card{
+    position:absolute; inset:0; border-radius:18px; overflow:hidden; cursor:grab;
+    border:1px solid var(--gold);
+    box-shadow:0 30px 60px -28px rgba(0,0,0,.85);
+    will-change:transform; user-select:none;
+  }
+  .card:active{ cursor:grabbing; }
+  .card .veil{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,10,7,0.12) 0%, rgba(8,10,7,0.9) 100%); }
+  .card .body{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:22px; }
+  /* swipe verdict stamps */
+  .stamp{ position:absolute; top:22px; z-index:3; font-family:'Playfair Display',serif; font-size:20px;
+    letter-spacing:.04em; padding:6px 14px; border-radius:8px; border:2px solid; opacity:0; transform:rotate(-8deg);
+    transition:opacity .1s; text-transform:uppercase; }
+  .stamp.yes{ left:20px; color:#a7c293; border-color:#a7c293; }
+  .stamp.no{ right:20px; color:#e39179; border-color:#e39179; transform:rotate(8deg); }
+
+  /* pole hints on the card edges */
+  .pole{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-bright); opacity:.85; }
+  .pole.l{ left:14px; } .pole.r{ right:14px; text-align:right; }
+
+  /* live taste-print: kept light so the JS-drawn radar + marks read (engine writes warm-on-cream colors) */
+  .tp-leaf{ background:var(--gh-cream); color:#1c2418; border:1px solid rgba(255,255,255,0.12); border-radius:18px;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.7); }
+  .dim-track{ height:6px; border-radius:99px; background:rgba(43,33,20,0.12); position:relative; }
+  .dim-mark{ position:absolute; top:50%; width:14px; height:14px; border-radius:99px;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border:1px solid #8a6a26;
+    transform:translate(-50%,-50%); left:50%; transition:left .6s cubic-bezier(.6,.02,.2,1);
+    box-shadow:0 2px 6px rgba(0,0,0,.5); }
+  .tag-chip{ opacity:0; transform:translateY(6px); transition:opacity .4s ease, transform .4s ease; }
+  .tag-chip.in{ opacity:1; transform:none; }
+
+  .fp{ opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease; }
+  .fp.in{ opacity:1; transform:none; }
+
+  /* finish card sits in the dark frame; keep it on the cream leaf for the JS-written list */
+  .tp-finish{ background:var(--gh-cream); color:#1c2418; border-radius:18px; padding:28px; }
+
+  /* small light-card local helpers (taste print interior, light-on-cream) */
+  .tp-faint{ color:#8a7c63; }
+  .tp-soft{ color:#4a4232; }
+  .tp-track{ height:6px; border-radius:99px; background:rgba(43,33,20,0.12); position:relative; overflow:hidden; }
+  .tp-fill{ height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); }
+  .tp-pill{ display:inline-flex; align-items:center; gap:7px; padding:5px 12px; border-radius:99px; font-size:11px;
+    letter-spacing:.04em; color:#6b5320; border:1px solid rgba(150,112,46,.4); background:rgba(200,162,74,.1); }
+  .tp-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
+  .tp-rule{ height:1px; background:rgba(43,33,20,0.12); }
+
+  .engine-split{ display:grid; grid-template-columns:1.25fr 1fr; gap:clamp(40px,5vw,72px); align-items:start; }
+  @media(max-width:980px){ .engine-split{ grid-template-columns:1fr; gap:44px; } }
+</style>
+</head>
+<body class="gh antialiased min-h-screen">
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ HERO — calibrate ════════ -->
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+  <div class="gh-section" data-reveal>
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">The Taste Engine · Calibrate</span></div>
+    <h1 class="gh-h1" style="max-width:13ch; margin-top:10px;">Swipe how<br>you <span class="gh-accent gh-italic">travel.</span></h1>
+    <p class="gh-lead" style="margin-top:22px; max-width:34ch;">
+      Six cards. No forms. We assemble your <span class="gh-accent">Taste Print</span> as you go — so &ldquo;somewhere for dinner&rdquo; always means the right place.
+    </p>
+    <div style="margin-top:32px;">
+      <p class="gh-eyebrow" style="margin-bottom:12px;">Set a starting vibe</p>
+      <div class="seg dark" id="vibeSeg">
+        <button data-v="casual">Casual</button>
+        <button class="on" data-v="mix">Mix</button>
+        <button data-v="fine">Fine</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ ENGINE ════════ -->
+<section class="gh-wash">
+ <div class="gh-section" data-reveal>
+  <div class="engine-split">
+
+  <!-- LEFT — swipe deck -->
+  <div id="deckCol">
+    <div class="flex items-center justify-between mb-5">
+      <div class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim);">Card <span id="qNum" class="gh-accent">1</span> of 6</div>
+      <div class="tp-track" style="width:160px;"><div class="tp-fill" id="qProg" style="width:8%"></div></div>
+    </div>
+
+    <!-- deck -->
+    <div class="deck" id="deck" data-noswipe></div>
+
+    <!-- swipe controls -->
+    <div class="flex items-center justify-center gap-5 mt-7" id="controls">
+      <button class="press" style="width:56px;height:56px;border-radius:99px;display:grid;place-items:center;font-size:22px;border:1px solid var(--alert);color:#e39179;background:rgba(181,84,58,0.12)" onclick="swipe('left')" aria-label="left pole">↤</button>
+      <span class="gh-caps" style="font-size:10px; color:var(--gh-cream-dim);">Drag or tap</span>
+      <button class="press" style="width:56px;height:56px;border-radius:99px;display:grid;place-items:center;font-size:22px;border:1px solid var(--confirm);color:#a7c293;background:rgba(95,125,79,0.12)" onclick="swipe('right')" aria-label="right pole">↦</button>
+    </div>
+
+    <!-- FINISH — taste fingerprint -->
+    <div id="finish" class="hidden">
+      <div class="tp-finish">
+        <div class="gh-caps tp-faint" style="font-size:11px; margin-bottom:8px;">Calibration complete</div>
+        <h2 class="gh-display" style="font-size:clamp(28px,3.4vw,40px); color:#1c2418; line-height:1.1;">Your Taste Print.</h2>
+        <p class="mt-3 tp-soft leading-relaxed text-[15px]" id="signature">—</p>
+        <div class="tp-rule my-6"></div>
+        <div class="gh-caps tp-faint" style="font-size:11px; margin-bottom:12px;">So Tures will</div>
+        <ul class="space-y-2.5 text-sm" style="color:#2a3322;" id="behaviors"></ul>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="03-paste-trip.html" class="gh-btn">Describe a trip →</a>
+          <button onclick="restart()" class="gh-btn gh-btn-ghost" style="color:#6b5320;border-color:rgba(150,112,46,.5);background:rgba(200,162,74,.08);">Recalibrate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — live Taste Print -->
+  <aside>
+    <div class="tp-leaf p-6 sticky top-24">
+      <div class="flex items-center justify-between mb-1">
+        <div class="gh-display" style="font-size:26px; color:#1c2418;">Taste Print</div>
+        <span class="tp-pill"><span class="dot pulse"></span>Live</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs tp-faint mb-5">
+        <span class="gh-caps">Confidence</span>
+        <span style="font-family:'JetBrains Mono',monospace; color:#1c2418;" id="confLabel">0.18</span>
+        <div class="tp-track flex-1"><div class="tp-fill" id="confBar" style="width:18%"></div></div>
+      </div>
+
+      <!-- fingerprint radar -->
+      <div class="flex justify-center mb-5">
+        <svg id="radar" viewBox="0 0 200 200" width="190" height="190" style="overflow:visible"></svg>
+      </div>
+
+      <div class="space-y-3.5" id="dims"></div>
+
+      <div class="tp-rule my-5"></div>
+      <div class="gh-caps tp-faint" style="font-size:11px; margin-bottom:12px;">Reading you as</div>
+      <div class="flex flex-wrap gap-2" id="tags">
+        <span class="text-xs tp-faint italic">tags appear as you swipe…</span>
+      </div>
+    </div>
+  </aside>
+
+  </div>
+ </div>
+</section>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:22px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-lead" style="font-size:12px; margin-top:8px; letter-spacing:.06em; text-transform:uppercase;">The Taste Engine</div>
+</footer>
+
+<script>
+/* ---------- dimension model (also the radar axes) ---------- */
+const DIMS = [
+  {key:'pace',     label:'Pace',   left:'Languid',    right:'Packed',      v:50},
+  {key:'register', label:'Register',left:'Hidden gem', right:'Grand',       v:50},
+  {key:'energy',   label:'Energy', left:'Solitude',   right:'Social',      v:50},
+  {key:'palate',   label:'Palate', left:'Comfort',    right:'Adventurous', v:50},
+  {key:'planning', label:'Plan',   left:'Spontaneous',right:'Scripted',    v:50},
+  {key:'aesthetic',label:'Look',   left:'Heritage',   right:'Modern',      v:50},
+];
+
+/* ---------- the 6 swipe cards (one per dimension) ---------- */
+/* self-hosted, optimized webp (see assets/img/) keyed by the original Unsplash id */
+const TTASTE = {
+  '1566073771259-6a8506099945':'taste-register',
+  '1507525428034-b723cf961d3e':'tulum',
+  '1618221195710-dd6b41faaea6':'taste-aesthetic',
+  '1517248135467-4c7edcad34c4':'taste-palate',
+  '1529417305485-480f579e7578':'taste-energy',
+  '1469854523086-cc02fe5d8800':'taste-planning',
+};
+const TIMG = function(id){ return 'assets/img/'+TTASTE[id]+'-960.webp'; };
+const CARDS = [
+  { dim:'register', prompt:'Where you sleep.',
+    photo:TIMG('1566073771259-6a8506099945'),
+    left:{label:'The hidden gem',sub:'No sign. The locals know.',d:{register:-40,planning:-8},tags:['Hidden over famous']},
+    right:{label:'The grand hotel',sub:'A doorman, a century-old bar.',d:{register:+40},tags:['Grand register']} },
+  { dim:'pace', prompt:'Your ideal day.',
+    photo:TIMG('1507525428034-b723cf961d3e'),
+    left:{label:'Languid',sub:'Long breakfast, nowhere to be.',d:{pace:-40},tags:['Unhurried']},
+    right:{label:'Packed',sub:'Three things done before lunch.',d:{pace:+40},tags:['Maximizer']} },
+  { dim:'aesthetic', prompt:'The room itself.',
+    photo:TIMG('1618221195710-dd6b41faaea6'),
+    left:{label:'Heritage',sub:'Patina, history, heavy drapes.',d:{aesthetic:-38},tags:['Heritage spaces']},
+    right:{label:'Modern & spare',sub:'Ten perfect things, nothing extra.',d:{aesthetic:+40},tags:['Design-forward']} },
+  { dim:'palate', prompt:'The one great dinner.',
+    photo:TIMG('1517248135467-4c7edcad34c4'),
+    left:{label:'Comfort',sub:'One perfect dish, done right.',d:{palate:-36,register:-6},tags:['Dependable excellence']},
+    right:{label:'Adventurous',sub:'The fourteen-course tasting.',d:{palate:+40},tags:['Chef’s table']} },
+  { dim:'energy', prompt:'By midnight, you’d rather be…',
+    photo:TIMG('1529417305485-480f579e7578'),
+    left:{label:'A quiet corner',sub:'The person you came with.',d:{energy:-40},tags:['Travels close']},
+    right:{label:'A long table',sub:'New friends collected as you go.',d:{energy:+40},tags:['Sociable']} },
+  { dim:'planning', prompt:'A free day.',
+    photo:TIMG('1469854523086-cc02fe5d8800'),
+    left:{label:'Spontaneous',sub:'Decide when you get there.',d:{planning:-40,pace:-8},tags:['Room to drift']},
+    right:{label:'Scripted',sub:'The optimum, nothing missed.',d:{planning:+40,pace:+8},tags:['Wants the optimum']} },
+];
+
+let qi = 0;
+const deck = document.getElementById('deck');
+
+/* ---------- render dims list ---------- */
+const dimsEl = document.getElementById('dims');
+DIMS.forEach(d=>{
+  dimsEl.insertAdjacentHTML('beforeend', `
+    <div>
+      <div class="flex justify-between text-[11px] caps tp-faint mb-1.5"><span>${d.left}</span><span>${d.right}</span></div>
+      <div class="dim-track"><div class="dim-mark" id="mark-${d.key}"></div></div>
+    </div>`);
+});
+
+/* ---------- radar ---------- */
+const radar = document.getElementById('radar');
+const CX=100, CY=100, R=72;
+function radarPoint(i, val){
+  const ang = (-90 + i*60) * Math.PI/180;
+  const r = (val/100)*R;
+  return [CX + r*Math.cos(ang), CY + r*Math.sin(ang)];
+}
+function drawRadar(){
+  let g = '';
+  // rings
+  [0.33,0.66,1].forEach(s=>{
+    let pts = DIMS.map((d,i)=>{ const a=(-90+i*60)*Math.PI/180; return (CX+R*s*Math.cos(a))+','+(CY+R*s*Math.sin(a)); }).join(' ');
+    g += `<polygon points="${pts}" fill="none" stroke="rgba(43,33,20,0.12)" />`;
+  });
+  // axes + labels
+  DIMS.forEach((d,i)=>{
+    const a=(-90+i*60)*Math.PI/180;
+    const ex=CX+R*Math.cos(a), ey=CY+R*Math.sin(a);
+    g += `<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="rgba(43,33,20,0.10)" />`;
+    const lx=CX+(R+15)*Math.cos(a), ly=CY+(R+15)*Math.sin(a);
+    g += `<text x="${lx}" y="${ly}" font-size="9" fill="#97886f" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase;letter-spacing:.08em">${d.label}</text>`;
+  });
+  // value polygon
+  let vpts = DIMS.map((d,i)=> radarPoint(i, d.v).join(',')).join(' ');
+  g += `<polygon id="radarFill" points="${vpts}" fill="rgba(200,162,74,0.22)" stroke="#c8a24a" stroke-width="1.5" style="transition:all .6s cubic-bezier(.6,.02,.2,1)" />`;
+  DIMS.forEach((d,i)=>{ const p=radarPoint(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#e6c873" />`; });
+  radar.innerHTML = g;
+}
+function updateRadar(){
+  let vpts = DIMS.map((d,i)=> radarPoint(i, d.v).join(',')).join(' ');
+  drawRadar(); // simplest: redraw
+}
+drawRadar();
+
+/* ---------- card rendering & stacking ---------- */
+function renderDeck(){
+  deck.innerHTML='';
+  for(let k = Math.min(CARDS.length-1, qi+2); k >= qi; k--){
+    const c = CARDS[k];
+    const depth = k - qi;
+    const el = document.createElement('div');
+    el.className='card';
+    el.style.backgroundColor='#1b130c';
+    el.style.backgroundImage="url('"+c.photo+"')";
+    el.style.backgroundSize='cover';
+    el.style.backgroundPosition='center';
+    el.style.zIndex = 10 - depth;
+    el.style.transform = `translateY(${depth*10}px) scale(${1 - depth*0.04})`;
+    el.style.opacity = depth>1 ? 0 : 1;
+    el.dataset.k = k;
+    el.innerHTML = `
+      <div class="veil"></div>
+      <div class="grain" style="position:absolute;inset:0;opacity:.4"></div>
+      <span class="stamp yes">This is us</span>
+      <span class="stamp no">Not us</span>
+      <span class="pole l">↤ ${c.left.label}</span>
+      <span class="pole r">${c.right.label} ↦</span>
+      <div class="body">
+        <div class="caps text-[10px] text-gold-bright mb-2">${c.prompt}</div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><div class="font-display text-2xl text-canvas leading-tight">${c.left.label}</div><div class="text-[12px] mt-1" style="color:rgba(242,234,216,.85)">${c.left.sub}</div></div>
+          <div class="text-right"><div class="font-display text-2xl text-canvas leading-tight">${c.right.label}</div><div class="text-[12px] mt-1" style="color:rgba(242,234,216,.85)">${c.right.sub}</div></div>
+        </div>
+      </div>`;
+    deck.appendChild(el);
+  }
+  attachDrag();
+}
+
+/* ---------- drag the top card ---------- */
+let drag=null;
+function topCard(){ return deck.querySelector('.card[data-k="'+qi+'"]'); }
+function attachDrag(){
+  const card = topCard();
+  if(!card) return;
+  let sx=0, sy=0, dx=0, active=false;
+  const onDown=(x,y)=>{ active=true; sx=x; sy=y; card.style.transition='none'; };
+  const onMove=(x,y)=>{
+    if(!active) return;
+    dx = x-sx; const dy=y-sy;
+    const rot = dx/18;
+    card.style.transform = `translate(${dx}px, ${dy*0.3}px) rotate(${rot}deg)`;
+    const yes=card.querySelector('.stamp.yes'), no=card.querySelector('.stamp.no');
+    yes.style.opacity = dx>0 ? Math.min(1, dx/80) : 0;
+    no.style.opacity  = dx<0 ? Math.min(1, -dx/80) : 0;
+  };
+  const onUp=()=>{
+    if(!active) return; active=false;
+    card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s ease';
+    if(Math.abs(dx) > 90){ fling(dx>0?'right':'left'); }
+    else { card.style.transform=''; card.querySelector('.stamp.yes').style.opacity=0; card.querySelector('.stamp.no').style.opacity=0; }
+    dx=0;
+  };
+  card.addEventListener('mousedown', e=>{ onDown(e.clientX,e.clientY); });
+  window.addEventListener('mousemove', e=>onMove(e.clientX,e.clientY));
+  window.addEventListener('mouseup', onUp);
+  card.addEventListener('touchstart', e=>{ onDown(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+  card.addEventListener('touchmove', e=>{ onMove(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+  card.addEventListener('touchend', onUp);
+  drag = {card};
+}
+
+function swipe(dir){ // button-triggered
+  const card = topCard(); if(!card) return;
+  card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s ease';
+  const stamp = card.querySelector(dir==='right'?'.stamp.yes':'.stamp.no'); if(stamp) stamp.style.opacity=1;
+  fling(dir);
+}
+
+function fling(dir){
+  const card = topCard(); if(!card) return;
+  const c = CARDS[qi];
+  const pick = dir==='right' ? c.right : c.left;
+  // animate off
+  const off = dir==='right' ? 520 : -520;
+  card.style.transform = `translate(${off}px, 40px) rotate(${dir==='right'?22:-22}deg)`;
+  card.style.opacity = 0;
+
+  // apply
+  for(const key in pick.d){
+    const dim = DIMS.find(x=>x.key===key);
+    dim.v = Math.max(4, Math.min(96, dim.v + pick.d[key]));
+    const m=document.getElementById('mark-'+key); if(m) m.style.left = dim.v+'%';
+  }
+  pick.tags.forEach(addTag);
+  updateRadar();
+  setConf(0.18 + (qi+1)*0.127);
+
+  setTimeout(()=>{
+    qi++;
+    document.getElementById('qNum').textContent = Math.min(qi+1,6);
+    document.getElementById('qProg').style.width = (qi/6*100+8)+'%';
+    if(qi >= CARDS.length){ finishUp(); return; }
+    renderDeck();
+  }, 360);
+}
+
+let firstTag=true;
+function addTag(text){
+  const tagsEl=document.getElementById('tags');
+  if(firstTag){ tagsEl.innerHTML=''; firstTag=false; }
+  const c=document.createElement('span'); c.className='tp-pill tag-chip'; c.textContent=text;
+  tagsEl.appendChild(c); requestAnimationFrame(()=>c.classList.add('in'));
+}
+function setConf(v){ v=Math.min(0.94,v); document.getElementById('confLabel').textContent=v.toFixed(2); document.getElementById('confBar').style.width=(v*100)+'%'; }
+function pole(k){ return DIMS.find(d=>d.key===k); }
+
+function finishUp(){
+  document.getElementById('deck').style.display='none';
+  document.getElementById('controls').style.display='none';
+  document.getElementById('qProg').style.width='100%';
+  const fin=document.getElementById('finish'); fin.classList.remove('hidden');
+  requestAnimationFrame(()=>{ fin.classList.add('fp','in'); });
+
+  const reg=pole('register').v, pace=pole('pace').v, en=pole('energy').v,
+        pal=pole('palate').v, plan=pole('planning').v, aes=pole('aesthetic').v;
+  const bits=[];
+  bits.push(pace<50?'an unhurried traveler':'a traveler who likes a full day');
+  bits.push(reg>55?'with a taste for the grand register':(reg<45?'who hunts the hidden over the famous':'comfortable across registers'));
+  bits.push(en>55?'energized by a room full of people':(en<45?'happiest in the quiet corner':'socially flexible'));
+  const sig=`You read as ${bits[0]}, ${bits[1]}, ${bits[2]}. `+
+    (plan>55?'We’ll script the spine and leave room at the edges.':'We’ll set one strong anchor and protect the white space.');
+  document.getElementById('signature').textContent=sig;
+
+  const bh=[];
+  bh.push(reg>52?'Book suite-tier rooms with a quiet outlook; apply Virtuoso amenities automatically.':'Favor characterful, well-located rooms over brand-name towers.');
+  bh.push(pace<50?'Hold your mornings — no 7am slots unless you ask.':'Stack the day efficiently — earliest sensible reservations.');
+  bh.push(pal>52?'Route you to the chef’s table and the dish locals queue for.':'Default to dependable excellence over experimental.');
+  bh.push(aes>52?'Lean modern & design-forward between equals.':'Lean heritage — the grand old room.');
+  bh.push('Watch every booking and pre-stage a fix the moment the world wobbles.');
+  const ul=document.getElementById('behaviors'); ul.innerHTML='';
+  bh.forEach(t=> ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>${t}</span></li>`));
+
+  /* Persist the Taste Print — Describe & Book folds it into every live plan.
+     placeTypes use the engine's search vocabulary. */
+  const placeTypes=[];
+  if(reg>55) placeTypes.push('grand');
+  if(reg<45) placeTypes.push('boutique');
+  if(aes>52) placeTypes.push('design-hotel','minimalist');
+  const tags=[...document.querySelectorAll('#tags .tag-chip')].map(c=>c.textContent);
+  const dims={}; DIMS.forEach(d=>{ dims[d.key]=d.v; });
+  const tastePrint={ placeTypes, tags, dims, signature:sig };
+  try{ localStorage.setItem('tures.tastePrint', JSON.stringify(tastePrint)); }catch(_){}
+  // Signed-in travelers get it persisted server-side so the planner reads it on every device.
+  // (Anonymous demo visitors stay localStorage-only so the shared demo account isn't polluted.)
+  if(window.tures && tures.configured && tures.signedIn){ tures.prefs.set({ tastePrint:tastePrint }).catch(function(){}); }
+  ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>Saved. Every plan you describe starts from this print.</span></li>`);
+}
+
+function restart(){
+  qi=0; firstTag=true;
+  DIMS.forEach(d=>{ d.v=50; const m=document.getElementById('mark-'+d.key); if(m) m.style.left='50%'; });
+  document.getElementById('tags').innerHTML='<span class="text-xs tp-faint italic">tags appear as you swipe…</span>';
+  setConf(0.18); updateRadar();
+  document.getElementById('finish').classList.add('hidden');
+  document.getElementById('deck').style.display='';
+  document.getElementById('controls').style.display='';
+  document.getElementById('qNum').textContent='1';
+  document.getElementById('qProg').style.width='8%';
+  applyVibe(currentVibe);
+  renderDeck();
+}
+
+/* ---------- starting-vibe segmented control ---------- */
+let currentVibe='mix';
+function applyVibe(v){
+  // nudge register/palate baselines as a starting lean (only meaningful before swiping)
+  if(qi!==0) return;
+  const reg=pole('register'), pal=pole('palate');
+  reg.v = v==='fine'?64 : v==='casual'?38 : 50;
+  pal.v = v==='fine'?60 : v==='casual'?42 : 50;
+  document.getElementById('mark-register').style.left=reg.v+'%';
+  document.getElementById('mark-palate').style.left=pal.v+'%';
+  updateRadar();
+}
+document.getElementById('vibeSeg').addEventListener('segchange', e=>{ currentVibe=e.detail.value; applyVibe(currentVibe); });
+
+renderDeck();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Your account</title>
+<meta name="description" content="Your trips, payment methods, connected services, and agent settings." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/account.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Your account" />
+<meta property="og:description" content="Your trips, payment methods, connected services, and agent settings." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/account.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Your account" />
+<meta name="twitter:description" content="Your trips, payment methods, connected services, and agent settings." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* account cards ride the greenhouse card vocabulary */
+  .card{ border:1px solid rgba(255,255,255,0.09); border-radius:12px; background:var(--gh-card); }
+
+  /* trip-rating dots, recolored to the gold accent */
+  .dot10{ width:18px;height:18px;border-radius:99px;border:1px solid rgba(255,255,255,0.16);font-size:10px;display:grid;place-items:center;color:var(--gh-cream-dim);cursor:pointer;transition:all .14s; }
+  .dot10:hover{ border-color:var(--gold); color:var(--gh-cream); }
+  .dot10.on{ background:var(--gold); color:#06120a; border-color:var(--gold); font-weight:600; }
+
+  /* greenhouse form inputs for the add-traveler form */
+  .gh-input{ border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04);
+    color:var(--gh-cream); padding:10px 14px; font-size:14px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s ease; }
+  .gh-input:focus{ border-color:var(--gold); }
+  .gh-input::placeholder{ color:var(--gh-cream-dim); }
+  select.gh-input option{ background:var(--gh-card); color:var(--gh-cream); }
+
+  /* text-color helpers mapped onto the greenhouse palette so the account JS markup recolors */
+  .text-ink{ color:var(--gh-cream); }
+  .text-ink-soft{ color:var(--gh-cream-dim); }
+  .text-ink-faint{ color:var(--gh-cream-dim); }
+  .text-gold-deep{ color:var(--gold); }
+  .font-display{ font-family:'Playfair Display',serif; font-weight:400; }
+</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="gh-display" style="font-size:22px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+    <div class="flex items-center gap-5 text-sm">
+      <a href="been.html" style="color:var(--gh-cream-dim); text-decoration:none;">Where you've been</a>
+      <a href="03-paste-trip.html" style="color:var(--gh-cream-dim); text-decoration:none;">Plan a trip</a>
+      <a href="#" id="signOut" style="color:var(--gh-cream-dim); text-decoration:none;">Sign out</a>
+    </div>
+  </nav>
+</header>
+
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 pt-12 pb-8 flex items-end justify-between flex-wrap gap-4">
+  <div>
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Your account</span></div>
+    <h1 class="gh-h1" style="font-size:clamp(40px,5vw,64px); margin-top:8px;" id="name">Traveler</h1>
+    <p class="gh-lead" style="margin-top:8px;" id="email"></p>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="gh-pill" id="planPill">Free</span>
+    <button id="upgradeBtn" class="gh-btn-ghost gh-btn" style="padding:11px 20px;display:none">Subscribe · $99/mo</button>
+    <a href="03-paste-trip.html" class="gh-btn">Plan a trip →</a>
+  </div>
+ </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<main class="gh-wash">
+ <div class="max-w-5xl mx-auto px-6 py-12 space-y-10">
+
+  <!-- TRIPS -->
+  <div>
+    <div class="gh-eyebrow mb-4">Your trips</div>
+    <div id="trips" class="space-y-3"><div class="text-sm text-ink-faint">Loading…</div></div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-10">
+    <!-- WALLET -->
+    <div>
+      <div class="gh-eyebrow mb-4">Wallet</div>
+      <div id="wallet" class="space-y-2 mb-3"><div class="text-sm text-ink-faint">—</div></div>
+      <div id="walletRec" class="text-[12.5px] text-ink-soft"></div>
+      <a href="welcome.html" class="text-[13px] text-gold-deep underline mt-2 inline-block">Manage wallet &amp; setup →</a>
+    </div>
+    <!-- PROFILE + SERVICES -->
+    <div>
+      <div class="gh-eyebrow mb-4">Traveler profile</div>
+      <div id="profile" class="card p-4 text-sm mb-6"><span class="text-ink-faint">No profile on file.</span></div>
+      <div class="gh-eyebrow mb-4">Connected services</div>
+      <div id="services" class="space-y-2"><div class="text-sm text-ink-faint">—</div></div>
+    </div>
+  </div>
+
+  <!-- TRAVELERS (family / companions) -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <div class="gh-eyebrow">Travelers on your account</div>
+      <button id="addTravelerToggle" class="text-[13px] text-gold-deep">+ Add traveler</button>
+    </div>
+    <div id="travelers" class="grid sm:grid-cols-2 gap-3 mb-3"></div>
+    <form id="travelerForm" class="card p-4 grid sm:grid-cols-2 gap-2.5" style="display:none">
+      <input id="tvName" class="gh-input" placeholder="Full name" />
+      <select id="tvRel" class="gh-input">
+        <option value="spouse">Spouse</option><option value="partner">Partner</option><option value="child">Child</option><option value="parent">Parent</option><option value="companion">Companion</option>
+      </select>
+      <input id="tvPass" class="gh-input" placeholder="Passport number (optional)" />
+      <input id="tvKtn" class="gh-input" placeholder="Known Traveler # (optional)" />
+      <button class="gh-btn sm:col-span-2">Add traveler</button>
+    </form>
+  </div>
+
+ </div>
+</main>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:20px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-eyebrow" style="margin-top:10px;">Plan free. Pay when it books.</div>
+</footer>
+
+<script src="assets/engine.js"></script>
+<script>
+if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
+
+var a = tures.account || {};
+document.getElementById('name').textContent = a.name || 'Traveler';
+document.getElementById('email').textContent = a.email || '';
+document.getElementById('signOut').onclick = function(e){ e.preventDefault(); tures.signOut(); location.href='index.html'; };
+
+function renderPlan(){
+  var p = (tures.account && tures.account.plan) || 'free';
+  document.getElementById('planPill').textContent = p === 'subscribe' ? 'Concierge · $99/mo' : 'Free · pay per trip';
+  document.getElementById('upgradeBtn').style.display = p === 'subscribe' ? 'none' : '';
+}
+renderPlan();
+
+// refresh plan/identity from the server (it may have changed, e.g. after subscribing)
+if(tures.configured && tures.signedIn){ tures.me().then(renderPlan).catch(function(){}); }
+
+// returned from a successful subscription
+if(new URLSearchParams(location.search).get('subscribed')){
+  if(tures.configured && tures.signedIn) tures.me().then(renderPlan).catch(function(){});
+}
+
+document.getElementById('upgradeBtn').onclick = function(){
+  this.textContent = 'Starting…'; this.disabled = true;
+  tures.billing.checkout().then(function(r){ location.href = r.url; }).catch(function(){ document.getElementById('upgradeBtn').textContent='Subscribe · $99/mo'; document.getElementById('upgradeBtn').disabled=false; });
+};
+
+function money(n){ return '$' + Math.round(n||0).toLocaleString(); }
+function statusPill(s){
+  var map = { booked:['pill-confirm','Booked'], confirmation_required:['pill-pending','Awaiting you'], booking:['pill-gold','Booking…'], failed:['pill-alert','Failed'] };
+  var m = map[s] || ['pill-gold', s];
+  return '<span class="pill '+m[0]+'">'+m[1]+'</span>';
+}
+
+if(tures.configured){
+  tures.bookings().then(function(res){
+    var el = document.getElementById('trips');
+    var list = res.bookings || [];
+    if(!list.length){ el.innerHTML = '<div class="card p-5 text-center text-sm text-ink-soft">No trips yet. <a href="03-paste-trip.html" class="text-gold-deep underline">Plan your first →</a></div>'; return; }
+    el.innerHTML = '';
+    list.forEach(function(b){
+      var legs = (b.components||[]).map(function(c){
+        return '<div class="flex justify-between text-[13px]"><span class="text-ink">'+(c.kind==='flight'?'✈':'⌂')+' '+c.title+'</span><span class="font-mono text-ink-soft">'+(c.confirmation||c.status)+(c.card?' · '+c.card.name:'')+'</span></div>';
+      }).join('');
+      var dest = (b.brief && b.brief.destination) || '';
+      var tags = (b.brief && b.brief.placeTypes) || [];
+      var row = document.createElement('div'); row.className='card p-4';
+      row.innerHTML = '<div class="flex items-center justify-between mb-2"><span class="font-display text-lg text-ink">'+((b.brief&&b.brief.origin)||'?')+' → '+(dest||'?')+'</span>'+statusPill(b.status)+'</div>'+
+        legs + '<div class="flex justify-between mt-2 pt-2 text-[13px]" style="border-top:1px solid rgba(255,255,255,0.09)"><span class="text-ink-faint">Total</span><span class="font-mono text-ink">'+money(b.totalUsd)+'</span></div>' +
+        (b.status==='booked' ? '<div class="mt-3 pt-2" style="border-top:1px solid rgba(255,255,255,0.09)"><div class="flex items-center justify-between"><span class="gh-eyebrow">Rate this trip — sharpens your taste</span><a class="text-[12px] text-gold-deep" target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent(dest+" travel review")+'">Review on Google ↗</a></div><div class="rate10 flex gap-1 mt-1.5" data-dest="'+dest+'" data-tags="'+tags.join(',')+'"></div></div>' : '');
+      el.appendChild(row);
+    });
+    // wire trip ratings → upsert the destination as a rated place (feeds the taste engine)
+    el.querySelectorAll('.rate10').forEach(function(box){
+      var dest = box.getAttribute('data-dest'); var tags = (box.getAttribute('data-tags')||'').split(',').filter(Boolean);
+      for(var i=1;i<=10;i++){ (function(n){ var d=document.createElement('span'); d.className='dot10'; d.textContent=n;
+        d.onclick=function(){ box.querySelectorAll('.dot10').forEach(function(x,j){ x.classList.toggle('on', j<n); });
+          tures.places.upsert({ kind:'city', name:dest, been:true, rating:n, tags:tags }).catch(function(){}); };
+        box.appendChild(d); })(i); }
+    });
+  }).catch(function(){ document.getElementById('trips').innerHTML = '<div class="text-sm text-ink-faint">Couldn\'t load trips.</div>'; });
+
+  tures.connections.list().then(function(res){
+    var conns = res.connections || [];
+    var cards = conns.filter(function(c){return c.kind==='payment';});
+    var w = document.getElementById('wallet');
+    w.innerHTML = cards.length ? '' : '<div class="text-sm text-ink-faint">No cards yet.</div>';
+    cards.forEach(function(c){ var r=document.createElement('div'); r.className='card px-3 py-2 text-sm text-ink'; r.textContent=c.label; w.appendChild(r); });
+    if(cards.length){
+      Promise.all([tures.wallet.recommend('airfare',5000), tures.wallet.recommend('hotel',2000)]).then(function(rs){
+        document.getElementById('walletRec').innerHTML = '✈ flights → '+(rs[0].name||'—')+' · ⌂ hotels → '+(rs[1].name||'—');
+      }).catch(function(){});
+    }
+    var svc = conns.filter(function(c){ return c.kind==='email'||c.kind==='calendar'||c.kind==='loyalty'; });
+    var s = document.getElementById('services');
+    s.innerHTML = svc.length ? '' : '<div class="text-sm text-ink-faint">None connected.</div>';
+    svc.forEach(function(c){ var r=document.createElement('div'); r.className='card px-3 py-2 text-sm flex justify-between'; r.innerHTML='<span class="text-ink">'+c.label+'</span><span class="dot dot-green"></span>'; s.appendChild(r); });
+  }).catch(function(){});
+
+  tures.profile.get().then(function(p){
+    if(p && p.meta){
+      document.getElementById('profile').innerHTML =
+        '<div class="flex justify-between"><span class="text-ink-soft">Passport</span><span class="text-ink font-mono">'+(p.meta.passportMasked||'—')+'</span></div>'+
+        '<div class="flex justify-between mt-1"><span class="text-ink-soft">Known Traveler</span><span class="text-ink">'+(p.meta.ktnOnFile?'on file':'—')+'</span></div>'+
+        ((p.meta.memberships&&p.meta.memberships.length)?'<div class="flex justify-between mt-1"><span class="text-ink-soft">Loyalty</span><span class="text-ink">'+p.meta.memberships.map(function(m){return m.program;}).join(', ')+'</span></div>':'');
+    }
+  }).catch(function(){});
+}
+
+// travelers (family / companions)
+function renderTravelers(){
+  tures.travelers.list().then(function(res){
+    var el = document.getElementById('travelers'); var list = res.travelers || [];
+    el.innerHTML = list.length ? '' : '<div class="text-sm text-ink-faint">Just you so far.</div>';
+    list.forEach(function(t){
+      var m = t.meta || {};
+      var card = document.createElement('div'); card.className='card p-3 flex items-center justify-between';
+      card.innerHTML = '<div><div class="text-ink text-sm font-medium">'+(m.fullName||t.label)+'</div><div class="text-ink-faint text-[12px]">'+(m.relationship||'')+(m.passportMasked?' · passport '+m.passportMasked:'')+'</div></div><button class="text-[12px] text-gold-deep" data-rm="'+t.id+'">remove</button>';
+      el.appendChild(card);
+    });
+    el.querySelectorAll('[data-rm]').forEach(function(b){ b.onclick=function(){ tures.travelers.remove(b.getAttribute('data-rm')).then(renderTravelers); }; });
+  }).catch(function(){});
+}
+document.getElementById('addTravelerToggle').onclick=function(){ var f=document.getElementById('travelerForm'); f.style.display = f.style.display==='none'?'':'none'; };
+document.getElementById('travelerForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var t = { fullName: document.getElementById('tvName').value.trim(), relationship: document.getElementById('tvRel').value,
+    passport: document.getElementById('tvPass').value.trim()? { number: document.getElementById('tvPass').value.trim(), country:'US' } : undefined,
+    knownTravelerNumber: document.getElementById('tvKtn').value.trim()||undefined, memberships: [] };
+  if(!t.fullName) return;
+  tures.travelers.add(t).then(function(){ e.target.reset(); document.getElementById('travelerForm').style.display='none'; renderTravelers(); }).catch(function(){});
+});
+if(tures.configured && tures.signedIn) renderTravelers();
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

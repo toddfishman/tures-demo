@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Pricing</title>
+<meta name="description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/pricing.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Pricing" />
+<meta property="og:description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/pricing.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Pricing" />
+<meta name="twitter:description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* pricing grid */
+  .pr-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
+  @media(max-width:920px){ .pr-grid{ grid-template-columns:1fr; max-width:460px; margin-inline:auto; } }
+
+  /* tier card */
+  .pr-tier{ display:flex; flex-direction:column; padding:32px 30px; position:relative; }
+  .pr-tier.featured{ position:relative; }
+  .pr-tier.featured::before{ content:""; position:absolute; inset:0; z-index:-1;
+    box-shadow:0 24px 60px -30px var(--gold); pointer-events:none; }
+
+  .pr-price{ display:flex; align-items:baseline; gap:8px; margin:6px 0 18px; }
+  .pr-price .amt{ font-family:'Playfair Display',serif; font-weight:400; font-size:clamp(44px,5vw,58px);
+    line-height:1; color:#fff; }
+  .pr-price .per{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gh-cream-dim); letter-spacing:.02em; }
+
+  .pr-list{ list-style:none; margin:0 0 28px; padding:0; display:flex; flex-direction:column; gap:11px; flex:1; }
+  .pr-list li{ display:flex; gap:11px; font-size:14px; line-height:1.5; color:var(--gh-cream); }
+  .pr-list .ck{ color:var(--gold); flex-shrink:0; font-size:13px; line-height:1.6; }
+
+  .pr-tier .gh-btn, .pr-tier .gh-btn-ghost{ width:100%; }
+
+  /* under-grid notes */
+  .pr-note{ max-width:60ch; margin:0 auto; text-align:center; }
+</style>
+</head>
+<body>
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ HERO ════════ -->
+<section class="gh-wash-surface gh-tile">
+  <div class="gh-section" style="text-align:center;" data-reveal>
+    <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">Pricing</span><span class="ln"></span></div>
+    <h1 class="gh-h1" style="max-width:18ch; margin-inline:auto;">Plan free. <span class="gh-accent gh-italic">Pay when it books.</span></h1>
+    <p class="gh-lead" style="margin-top:22px; max-width:54ch; margin-inline:auto;">
+      Planning, itineraries, and your Taste Print are always free. You only pay the moment Tures actually books — per trip, or go unlimited.
+    </p>
+  </div>
+</section>
+
+<!-- ════════ TIERS ════════ -->
+<section class="gh-wash">
+  <div class="gh-section-tight" data-reveal>
+    <div class="pr-grid">
+
+      <!-- FREE -->
+      <div class="pr-tier gh-card">
+        <p class="gh-eyebrow" style="margin-bottom:10px;">Explore</p>
+        <h2 class="gh-h3" style="margin-bottom:2px;">Free</h2>
+        <div class="pr-price"><span class="amt">$0</span></div>
+        <p class="gh-lead" style="font-size:14px; margin-bottom:22px;">Plan as much as you like. Pay nothing until you book.</p>
+        <ul class="pr-list">
+          <li><span class="ck">✓</span> Unlimited trip planning &amp; itineraries</li>
+          <li><span class="ck">✓</span> Your Taste Print</li>
+          <li><span class="ck">✓</span> Wallet &amp; traveler profile</li>
+          <li><span class="ck">✓</span> See exactly what it would book</li>
+        </ul>
+        <a href="03-paste-trip.html" class="gh-btn gh-btn-ghost">Start planning free</a>
+      </div>
+
+      <!-- PER TRIP (featured) -->
+      <div class="pr-tier featured gh-card-acc">
+        <span class="gh-pill" style="position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--gh-card);">Most popular</span>
+        <p class="gh-eyebrow" style="margin-bottom:10px;">Pay as you go</p>
+        <h2 class="gh-h3" style="margin-bottom:2px;">Per trip</h2>
+        <div class="pr-price"><span class="amt">$99</span><span class="per">/ booked trip</span></div>
+        <p class="gh-lead" style="font-size:14px; margin-bottom:22px;">Best for the occasional trip — charged only when one actually books. No commitment.</p>
+        <ul class="pr-list">
+          <li><span class="ck">✓</span> Everything in Free</li>
+          <li><span class="ck">✓</span> Real booking, verified twice</li>
+          <li><span class="ck">✓</span> Best-card-per-charge from your wallet</li>
+          <li><span class="ck">✓</span> Thorough taste-profile questions</li>
+          <li><span class="ck">✓</span> AI text assistant while you plan</li>
+        </ul>
+        <a href="03-paste-trip.html" class="gh-btn">Start free → pay at booking</a>
+      </div>
+
+      <!-- SUBSCRIBE -->
+      <div class="pr-tier gh-card">
+        <p class="gh-eyebrow" style="margin-bottom:10px;">Unlimited</p>
+        <h2 class="gh-h3" style="margin-bottom:2px;">Concierge</h2>
+        <div class="pr-price"><span class="amt">$99</span><span class="per">/ month · unlimited</span></div>
+        <p class="gh-lead" style="font-size:14px; margin-bottom:22px;">Same price as a single trip — but always on. The proactive layer that only makes sense running every day. <span style="color:var(--gh-cream);">Booking more than once a month? This is the better deal.</span></p>
+        <ul class="pr-list">
+          <li><span class="ck">✓</span> Everything in Per trip</li>
+          <li><span class="ck">✓</span> Hiccup Handler always on — proactive, every trip</li>
+          <li><span class="ck">✓</span> A real person in a triage situation</li>
+          <li><span class="ck">✓</span> &ldquo;Where you've been,&rdquo; remembered</li>
+          <li><span class="ck">✓</span> The Taste Engine — learns your taste, recommends</li>
+          <li><span class="ck">✓</span> No per-booking fee, ever</li>
+        </ul>
+        <a href="signup.html" id="subscribeBtn" class="gh-btn gh-btn-ghost">Subscribe</a>
+      </div>
+
+    </div>
+
+    <!-- positioning note -->
+    <div class="pr-note" style="margin-top:56px;" data-reveal>
+      <p class="gh-lead" style="font-size:15px;">Per trip and Concierge cost the same on purpose. <span style="color:var(--gold);">Per trip</span> covers booking one journey — the thorough taste profile and an AI text assistant included. <span style="color:var(--gold);">Concierge</span> adds the always-on layer: a proactive Hiccup Handler, a real person when plans go sideways, your travel history, and the Taste Engine that learns what you like. The difference is what it does, not what it costs.</p>
+    </div>
+
+    <!-- pass-through note -->
+    <div class="pr-note" style="margin-top:40px;">
+      <div class="gh-rule" style="max-width:120px; margin:0 auto 24px;"></div>
+      <p class="gh-lead" style="font-size:14px;">Travel charges (flights, hotels) always pass through at cost to your own card — Tures' fee is only the concierge service above. Nothing is ever charged without your approval, and you can cancel anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:26px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-lead" style="font-size:13px; margin-top:8px;">Plan free. Pay when it books.</div>
+</footer>
+
+<script src="assets/ui.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+// Subscribe: signed-in → start checkout (Stripe live, or mock activation); else → sign up first.
+document.getElementById('subscribeBtn').addEventListener('click', function(e){
+  if(!(window.tures && tures.signedIn)){ return; } // fall through to signup.html
+  e.preventDefault();
+  var b=this; b.textContent='Starting…';
+  tures.billing.checkout().then(function(r){ location.href = r.url; }).catch(function(){ b.textContent='Subscribe'; });
+});
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

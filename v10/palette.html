@@ -1,0 +1,147 @@
+<!doctype html>
+<!-- Palette viewer — see the 5 surface directions applied to the real system, then pick one.
+     Chocolate leather + brass foil are held constant; only the *surface* (the off-cream page)
+     varies. These are reconstructions of the 5 directions described earlier (never saved to a
+     file), so treat the hexes as a starting point Todd can nudge. NOT part of the funnel. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Palette directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  body{ background:var(--obsidian); font-family:'Inter',system-ui,sans-serif; }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:28px 20px 80px; }
+  .hd{ text-align:center; margin-bottom:22px; }
+
+  /* swatch chooser */
+  .swatches{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:8px; }
+  .sw{ cursor:pointer; border:1px solid rgba(200,162,74,0.28); border-radius:12px; padding:8px 8px 9px;
+    background:rgba(20,15,10,0.4); width:104px; text-align:center; transition:border-color .15s, transform .12s; }
+  .sw:hover{ border-color:rgba(230,200,115,0.7); } .sw:active{ transform:scale(.98); }
+  .sw.on{ border-color:var(--gold-bright); box-shadow:0 0 0 1px var(--gold-bright) inset; }
+  .sw .chip{ height:34px; border-radius:7px; border:1px solid rgba(0,0,0,0.25); margin-bottom:6px; }
+  .sw .nm{ font-size:12px; color:var(--canvas-warm); font-weight:600; }
+  .sw .hx{ font-family:'JetBrains Mono',monospace; font-size:9.5px; color:rgba(236,227,208,0.5); }
+
+  /* ===== the live sample (its surface tokens are swapped by JS) ===== */
+  .sample{ border-radius:16px; overflow:hidden; margin-top:18px;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,0.9); border:1px solid rgba(200,162,74,0.18);
+    --s:#ece3d0; --sd:#e2d6bd; --tink:#2a2118; --tsoft:#6b5d49; --tline:rgba(43,36,28,0.12); }
+  /* constant chocolate top bar */
+  .s-bar{ background:linear-gradient(155deg,#241910,#1b130c 55%,#120c07); display:flex; align-items:center;
+    justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(200,162,74,0.18); }
+  .s-bar .mark{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:26px; }
+  .s-cta{ background:linear-gradient(180deg,#e6c873,#c8a24a 55%,#a8842f); color:#241a0c; font-weight:600;
+    border:1px solid #8a6a26; border-radius:6px; padding:8px 16px; font-size:13px; }
+
+  /* the surface page */
+  .s-page{ background:linear-gradient(180deg, var(--s), var(--sd)); padding:34px 30px 38px; color:var(--tink); }
+  .s-eyebrow{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:10px; }
+  .s-h{ font-family:'Cormorant Garamond',serif; font-size:38px; line-height:1.04; color:var(--tink); margin-bottom:8px; }
+  .s-body{ font-size:15px; line-height:1.6; color:var(--tsoft); max-width:48ch; }
+  .s-foil{ height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:22px 0; }
+
+  .s-card{ background:rgba(255,255,255,0.45); border:1px solid var(--tline); border-radius:11px; padding:16px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .s-card .ttl{ font-family:'Cormorant Garamond',serif; font-size:21px; color:var(--tink); }
+  .s-card .meta{ font-size:12.5px; color:var(--tsoft); margin-top:2px; }
+  .s-conf{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--tsoft); }
+  .s-pill{ display:inline-flex; align-items:center; gap:6px; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    font-weight:600; padding:4px 10px; border-radius:99px; background:rgba(95,125,79,0.16); color:#43603a; }
+  .s-dot{ width:7px; height:7px; border-radius:99px; background:#5f7d4f; }
+
+  .s-btns{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .s-gold{ background:linear-gradient(180deg,#e6c873,#c8a24a 55%,#a8842f); color:#241a0c; font-weight:600;
+    border:1px solid #8a6a26; border-radius:8px; padding:11px 22px; font-size:14px; }
+  .s-ink{ background:rgba(255,255,255,0.5); color:var(--tink); border:1px solid var(--tline);
+    border-radius:8px; padding:11px 22px; font-size:14px; }
+
+  .now{ text-align:center; margin-top:16px; font-size:12.5px; color:rgba(236,227,208,0.6); }
+  .now b{ color:var(--gold-bright); } .now .mono{ font-family:'JetBrains Mono',monospace; font-size:11px; }
+  .back{ display:inline-block; margin-top:26px; color:var(--gold-bright); font-size:13px; text-decoration:none; }
+</style>
+</head>
+<body class="text-canvas">
+ <div class="wrap">
+  <div class="hd">
+    <div class="caps text-[11px] text-gold/80 mb-2">Design · surface directions</div>
+    <h1 class="font-display foil text-4xl sm:text-5xl">Pick the surface.</h1>
+    <p class="text-canvas/65 text-sm mt-3 max-w-xl mx-auto">Chocolate leather and brass foil stay fixed — only the page surface changes. Tap a swatch to apply it to a real slice of the product.</p>
+  </div>
+
+  <div class="swatches" id="swatches"></div>
+
+  <div class="sample" id="sample">
+    <div class="s-bar">
+      <span class="mark foil">t<span class="spark" style="font-size:.5em;vertical-align:super">✦</span>ures</span>
+      <span class="s-cta">Start free →</span>
+    </div>
+    <div class="s-page">
+      <div class="s-eyebrow">Chapter VII · Confirmed</div>
+      <div class="s-h">Eleven days, booked.</div>
+      <p class="s-body">You named Real Christine. Tures booked Real Christine — verified against the provider receipt and your inbox before it said “Booked.”</p>
+      <div class="s-foil"></div>
+      <div class="s-card">
+        <div>
+          <div class="ttl">Real Christine, Paris</div>
+          <div class="meta">Junior Suite · Dec 4 → 7 · <span class="s-conf">CONF 8849-RCP</span></div>
+        </div>
+        <span class="s-pill"><span class="s-dot"></span>Verified ×2</span>
+      </div>
+      <div class="s-btns">
+        <span class="s-gold">Confirm &amp; book →</span>
+        <span class="s-ink">See the receipt</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="now" id="now"></div>
+  <div style="text-align:center"><a class="back" href="index.html">← Back to the cover</a></div>
+ </div>
+
+<script>
+  // chocolate + brass held constant; each direction swaps only the surface + ink tokens.
+  var PALETTES = [
+    { key:'cream',     name:'Current · Cream',  s:'#ece3d0', sd:'#e2d6bd', ink:'#2a2118', soft:'#6b5d49', line:'rgba(43,36,28,0.12)' },
+    { key:'porcelain', name:'Porcelain',        s:'#f4f1ea', sd:'#eae5da', ink:'#2a2218', soft:'#6b6253', line:'rgba(43,36,28,0.11)' },
+    { key:'greige',    name:'Greige',           s:'#e7e2d8', sd:'#dad3c5', ink:'#2b2620', soft:'#6d655a', line:'rgba(43,36,28,0.13)' },
+    { key:'sage',      name:'Sage',             s:'#e4e7dd', sd:'#d7dcc9', ink:'#272b22', soft:'#5f6553', line:'rgba(39,43,34,0.13)' },
+    { key:'slate',     name:'Slate',            s:'#e0e4e6', sd:'#d0d7da', ink:'#232a2d', soft:'#5a646a', line:'rgba(35,42,45,0.13)' },
+    { key:'midnight',  name:'Midnight leather', s:'#1a1517', sd:'#221c1e', ink:'#ede6dc', soft:'#b3a99c', line:'rgba(255,255,255,0.10)', dark:true }
+  ];
+
+  var sample = document.getElementById('sample');
+  var swEl = document.getElementById('swatches');
+  var nowEl = document.getElementById('now');
+
+  function apply(p){
+    sample.style.setProperty('--s', p.s);
+    sample.style.setProperty('--sd', p.sd);
+    sample.style.setProperty('--tink', p.ink);
+    sample.style.setProperty('--tsoft', p.soft);
+    sample.style.setProperty('--tline', p.line);
+    // on the dark surface, cards + ink buttons need a light translucency instead of white
+    var cardBg = p.dark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.45)';
+    sample.querySelector('.s-card').style.background = cardBg;
+    sample.querySelector('.s-ink').style.background = cardBg;
+    document.querySelectorAll('.sw').forEach(function(x){ x.classList.toggle('on', x.dataset.k===p.key); });
+    nowEl.innerHTML = 'Showing <b>'+p.name+'</b> · surface <span class="mono">'+p.s.toUpperCase()+'</span> · ink <span class="mono">'+p.ink.toUpperCase()+'</span>';
+  }
+
+  PALETTES.forEach(function(p){
+    var b = document.createElement('div'); b.className='sw'; b.dataset.k=p.key;
+    b.innerHTML = '<div class="chip" style="background:linear-gradient(180deg,'+p.s+','+p.sd+')"></div><div class="nm">'+p.name.replace('Current · ','')+'</div><div class="hx">'+p.s.toUpperCase()+'</div>';
+    b.onclick = function(){ apply(p); };
+    swEl.appendChild(b);
+  });
+  apply(PALETTES[0]);
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

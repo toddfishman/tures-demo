@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Questions</title>
+<meta name="description" content="Honest answers about how Tures books, what can go wrong, and what we do with your data." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/faq.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Questions" />
+<meta property="og:description" content="Honest answers about how Tures books, what can go wrong, and what we do with your data." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/faq.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Questions" />
+<meta name="twitter:description" content="Honest answers about how Tures books, what can go wrong, and what we do with your data." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; padding-bottom:96px; }
+
+  /* ghost mark behind the hero */
+  .faq-ghost{ position:absolute; top:-0.18em; right:0; z-index:0; line-height:1;
+    font-family:'Playfair Display',serif; font-size:38vw; color:var(--gold);
+    opacity:.06; pointer-events:none; user-select:none; }
+  @media(min-width:640px){ .faq-ghost{ font-size:24vw; } }
+
+  /* the FAQ stack */
+  .faq-list{ display:flex; flex-direction:column; gap:14px; }
+
+  /* each accordion row as an accent-bordered glass card.
+     NOTE: .exp / .exp-head / .exp-body / .exp-chev are owned by ui.js + tures.css
+     (click-to-toggle + max-height collapse + chevron rotation). We only restyle. */
+  .faq-list .exp{ background:var(--gh-card); border:1px solid rgba(255,255,255,0.09);
+    border-left:2px solid rgba(74,222,128,0.28); transition:border-color .4s ease, background .4s ease; }
+  .faq-list .exp:hover{ border-left-color:var(--gold); }
+  .faq-list .exp.open{ background:rgba(255,255,255,0.04); border-left-color:var(--gold); }
+
+  .faq-list .exp-head{ display:flex; align-items:flex-start; gap:16px;
+    padding:22px clamp(20px,3vw,30px); cursor:pointer; }
+  .faq-num{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em;
+    color:var(--gold); margin-top:6px; min-width:2.4ch; flex-shrink:0; }
+  .faq-q{ flex:1; font-family:'Playfair Display',serif; font-weight:400;
+    font-size:clamp(19px,1.7vw,23px); line-height:1.25; color:var(--gh-cream); }
+  .faq-list .exp-chev{ color:var(--gold); font-size:22px; margin-top:2px; flex-shrink:0; }
+
+  .faq-list .exp-body .faq-a{ padding:0 clamp(20px,3vw,30px) 24px clamp(20px,3vw,30px);
+    margin-left:calc(2.4ch + 16px); border-top:1px solid rgba(255,255,255,0.06);
+    padding-top:18px; }
+  @media(max-width:560px){ .faq-list .exp-body .faq-a{ margin-left:0; } }
+  .faq-a p{ font-size:15px; line-height:1.7; color:var(--gh-cream-dim); margin:0 0 .8rem; }
+  .faq-a p:last-child{ margin-bottom:0; }
+  .faq-a strong{ color:var(--gh-cream); font-weight:500; }
+  .faq-a em{ color:var(--gh-cream); font-style:italic; }
+  .faq-a a{ color:var(--gold); text-decoration:none; border-bottom:1px solid rgba(74,222,128,0.4); }
+  .faq-a a:hover{ border-bottom-color:var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ HERO ════════ -->
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+  <div class="faq-ghost" data-parallax="0.1" aria-hidden="true">?</div>
+  <div class="gh-section-tight" style="position:relative; z-index:1;">
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Plain answers</span></div>
+    <h1 class="gh-h1" style="max-width:16ch">The questions<br>worth asking.</h1>
+    <p class="gh-lead" style="margin-top:22px; max-width:52ch; color:var(--gh-cream);">
+      No spin. Where the agent is strong, where it isn't, and exactly what we touch.
+    </p>
+  </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ QUESTIONS ════════ -->
+<main class="gh-wash">
+  <div class="gh-section" style="max-width:920px;">
+    <p class="gh-eyebrow" style="margin-bottom:30px;">Twelve questions · tap to expand</p>
+
+    <div class="faq-list">
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">I</span><span class="faq-q">Is this real, or just another travel chatbot?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>It's real, and it's the opposite of a chatbot. Every other "AI travel" product ends with a slideshow and a list of links — <em>now go book it yourself.</em> Tures ends with confirmation numbers. You describe a trip in plain English; we book every leg — flight by flight, hotel by hotel, dinner by dinner — to your exact specs.</p>
+         <p>This demo is a working preview of the product surface. Real bookings run on live travel rails (Duffel for flights, boutique inventory for hotels, computer-use for the no-API long tail).</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">II</span><span class="faq-q">How does Tures actually book?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>The language model never books anything itself. It reads your brief and produces a structured plan; a deterministic executor validates that plan and submits it through real booking APIs. For vendors without an API — a boutique hotel on a 2007 property system, a restaurant on Resy or Tock — a supervised computer-use agent completes the flow the way a person would.</p>
+         <p>Every run has three hard ceilings: a spend cap, a time cap, and a cap on irreversible actions. The agent can search all day; it can only <em>commit</em> a small number of bookings before a human checks the work. <a href="05-execution.html">Watch a run →</a></p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">III</span><span class="faq-q">What happens if the agent fails?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>It will, sometimes — and we built for that. When an agent can't complete a booking, it escalates to a human operator who finishes it by hand and logs it identically, so you see one clean record. When an agent makes a <strong>material error</strong> we caused — wrong date, wrong city, wrong traveler, wrong room — we refund that booking in full and rebook your original itinerary at our expense, subject to availability.</p>
+         <p>We never confirm what we can't verify in two places. Trust collapses on a single faked confirmation, and we know it.</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">IV</span><span class="faq-q">What permissions do I grant — and why?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Permissions are a gradient, not a switch. You grant only what a given trip needs: a payment method to book, your inbox (travel senders only) to catch confirmations and disruptions, your calendar to hold dates, loyalty accounts to credit status. Each grant is scoped, encrypted, and rotated automatically.</p>
+         <p>We show you when we last used each one — "we read your Gmail 6 hours ago" — on your <a href="account.html">account page</a>. <a href="04-connections.html">See the gradient →</a></p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">V</span><span class="faq-q">Can I revoke access? How fast?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Instantly, and there's a one-tap kill switch at the top of your account. Toggling it invalidates your active sessions, halts every running agent, and marks all connected services as revoked on the spot. We schedule a deletion of the underlying OAuth tokens with a 7-day grace window in case you change your mind.</p>
+         <p>Bookings already confirmed remain your contractual relationship with the vendor — revoking doesn't un-book a flight, but it does stop us from taking any new action.</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">VI</span><span class="faq-q">Where do my photos, messages, and inbox data go?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>This is the most sensitive surface we touch, so we're blunt: if you connect your inbox, we read messages <strong>relevant to travel</strong> — confirmations, itineraries, vendor notes — to coordinate your trip and recover from disruptions. We do not read mail from senders outside the travel domain unless you explicitly direct us to.</p>
+         <p>We do not train any AI model on your inbox. We don't sell or share its contents. We purge cached inbox content within 30 days of revocation or trip completion, whichever is later. Full detail in the <a href="legal/privacy.html">Privacy Policy →</a></p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">VII</span><span class="faq-q">What's your refund policy?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Three clear categories. <strong>We caused it</strong> (wrong booking): full refund within 24 hours, no action from you. <strong>The vendor caused it</strong> (airline cancels, hotel oversells): we rebook first, then open the claim with the vendor and credit you when it clears — you get a status page you can watch. <strong>You changed your mind</strong>: governed by the vendor's own policy, which we surface at booking time. We don't eat vendor change fees by default, but we'll often waive our concierge fee as goodwill.</p>
+         <p>The detail lives in the <a href="legal/terms.html#refunds">Terms →</a></p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">VIII</span><span class="faq-q">Am I insured if something goes wrong on the trip?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Tures is a booking concierge, not an insurer. For a flight cancellation or a weather event, the Hiccup Handler will rebook you — usually before the airline's own email lands — but recovery is logistics, not indemnity. For trip-cancellation, medical, or baggage coverage, we recommend a dedicated travel-insurance policy and can surface options at booking. Vendor-caused and force-majeure losses sit with the vendor; we act as your advocate.</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">IX</span><span class="faq-q">How do taxes, fees, and commissions work?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Travel charges pass through at cost — what the supplier charges is what you pay, in the currency they bill, converted to USD at the booking-date rate (the FX line is on every receipt). Any supplier commission we earn is <strong>disclosed in the receipt</strong>, not hidden in a markup. The only thing you pay Tures directly is the concierge subscription, plus applicable sales tax on that fee where your state requires it.</p>
+         <p>See it itemized in <a href="billing.html">Billing →</a></p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">X</span><span class="faq-q">Can the agent spend my money without asking?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Only within the brief you gave it, and within limits you set. By default we ask for a one-tap confirmation on any booking over a threshold you choose, and on any trip involving minors. You can grant standing rebooking authority — "if a flight is cancelled, put me on the cleanest same-class alternative" — and you can revoke it just as easily. Anything outside your brief is on us, not you.</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">XI</span><span class="faq-q">Who can see my trips?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>You, anyone in your household you choose to share a trip with, and — when you need help — a support operator scoped to your account. Row-level security is enforced at the database layer, so one customer can never read another's trips. Operator access is role-limited: an engineer can read agent traces but not your card; a billing operator can read payments but can't trigger an agent. Every operator action is logged under their own identity.</p>
+       </div></div>
+     </div>
+
+     <div class="exp">
+       <div class="exp-head"><span class="faq-num">XII</span><span class="faq-q">What about my overall privacy?</span><span class="exp-chev">›</span></div>
+       <div class="exp-body"><div class="faq-a">
+         <p>Show-your-work is the whole product. You can see exactly what the agent did, when, and with whose permission, on your account activity log. We name every third party that ever touches your data, retain inbox/calendar content only as long as a trip needs it, and honor GDPR/CCPA rights to access, delete, and port. The one carve-out: audit-log records of agent actions are kept for legal defense, with your personal data redacted.</p>
+         <p>Read it in full → <a href="legal/privacy.html">Privacy</a> · <a href="legal/terms.html">Terms</a></p>
+       </div></div>
+     </div>
+
+    </div>
+
+    <!-- still have a question -->
+    <div style="text-align:center; padding:64px 0 8px;">
+      <div class="gh-rule" style="width:64px; margin:0 auto 28px;"></div>
+      <p class="gh-display gh-italic" style="font-size:clamp(24px,3vw,32px); color:var(--gh-cream); line-height:1.2;">Still wondering something?</p>
+      <p class="gh-lead" style="margin-top:12px;">The concierge answers in plain language, any hour.</p>
+      <a href="08-concierge.html" class="gh-btn gh-btn-lg" style="margin-top:26px;">Ask the concierge →</a>
+      <div class="gh-rule" style="width:64px; margin:34px auto 0;"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════ FOOTER ════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <div class="gh-display" style="font-size:26px; color:#fff;">t<span class="gh-accent">✦</span>ures</div>
+  <div class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim); margin-top:8px;">Questions worth asking</div>
+  <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:18px;">
+    <a href="account.html" class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim);">Account</a>
+    <a href="billing.html" class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim);">Billing</a>
+    <a href="legal/index.html" class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim);">Legal</a>
+  </div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar" style="position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px); background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px); border-top:1px solid rgba(255,255,255,0.08);">
+  <div style="max-width:920px; margin:0 auto; display:flex; align-items:center; gap:12px;">
+    <a href="legal/index.html" class="gh-btn-ghost gh-btn" style="white-space:nowrap;">Legal</a>
+    <a href="auth/signup.html" class="gh-btn" style="flex:1; max-width:360px;">Create an account →</a>
+  </div>
+</div>
+
+<script src="assets/ui.js"></script>
+<script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

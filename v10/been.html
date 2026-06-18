@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Where you've been</title>
+<meta name="description" content="Where you have been, remembered — so Tures plans around the places you already know." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/been.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Where you've been" />
+<meta property="og:description" content="Where you have been, remembered — so Tures plans around the places you already know." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/been.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Where you've been" />
+<meta name="twitter:description" content="Where you have been, remembered — so Tures plans around the places you already know." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* ───── continent group label ───── */
+  .cont-label{ display:inline-flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .cont-label .ln{ width:30px; height:1px; background:var(--gold); }
+  .cont-label .txt{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+
+  /* ───── country card — a framed place in the gallery ───── */
+  .country{ display:flex; flex-direction:column; gap:8px; padding:14px 14px; border-radius:12px; cursor:pointer;
+    border:1px solid rgba(255,255,255,0.09); background:var(--gh-card);
+    box-shadow:0 18px 40px -30px rgba(0,0,0,0.9);
+    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease; user-select:none; }
+  .country:hover{ border-color:var(--gold); transform:translateY(-3px); box-shadow:0 24px 48px -28px rgba(0,0,0,0.95), 0 0 22px -12px var(--gold); }
+  .country.been{ background:var(--gh-card); border-color:var(--gold); box-shadow:0 0 22px -10px var(--gold), inset 0 1px 0 rgba(255,255,255,0.06); }
+  .country .flag{ font-size:26px; line-height:1; }
+  .country .nm{ font-size:13px; color:var(--gh-cream); font-weight:500; }
+  .country.been .nm{ color:#fff; }
+  .rate{ display:none; gap:4px; flex-wrap:wrap; }
+  .country.been .rate{ display:flex; }
+  .dot10{ width:18px;height:18px;border-radius:99px;border:1px solid rgba(255,255,255,0.18);font-size:10px;
+    display:grid;place-items:center;color:var(--gh-cream-dim);cursor:pointer; transition:all .14s; }
+  .dot10:hover{ border-color:var(--gold); }
+  .dot10.on{ background:var(--gold); color:#06120a; border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body class="gh antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+    <div class="flex items-center gap-5 text-sm">
+      <a href="account.html" class="gh-caps" style="font-size:11px; color:var(--gh-cream-dim);">Account</a>
+      <a href="03-paste-trip.html" class="gh-btn" style="padding:11px 20px;">Plan a trip</a>
+    </div>
+  </nav>
+</header>
+
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+ <div class="ghost-num absolute -top-8 right-2 text-[20vw] z-0 gh-accent" style="opacity:.08;" data-parallax="0.12">✦</div>
+ <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-10">
+  <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Your map</span></div>
+  <h1 class="gh-h1" style="max-width:14ch; margin-top:10px;">Where you've <span class="gh-accent gh-italic">been.</span></h1>
+  <p class="gh-lead" style="margin-top:18px; max-width:48ch;">Tap the places you've visited and rate how much <em class="gh-italic" style="color:var(--gh-cream);">you</em> liked them, 1–10. Tures learns your taste from this — the more you mark, the sharper your suggestions.</p>
+  <div class="gh-lead" style="margin-top:16px; font-size:14px;" id="summary">—</div>
+ </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<main class="gh-wash">
+ <div class="max-w-5xl mx-auto px-6 py-12" id="continents"></div>
+</main>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:22px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-eyebrow" style="margin-top:10px;">It learns where you love.</div>
+</footer>
+
+<script src="assets/engine.js"></script>
+<script>
+if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
+
+var WORLD = {
+  "Europe": [["🇵🇹","Portugal"],["🇪🇸","Spain"],["🇫🇷","France"],["🇮🇹","Italy"],["🇬🇧","UK"],["🇩🇪","Germany"],["🇳🇱","Netherlands"],["🇨🇭","Switzerland"],["🇬🇷","Greece"],["🇮🇸","Iceland"],["🇸🇪","Sweden"],["🇩🇰","Denmark"],["🇫🇮","Finland"],["🇳🇴","Norway"]],
+  "Asia": [["🇯🇵","Japan"],["🇹🇭","Thailand"],["🇻🇳","Vietnam"],["🇸🇬","Singapore"],["🇰🇷","South Korea"],["🇮🇩","Indonesia"],["🇮🇳","India"],["🇦🇪","UAE"],["🇹🇷","Turkey"],["🇱🇰","Sri Lanka"]],
+  "Americas": [["🇺🇸","USA"],["🇨🇦","Canada"],["🇲🇽","Mexico"],["🇨🇷","Costa Rica"],["🇵🇪","Peru"],["🇦🇷","Argentina"],["🇨🇱","Chile"],["🇧🇷","Brazil"],["🇨🇴","Colombia"]],
+  "Africa & Middle East": [["🇲🇦","Morocco"],["🇿🇦","South Africa"],["🇪🇬","Egypt"],["🇰🇪","Kenya"],["🇹🇿","Tanzania"],["🇯🇴","Jordan"]],
+  "Oceania": [["🇦🇺","Australia"],["🇳🇿","New Zealand"],["🇫🇯","Fiji"]]
+};
+
+var state = {};   // name → { been, rating }
+
+var saveTimers = {};
+function save(name, region){
+  // Debounce per place so a quick mark-then-rate collapses into ONE write with the final state
+  // (two racing upserts could otherwise reorder and clobber the rating).
+  clearTimeout(saveTimers[name]);
+  saveTimers[name] = setTimeout(function(){
+    var s = state[name] || {};
+    tures.places.upsert({ kind:'country', name:name, region:region, been: !!s.been, rating: s.rating }).catch(function(){});
+  }, 350);
+}
+function renderSummary(){
+  var been = Object.keys(state).filter(function(n){ return state[n].been; });
+  var loved = been.filter(function(n){ return (state[n].rating||0) >= 8; });
+  document.getElementById('summary').innerHTML = '<strong style="color:var(--gold)">'+been.length+'</strong> places visited · <strong style="color:var(--gold)">'+loved.length+'</strong> you loved (8+)';
+}
+
+function buildCard(flag, name, region){
+  var card = document.createElement('div'); card.className='country'; card.setAttribute('data-name', name);
+  card.innerHTML = '<div class="flex items-center gap-2"><span class="flag">'+flag+'</span><span class="nm">'+name+'</span></div><div class="rate"></div>';
+  var rate = card.querySelector('.rate');
+  for(var i=1;i<=10;i++){ (function(n){ var d=document.createElement('span'); d.className='dot10'; d.textContent=n; d.onclick=function(e){ e.stopPropagation(); setRating(name, n); }; rate.appendChild(d); })(i); }
+  card.onclick = function(){ toggleBeen(name, region); };
+  return card;
+}
+function toggleBeen(name, region){
+  var s = state[name] = state[name] || {}; s.been = !s.been; if(!s.been) s.rating = undefined;
+  paint(name); save(name, region); renderSummary();
+}
+function setRating(name, n){
+  var s = state[name] = state[name] || {}; s.been = true; s.rating = (s.rating===n? undefined : n);
+  paint(name); var region = cardRegion[name]; save(name, region); renderSummary();
+}
+var cardRegion = {};
+function paint(name){
+  var card = document.querySelector('.country[data-name="'+name+'"]'); if(!card) return;
+  var s = state[name] || {};
+  card.classList.toggle('been', !!s.been);
+  card.querySelectorAll('.dot10').forEach(function(d,i){ d.classList.toggle('on', !!s.rating && (i+1) <= s.rating); });
+}
+
+// build UI
+var cont = document.getElementById('continents');
+Object.keys(WORLD).forEach(function(region){
+  var h = document.createElement('div'); h.className='mb-8';
+  h.innerHTML = '<div class="cont-label"><span class="ln"></span><span class="txt">'+region+'</span></div>';
+  var grid = document.createElement('div'); grid.className='grid grid-cols-2 sm:grid-cols-4 gap-2.5';
+  WORLD[region].forEach(function(c){ cardRegion[c[1]] = region; grid.appendChild(buildCard(c[0], c[1], region)); });
+  h.appendChild(grid); cont.appendChild(h);
+});
+
+// load existing
+if(tures.configured){
+  tures.places.list().then(function(res){
+    (res.places||[]).forEach(function(p){ state[p.name] = { been: p.been, rating: p.rating }; paint(p.name); });
+    renderSummary();
+  }).catch(renderSummary);
+} else { renderSummary(); }
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

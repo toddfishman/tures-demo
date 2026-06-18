@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Colophon</title>
+<meta name="description" content="Why Tures exists: an AI concierge that executes travel end to end, instead of handing you more research." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/about.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Colophon" />
+<meta property="og:description" content="Why Tures exists: an AI concierge that executes travel end to end, instead of handing you more research." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/about.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Colophon" />
+<meta name="twitter:description" content="Why Tures exists: an AI concierge that executes travel end to end, instead of handing you more research." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* one-breath pitch flow row */
+  .ab-flow{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; font-size:clamp(15px,1.3vw,18px); color:var(--gh-cream-dim); }
+  .ab-flow .ar{ color:var(--gold); }
+  .ab-flow .strong{ color:var(--gh-cream); font-weight:500; }
+
+  /* the deeper-brief expandable cards — keep .exp/.exp-head/.exp-body/.exp-chev
+     (ui.js toggles .open; tures.css drives the collapse + chevron rotation).
+     These page-scoped rules only re-skin them into the Greenhouse glass card. */
+  .ab-exp{ background:var(--gh-card); border:1px solid rgba(255,255,255,0.09); transition:border-color .4s ease; }
+  .ab-exp.open{ border-color:var(--gold); }
+  .ab-exp .exp-head{ display:flex; align-items:center; justify-content:space-between; gap:18px;
+    padding:22px 24px; cursor:pointer; }
+  .ab-exp .exp-head .ttl{ font-family:'Playfair Display',serif; font-weight:400; font-size:clamp(18px,1.7vw,24px); color:var(--gh-cream); }
+  .ab-exp .exp-chev{ color:var(--gold); font-size:20px; flex-shrink:0; }
+  .ab-exp .exp-body > .inner{ padding:0 24px 24px; }
+  .ab-exp .gh-lead{ font-size:14.5px; }
+
+  .ab-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+  @media(max-width:640px){ .ab-grid2{ grid-template-columns:1fr; } }
+
+  /* competitive table, Greenhouse-skinned */
+  .ab-table{ width:100%; border-collapse:collapse; }
+  .ab-table th,.ab-table td{ text-align:left; padding:11px 14px; vertical-align:top; font-size:13px; line-height:1.5; }
+  .ab-table th{ font-family:'DM Sans',sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:10px;
+    color:var(--gold); border-bottom:1px solid rgba(255,255,255,0.12); }
+  .ab-table td{ color:var(--gh-cream-dim); border-bottom:1px solid rgba(255,255,255,0.07); }
+  .ab-table td:first-child{ color:var(--gh-cream); }
+
+  .ab-list{ margin:0; padding-left:18px; }
+  .ab-list li{ margin-bottom:10px; color:var(--gh-cream-dim); font-size:14px; line-height:1.6; }
+  .ab-list li strong{ color:var(--gh-cream); font-weight:500; }
+  .ab-num{ counter-reset:abn; list-style:none; padding-left:0; }
+  .ab-num li{ position:relative; padding-left:38px; }
+  .ab-num li::before{ counter-increment:abn; content:counter(abn); position:absolute; left:0; top:0;
+    font-family:'Playfair Display',serif; color:var(--gold); font-size:18px; line-height:1.2; }
+</style>
+</head>
+<body>
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ HERO ════════ -->
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+  <div class="gh-section" style="padding-top:clamp(72px,11vw,140px);" data-reveal>
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Colophon</span></div>
+    <h1 class="gh-h1" style="max-width:18ch;">It books the trip you describe.</h1>
+    <p class="gh-display gh-italic" style="font-size:clamp(22px,2.8vw,38px); color:var(--gh-cream-dim); margin-top:14px;">Not researches one for you.</p>
+  </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ ONE-BREATH PITCH ════════ -->
+<section class="gh-wash">
+  <div class="gh-section-tight" data-reveal>
+    <p class="gh-eyebrow" style="margin-bottom:14px;">The whole idea</p>
+    <h2 class="gh-h2" style="max-width:20ch;">An executor, <span class="gh-accent gh-italic">not</span> a search engine.</h2>
+    <div class="ab-flow" style="margin-top:28px;">
+      <span>You describe the trip</span>
+      <span class="ar">→</span>
+      <span>Tures books every leg</span>
+      <span class="ar">→</span>
+      <span class="strong">confirmation numbers, not links</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ COLOPHON PLATE ════════ -->
+<section class="gh-wash-surface">
+  <div class="gh-section-tight" data-reveal>
+    <div class="gh-glass-acc" style="max-width:640px; margin:0 auto; padding:clamp(40px,6vw,64px); text-align:center;">
+      <div class="gh-rule" style="width:80px; margin:0 auto 28px;"></div>
+      <div class="gh-display" style="font-size:34px; color:#fff;">t<span class="gh-accent">✦</span>ures</div>
+      <div style="margin-top:22px; display:flex; flex-direction:column; gap:14px; color:var(--gh-cream-dim); font-size:14px; line-height:1.6;">
+        <p>Set in <span style="color:var(--gh-cream); font-family:'Playfair Display',serif;">Playfair Display</span> &amp; <span style="color:var(--gh-cream);">DM Sans</span>, with <span style="color:var(--gh-cream); font-family:'JetBrains Mono',monospace;">JetBrains Mono</span> for codes.</p>
+        <p class="gh-caps" style="font-size:10px; color:var(--gh-cream-dim);">Editorial &amp; product direction · Tures</p>
+        <p class="gh-caps" style="font-size:10px; color:var(--gh-cream-dim);">Grown under glass · dark botanical</p>
+        <p class="gh-caps gh-accent" style="font-size:11px; padding-top:6px;">First Edition · MMXXVI</p>
+      </div>
+      <div class="gh-rule" style="width:80px; margin:28px auto 0;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ THE DEEPER BRIEF ════════ -->
+<section class="gh-wash">
+  <div class="gh-section-tight" data-reveal>
+    <div style="text-align:center; margin-bottom:36px;">
+      <p class="gh-eyebrow" style="margin-bottom:10px;">The deeper brief · tap to read</p>
+      <h2 class="gh-h3">Everything under the canopy.</h2>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; max-width:840px; margin:0 auto;">
+
+      <!-- What's new in this edition -->
+      <div class="exp ab-exp">
+        <div class="exp-head"><span class="ttl">What's new in this edition</span><span class="exp-chev">›</span></div>
+        <div class="exp-body"><div class="inner ab-grid2">
+          <div>
+            <p class="gh-eyebrow" style="margin-bottom:6px;">Calibrate</p>
+            <p class="gh-h3" style="font-size:20px;">The Taste Engine</p>
+            <p class="gh-lead" style="margin-top:8px;">A per-traveler model that turns a few swipes into a working Taste Print, then sharpens after every trip. <a href="02-taste-engine.html" class="gh-accent" style="text-decoration:underline;">Calibrate →</a></p>
+          </div>
+          <div>
+            <p class="gh-eyebrow" style="margin-bottom:6px;">Watch</p>
+            <p class="gh-h3" style="font-size:20px;">The Hiccup Handler</p>
+            <p class="gh-lead" style="margin-top:8px;">An always-on monitor that scores the world's signals against your itinerary and pre-stages the fix before it reaches you. <a href="06-hiccup-handler.html" class="gh-accent" style="text-decoration:underline;">See it →</a></p>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- Who is Andy Rockwell -->
+      <div class="exp ab-exp">
+        <div class="exp-head"><span class="ttl">Who is Andy Rockwell?</span><span class="exp-chev">›</span></div>
+        <div class="exp-body"><div class="inner">
+          <p class="gh-lead" style="margin-bottom:14px;">Not a marketing segment — a specific person:</p>
+          <ul class="ab-list">
+            <li><strong>Mid-to-late 30s, $300K+ HHI</strong> — finance, tech, law. 12–25 personal travel nights/yr.</li>
+            <li><strong>Knows hotels by name.</strong> Asked for Real Christine, not "a boutique in Paris."</li>
+            <li><strong>Status traveler.</strong> Airline status, Amex Platinum/Centurion, a Virtuoso advisor he tolerates.</li>
+            <li><strong>Friction-allergic.</strong> Eleven minutes to describe the trip, then never think about logistics.</li>
+            <li><strong>High-trust if earned</strong> — and gone in 30 seconds if you fake a confirmation.</li>
+          </ul>
+          <p class="gh-lead" style="margin-top:14px;"><strong style="color:var(--gh-cream); font-weight:500;">He's not a price shopper. He's a time-and-cognition shopper.</strong></p>
+        </div></div>
+      </div>
+
+      <!-- Jobs to be done -->
+      <div class="exp ab-exp">
+        <div class="exp-head"><span class="ttl">Jobs to be done</span><span class="exp-chev">›</span></div>
+        <div class="exp-body"><div class="inner">
+          <ul class="ab-list ab-num">
+            <li><strong>Book exactly what I told you.</strong> If I name the hotel, you book that hotel.</li>
+            <li><strong>Find the cleanest feasible alternative when my ask is impossible — and ask first.</strong></li>
+            <li><strong>Handle the chain of permissions.</strong> Use my card, credit my status — and tell me what you did.</li>
+            <li><strong>Coordinate dinners</strong> — including the ones without a public API.</li>
+            <li><strong>Take care of things while I sleep.</strong> Schedule change, strike three days out — handle it.</li>
+          </ul>
+        </div></div>
+      </div>
+
+      <!-- Competitive landscape -->
+      <div class="exp ab-exp">
+        <div class="exp-head"><span class="ttl">Competitive landscape</span><span class="exp-chev">›</span></div>
+        <div class="exp-body"><div class="inner">
+          <div style="overflow-x:auto; border:1px solid rgba(255,255,255,0.09); margin-bottom:16px;">
+            <table class="ab-table">
+              <thead><tr><th>Tier</th><th>Players</th><th>Where they fail Andy</th></tr></thead>
+              <tbody>
+                <tr><td>Mass-market OTA</td><td>Expedia, Booking, Kayak</td><td>Generic inventory, no execution, no taste</td></tr>
+                <tr><td>Curated luxury</td><td>Inspirato, Mr&nbsp;&amp;&nbsp;Mrs Smith</td><td>Inventory only; no flights</td></tr>
+                <tr><td>AI travel research</td><td>Mindtrip, Layla, Vacay</td><td>Slideshows that end with "now go book it"</td></tr>
+                <tr><td>Human concierge</td><td>Quintessentially, Virtuoso</td><td>24–72hr loops, $5K–$20K/yr, gatekept</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="gh-lead"><strong style="color:var(--gh-cream); font-weight:500;">Where Tures sits:</strong> the empty quadrant — <em class="gh-accent">executor-grade automation at concierge-grade taste.</em> The moat is the integration surface, the Taste Engine's per-user model, and the trust UX.</p>
+        </div></div>
+      </div>
+
+      <!-- Business model & honest skepticism -->
+      <div class="exp ab-exp">
+        <div class="exp-head"><span class="ttl">Business model &amp; honest skepticism</span><span class="exp-chev">›</span></div>
+        <div class="exp-body"><div class="inner">
+          <p class="gh-lead" style="margin-bottom:14px;"><strong style="color:var(--gh-cream); font-weight:500;">$1,800/year</strong> for unlimited trips + transparent supplier commissions disclosed in the receipt. Slots between Amex Platinum and a Virtuoso advisor.</p>
+          <ul class="ab-list">
+            <li><strong>Top-end restaurant inventory isn't fully solvable by software.</strong> Honest about autobook vs. request-and-confirm.</li>
+            <li><strong>The Hiccup Handler must never cry wolf.</strong> It surfaces a held fix, executes on a real trigger, explains itself every time.</li>
+            <li><strong>Trust collapses on a single visible failure.</strong> Never confirm what we can't verify in two places.</li>
+            <li><strong>The LLM never books anything itself.</strong> It produces a plan; a deterministic executor validates and submits.</li>
+          </ul>
+        </div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CONTACT ════════ -->
+<section id="contact" class="gh-wash-surface">
+  <div class="gh-section" data-reveal>
+    <div class="gh-split">
+      <div>
+        <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Contact</span></div>
+        <h2 class="gh-h2">Tell us where<br>you're heading.</h2>
+        <p class="gh-lead" style="margin-top:20px; max-width:34ch;">Describe the trip in plain English. Tures books every leg and hands you confirmation numbers — pay only when something actually books.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px; justify-content:center;">
+        <a href="03-paste-trip.html" class="gh-btn gh-btn-lg">Start planning — free →</a>
+        <a href="index.html" class="gh-btn-ghost gh-btn gh-btn-lg">← Back to the edition</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <div class="gh-display" style="font-size:26px; color:#fff;">t<span class="gh-accent">✦</span>ures</div>
+  <div class="gh-lead" style="font-size:13px; margin-top:8px;">A trip booked is the only thing we ship.</div>
+</footer>
+
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

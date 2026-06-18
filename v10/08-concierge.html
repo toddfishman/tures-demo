@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — In-trip concierge</title>
+<meta name="description" content="Text Tures from anywhere. Same agent, same memory, same permissions — it just gets the thing done." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/08-concierge.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — In-trip concierge" />
+<meta property="og:description" content="Text Tures from anywhere. Same agent, same memory, same permissions — it just gets the thing done." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/08-concierge.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — In-trip concierge" />
+<meta name="twitter:description" content="Text Tures from anywhere. Same agent, same memory, same permissions — it just gets the thing done." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* ---- chat console (gh-glass-acc framed) ---- */
+  .cc-console{ border-radius:18px; overflow:hidden; }
+  .cc-head{ display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .cc-avatar{ width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
+    font-family:'Playfair Display',serif; font-size:18px; background:var(--gh-card);
+    color:var(--gold); border:1px solid var(--gold); flex-shrink:0; }
+  #chat{ min-height:320px; max-height:420px; overflow-y:auto; }
+
+  /* bubble palette retuned to greenhouse, classes/ids unchanged */
+  .bubble-me{ background:var(--gold); color:#06120a; }
+  .bubble-t{ background:rgba(255,255,255,0.055); color:var(--gh-cream); border:1px solid rgba(255,255,255,0.12); }
+  /* bubble entrance physics */
+  .msg{ opacity:0; transform:translateY(10px) scale(.97); transition:opacity .3s ease, transform .34s cubic-bezier(.34,1.5,.64,1); }
+  .msg.in{ opacity:1; transform:none; }
+  .typing span{ display:inline-block; width:5px; height:5px; border-radius:99px; background:var(--gh-cream-dim); margin:0 1px; animation:blink 1.2s infinite; }
+  .typing span:nth-child(2){ animation-delay:.2s } .typing span:nth-child(3){ animation-delay:.4s }
+  @keyframes blink{ 0%,60%,100%{opacity:.3} 30%{opacity:1} }
+  .acting{ display:inline-flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,255,255,0.05); border:1px solid var(--gold); padding:4px 10px; border-radius:99px; }
+
+  /* quick replies */
+  #suggestions{ display:flex; gap:8px; overflow-x:auto; padding:8px 14px 6px; }
+  .qr{ padding:7px 14px; border-radius:99px; font-size:12px; cursor:pointer; white-space:nowrap;
+    border:1px solid var(--gold); color:var(--gold); background:rgba(255,255,255,0.04); transition:all .14s; }
+  .qr:hover{ background:rgba(255,255,255,0.1); } .qr:active{ transform:scale(.96); }
+
+  /* channel segmented control — greenhouse skin (ui.js injects .thumb) */
+  #chanSeg{ position:relative; display:inline-flex; padding:4px; border-radius:99px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); }
+  #chanSeg button{ position:relative; z-index:1; padding:7px 16px; border:none; border-radius:99px; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:12px; letter-spacing:.02em; color:var(--gh-cream-dim);
+    background:transparent; transition:color .2s ease; }
+  #chanSeg button.on{ color:#06120a; font-weight:500; }
+  #chanSeg .thumb{ position:absolute; z-index:0; top:4px; bottom:4px; border-radius:99px; background:var(--gold);
+    transition:left .25s cubic-bezier(.2,.6,.2,1), width .25s cubic-bezier(.2,.6,.2,1); }
+
+  /* composer */
+  .cc-composer{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-top:1px solid rgba(255,255,255,0.08); }
+  .composer-input{ flex:1; background:rgba(255,255,255,0.05); color:var(--gh-cream); border:1px solid rgba(255,255,255,0.12);
+    outline:none; border-radius:99px; padding:11px 16px; font-size:13px; font-family:'DM Sans',sans-serif; }
+  .composer-input::placeholder{ color:var(--gh-cream-dim); }
+  #sendBtn{ width:38px; height:38px; border-radius:50%; border:none; background:var(--gold); color:#06120a;
+    display:grid; place-items:center; font-size:15px; cursor:pointer; flex-shrink:0; transition:filter .25s ease; }
+  #sendBtn:hover{ filter:brightness(1.08); }
+
+  /* status dot in head */
+  .cc-online{ width:7px; height:7px; border-radius:50%; background:var(--gold); flex-shrink:0;
+    box-shadow:0 0 10px var(--gold); }
+
+  /* layout */
+  .cc-grid{ display:grid; grid-template-columns:1.25fr 0.95fr; gap:clamp(32px,4vw,56px); align-items:start; }
+  @media(max-width:980px){ .cc-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="05-execution.html">In flight</a>
+      <a href="07-itinerary.html">Itinerary</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="08-concierge.html" class="active">Concierge</a>
+      <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
+    </div>
+    <a href="03-paste-trip.html" class="md:hidden text-gold text-sm quiet">Start free</a>
+  </nav>
+</header>
+
+<!-- ════════ HERO ════════ -->
+<section class="gh-wash gh-tile">
+ <div class="gh-section-tight">
+  <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">The Tures Concierge</span></div>
+  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:8px;">
+    <span class="gh-pill">Sample trip</span>
+  </div>
+  <h1 class="gh-h1" style="max-width:18ch">Text Tures from Paris.<br><span class="gh-accent gh-italic">Done before the apéritif.</span></h1>
+  <p class="gh-lead" style="margin-top:22px; max-width:46ch;">Same agent, same memory, same permissions — WhatsApp, Telegram, or the app. Tap a message to watch it work.</p>
+  <div style="margin-top:28px; display:flex; flex-wrap:wrap; gap:10px;">
+    <span class="gh-stat"><span class="dot"></span><span class="lbl">Always on</span></span>
+    <span class="gh-stat"><span class="dot"></span><span class="lbl">A real person in triage</span></span>
+    <span class="gh-stat"><span class="dot"></span><span class="lbl">No per-booking fee</span></span>
+  </div>
+ </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ THE THREAD ════════ -->
+<section class="gh-wash-surface">
+ <div class="gh-section" data-reveal>
+  <div class="cc-grid">
+
+   <!-- chat -->
+   <div>
+     <div id="chanSeg" class="seg" data-seg style="margin-bottom:18px;">
+       <button class="on" data-v="WhatsApp">WhatsApp</button>
+       <button data-v="Telegram">Telegram</button>
+       <button data-v="App">In-app</button>
+     </div>
+
+     <div class="cc-console gh-glass-acc">
+      <div class="cc-head">
+        <div class="cc-avatar">t</div>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif; font-size:16px; color:var(--gh-cream);">Tures Concierge</div>
+          <div style="font-size:11px; color:var(--gh-cream-dim);" id="chanLine">WhatsApp · online · typically &lt;1 min</div>
+        </div>
+        <span class="cc-online"></span>
+      </div>
+      <div id="chat" class="px-3 py-4 space-y-2.5 text-[13px]" data-noswipe></div>
+      <!-- quick replies -->
+      <div id="suggestions" data-noswipe></div>
+      <!-- composer -->
+      <div class="cc-composer">
+        <input id="composer" class="composer-input" placeholder="Message Tures…" data-noswipe />
+        <button id="sendBtn" class="shrink-0">↑</button>
+      </div>
+     </div>
+   </div>
+
+   <!-- side -->
+   <aside style="display:flex; flex-direction:column; gap:18px;">
+     <div class="gh-card" style="padding:28px 26px;">
+       <p class="gh-eyebrow" style="margin-bottom:12px;">Why a thread</p>
+       <h3 class="gh-h3">The best interface is the one you never have to open.</h3>
+       <p class="gh-lead" style="font-size:15px; margin-top:14px;">Text it like a fixer who already has your card, calendar, and taste loaded.</p>
+     </div>
+
+     <div class="gh-card" style="padding:28px 26px;">
+       <p class="gh-eyebrow" style="margin-bottom:16px;">Carries across every channel</p>
+       <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+         <li style="display:flex; gap:12px;"><span class="gh-accent">✦</span><span class="gh-lead" style="font-size:15px;">Your Taste Print — "somewhere for dinner" means the right place.</span></li>
+         <li style="display:flex; gap:12px;"><span class="gh-accent">✦</span><span class="gh-lead" style="font-size:15px;">Live trip state — it knows you land in Ivalo at 9pm.</span></li>
+         <li style="display:flex; gap:12px;"><span class="gh-accent">✦</span><span class="gh-lead" style="font-size:15px;">The Hiccup Handler — texts first when something's fixed.</span></li>
+       </ul>
+     </div>
+
+     <a href="03-paste-trip.html" class="gh-btn gh-btn-lg" style="width:100%;">Start free →</a>
+     <a href="index.html" class="gh-caps" style="text-align:center; font-size:11px; color:var(--gold); text-decoration:none;">← Back to the edition</a>
+   </aside>
+  </div>
+ </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-eyebrow" style="margin-top:10px;">The Tures Concierge</div>
+</footer>
+
+<script>
+const chat = document.getElementById('chat');
+const sugEl = document.getElementById('suggestions');
+
+/* each scripted reply can carry an "acting" status that shows while Tures works */
+const SCRIPT = {
+  "Push my Friday dinner to 9pm": {
+    acting:"Acting · moving your reservation",
+    replies:[
+      "On it. Le Bistrot Paul Bert has you at 8:00 Fri — moving to 21:00.",
+      "Done. 21:00 confirmed (R-8212-B). They'll hold a quieter corner per your Taste Print. ✦"
+    ]},
+  "Find me somewhere for dinner tonight": {
+    acting:"Acting · checking tables nearby",
+    replies:[
+      "You're in Paris tonight, nothing booked. Reading your Taste Print: hidden-gem, adventurous, quiet corner.",
+      "Three I can get you into within 30 min: Clamato (runner sent), Le Servan (21:15), Septime La Cave. Want Le Servan?"
+    ]},
+  "I'm running 40 min late to the airport": {
+    acting:"Acting · re-checking AY 1574",
+    replies:[
+      "Noted — checking AY 1574.",
+      "You're fine: 1h 50m buffer at HEL absorbs it, bag drop open until T-60. I alerted your driver and re-timed the Javri transfer. Nothing to do. 🙂"
+    ]},
+  "Add a spa afternoon in Copenhagen": {
+    acting:"Acting · finding a slot Dec 11",
+    replies:[
+      "Looking at Dec 11, your open afternoon in CPH.",
+      "Held 15:00 at La Banchina's sauna + harbor bath — small, design-forward, your kind of place. Confirm and I'll add it to your itinerary + calendar."
+    ]},
+};
+
+function addMsg(text, who){
+  const el = document.createElement('div');
+  el.className = 'msg ' + (who==='me'
+    ? 'max-w-[82%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2 bubble-me'
+    : 'max-w-[88%] rounded-2xl rounded-tl-sm px-3 py-2 bubble-t');
+  el.innerHTML = text;
+  chat.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('in'));
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+function actingPill(label){
+  const el=document.createElement('div');
+  el.className='msg flex';
+  el.innerHTML='<span class="acting"><span class="dot dot-amber pulse"></span>'+label+'</span>';
+  chat.appendChild(el); requestAnimationFrame(()=>el.classList.add('in')); chat.scrollTop=chat.scrollHeight;
+  return el;
+}
+function typing(){
+  const el = document.createElement('div');
+  el.className='msg max-w-[60%] rounded-2xl rounded-tl-sm px-3 py-2.5 bubble-t typing';
+  el.innerHTML='<span></span><span></span><span></span>';
+  chat.appendChild(el); requestAnimationFrame(()=>el.classList.add('in')); chat.scrollTop=chat.scrollHeight;
+  return el;
+}
+function send(q){
+  addMsg(q,'me');
+  renderSuggestions(q);
+  const entry = SCRIPT[q] || {replies:["Got it — handling that now.","Done. ✦"]};
+  const replies = entry.replies;
+  let actingEl = entry.acting ? null : undefined;
+  if(entry.acting){ setTimeout(()=>{ actingEl = actingPill(entry.acting); }, 350); }
+  let i=0;
+  const step=()=>{
+    if(i>=replies.length){ if(actingEl){ actingEl.remove(); } return; }
+    const t=typing();
+    setTimeout(()=>{
+      t.remove();
+      if(i===0 && actingEl){ actingEl.remove(); actingEl=null; }
+      addMsg(replies[i],'t'); i++; setTimeout(step, 550);
+    }, 1000+i*200);
+  };
+  setTimeout(step, entry.acting ? 900 : 400);
+}
+function renderSuggestions(used){
+  sugEl.innerHTML='';
+  Object.keys(SCRIPT).forEach(q=>{
+    if(q===used) return;
+    const b=document.createElement('button'); b.className='qr'; b.textContent=q; b.onclick=()=>send(q);
+    sugEl.appendChild(b);
+  });
+}
+
+/* composer */
+function sendTyped(){
+  const v=document.getElementById('composer').value.trim();
+  if(!v) return;
+  document.getElementById('composer').value='';
+  send(v);
+}
+document.getElementById('sendBtn').addEventListener('click', sendTyped);
+document.getElementById('composer').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendTyped(); } });
+
+/* channel segmented control */
+document.getElementById('chanSeg').addEventListener('segchange', function(e){
+  const name=e.detail.value;
+  const lines={WhatsApp:'WhatsApp · online · typically <1 min', Telegram:'Telegram · @tures_concierge · online', App:'Tures app · secure thread'};
+  document.getElementById('chanLine').innerHTML = lines[name];
+});
+
+// seed
+addMsg("Evening, Andy. You're in Paris through Saturday — everything's confirmed. What can I do?", 't');
+renderSuggestions();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>
