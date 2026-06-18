@@ -1000,9 +1000,25 @@ function finalizeTrip(){
   var c=window.__chosen, lines=['⌂ '+c.hotel, '✈ '+(c.flight||'flights')];
   if(c.dinners.length) lines.push('✦ '+c.dinners.length+' dinner'+(c.dinners.length>1?'s':''));
   if(c.excursions.length) lines.push('◎ '+c.excursions.length+' excursion'+(c.excursions.length>1?'s':''));
-  addMsg('Here’s your trip:<br>'+lines.join('<br>')+'<br><br>Everything above is held, nothing booked — I verify each twice before anything says “Booked.”', 't');
+  addMsg('Here’s your trip:<br>'+lines.join('<br>')+'<br><br>Everything above is held, nothing booked — I verify each twice before anything says “Booked.” Ready when you are.', 't');
   setStep(3);
-  setTimeout(function(){ composer.value=(window.__readyBrief||'')+' Staying at '+c.hotel+'.'; autoGrow(); planned=false; sendBrief(); }, 1000);
+  // Execution hand-off — DON'T re-submit the brief (that restarted the whole loop). Offer to book.
+  sugEl.innerHTML = '';
+  var bookBtn = document.createElement('button');
+  bookBtn.className = 'qr'; bookBtn.textContent = '✦ Book it — execute now';
+  bookBtn.onclick = function(){
+    sugEl.innerHTML = '';
+    addMsg('Book it.', 'me');
+    addMsg('On it — executing each leg now, verified against two sources before anything reads “Booked.” Follow along live.', 't');
+    setTimeout(function(){ location.href = '05-execution.html'; }, 1000);
+  };
+  var holdBtn = document.createElement('button');
+  holdBtn.className = 'qr'; holdBtn.textContent = 'Hold — I’ll decide later';
+  holdBtn.onclick = function(){
+    sugEl.innerHTML = '';
+    addMsg('Held. I’ll keep everything reserved and watch for changes — say the word and I’ll book it.', 't');
+  };
+  sugEl.appendChild(bookBtn); sugEl.appendChild(holdBtn);
 }
 
 document.addEventListener('click', function(e){
