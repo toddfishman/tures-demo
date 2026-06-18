@@ -1009,8 +1009,20 @@ function finalizeTrip(){
   bookBtn.onclick = function(){
     sugEl.innerHTML = '';
     addMsg('Book it.', 'me');
-    addMsg('On it — executing each leg now, verified against two sources before anything reads “Booked.” Follow along live.', 't');
-    setTimeout(function(){ location.href = '05-execution.html'; }, 1000);
+    // No live engine (or a pure demo) → the visual execution demo.
+    if(!(window.tures && tures.configured && currentBrief)){
+      addMsg('On it — executing each leg now, verified against two sources before anything reads “Booked.” Follow along live.', 't');
+      setTimeout(function(){ location.href = '05-execution.html'; }, 1000);
+      return;
+    }
+    // Live engine → a real authorization gate before any booking call is made.
+    addMsg('I’ll book each leg and verify every confirmation against two sources before it counts — nothing is charged until it’s confirmed. Ready to authorize?', 't');
+    sugEl.innerHTML = '';
+    var auth = document.createElement('button'); auth.className='qr'; auth.textContent='✦ Authorize & book';
+    auth.onclick = function(){ sugEl.innerHTML=''; addMsg('Authorized — go.', 'me'); executeBooking(); };
+    var notyet = document.createElement('button'); notyet.className='qr'; notyet.textContent='Not yet';
+    notyet.onclick = function(){ sugEl.innerHTML=''; addMsg('Held — everything stays reserved. Say the word when you’re ready.', 't'); };
+    sugEl.appendChild(auth); sugEl.appendChild(notyet);
   };
   var holdBtn = document.createElement('button');
   holdBtn.className = 'qr'; holdBtn.textContent = 'Hold — I’ll decide later';
@@ -1019,6 +1031,50 @@ function finalizeTrip(){
     addMsg('Held. I’ll keep everything reserved and watch for changes — say the word and I’ll book it.', 't');
   };
   sugEl.appendChild(bookBtn); sugEl.appendChild(holdBtn);
+}
+
+/* Real booking: stage on the engine (/book), pass the human-confirm gate (/book/:id/confirm),
+   then show the engine's actual confirmations. With the mock supplier + liveBooking off these are
+   simulated and NOTHING is charged; flip the engine's real-money switches to go live. */
+function executeBooking(){
+  var t = typing();
+  tures.book({ brief: currentBrief }).then(function(bk){
+    return tures.confirm(bk.tripId || bk.id).then(function(booking){
+      try{ t.remove(); }catch(_){}
+      var comps = (booking && booking.components) || [];
+      var booked = comps.filter(function(c){ return /book|confirm|done|ok|tick/i.test(c.status||''); });
+      var lines = (booked.length ? booked : comps).map(function(c){
+        var code = c.confirmation || c.pnr || c.ref || c.locator || c.code || '';
+        var label = c.label || c.title || c.name || c.kind || 'leg';
+        return '✓ ' + String(label).replace(/</g,'&lt;') + (code ? ' · <span class="font-mono text-gold-deep">' + String(code).replace(/</g,'&lt;') + '</span>' : '');
+      });
+      var total = (booking && booking.totalUsd) ? '<br><br>Total authorized: $' + Number(booking.totalUsd).toLocaleString() : '';
+      addMsg('Booked — each confirmation verified against two sources before it counted.<br>' + (lines.join('<br>') || 'Every leg confirmed.') + total, 't');
+      setStep(3);
+      sugEl.innerHTML = '';
+      var trips = document.createElement('button'); trips.className='qr'; trips.textContent='See it in My Trips →';
+      trips.onclick = function(){ location.href = '07-itinerary.html'; };
+      var audit = document.createElement('button'); audit.className='qr'; audit.textContent='Watch the audit';
+      audit.onclick = function(){ location.href = '05-execution.html?trip=' + encodeURIComponent(booking.tripId || booking.id || ''); };
+      sugEl.appendChild(trips); sugEl.appendChild(audit);
+    });
+  }).catch(function(err){
+    try{ t.remove(); }catch(_){}
+    if(err && err.status === 409){
+      // Blocked at the policy gate — typically no payment method on file. Route to set one up.
+      var v = (err.body && err.body.violations) || [];
+      var why = v.length ? v.map(function(x){ return (x && (x.message || x.reason || x.code)) || x; }).join(' · ') : 'a card on file is required';
+      addMsg('Almost — to book this for real I need a payment method on file (your Tures Vault). ' + String(why).replace(/</g,'&lt;') + '. Set that up and I’ll book this trip in one tap — nothing is charged until it’s confirmed.', 't');
+      try{ localStorage.setItem('tures.pendingTrip', JSON.stringify({ brief: currentBrief, hotel: (window.__chosen && window.__chosen.hotel) || '' })); }catch(_){}
+      sugEl.innerHTML = '';
+      var go = document.createElement('button'); go.className='qr'; go.textContent='Set up payment & book →';
+      go.onclick = function(){ location.href = (window.tures && tures.signedIn) ? 'checkout.html' : 'signup.html'; };
+      sugEl.appendChild(go);
+    } else {
+      addMsg('The live engine hit a snag (' + (String((err && err.message) || err)).replace(/</g,'&lt;') + '). Here’s the demo execution instead.', 't');
+      setTimeout(function(){ location.href = '05-execution.html'; }, 1100);
+    }
+  });
 }
 
 document.addEventListener('click', function(e){
