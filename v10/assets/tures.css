@@ -1128,27 +1128,39 @@ html[data-theme="greenhouse"] .pill-info,     html[data-theme="greenhouse"] .pil
 
 /* ── floating chrome → liquid glass, accent-outlined ── */
 /* Trigger pill matches the dropdown: same dark glass, accent-outlined (was light glass → looked mismatched). */
-html[data-theme="greenhouse"] .tures-logo,
+/* Pill + dropdown modelled exactly on the cover's, so the chrome is identical on every page. */
+html[data-theme="greenhouse"] .tures-logo{
+  font-family:'Playfair Display',serif; font-weight:400; font-size:25px; letter-spacing:.04em; line-height:1;
+  color:#ffffff; background:rgba(8,12,8,0.55); backdrop-filter:blur(24px) saturate(180%);
+  border:1.5px solid var(--gold); padding:13px 23px 13px 21px; border-radius:60px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.12); }
+html[data-theme="greenhouse"] .tures-logo .spark{ font-size:0.6em; vertical-align:super; color:var(--gold); }
+html[data-theme="greenhouse"] .tures-logo .car{ font-size:13px; opacity:1; color:var(--gold); margin-left:8px; }
 html[data-theme="greenhouse"] .tures-signup{
-  background:rgba(8,12,8,0.58); backdrop-filter:blur(22px) saturate(180%);
-  border:1.5px solid var(--gold); color:#ffffff;
-  box-shadow:0 4px 22px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.1); }
-html[data-theme="greenhouse"] .tures-logo .spark,
-html[data-theme="greenhouse"] .tures-logo .car{ color:var(--gold); }
+  font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em; color:#ffffff;
+  background:rgba(8,12,8,0.55); backdrop-filter:blur(22px) saturate(180%); border:1.5px solid var(--gold);
+  padding:13px 22px; border-radius:60px; box-shadow:0 4px 22px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
 html[data-theme="greenhouse"] .tures-logo:hover,
-html[data-theme="greenhouse"] .tures-signup:hover{ border-color:var(--gold-bright); background:rgba(14,20,14,0.78); }
+html[data-theme="greenhouse"] .tures-signup:hover{ border-color:var(--gold-bright); background:rgba(14,20,14,0.72); }
 html[data-theme="greenhouse"] .tures-menu{
+  min-width:300px; padding:0 0 6px; overflow:hidden auto;
   background:rgba(8,12,8,0.6); backdrop-filter:blur(40px) saturate(200%);
-  border:1px solid rgba(255,255,255,0.12); border-top:1px solid var(--gold);
+  border:1px solid rgba(255,255,255,0.12); border-top:1px solid var(--gold); border-radius:12px;
   box-shadow:0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08); }
+html[data-theme="greenhouse"] .tures-menu::before{ content:""; display:block; height:1px;
+  background:linear-gradient(to right, transparent, var(--gold), transparent); }
+html[data-theme="greenhouse"] .tures-menu a{ padding:10px 20px; }
+html[data-theme="greenhouse"] .tures-menu a:hover{ padding-left:23px; }
+html[data-theme="greenhouse"] .tures-menu a .pg{ font-family:'Playfair Display',serif; font-size:11px; min-width:30px; }
 /* Stop the side-switching: logo + dropdown live top-RIGHT on every page (matching the cover),
    the account/sign-up pill moves to top-LEFT. The menu opens aligned to the logo's right edge. */
-html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:16px; }
+html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:30px; top:22px; }
 html[data-theme="greenhouse"] .tures-menu{ left:auto; right:0; }
-html[data-theme="greenhouse"] .tures-signup{ right:auto; left:16px; }
+html[data-theme="greenhouse"] .tures-signup{ right:auto; left:30px; top:22px; }
 @media(max-width:640px){
-  html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:11px; }
-  html[data-theme="greenhouse"] .tures-signup{ right:auto; left:11px; }
+  html[data-theme="greenhouse"] .tures-chrome-logo{ left:auto; right:14px; top:14px; }
+  html[data-theme="greenhouse"] .tures-signup{ right:auto; left:14px; top:14px; font-size:11.5px; padding:11px 16px; }
+  html[data-theme="greenhouse"] .tures-logo{ font-size:21px; padding:11px 18px; }
 }
 html[data-theme="greenhouse"] .tures-menu a,
 html[data-theme="greenhouse"] .tures-menu .grp-head,
