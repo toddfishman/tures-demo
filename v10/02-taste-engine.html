@@ -52,32 +52,32 @@
     text-transform:uppercase; color:var(--gold-bright); opacity:.85; }
   .pole.l{ left:14px; } .pole.r{ right:14px; text-align:right; }
 
-  /* live taste-print: kept light so the JS-drawn radar + marks read (engine writes warm-on-cream colors) */
-  .tp-leaf{ background:var(--gh-cream); color:#1c2418; border:1px solid rgba(255,255,255,0.12); border-radius:18px;
-    box-shadow:0 24px 60px -30px rgba(0,0,0,.7); }
-  .dim-track{ height:6px; border-radius:99px; background:rgba(43,33,20,0.12); position:relative; }
+  /* live taste-print — dark glass, the radar glows with the scene accent */
+  .tp-leaf{ background:rgba(255,255,255,0.045); color:var(--gh-cream); border:1px solid var(--gold); border-radius:18px;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.85), 0 0 34px -18px var(--gold); backdrop-filter:blur(10px); }
+  .dim-track{ height:6px; border-radius:99px; background:rgba(255,255,255,0.12); position:relative; }
   .dim-mark{ position:absolute; top:50%; width:14px; height:14px; border-radius:99px;
-    background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border:1px solid #8a6a26;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border:1px solid var(--gold);
     transform:translate(-50%,-50%); left:50%; transition:left .6s cubic-bezier(.6,.02,.2,1);
-    box-shadow:0 2px 6px rgba(0,0,0,.5); }
+    box-shadow:0 0 10px -2px var(--gold); }
   .tag-chip{ opacity:0; transform:translateY(6px); transition:opacity .4s ease, transform .4s ease; }
   .tag-chip.in{ opacity:1; transform:none; }
 
   .fp{ opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease; }
   .fp.in{ opacity:1; transform:none; }
 
-  /* finish card sits in the dark frame; keep it on the cream leaf for the JS-written list */
-  .tp-finish{ background:var(--gh-cream); color:#1c2418; border-radius:18px; padding:28px; }
+  /* finish card — dark glass */
+  .tp-finish{ background:rgba(255,255,255,0.045); color:var(--gh-cream); border:1px solid var(--gold); border-radius:18px; padding:28px; backdrop-filter:blur(10px); }
 
-  /* small light-card local helpers (taste print interior, light-on-cream) */
-  .tp-faint{ color:#8a7c63; }
-  .tp-soft{ color:#4a4232; }
-  .tp-track{ height:6px; border-radius:99px; background:rgba(43,33,20,0.12); position:relative; overflow:hidden; }
+  /* dark-theme helpers */
+  .tp-faint{ color:var(--gh-cream-dim); }
+  .tp-soft{ color:var(--gh-cream); }
+  .tp-track{ height:6px; border-radius:99px; background:rgba(255,255,255,0.12); position:relative; overflow:hidden; }
   .tp-fill{ height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); }
   .tp-pill{ display:inline-flex; align-items:center; gap:7px; padding:5px 12px; border-radius:99px; font-size:11px;
-    letter-spacing:.04em; color:#6b5320; border:1px solid rgba(150,112,46,.4); background:rgba(200,162,74,.1); }
+    letter-spacing:.04em; color:var(--gold); border:1px solid var(--gold); background:rgba(255,255,255,0.04); }
   .tp-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
-  .tp-rule{ height:1px; background:rgba(43,33,20,0.12); }
+  .tp-rule{ height:1px; background:rgba(255,255,255,0.1); }
 
   .engine-split{ display:grid; grid-template-columns:1.25fr 1fr; gap:clamp(40px,5vw,72px); align-items:start; }
   @media(max-width:980px){ .engine-split{ grid-template-columns:1fr; gap:44px; } }
@@ -135,14 +135,14 @@
     <div id="finish" class="hidden">
       <div class="tp-finish">
         <div class="gh-caps tp-faint" style="font-size:11px; margin-bottom:8px;">Calibration complete</div>
-        <h2 class="gh-display" style="font-size:clamp(28px,3.4vw,40px); color:#1c2418; line-height:1.1;">Your Taste Print.</h2>
+        <h2 class="gh-display" style="font-size:clamp(28px,3.4vw,40px); color:var(--gh-cream); line-height:1.1;">Your Taste Print.</h2>
         <p class="mt-3 tp-soft leading-relaxed text-[15px]" id="signature">—</p>
         <div class="tp-rule my-6"></div>
         <div class="gh-caps tp-faint" style="font-size:11px; margin-bottom:12px;">So Tures will</div>
-        <ul class="space-y-2.5 text-sm" style="color:#2a3322;" id="behaviors"></ul>
+        <ul class="space-y-2.5 text-sm" style="color:var(--gh-cream);" id="behaviors"></ul>
         <div class="mt-7 flex flex-wrap gap-3">
           <a href="03-paste-trip.html" class="gh-btn">Describe a trip →</a>
-          <button onclick="restart()" class="gh-btn gh-btn-ghost" style="color:#6b5320;border-color:rgba(150,112,46,.5);background:rgba(200,162,74,.08);">Recalibrate</button>
+          <button onclick="restart()" class="gh-btn gh-btn-ghost">Recalibrate</button>
         </div>
       </div>
     </div>
@@ -152,12 +152,12 @@
   <aside>
     <div class="tp-leaf p-6 sticky top-24">
       <div class="flex items-center justify-between mb-1">
-        <div class="gh-display" style="font-size:26px; color:#1c2418;">Taste Print</div>
+        <div class="gh-display" style="font-size:26px; color:var(--gh-cream);">Taste Print</div>
         <span class="tp-pill"><span class="dot pulse"></span>Live</span>
       </div>
       <div class="flex items-center gap-2 text-xs tp-faint mb-5">
         <span class="gh-caps">Confidence</span>
-        <span style="font-family:'JetBrains Mono',monospace; color:#1c2418;" id="confLabel">0.18</span>
+        <span style="font-family:'JetBrains Mono',monospace; color:var(--gh-cream);" id="confLabel">0.18</span>
         <div class="tp-track flex-1"><div class="tp-fill" id="confBar" style="width:18%"></div></div>
       </div>
 
@@ -260,20 +260,20 @@ function drawRadar(){
   // rings
   [0.33,0.66,1].forEach(s=>{
     let pts = DIMS.map((d,i)=>{ const a=(-90+i*60)*Math.PI/180; return (CX+R*s*Math.cos(a))+','+(CY+R*s*Math.sin(a)); }).join(' ');
-    g += `<polygon points="${pts}" fill="none" stroke="rgba(43,33,20,0.12)" />`;
+    g += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.12)" />`;
   });
   // axes + labels
   DIMS.forEach((d,i)=>{
     const a=(-90+i*60)*Math.PI/180;
     const ex=CX+R*Math.cos(a), ey=CY+R*Math.sin(a);
-    g += `<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="rgba(43,33,20,0.10)" />`;
+    g += `<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="rgba(255,255,255,0.1)" />`;
     const lx=CX+(R+15)*Math.cos(a), ly=CY+(R+15)*Math.sin(a);
-    g += `<text x="${lx}" y="${ly}" font-size="9" fill="#97886f" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase;letter-spacing:.08em">${d.label}</text>`;
+    g += `<text x="${lx}" y="${ly}" font-size="9" fill="#B8AD96" text-anchor="middle" dominant-baseline="middle" style="text-transform:uppercase;letter-spacing:.08em">${d.label}</text>`;
   });
-  // value polygon
+  // value polygon — strokes + nodes follow the scene accent
   let vpts = DIMS.map((d,i)=> radarPoint(i, d.v).join(',')).join(' ');
-  g += `<polygon id="radarFill" points="${vpts}" fill="rgba(200,162,74,0.22)" stroke="#c8a24a" stroke-width="1.5" style="transition:all .6s cubic-bezier(.6,.02,.2,1)" />`;
-  DIMS.forEach((d,i)=>{ const p=radarPoint(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#e6c873" />`; });
+  g += `<polygon id="radarFill" points="${vpts}" fill="rgba(74,222,128,0.16)" stroke-width="1.5" style="stroke:var(--gold); transition:all .6s cubic-bezier(.6,.02,.2,1)" />`;
+  DIMS.forEach((d,i)=>{ const p=radarPoint(i,d.v); g+=`<circle cx="${p[0]}" cy="${p[1]}" r="2.5" style="fill:var(--gold-bright)" />`; });
   radar.innerHTML = g;
 }
 function updateRadar(){

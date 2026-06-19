@@ -37,8 +37,9 @@
 .gh-caps{ text-transform:uppercase; letter-spacing:.14em; }
 
 /* ---- sections & rhythm ---- */
-.gh-section{ padding:clamp(64px,9vw,124px) clamp(24px,6vw,80px); max-width:1240px; margin:0 auto; }
-.gh-section-tight{ padding:clamp(48px,6vw,88px) clamp(24px,6vw,80px); max-width:1240px; margin:0 auto; }
+/* Tighter top so content sits up under the title (less title-then-whitespace), generous bottom. */
+.gh-section{ padding:clamp(40px,5.5vw,78px) clamp(24px,6vw,80px) clamp(60px,8vw,104px); max-width:1240px; margin:0 auto; }
+.gh-section-tight{ padding:clamp(28px,4vw,52px) clamp(24px,6vw,80px) clamp(40px,5vw,68px); max-width:1240px; margin:0 auto; }
 .gh-wash{ background:var(--gh-bg); }
 .gh-wash-surface{ background:var(--gh-surface); }
 .gh-tile{ background-image:var(--gh-tile); background-size:40px 40px; }
