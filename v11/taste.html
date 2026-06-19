@@ -1,0 +1,228 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — The Taste Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<style>
+  /* ── taste — page-specific only; everything else reuses v11.css ── */
+  .ts-hero{padding-top:74px}
+  .ts-hero h1{margin-top:20px;max-width:12ch}
+  .ts-hero .lead{margin:18px auto 0}
+
+  /* Taste Print panel */
+  .print-wrap{margin-top:38px}
+  .print{border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);overflow:hidden;
+    box-shadow:0 40px 90px -60px rgba(0,0,0,.3)}
+  .print .ph{display:flex;align-items:center;gap:13px;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .print .ph .avatar{width:42px;height:42px;font-size:19px}
+  .print .ph .who{flex:1}
+  .print .ph .who .nm{font-family:'Playfair Display',serif;font-size:18px}
+  .print .ph .who .sub{font-size:12.5px;color:var(--muted)}
+  .print .ph .edit{font-size:12.5px;color:var(--acc-deep);border:1px solid var(--acc-line);border-radius:999px;padding:6px 13px;background:var(--acc-dim)}
+  .print .pb{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+  .pcell{background:var(--bg);padding:18px 20px}
+  .pcell .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:5px 12px}
+  .chip.av{color:var(--muted);background:var(--bg);border-style:dashed}
+  .chip.lv{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
+  .print .pf{padding:11px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;align-items:center;gap:8px}
+  .print .pf .demo-tag{margin-left:auto}
+
+  /* Because you loved */
+  .byl{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .byl .past,.byl .next{padding:26px 28px}
+  .byl .past{background:var(--surface)}
+  .byl .next{border-left:1px solid var(--line);position:relative}
+  .byl .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .byl .next .lbl{color:var(--acc-deep)}
+  .byl h3{margin-bottom:6px}
+  .byl p{color:var(--muted);font-size:14px;max-width:34ch}
+  .byl .meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin-top:14px}
+  .byl .arrow{position:absolute;left:-17px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
+    background:var(--bg);border:1px solid var(--line-2);display:grid;place-items:center;color:var(--acc-deep);z-index:2}
+  .byl .arrow svg{stroke:var(--acc-deep)}
+  .byl .next .demo-tag{position:absolute;top:18px;right:20px}
+
+  /* how it learns */
+  .learn .ico svg{stroke:var(--acc-deep)}
+
+  /* privacy band */
+  .privacy{display:flex;align-items:center;gap:20px;border:1px solid var(--acc-line);background:var(--acc-dim);border-radius:var(--radius);padding:26px 30px}
+  .privacy .ic{width:48px;height:48px;border-radius:13px;flex:0 0 auto;display:grid;place-items:center;background:var(--bg);border:1px solid var(--acc-line);color:var(--acc-deep)}
+  .privacy .ic svg{stroke:var(--acc-deep)}
+  .privacy h3{margin-bottom:4px}
+  .privacy p{color:var(--muted);font-size:14.5px;max-width:62ch}
+  .privacy a{color:var(--acc-deep);font-weight:500;white-space:nowrap}
+  .privacy a:hover{text-decoration:underline}
+
+  .ts-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+  @media (max-width:760px){
+    .print .pb{grid-template-columns:1fr}
+    .byl{grid-template-columns:1fr}
+    .byl .next{border-left:none;border-top:1px solid var(--line)}
+    .byl .arrow{left:50%;top:-17px;transform:translateX(-50%) rotate(90deg)}
+    .privacy{flex-direction:column;align-items:flex-start;gap:14px}
+  }
+</style>
+</head>
+<body data-page="taste">
+<main>
+
+  <!-- HERO -->
+  <section class="section ts-hero">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> The Taste Engine</span>
+      <h1 style="margin-left:auto;margin-right:auto">It gets to know <em>you.</em></h1>
+      <p class="lead center">Tures learns what you love, what you avoid, and where you should go next &mdash; then books in that vein. The more you travel, the more it sounds like the friend who already knows your taste.</p>
+    </div>
+  </section>
+
+  <!-- TASTE PRINT -->
+  <section class="section tight">
+    <div class="wrap">
+      <div class="center">
+        <span class="eyebrow"><span class="dot"></span> Your Taste Print</span>
+        <h2 style="margin-top:18px">A profile that <em>books like you would.</em></h2>
+      </div>
+
+      <div class="print-wrap">
+        <div class="print">
+          <div class="ph">
+            <span class="avatar">A</span>
+            <div class="who">
+              <div class="nm">Andy Rockwell</div>
+              <div class="sub">Taste Print &middot; learned across 11 trips</div>
+            </div>
+            <a class="edit" href="vault.html">Edit preferences</a>
+          </div>
+
+          <div class="pb">
+            <div class="pcell">
+              <div class="l">Cabin</div>
+              <div class="chips"><span class="chip">Business</span><span class="chip">Lie-flat on red-eyes</span></div>
+            </div>
+            <div class="pcell">
+              <div class="l">Hotels</div>
+              <div class="chips"><span class="chip">Design-forward</span><span class="chip">Boutique</span><span class="chip">Under 80 rooms</span></div>
+            </div>
+            <div class="pcell">
+              <div class="l">Cuisine</div>
+              <div class="chips"><span class="chip">Tasting menus</span><span class="chip">Local seafood</span></div>
+            </div>
+            <div class="pcell">
+              <div class="l">Pace</div>
+              <div class="chips"><span class="chip">Unhurried mornings</span><span class="chip">One thing a day</span></div>
+            </div>
+            <div class="pcell">
+              <div class="l">Avoid</div>
+              <div class="chips"><span class="chip av">Big resorts</span><span class="chip av">Crowds</span><span class="chip av">Early flights</span></div>
+            </div>
+            <div class="pcell">
+              <div class="l">Loves</div>
+              <div class="chips"><span class="chip lv">Coastal towns</span><span class="chip lv">Walkable old quarters</span></div>
+            </div>
+          </div>
+
+          <div class="pf">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--faint)"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <span>Yours to edit any time. Tures books inside it, asks outside it.</span>
+            <span class="demo-tag">Sample</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- BECAUSE YOU LOVED -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:36px">
+        <span class="eyebrow"><span class="dot"></span> How it shows up</span>
+        <h2 style="margin-top:18px">Every pick traces back to <em>something you loved.</em></h2>
+      </div>
+
+      <div class="byl">
+        <div class="past">
+          <div class="lbl">Because you loved</div>
+          <h3 class="serif">The Real Christine, Paris</h3>
+          <p>You spent two extra nights in the design rooms, asked to keep the same one on the way back, and rated the courtyard breakfast your favourite of the trip.</p>
+          <div class="meta">Dec 2025 &middot; 5 nights &middot; design suite</div>
+        </div>
+        <div class="next">
+          <span class="arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="demo-tag">Sample</span>
+          <div class="lbl">On Maui we would hold</div>
+          <h3 class="serif">Montage Kapalua Bay</h3>
+          <p>Same design-led, low-key feel &mdash; an ocean-view residence over a big resort tower, with the unhurried mornings you keep coming back for.</p>
+          <div class="meta">Jun 12&ndash;19 &middot; ocean-view residence &middot; held to confirm</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- HOW IT LEARNS -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:40px">
+        <span class="eyebrow"><span class="dot"></span> How it learns</span>
+        <h2 style="margin-top:18px">It learns the way a good concierge would. <em>By paying attention.</em></h2>
+      </div>
+      <div class="grid-3 learn">
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <h3>From your trips</h3>
+          <p>Where you've been, what you went back to, the room you asked to keep. Every place you've stayed teaches Tures what "your kind of place" actually means.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6a4 4 0 0 0 4 4h11M21 17v-6a4 4 0 0 0-4-4H6M8 4 5 7l3 3M16 20l3-3-3-3"/></svg></span>
+          <h3>From your corrections</h3>
+          <p>Every swap is a signal. Trade the resort for a boutique, push the flight an hour later &mdash; Tures remembers the reason, not just the change, and stops offering the thing you moved away from.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/><path d="M3 18.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-1.5"/></svg></span>
+          <h3>From your bookings</h3>
+          <p>What you actually confirm tells the truest story. The picks you say yes to &mdash; and how fast &mdash; sharpen the next slate so the right option is already at the top.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="section tight">
+    <div class="wrap">
+      <div class="privacy">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <div>
+          <h3 class="serif">It is your data, working for you</h3>
+          <p>Your Taste Print is yours &mdash; editable and revocable any time, never traded or sold. Held quietly in the Vault, tokenized through VGS, and used only to book the way you would. Turn any of it off and Tures simply asks more.</p>
+        </div>
+        <a href="vault.html">Open the Vault &nbsp;→</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- CLOSING CTA -->
+  <section class="section tight">
+    <div class="wrap center">
+      <h2>Let it learn your taste. <em>Starting with one trip.</em></h2>
+      <p class="lead center" style="margin:16px auto 28px">Describe where you're headed. Tures books it the way you would &mdash; and gets sharper every time.</p>
+      <div class="ts-cta">
+        <a class="btn" href="plan.html">Plan a trip &nbsp;→</a>
+        <a class="btn ghost" href="vault.html">The Vault</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script src="_devkit.js"></script>
+</body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>tures — Where would you like to go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0B0B0D;
+    --bg-2:#101012;
+    --ink:#EDE9E0;
+    --ink-soft:#A9A39A;
+    --ink-faint:#6F6A62;
+    --acc:#C9A24A;
+    --acc-light:#E6C873;
+    --line:rgba(201,162,74,.16);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'DM Sans',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  /* soft gold radial wash */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(60% 55% at 50% 38%, rgba(201,162,74,.16), rgba(201,162,74,.05) 42%, transparent 70%),
+      radial-gradient(40% 40% at 50% 120%, rgba(230,200,115,.07), transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+  /* faint grain via subtle vignette */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:radial-gradient(120% 100% at 50% 0%, transparent 55%, rgba(0,0,0,.55) 100%);
+    pointer-events:none;
+    z-index:0;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(201,162,74,.28);color:#fff}
+
+  header,main,footer{position:relative;z-index:2}
+
+  /* ---- top bar ---- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:30px clamp(20px,5vw,60px);
+  }
+  .wordmark{
+    font-family:var(--serif);
+    font-size:24px;
+    letter-spacing:.5px;
+    color:var(--ink);
+    font-weight:500;
+  }
+  .spark{color:var(--acc);font-style:normal}
+  .signin{
+    font-family:var(--sans);
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding:8px 4px;
+    border-radius:3px;
+    transition:color .3s ease;
+  }
+  .signin:hover{color:var(--acc-light)}
+  .signin:focus-visible{outline:1px solid var(--acc);outline-offset:6px}
+
+  /* ---- hero ---- */
+  main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px clamp(20px,6vw,80px) 80px;
+  }
+  .eyebrow{
+    font-family:var(--sans);
+    font-size:11px;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--acc);
+    opacity:.85;
+    margin-bottom:34px;
+    animation:rise 1.1s ease both;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(38px,7.4vw,86px);
+    line-height:1.04;
+    letter-spacing:-.01em;
+    color:var(--ink);
+    max-width:14ch;
+    animation:rise 1.1s .08s ease both;
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--acc-light);
+  }
+
+  /* ---- prose input ---- */
+  .field{
+    width:min(720px,100%);
+    margin-top:clamp(34px,6vh,58px);
+    position:relative;
+    animation:rise 1.1s .18s ease both;
+  }
+  .field-frame{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    transition:border-color .4s ease, box-shadow .4s ease;
+    padding:6px;
+  }
+  .field-frame:focus-within{
+    border-color:rgba(201,162,74,.5);
+    box-shadow:0 0 0 1px rgba(201,162,74,.18), 0 24px 60px -28px rgba(201,162,74,.4);
+  }
+  textarea{
+    width:100%;
+    background:transparent;
+    border:0;
+    resize:none;
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:clamp(17px,2.4vw,21px);
+    line-height:1.6;
+    font-weight:400;
+    padding:22px 22px 16px;
+    min-height:96px;
+    outline:none;
+  }
+  textarea::placeholder{
+    color:var(--ink-faint);
+    font-style:italic;
+    opacity:1;
+  }
+  .field-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 14px 12px;
+    gap:14px;
+  }
+  .hint{
+    font-family:var(--sans);
+    font-size:12px;
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+    text-align:left;
+  }
+  .hint kbd{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1px 6px;
+    margin:0 2px;
+  }
+  .send{
+    flex:none;
+    width:46px;height:46px;
+    border-radius:50%;
+    border:1px solid rgba(201,162,74,.4);
+    background:radial-gradient(120% 120% at 30% 20%, rgba(230,200,115,.22), rgba(201,162,74,.05));
+    color:var(--acc-light);
+    display:grid;place-items:center;
+    cursor:pointer;
+    transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+  .send:hover{transform:translateY(-1px);border-color:var(--acc);box-shadow:0 12px 30px -14px rgba(201,162,74,.7)}
+  .send:focus-visible{outline:1px solid var(--acc);outline-offset:4px}
+  .send svg{width:18px;height:18px}
+
+  .subline{
+    margin-top:30px;
+    font-family:var(--sans);
+    font-size:13.5px;
+    letter-spacing:.02em;
+    color:var(--ink-soft);
+    max-width:46ch;
+    animation:rise 1.1s .28s ease both;
+  }
+
+  /* ---- footer ---- */
+  footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+    padding:26px clamp(20px,5vw,60px);
+    border-top:1px solid rgba(255,255,255,.05);
+    font-size:12px;
+    letter-spacing:.04em;
+    color:var(--ink-faint);
+  }
+  footer .wordmark{font-size:17px}
+
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+  @media (max-width:480px){
+    .field-row{flex-direction:row}
+    .hint{display:none}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <a class="wordmark" href="#" aria-label="tures home">t<span class="spark">&#10022;</span>ures</a>
+    <a class="signin" href="#">Sign in</a>
+  </header>
+
+  <main>
+    <p class="eyebrow">Your private travel concierge</p>
+    <h1>Where would you <em>like</em> to go</h1>
+
+    <form class="field" aria-label="Describe your trip">
+      <div class="field-frame">
+        <label for="trip" class="visually-hidden" style="position:absolute;left:-9999px">Describe your trip</label>
+        <textarea id="trip" rows="3" placeholder="Five days in Italy with my wife. Food-focused. Under $8k. Business class if possible."></textarea>
+        <div class="field-row">
+          <p class="hint">Speak plainly. Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line.</p>
+          <button class="send" type="submit" aria-label="Send to your concierge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <p class="subline">Tures is your AI travel concierge. It books, monitors, and optimizes every journey.</p>
+  </main>
+
+  <footer>
+    <span class="wordmark">t<span class="spark">&#10022;</span>ures</span>
+    <span>A private travel intelligence &middot; On, always</span>
+  </footer>
+
+  <script>
+    const ta = document.getElementById('trip');
+    const grow = () => { ta.style.height='auto'; ta.style.height = Math.max(96, ta.scrollHeight)+'px'; };
+    ta.addEventListener('input', grow);
+    ta.addEventListener('keydown', e => {
+      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.form.requestSubmit(); }
+    });
+    ta.form.addEventListener('submit', e => {
+      e.preventDefault();
+      // In the live product this hands off to your concierge.
+      ta.blur();
+    });
+  </script>
+<script src="_devkit.js"></script>
+</body>
+</html>

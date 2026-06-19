@@ -1,0 +1,333 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — The Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<style>
+  /* page-specific only — reuses v11.css tokens + classes */
+  .vault-hero{padding:84px 0 36px;text-align:center}
+  .vault-hero .lead{margin:22px auto 0}
+
+  /* trust banner */
+  .trust-banner{
+    display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;
+    background:linear-gradient(180deg,var(--surface),var(--bg));
+    border:1px solid var(--line-2);border-radius:var(--radius);padding:22px 26px;
+  }
+  .trust-banner .seal{display:flex;align-items:center;gap:13px;text-align:left}
+  .trust-banner .lock{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--acc-dim);color:var(--acc-deep)}
+  .trust-banner .seal .st{font-family:'Playfair Display',serif;font-size:18px;line-height:1.15}
+  .trust-banner .seal .ss{font-size:12.5px;color:var(--muted)}
+  .trust-banner .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .trust-divider{width:1px;align-self:stretch;background:var(--line)}
+
+  /* category cards */
+  .vault-card{display:flex;flex-direction:column}
+  .vault-card .vhead{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+  .vault-card .vhead h3{margin:0}
+  .vault-card .vsub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .saved{display:flex;flex-direction:column;gap:11px;margin-top:2px}
+  .row{display:flex;align-items:center;gap:13px;padding:13px 14px;border:1px solid var(--line);
+    border-radius:12px;background:var(--surface)}
+  .row .rl{min-width:0;flex:1}
+  .row .rk{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+  .row .rv{font-family:'Space Mono',monospace;font-size:14px;color:var(--text);margin-top:3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .rtail{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .pill-card{width:34px;height:22px;border-radius:4px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--text);color:#fff;font-size:8px;font-weight:700;letter-spacing:.06em}
+  .edit{font-size:12.5px;font-weight:500;color:var(--acc-deep);background:none;border:none;cursor:pointer;
+    padding:5px 9px;border-radius:8px;transition:background .15s}
+  .edit:hover,.edit:focus-visible{background:var(--acc-dim)}
+  .tok{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--good);
+    display:inline-flex;align-items:center;gap:5px}
+  .tok::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good)}
+
+  /* access grants — demoted */
+  .grants{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .grants .ghead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+  .grant-row{display:flex;align-items:center;gap:15px;padding:15px 0;border-top:1px solid var(--line)}
+  .grant-row .gi{width:38px;height:38px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--surface-2);color:var(--muted)}
+  .grant-row .gm{flex:1;min-width:0}
+  .grant-row .gm .gt{font-size:14.5px;font-weight:500}
+  .grant-row .gm .gd{font-size:12.5px;color:var(--muted)}
+  /* toggle */
+  .tg{position:relative;width:42px;height:24px;flex:0 0 auto;border-radius:999px;border:1px solid var(--line-2);
+    background:var(--surface-2);cursor:pointer;transition:background .2s,border-color .2s;padding:0}
+  .tg::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+  .tg[aria-pressed="true"]{background:var(--acc);border-color:var(--acc)}
+  .tg[aria-pressed="true"]::after{transform:translateX(18px)}
+
+  .reassure{display:flex;align-items:center;gap:13px;justify-content:center;text-align:left;
+    color:var(--muted);font-size:14px;max-width:62ch;margin:0 auto}
+  .reassure svg{flex:0 0 auto;stroke:var(--good)}
+
+  .vault-cta{text-align:center}
+  .vault-cta .btn{margin:6px 6px 0}
+
+  @media (max-width:860px){
+    .trust-divider{display:none}
+    .trust-banner{justify-content:flex-start}
+  }
+</style>
+</head>
+<body data-page="vault">
+<main>
+
+  <!-- HERO -->
+  <section class="wrap vault-hero">
+    <span class="eyebrow"><span class="dot"></span> The Vault</span>
+    <h1 class="serif">Your details, <em>locked down.</em></h1>
+    <p class="lead center">So Tures can book the moment a trip is right — flights, hotels, the table you wanted — without stopping to ask for your card or your passport each time. Saved once, sealed, and never shown again.</p>
+  </section>
+
+  <!-- TRUST BANNER -->
+  <section class="wrap section tight" style="padding-top:8px">
+    <div class="trust-banner">
+      <div class="seal">
+        <span class="lock">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+        <span>
+          <span class="st serif">Secured by VGS</span>
+          <span class="ss">Bank-grade tokenization · the industry standard for holding payment and identity</span>
+        </span>
+      </div>
+      <span class="trust-divider"></span>
+      <div class="chips">
+        <span class="tag">PCI-DSS Level 1</span>
+        <span class="tag">SOC 2</span>
+        <span class="tag">Tokenized, not stored</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY CARDS -->
+  <section class="wrap section tight" style="padding-top:18px">
+    <div class="grid-2">
+
+      <!-- Payment -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Payment</h3>
+            <div class="vsub">The card Tures charges — only when a booking is confirmed.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="pill-card">VISA</span>
+            <span class="rl">
+              <span class="rk">Visa · primary</span>
+              <span class="rv">•••• •••• •••• 6411</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="pill-card">AMEX</span>
+            <span class="rl">
+              <span class="rk">Amex · points</span>
+              <span class="rv">•••• •••••• •2008</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Travel documents -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="9.5" r="2.4"/><path d="M8.5 16c.8-1.8 6.2-1.8 7 0"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Travel documents</h3>
+            <div class="vsub">Pre-filled at booking so check-in and security move fast.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Passport · United States</span>
+              <span class="rv">••••• 8127 · exp 2029</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Known Traveler Number</span>
+              <span class="rv">•••••• 419</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Identity & trusted traveler -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Identity &amp; trusted traveler</h3>
+            <div class="vsub">Your faster lanes, applied automatically.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">TSA PreCheck</span>
+              <span class="rv">Enrolled · ID •••• 419</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Global Entry</span>
+              <span class="rv">Active · PASSID ••••• 27</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Loyalty -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.2 5.8.9-4.2 4 1 5.7L12 16.9 6.8 18.8l1-5.7-4.2-4 5.8-.9L12 3z"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Loyalty</h3>
+            <div class="vsub">Status and numbers attached to every booking that earns.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Hawaiian · Pualani Platinum</span>
+              <span class="rv">HA •••• 6202</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">World of Hyatt · Globalist</span>
+              <span class="rv">HY •••• 8845</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Amex Membership Rewards</span>
+              <span class="rv">MR •••• 2008</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ACCESS GRANTS — demoted, optional -->
+  <section class="wrap section tight" style="padding-top:8px">
+    <div class="grants">
+      <div class="ghead">
+        <div>
+          <span class="demo-tag">Optional</span>
+          <h3 class="serif" style="margin-top:10px">Access grants</h3>
+          <p style="color:var(--muted);font-size:14px;max-width:54ch;margin-top:6px">Let Tures read just enough to stay one step ahead. Entirely your call, off by default, and revocable in a tap.</p>
+        </div>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Calendar</span><span class="gd">See trip dates and avoid double-booking your days.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant calendar access"></button>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Inbox</span><span class="gd">Catch confirmations and delays the airlines email you.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant inbox access"></button>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-5.4A8 8 0 1 1 21 11.5z"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Messaging</span><span class="gd">Reach you on WhatsApp or text when something needs you.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant messaging access"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REASSURANCE -->
+  <section class="wrap section tight" style="padding-top:0">
+    <p class="reassure">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      Tures works from tokens, never your raw numbers — the actual digits stay sealed inside VGS, out of reach of Tures and of anyone else. Revoke any item, or wipe the Vault, anytime.
+    </p>
+  </section>
+
+  <!-- CTA -->
+  <section class="wrap section tight vault-cta">
+    <div class="rule" style="margin-bottom:40px"></div>
+    <h2 class="serif">Sealed. Now let it <em>work.</em></h2>
+    <p class="lead center" style="margin:16px auto 26px">With the Vault set, Tures can book end to end. Try it live, or look in on the trips already in motion.</p>
+    <a class="btn" href="app.html">Open the live demo</a>
+    <a class="btn ghost" href="trips.html">See My Trips</a>
+  </section>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+  /* quiet, optional access toggles — purely local */
+  document.querySelectorAll('.tg').forEach(function(t){
+    t.addEventListener('click', function(){
+      t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+  });
+</script>
+<script src="_devkit.js"></script>
+</body></html>

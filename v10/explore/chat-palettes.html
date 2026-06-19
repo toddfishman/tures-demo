@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>chat A·2 — palette comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{ --s:0.36; --fw:1280px; --fh:900px; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#15171b; color:#EDEDED; font-family:'DM Sans',sans-serif; }
+  header{ padding:30px 36px 8px; }
+  header h1{ font-family:'Playfair Display',serif; font-weight:400; font-size:26px; margin:0 0 6px; }
+  header p{ margin:0; font-size:13px; color:#9aa1aa; max-width:680px; line-height:1.6; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, calc(var(--fw) * var(--s))); gap:30px 26px; justify-content:center; padding:26px 36px 70px; }
+  .cell{ width:calc(var(--fw) * var(--s)); }
+  .meta{ display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+  .meta .idx{ font-family:'Space Mono',monospace; font-size:12px; color:#fff; opacity:.9; }
+  .meta .chip{ width:15px; height:15px; border-radius:4px; border:1px solid rgba(255,255,255,.28); flex:0 0 auto; }
+  .meta .hex{ font-family:'Space Mono',monospace; font-size:10px; color:#8b929c; margin-left:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .meta .open{ margin-left:auto; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#cdd3da; text-decoration:none; border:1px solid rgba(255,255,255,.18); padding:4px 8px; border-radius:6px; flex:0 0 auto; }
+  .meta .open:hover{ border-color:#fff; color:#fff; }
+  .frameWrap{ width:calc(var(--fw) * var(--s)); height:calc(var(--fh) * var(--s)); overflow:hidden; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:#000; position:relative; }
+  .frame{ width:var(--fw); height:var(--fh); border:0; transform:scale(var(--s)); transform-origin:top left; pointer-events:none; }
+  .frameWrap .click{ position:absolute; inset:0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>chat A·2 · palette comparison</h1>
+  <p>The proactive-rebook screen rendered in your nine favourite combinations, side by side. Thumbnails are static and non-interactive — click <b>open ↗</b> on any one to see it full-size and live in a new tab.</p>
+</header>
+<div class="grid" id="grid"></div>
+<script>
+  var COMBOS = [
+    { bg:"ffffff", acc:"ee4f4f", tx:"000000" },
+    { bg:"ffffff", acc:"ff8c6b", tx:"000000" },
+    { bg:"000b42", acc:"fe6262", tx:"ffffff" },
+    { bg:"db5a14", acc:"07f2ee", tx:"ffffff" },
+    { bg:"c367e4", acc:"9fe916", tx:"ffffff" },
+    { bg:"ffffff", acc:"1639e9", tx:"000000" },
+    { bg:"e46767", acc:"1639e9", tx:"ffffff" },
+    { bg:"ffffff", acc:"ff4929", tx:"1a1a1a" },
+    { bg:"1dfc6b", acc:"e10909", tx:"000000" }
+  ];
+  var grid = document.getElementById("grid");
+  COMBOS.forEach(function (c, i) {
+    var hash = "#pal=" + c.bg + "-" + c.acc + "-" + c.tx;
+    var src = "chat-2.html" + hash;
+    var cell = document.createElement("div");
+    cell.className = "cell";
+    cell.innerHTML =
+      '<div class="meta">' +
+        '<span class="idx">' + ("0" + (i + 1)).slice(-2) + '</span>' +
+        '<span class="chip" style="background:#' + c.bg + '"></span>' +
+        '<span class="chip" style="background:#' + c.acc + '"></span>' +
+        '<span class="chip" style="background:#' + c.tx + '"></span>' +
+        '<span class="hex">#' + c.acc + '</span>' +
+        '<a class="open" href="' + src + '" target="_blank" rel="noopener">open ↗</a>' +
+      '</div>' +
+      '<div class="frameWrap"><iframe class="frame" src="' + src + '" loading="lazy" title="combo ' + (i + 1) + '"></iframe>' +
+        '<a class="click" href="' + src + '" target="_blank" rel="noopener" aria-label="open combo ' + (i + 1) + ' full size"></a></div>';
+    grid.appendChild(cell);
+  });
+</script>
+</body>
+</html>

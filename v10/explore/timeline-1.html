@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>t✦ures — One request. Thousands of decisions.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --canvas: #06080A;
+    --canvas-2: #0A0E12;
+    --ink: #F4F1EA;
+    --ink-soft: #B7BBC2;
+    --ink-mute: #6E747E;
+    --line: rgba(244, 241, 234, 0.10);
+    --line-soft: rgba(244, 241, 234, 0.055);
+    --acc: #2DD4BF;
+    --acc-deep: #119E8E;
+    --acc-glow: rgba(45, 212, 191, 0.18);
+    --card: rgba(255, 255, 255, 0.022);
+    --card-edge: rgba(255, 255, 255, 0.07);
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --mono: 'Space Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  /* ambient backdrop */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(900px 600px at 78% -8%, var(--acc-glow), transparent 60%),
+      radial-gradient(700px 700px at -10% 30%, rgba(45, 212, 191, 0.06), transparent 62%),
+      radial-gradient(1000px 800px at 50% 120%, rgba(45, 212, 191, 0.05), transparent 60%);
+    pointer-events: none;
+  }
+
+  ::selection { background: var(--acc); color: #042; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .spark { color: var(--acc); font-style: normal; }
+
+  /* ---------- top bar ---------- */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px clamp(18px, 5vw, 56px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: linear-gradient(to bottom, rgba(6,8,10,0.82), rgba(6,8,10,0.0));
+    transition: background .4s ease;
+  }
+  header.solid {
+    background: rgba(6,8,10,0.86);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .wordmark {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 23px;
+    letter-spacing: .01em;
+  }
+  .wordmark .spark { font-size: .72em; vertical-align: 1px; margin: 0 .01em; }
+  .nav-right { display: flex; align-items: center; gap: 22px; }
+  .signin {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    transition: color .25s ease;
+  }
+  .signin:hover, .signin:focus-visible { color: var(--ink); }
+
+  /* ---------- layout ---------- */
+  main { position: relative; z-index: 1; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 90px;
+    position: relative;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--acc);
+    margin-bottom: 30px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--acc);
+    box-shadow: 0 0 0 0 var(--acc-glow);
+    animation: pulse 2.6s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(45,212,191,0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(45,212,191,0); }
+    100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(44px, 8.5vw, 104px);
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+    margin-bottom: 28px;
+  }
+  .hero h1 .muted { color: var(--ink-mute); }
+  .hero h1 em { font-style: italic; color: var(--acc); }
+  .hero .sub {
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: clamp(16px, 2.2vw, 21px);
+    color: var(--ink-soft);
+    max-width: 30ch;
+    line-height: 1.5;
+    margin-bottom: 40px;
+  }
+  .hero .scroll-cue {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .scroll-cue .track {
+    width: 1px; height: 42px;
+    background: linear-gradient(var(--acc), transparent);
+    position: relative; overflow: hidden;
+  }
+  .scroll-cue .track::after {
+    content: "";
+    position: absolute; left: 0; top: 0;
+    width: 1px; height: 14px;
+    background: var(--ink);
+    animation: drop 2.2s cubic-bezier(.6,0,.2,1) infinite;
+  }
+  @keyframes drop { 0% { transform: translateY(-14px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(42px); opacity: 0; } }
+
+  /* the request that kicks it off */
+  .request-chip {
+    margin-top: 34px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px 13px 16px;
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: 14px;
+    font-family: var(--sans);
+    font-size: clamp(14px, 2vw, 16px);
+    color: var(--ink);
+    backdrop-filter: blur(8px);
+    max-width: 92vw;
+  }
+  .request-chip .you {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--acc);
+    border: 1px solid var(--acc-deep);
+    border-radius: 6px;
+    padding: 3px 7px;
+    flex-shrink: 0;
+  }
+  .request-chip .quote { color: var(--ink); }
+
+  /* ---------- section intros ---------- */
+  .section-label {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 14px;
+  }
+
+  /* ---------- timeline ---------- */
+  .timeline {
+    position: relative;
+    padding: clamp(60px, 12vh, 130px) 0 clamp(40px, 8vh, 90px);
+  }
+  .timeline-head { margin-bottom: clamp(40px, 8vh, 80px); max-width: 24ch; }
+  .timeline-head h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(28px, 4.6vw, 46px);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+  }
+  .timeline-head p {
+    margin-top: 16px;
+    color: var(--ink-soft);
+    font-size: clamp(15px, 2vw, 17px);
+    max-width: 42ch;
+  }
+
+  .spine {
+    position: relative;
+    padding-left: clamp(46px, 8vw, 86px);
+  }
+  /* the connecting line */
+  .spine::before {
+    content: "";
+    position: absolute;
+    left: clamp(14px, 2.4vw, 22px);
+    top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--line);
+  }
+  /* progress fill driven by JS */
+  .spine-progress {
+    position: absolute;
+    left: clamp(14px, 2.4vw, 22px);
+    top: 8px;
+    width: 2px;
+    height: 0;
+    background: linear-gradient(var(--acc), var(--acc-deep));
+    box-shadow: 0 0 12px var(--acc-glow);
+    transition: height .15s linear;
+    z-index: 1;
+  }
+
+  .node {
+    position: relative;
+    padding: clamp(18px, 3vh, 30px) 0 clamp(30px, 6vh, 58px) 0;
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .node.in { opacity: 1; transform: none; }
+  .node:last-child { padding-bottom: 0; }
+
+  .node .marker {
+    position: absolute;
+    left: calc(clamp(14px, 2.4vw, 22px) - clamp(46px, 8vw, 86px) + 1px);
+    top: clamp(20px, 3vh, 32px);
+    width: 30px; height: 30px;
+    transform: translateX(-50%);
+    display: grid;
+    place-items: center;
+  }
+  .node .marker .ring {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: var(--canvas);
+    display: grid; place-items: center;
+    transition: border-color .5s ease, box-shadow .5s ease;
+    position: relative; z-index: 2;
+  }
+  .node.in .marker .ring {
+    border-color: var(--acc);
+    box-shadow: 0 0 0 5px rgba(45,212,191,0.07), 0 0 18px var(--acc-glow);
+  }
+  .node .marker .ring svg { width: 15px; height: 15px; opacity: .35; transition: opacity .5s ease; }
+  .node.in .marker .ring svg { opacity: 1; }
+  .node .marker .ring svg path,
+  .node .marker .ring svg circle,
+  .node .marker .ring svg line { stroke: var(--acc); }
+
+  .node .step-no {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: var(--acc);
+    margin-bottom: 9px;
+    display: block;
+  }
+  .node h3 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(23px, 3.6vw, 34px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  .node h3 .said {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .node p.detail {
+    font-family: var(--sans);
+    font-size: clamp(14.5px, 2vw, 16.5px);
+    color: var(--ink-soft);
+    max-width: 46ch;
+    line-height: 1.55;
+  }
+
+  /* mini "working" card attached to some nodes */
+  .work-card {
+    margin-top: 18px;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: 13px;
+    padding: 15px 17px;
+    backdrop-filter: blur(8px);
+  }
+  .work-card .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 7px 0;
+    font-size: 13.5px;
+  }
+  .work-card .row + .row { border-top: 1px solid var(--line-soft); }
+  .work-card .row .k { color: var(--ink-soft); font-family: var(--sans); }
+  .work-card .row .v { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .work-card .row .v.acc { color: var(--acc); }
+  .work-card .head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .badge-sample {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--acc);
+    border: 1px solid var(--acc-deep);
+    border-radius: 5px;
+    padding: 2px 6px;
+  }
+  .conf {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--acc);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .conf .tick {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1.5px solid var(--acc);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .conf .tick svg { width: 9px; height: 9px; }
+  .conf .tick svg path { stroke: var(--acc); }
+
+  /* ---------- the big closer ---------- */
+  .closer {
+    min-height: 96svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: clamp(60px, 14vh, 140px) 0;
+    position: relative;
+  }
+  .closer .one {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity .9s ease, transform .9s ease;
+  }
+  .closer.in .one { opacity: 1; transform: none; }
+  .closer h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(40px, 9vw, 110px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .closer h2 .line2 { color: var(--acc); display: block; }
+  .closer p {
+    margin: 28px auto 0;
+    color: var(--ink-soft);
+    font-size: clamp(16px, 2.2vw, 19px);
+    max-width: 36ch;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 42px;
+    padding: 16px 30px;
+    background: var(--acc);
+    color: #03201c;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s ease, background .25s ease;
+    box-shadow: 0 10px 40px -12px var(--acc-glow);
+  }
+  .cta:hover, .cta:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 50px -10px rgba(45,212,191,0.45);
+    background: #36e6d1;
+  }
+  .cta svg { width: 16px; height: 16px; }
+  .cta svg path { stroke: #03201c; }
+  .closer .micro {
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 1px solid var(--line-soft);
+    padding: 44px clamp(20px, 5vw, 40px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+  footer .wordmark { font-size: 20px; }
+  footer .legal { color: var(--ink-mute); font-size: 12.5px; }
+  footer .flinks { display: flex; gap: 22px; }
+  footer .flinks a { color: var(--ink-soft); font-size: 13px; transition: color .25s ease; }
+  footer .flinks a:hover, footer .flinks a:focus-visible { color: var(--ink); }
+
+  :focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: 4px; }
+
+  @media (max-width: 560px) {
+    .hero .scroll-cue { font-size: 11px; }
+    .work-card { max-width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .node, .closer .one { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .eyebrow .dot, .scroll-cue .track::after { animation: none; }
+    .spine-progress { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <header id="hdr">
+    <a class="wordmark" href="#top">t<span class="spark">✦</span>ures</a>
+    <nav class="nav-right">
+      <a class="signin" href="#">Sign in</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero wrap">
+      <span class="eyebrow"><span class="dot"></span>Your travel concierge, working</span>
+      <h1>One request.<br /><em>Thousands</em> <span class="muted">of decisions.</span></h1>
+      <p class="sub">You describe the trip in plain English. Tures books every leg — and hands you confirmation numbers, not links.</p>
+      <div class="request-chip">
+        <span class="you">You</span>
+        <span class="quote">&ldquo;Family trip to Hawaii — Seattle to Maui, June 12–19.&rdquo;</span>
+      </div>
+      <div class="scroll-cue" style="margin-top:46px;">
+        <span class="track"></span>
+        <span>Watch it work</span>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="timeline wrap">
+      <div class="timeline-head">
+        <div class="section-label">The work, in order</div>
+        <h2>From eight words to a finished itinerary.</h2>
+        <p>Every step below happens on its own. You don&rsquo;t click, compare, or confirm — you just go.</p>
+      </div>
+
+      <div class="spine">
+        <div class="spine-progress" id="progress"></div>
+
+        <!-- 01 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h11"/><path d="M11 7l5 5-5 5"/><path d="M20 5v14"/></svg>
+          </span></span>
+          <span class="step-no">STEP 01</span>
+          <h3>You say <span class="said">&ldquo;Family trip to Hawaii.&rdquo;</span></h3>
+          <p class="detail">Four travelers, one week, beachfront. No forms, no checklists. Tures takes it from here.</p>
+        </article>
+
+        <!-- 02 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-3 12-5-4 9 4 9-12-5-8-3z"/></svg>
+          </span></span>
+          <span class="step-no">STEP 02</span>
+          <h3>Tures searches flights.</h3>
+          <p class="detail">It compares 37 routings across cabins and times, then holds the pair that fits a family with a stroller and a 9 a.m. landing.</p>
+          <div class="work-card">
+            <div class="head"><span>Flights · SEA → OGG</span><span class="badge-sample">Sample</span></div>
+            <div class="row"><span class="k">Alaska 893 · nonstop · 6h 02m</span><span class="v acc">held</span></div>
+            <div class="row"><span class="k">Return · Alaska 896 · Jun 19</span><span class="v">9:55a</span></div>
+            <div class="row"><span class="k">Options compared</span><span class="v">37</span></div>
+          </div>
+        </article>
+
+        <!-- 03 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M10 21v-5h4v5"/></svg>
+          </span></span>
+          <span class="step-no">STEP 03</span>
+          <h3>It finds the hotel.</h3>
+          <p class="detail">Ocean-view, connecting rooms, walkable to dinner. Booked at the Andaz Maui at Wailea — and it knows your suite preference.</p>
+          <div class="work-card">
+            <div class="head"><span>Stay · Wailea, Maui</span><span class="badge-sample">Sample</span></div>
+            <div class="row"><span class="k">Andaz Maui · Partial Ocean View</span><span class="v">7 nights</span></div>
+            <div class="row"><span class="k">Connecting rooms</span><span class="v acc">confirmed</span></div>
+            <div class="conf"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4 10-11"/></svg></span>Confirmation AZM-4471KQ</div>
+          </div>
+        </article>
+
+        <!-- 04 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><circle cx="12" cy="13" r="7"/><path d="M12 10v3l2 2"/></svg>
+          </span></span>
+          <span class="step-no">STEP 04</span>
+          <h3>It books the days.</h3>
+          <p class="detail">A snorkel charter at Molokini, a luau the kids will love, and a quiet table for two at Mama&rsquo;s Fish House — reserved for 7:30.</p>
+          <div class="work-card">
+            <div class="head"><span>On the ground</span><span class="badge-sample">Sample</span></div>
+            <div class="row"><span class="k">Molokini sunrise snorkel · Jun 14</span><span class="v acc">4 seats</span></div>
+            <div class="row"><span class="k">Mama&rsquo;s Fish House · Jun 16</span><span class="v">7:30p</span></div>
+            <div class="row"><span class="k">Old Lahaina Luau · Jun 17</span><span class="v">5:45p</span></div>
+          </div>
+        </article>
+
+        <!-- 05 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13a4 4 0 1 1-5-7 6 6 0 1 1 9 5h-1"/><path d="M7 17v3M11 17v4M15 17v2"/></svg>
+          </span></span>
+          <span class="step-no">STEP 05</span>
+          <h3>It tracks the weather.</h3>
+          <p class="detail">Seven days of forecasts, watched quietly. When a swell warning lands on snorkel morning, it already has a plan B.</p>
+        </article>
+
+        <!-- 06 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+          </span></span>
+          <span class="step-no">STEP 06</span>
+          <h3>It handles the delay.</h3>
+          <p class="detail">When your outbound slips three hours, Tures rebooks the connection, pushes the rental pickup, and texts you the new plan before the gate agent says a word.</p>
+          <div class="work-card">
+            <div class="head"><span>Disruption · resolved</span><span class="badge-sample">Demo</span></div>
+            <div class="row"><span class="k">AS 893 delayed 3h 10m</span><span class="v">rebooked</span></div>
+            <div class="row"><span class="k">Car pickup · Kahului</span><span class="v acc">moved to 1:15p</span></div>
+            <div class="row"><span class="k">You did</span><span class="v acc">nothing</span></div>
+          </div>
+        </article>
+
+        <!-- 07 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.8 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>
+          </span></span>
+          <span class="step-no">STEP 07</span>
+          <h3>It optimizes points.</h3>
+          <p class="detail">42,000 miles applied to the right cabin, status credits preserved, and the hotel charged to the card that earns 5x. Found, not asked for.</p>
+          <div class="work-card">
+            <div class="head"><span>Loyalty · auto-applied</span><span class="badge-sample">Sample</span></div>
+            <div class="row"><span class="k">Mileage Plan · applied</span><span class="v acc">42,000 mi</span></div>
+            <div class="row"><span class="k">Out-of-pocket saved</span><span class="v acc">$612</span></div>
+          </div>
+        </article>
+
+        <!-- 08 -->
+        <article class="node">
+          <span class="marker"><span class="ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span></span>
+          <span class="step-no">STEP 08</span>
+          <h3>You travel.</h3>
+          <p class="detail">Every confirmation in one place, every contingency already handled. You showed up. Tures did the rest.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CLOSER -->
+    <section class="closer wrap" id="closer">
+      <div class="one">
+        <div class="section-label" style="margin-bottom:24px;">Eight words in</div>
+        <h2>One request.<br /><span class="line2">Thousands of decisions.</span></h2>
+        <p>You make one. Tures makes the rest — quietly, around the clock, in your pocket.</p>
+        <button class="cta" onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'})">
+          Try it
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="micro">No itineraries to build. No tabs to compare. Just the trip.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="wordmark" href="#top">t<span class="spark">✦</span>ures</a>
+    <nav class="flinks">
+      <a href="#">How it works</a>
+      <a href="#">Pricing</a>
+      <a href="#">Sign in</a>
+    </nav>
+    <span class="legal">&copy; 2026 Tures. Your concierge, on call.</span>
+  </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var hdr = document.getElementById('hdr');
+      var nodes = Array.prototype.slice.call(document.querySelectorAll('.node'));
+      var closer = document.getElementById('closer');
+      var spine = document.querySelector('.spine');
+      var progress = document.getElementById('progress');
+
+      // header solidify
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 40) hdr.classList.add('solid');
+        else hdr.classList.remove('solid');
+      }, { passive: true });
+
+      if (reduce) {
+        nodes.forEach(function (n) { n.classList.add('in'); });
+        closer.classList.add('in');
+        if (progress) progress.style.height = '100%';
+        return;
+      }
+
+      // reveal on scroll
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('in');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.28, rootMargin: '0px 0px -8% 0px' });
+      nodes.forEach(function (n) { io.observe(n); });
+
+      var io2 = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) closer.classList.add('in'); });
+      }, { threshold: 0.35 });
+      io2.observe(closer);
+
+      // spine progress fill
+      function updateProgress() {
+        if (!spine || !progress) return;
+        var rect = spine.getBoundingClientRect();
+        var vh = window.innerHeight;
+        var start = vh * 0.5;
+        var traveled = start - rect.top;
+        var pct = Math.max(0, Math.min(1, traveled / rect.height));
+        progress.style.height = (pct * 100) + '%';
+        requestAnimationFrame(function(){});
+      }
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          window.requestAnimationFrame(function () { updateProgress(); ticking = false; });
+          ticking = true;
+        }
+      }, { passive: true });
+      window.addEventListener('resize', updateProgress);
+      updateProgress();
+    })();
+  </script>
+<script src="_devkit.js"></script>
+</body>
+</html>

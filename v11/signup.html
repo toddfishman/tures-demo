@@ -1,0 +1,144 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — Get started</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<style>
+  /* ── signup — page-specific only; everything else reuses v11.css ── */
+  .signup-hero{padding-top:78px}
+  .signup-hero h1{margin-top:22px;max-width:12ch}
+  .signup-hero .lead{margin:18px auto 0}
+
+  .form-card{max-width:520px;margin:38px auto 0;text-align:left}
+  .form-card .grp{margin-bottom:18px}
+  .form-card label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:7px}
+  .form-card textarea.field{resize:vertical;min-height:96px;line-height:1.5}
+  .form-card .btn{width:100%;margin-top:6px}
+  .form-card .fine{font-size:12.5px;color:var(--faint);text-align:center;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:7px}
+  .form-card .fine svg{stroke:var(--good);flex:0 0 auto}
+
+  /* inert acknowledgement */
+  .ack{display:none;margin-top:8px;border:1px solid var(--acc-line);background:var(--acc-dim);border-radius:14px;padding:22px;text-align:center}
+  .ack.show{display:block;animation:ackin .4s ease}
+  @keyframes ackin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .ack .ico-lg{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:var(--bg);border:1px solid var(--acc-line)}
+  .ack .ico-lg svg{stroke:var(--acc-deep)}
+  .ack h3{margin-bottom:6px}
+  .ack p{color:var(--muted);font-size:14px;max-width:34ch;margin:0 auto}
+  .ack .demo-tag{margin-top:14px;display:inline-block}
+
+  /* next steps */
+  .next .num{font-family:'Space Mono',monospace;color:var(--acc);font-size:13px;font-weight:700}
+  .next h3{margin-top:6px}
+
+  .seclinks{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;font-size:14px;margin-top:6px}
+  .seclinks a{color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+  .seclinks a:hover{color:var(--acc-deep)}
+</style>
+</head>
+<body data-page="signup">
+<main>
+
+  <!-- HERO + FORM -->
+  <section class="section signup-hero">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> Get started</span>
+      <h1 style="margin-left:auto;margin-right:auto">Request <em>access.</em></h1>
+      <p class="lead center">Tures is rolling out by invitation. Tell us where to reach you, and we'll open a seat. No account to set up tonight — just a sentence about where you're headed.</p>
+
+      <!-- INERT request form -->
+      <form class="card form-card" id="req-form" novalidate>
+        <div class="grp">
+          <label for="f-name">Name</label>
+          <input class="field" type="text" id="f-name" name="name" placeholder="Andy Rockwell" autocomplete="name">
+        </div>
+        <div class="grp">
+          <label for="f-email">Email</label>
+          <input class="field" type="email" id="f-email" name="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="grp">
+          <label for="f-trip">Where are you dreaming of going first?</label>
+          <textarea class="field" id="f-trip" name="trip" placeholder="Seattle to Maui in June — somewhere on the water, business if it isn't crazy."></textarea>
+        </div>
+        <button class="btn" type="submit">Request access &nbsp;→</button>
+        <p class="fine">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          No card required to request access.
+        </p>
+
+        <!-- calm, clearly-not-a-real-account acknowledgement -->
+        <div class="ack" id="ack" role="status" aria-live="polite">
+          <div class="ico-lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h3 class="serif">Thanks — we'll be in touch shortly.</h3>
+          <p>We've noted your request. A concierge will reach out by email when your seat opens. Nothing has been created or charged.</p>
+          <span class="demo-tag">Mockup · no account made</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- WHAT HAPPENS NEXT -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:40px">
+        <span class="eyebrow"><span class="dot"></span> What happens next</span>
+        <h2 style="margin-top:18px">Three quiet steps. <em>Then a booked trip.</em></h2>
+      </div>
+      <div class="grid-3 next">
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="num">01</span>
+          <h3>We reach out</h3>
+          <p>A short note by email when your seat opens — and a real person you can reply to, not a no-reply address.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <span class="num">02</span>
+          <h3>You connect your Vault</h3>
+          <p>Cards, loyalty, travel documents — tokenized through VGS and never stored in plain text. You stay in control of every value.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-7-9 12-2-5-9 0z"/></svg></span>
+          <span class="num">03</span>
+          <h3>You plan your first trip</h3>
+          <p>Describe it in one message. Tures books every leg and hands back confirmation numbers — then stays on, watching, 24/7.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECONDARY LINKS -->
+  <section class="section tight">
+    <div class="wrap center">
+      <div class="seclinks">
+        <a href="pricing.html">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Pricing
+        </a>
+        <a href="plan.html">
+          Plan a trip
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+  (function () {
+    var form = document.getElementById("req-form");
+    var ack = document.getElementById("ack");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();                 // INERT — no real submission
+      ack.classList.add("show");
+      ack.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  })();
+</script>
+<script src="_devkit.js"></script>
+</body></html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tures — It learns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --space:#05080F;--space-2:#070C18;
+    --acc:#5EEAD4;--acc-soft:#7af3e0;--blue:#5B8DEF;
+    --ink:#EAF1F5;--ink-dim:#9FB2BE;--ink-faint:#65788A;
+    --line:rgba(94,234,212,.14);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'DM Sans',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--space);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(94,234,212,.25);color:#fff}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+
+  header.bar{display:flex;align-items:center;justify-content:space-between;padding:24px clamp(20px,5vw,56px)}
+  .mark{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--ink)}
+  .spark{color:var(--acc)}
+  nav.top{display:flex;align-items:center;gap:26px;font-size:14px;color:var(--ink-dim)}
+  nav.top a:hover{color:var(--ink)}
+  .signin{border:1px solid var(--line);padding:9px 18px;border-radius:999px;color:var(--ink);font-weight:500}
+  .signin:hover{border-color:rgba(94,234,212,.45)}
+
+  .container{max-width:1080px;margin:0 auto;padding:8px clamp(20px,5vw,40px) 40px}
+  .lead{max-width:680px;margin-bottom:30px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:flex;align-items:center;gap:11px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--acc);opacity:.6}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4vw,50px);line-height:1.06;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--acc-soft)}
+  .lead p{color:var(--ink-dim);font-weight:300;font-size:16.5px;margin-top:14px}
+
+  /* taste print layout */
+  .print{display:grid;grid-template-columns:330px 1fr;gap:22px;align-items:start}
+
+  /* left: identity card */
+  .id-card{border:1px solid rgba(94,234,212,.22);border-radius:20px;padding:26px;
+           background:radial-gradient(circle at 50% 0%, rgba(94,234,212,.10), transparent 60%), linear-gradient(180deg,#0a131f,#070c18);position:relative;overflow:hidden}
+  .id-card::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 110%, rgba(91,141,239,.12), transparent 50%);pointer-events:none}
+  .id-top{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:22px}
+  .id-top .live{display:flex;align-items:center;gap:7px;color:var(--acc)}
+  .id-top .live i{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:blink 2.4s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .id-card h2{font-family:var(--serif);font-size:26px;font-weight:500;margin-bottom:4px}
+  .id-card .since{font-size:12.5px;color:var(--ink-dim);margin-bottom:24px}
+
+  /* radar */
+  .radar{width:100%;display:block;margin:6px 0 4px}
+  .radar .grid-line{fill:none;stroke:rgba(120,160,180,.16);stroke-width:.8}
+  .radar .axis{stroke:rgba(120,160,180,.16);stroke-width:.7}
+  .radar .shape{fill:rgba(94,234,212,.16);stroke:var(--acc);stroke-width:1.6;filter:drop-shadow(0 0 5px rgba(94,234,212,.5))}
+  .radar .pt{fill:var(--acc)}
+  .radar .axlbl{font-family:var(--mono);font-size:9px;fill:var(--ink-dim);letter-spacing:.04em}
+  .id-note{font-size:11px;color:var(--ink-faint);margin-top:14px;display:flex;align-items:center;gap:8px;line-height:1.4}
+  .tag{font-family:var(--sans);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);border:1px solid rgba(94,234,212,.4);border-radius:4px;padding:2px 6px;line-height:1;white-space:nowrap}
+
+  /* right column */
+  .right{display:flex;flex-direction:column;gap:18px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{border:1px solid var(--line);border-radius:18px;padding:22px;background:linear-gradient(180deg,#0a111f,#070c18)}
+  .card h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .card h3::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}
+
+  .kv{display:flex;flex-direction:column;gap:13px}
+  .kv .item{display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+  .kv .k{font-size:13px;color:var(--ink-dim)}
+  .kv .v{font-family:var(--serif);font-size:17px;color:var(--ink);text-align:right}
+  .brands{display:flex;flex-wrap:wrap;gap:8px}
+  .brand{font-size:12.5px;color:var(--ink);border:1px solid rgba(94,234,212,.26);border-radius:8px;padding:6px 11px;background:rgba(94,234,212,.04)}
+
+  /* patterns */
+  .pat{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid rgba(94,234,212,.08)}
+  .pat:last-child{border-bottom:none}
+  .pat .ic{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid rgba(94,234,212,.3);display:grid;place-items:center;color:var(--acc)}
+  .pat .ic svg{width:15px;height:15px}
+  .pat .t{font-size:13.5px;color:var(--ink)}
+  .pat .t b{color:var(--acc-soft);font-weight:600}
+  .pat .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:3px;letter-spacing:.03em}
+
+  /* feeds-into recommendation strip */
+  .feed{border:1px solid rgba(94,234,212,.3);border-radius:18px;padding:24px 26px;
+        background:linear-gradient(110deg, rgba(94,234,212,.08), rgba(91,141,239,.06));position:relative}
+  .feed .label{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+  .feed .reco{font-family:var(--serif);font-size:clamp(19px,2.2vw,25px);line-height:1.3;color:var(--ink)}
+  .feed .reco b{color:var(--acc-soft);font-weight:500;font-style:italic}
+  .feed .actions{margin-top:20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .go{background:var(--acc);color:#04201C;font-weight:600;font-size:14.5px;border:none;border-radius:999px;padding:13px 26px;cursor:pointer;font-family:var(--sans);transition:transform .2s,box-shadow .2s}
+  .go:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(94,234,212,.5)}
+  .ghost{font-size:14px;color:var(--ink-dim)}
+  .ghost:hover{color:var(--ink)}
+  .feed .demo{margin-top:16px;font-size:11px;color:var(--ink-faint);display:flex;align-items:center;gap:8px}
+
+  @media (prefers-reduced-motion:reduce){
+    .id-top .live i{animation:none}
+    .go{transition:none}
+  }
+
+  footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:22px clamp(20px,5vw,56px);border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-faint)}
+  footer .mark{font-size:17px}
+
+  @media (max-width:840px){
+    .print{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr}
+    nav.top a:not(.signin){display:none}
+  }
+</style>
+</head>
+<body>
+  <header class="bar">
+    <a class="mark" href="#" aria-label="tures home">t<span class="spark">✦</span>ures</a>
+    <nav class="top">
+      <a href="#">Map</a><a href="#">Taste</a><a href="#">Trips</a>
+      <a class="signin" href="#">Sign in</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="lead">
+      <p class="eyebrow">It learns</p>
+      <h1>The more you travel, the more it <em>knows your taste.</em></h1>
+      <p>This is your Taste Print — the pattern Tures has learned from how you actually travel. Your data, working for you. Yours to edit, yours to turn off.</p>
+    </div>
+
+    <div class="print">
+      <!-- ID / TASTE PRINT CARD -->
+      <div class="id-card">
+        <div class="id-top">
+          <span>Taste Print</span>
+          <span class="live"><i></i>Learning</span>
+        </div>
+        <h2>Member profile</h2>
+        <p class="since">Building since 2019 · 184 trips read</p>
+
+        <svg class="radar" viewBox="0 0 240 220" role="img" aria-label="Taste radar across six dimensions">
+          <!-- rings -->
+          <g>
+            <polygon class="grid-line" points="120,30 198,75 198,165 120,210 42,165 42,75"/>
+            <polygon class="grid-line" points="120,70 168,95 168,145 120,170 72,145 72,95"/>
+            <polygon class="grid-line" points="120,105 145,118 145,142 120,155 95,142 95,118"/>
+          </g>
+          <!-- axes -->
+          <g>
+            <line class="axis" x1="120" y1="120" x2="120" y2="30"/>
+            <line class="axis" x1="120" y1="120" x2="198" y2="75"/>
+            <line class="axis" x1="120" y1="120" x2="198" y2="165"/>
+            <line class="axis" x1="120" y1="120" x2="120" y2="210"/>
+            <line class="axis" x1="120" y1="120" x2="42" y2="165"/>
+            <line class="axis" x1="120" y1="120" x2="42" y2="75"/>
+          </g>
+          <!-- data shape -->
+          <polygon class="shape" points="120,40 192,80 175,150 120,185 55,150 60,82"/>
+          <g class="pt">
+            <circle cx="120" cy="40" r="2.6"/><circle cx="192" cy="80" r="2.6"/>
+            <circle cx="175" cy="150" r="2.6"/><circle cx="120" cy="185" r="2.6"/>
+            <circle cx="55" cy="150" r="2.6"/><circle cx="60" cy="82" r="2.6"/>
+          </g>
+          <!-- labels -->
+          <text class="axlbl" x="120" y="22" text-anchor="middle">Design</text>
+          <text class="axlbl" x="204" y="72">Cuisine</text>
+          <text class="axlbl" x="204" y="172">Coastal</text>
+          <text class="axlbl" x="120" y="224" text-anchor="middle">Quiet</text>
+          <text class="axlbl" x="36" y="172" text-anchor="end">Walkable</text>
+          <text class="axlbl" x="36" y="72" text-anchor="end">Culture</text>
+        </svg>
+        <p class="id-note"><span class="tag">Sample</span> An illustrative profile. Real Taste Prints are private and member-controlled.</p>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right">
+        <div class="row">
+          <div class="card">
+            <h3>Preferences</h3>
+            <div class="kv">
+              <div class="item"><span class="k">Cabin</span><span class="v">Business · window</span></div>
+              <div class="item"><span class="k">Seat</span><span class="v">Forward, left side</span></div>
+              <div class="item"><span class="k">Pace</span><span class="v">Slow · 4–5 nights</span></div>
+              <div class="item"><span class="k">Check-in</span><span class="v">Late · never red-eye home</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Favorite hotels</h3>
+            <div class="brands">
+              <span class="brand">Aman</span><span class="brand">Rosewood</span>
+              <span class="brand">Six Senses</span><span class="brand">Le Bristol</span>
+              <span class="brand">small design houses</span>
+            </div>
+            <h3 style="margin-top:20px">Cuisines</h3>
+            <div class="brands">
+              <span class="brand">tasting menus</span><span class="brand">Basque</span>
+              <span class="brand">kaiseki</span><span class="brand">coastal Iberian</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent patterns it noticed</h3>
+          <div class="pat">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <span><span class="t">You book <b>shoulder season</b> — May and late September, avoiding peak crowds.</span><span class="meta">9 of last 11 trips</span></span>
+          </div>
+          <div class="pat">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></span>
+            <span><span class="t">You skip the resort restaurant — you'd rather <b>walk to a local table.</b></span><span class="meta">Pattern across Maui, Lisbon, San Sebastián</span></span>
+          </div>
+          <div class="pat">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 20l-4.9 2.6.9-5.5-4-3.9 5.5-.8z"/></svg></span>
+            <span><span class="t">Loyalty: you concentrate stays to keep <b>top-tier status</b> on two programs.</span><span class="meta">Tures protects the threshold automatically</span></span>
+          </div>
+        </div>
+
+        <!-- FEEDS INTO -->
+        <div class="feed">
+          <p class="label">↳ So the next recommendation is</p>
+          <p class="reco">Five nights in <b>San Sebastián</b> in late September — a small design hotel in the old town, two tasting-menu reservations held, business window seats both ways, routed to protect your status run.</p>
+          <div class="actions">
+            <button class="go">Have Tures plan it →</button>
+            <a class="ghost" href="#">Adjust my Taste Print</a>
+          </div>
+          <p class="demo"><span class="tag">Demo</span> Recommendation generated from the sample profile above.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <a class="mark" href="#" aria-label="tures home">t<span class="spark">✦</span>ures</a>
+    <span>Your data, working for you — private, editable, always yours.</span>
+    <span>© 2026 Tures</span>
+  </footer>
+<script src="_devkit.js"></script>
+</body>
+</html>

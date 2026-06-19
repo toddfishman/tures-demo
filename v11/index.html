@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>t✦ures — Stop planning trips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/v11.css" />
+<style>nav:not(.links){display:none !important}footer:not(.v11-foot){display:none !important}</style>
+<style>
+  :root{
+    /* ── v11 palette — White · Vermilion · Ink (baked default) ── */
+    --bg:#ffffff;
+    --surface:#f4f4f4;
+    --surface-2:#eaeaea;
+    --line:rgba(26,26,26,.10);
+    --line-2:rgba(26,26,26,.16);
+    --text:#1a1a1a;
+    --muted:#7a7a7a;
+    --faint:#a8a8a8;
+    --acc:#ff4929;
+    --acc-2:#ff775f;
+    --acc-dim:rgba(255,73,41,.12);
+    --bubble-me:#ececed;
+    --bubble-ai:#f5f5f6;
+    --good:#2e9e5b;
+    --radius:18px;
+    --maxw:1120px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 700px at 82% -8%, rgba(255,73,41,.06), transparent 60%),
+      radial-gradient(900px 600px at 8% 12%, rgba(26,26,26,.035), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'DM Sans',system-ui,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--acc-dim);color:var(--acc-2)}
+  a{color:inherit;text-decoration:none}
+  .serif{font-family:'Playfair Display',Georgia,serif}
+  .mono{font-family:'Space Mono',monospace}
+  .spark{color:var(--acc);font-style:normal;letter-spacing:0}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---- Nav ---- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(14px);
+    background:linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.5));
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .mark{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;letter-spacing:.5px}
+  .nav-actions{display:flex;align-items:center;gap:22px;font-size:14px}
+  .nav-actions a{color:var(--muted);transition:color .2s}
+  .nav-actions a:hover{color:var(--text)}
+  .signin{color:var(--text)}
+  .btn{
+    font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;
+    border:none;cursor:pointer;border-radius:999px;padding:10px 20px;
+    background:var(--acc);color:#1a1305;transition:transform .15s, box-shadow .2s;
+    box-shadow:0 0 0 1px rgba(255,73,41,.2);
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(255,73,41,.22)}
+  .btn-ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .btn-ghost:hover{box-shadow:inset 0 0 0 1px var(--acc);color:var(--acc-2)}
+
+  /* ---- Hero ---- */
+  .hero{padding:78px 0 60px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-2);
+    border:1px solid var(--line-2);border-radius:999px;padding:6px 14px;margin-bottom:26px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc);animation:pulse 2.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1.hero-title{
+    font-family:'Playfair Display',serif;font-weight:500;
+    font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-.01em;
+  }
+  h1.hero-title em{font-style:italic;color:var(--acc-2)}
+  .subline{margin-top:22px;font-size:18px;color:var(--muted);max-width:34ch;font-weight:300}
+  .subline b{color:var(--text);font-weight:500}
+  .hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+  .reassure{margin-top:22px;display:flex;gap:20px;color:var(--faint);font-size:13px;flex-wrap:wrap}
+  .reassure span{display:inline-flex;align-items:center;gap:7px}
+  .reassure svg{stroke:var(--acc);opacity:.8}
+
+  /* ---- Phone / Thread ---- */
+  .phone-stage{display:flex;justify-content:center;position:relative}
+  .glow{position:absolute;inset:-40px;background:radial-gradient(closest-side, rgba(255,73,41,.12), transparent 70%);filter:blur(20px);z-index:0;pointer-events:none}
+  .phone{
+    position:relative;z-index:1;
+    width:360px;max-width:100%;
+    background:var(--surface);
+    border-radius:40px;
+    padding:14px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px var(--line-2), inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .screen{
+    background:linear-gradient(180deg, var(--surface-2), var(--surface));
+    border-radius:28px;overflow:hidden;border:1px solid var(--line);
+    display:flex;flex-direction:column;height:600px;
+  }
+  .screen-top{
+    padding:16px 18px 13px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.012);
+  }
+  .avatar{
+    width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+    background:radial-gradient(circle at 32% 28%, var(--acc-2), var(--acc) 55%, #cf3b1f);
+    display:grid;place-items:center;color:#241a05;font-family:'Playfair Display',serif;font-weight:600;font-size:18px;
+    box-shadow:0 0 0 3px rgba(255,73,41,.12);
+  }
+  .who{display:flex;flex-direction:column;line-height:1.2}
+  .who .name{font-weight:500;font-size:15px}
+  .who .status{font-size:12px;color:var(--good);display:flex;align-items:center;gap:5px}
+  .who .status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)}
+  .screen-top .menu{margin-left:auto;color:var(--faint);font-size:20px;letter-spacing:2px}
+
+  .thread{flex:1;overflow:hidden;padding:18px 16px;display:flex;flex-direction:column;gap:14px;position:relative}
+  .msg{max-width:84%;opacity:0;transform:translateY(10px)}
+  .msg.show{animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .bubble{
+    padding:11px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;
+  }
+  .from-ai{align-self:flex-start}
+  .from-ai .bubble{background:var(--bubble-ai);border:1px solid var(--line);border-bottom-left-radius:5px;color:var(--text)}
+  .from-me{align-self:flex-end}
+  .from-me .bubble{background:var(--bubble-me);border:1px solid var(--line-2);border-bottom-right-radius:5px}
+  .tstamp{font-size:10.5px;color:var(--faint);margin:4px 4px 0}
+  .from-me .tstamp{text-align:right}
+
+  /* typing */
+  .typing .bubble{display:inline-flex;gap:5px;align-items:center;padding:14px 16px}
+  .typing .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;animation:blink 1.4s infinite}
+  .typing .dot:nth-child(2){animation-delay:.2s}
+  .typing .dot:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+  /* result card */
+  .result-card{
+    align-self:flex-start;max-width:92%;width:92%;
+    background:linear-gradient(180deg, rgba(255,73,41,.05), rgba(0,0,0,.025));
+    border:1px solid var(--line-2);border-radius:16px;overflow:hidden;
+  }
+  .rc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .rc-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:500}
+  .demo-tag{
+    font-family:'DM Sans',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--acc-2);border:1px solid var(--line-2);border-radius:6px;padding:3px 7px;
+  }
+  .rc-row{display:flex;gap:11px;padding:11px 14px;align-items:flex-start;border-bottom:1px solid var(--line)}
+  .rc-row:last-child{border-bottom:none}
+  .rc-ico{
+    width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--acc-dim);
+  }
+  .rc-ico svg{stroke:var(--acc-2)}
+  .rc-main{flex:1;min-width:0}
+  .rc-main .ln1{font-size:13.5px;font-weight:500}
+  .rc-main .ln2{font-size:12px;color:var(--muted)}
+  .rc-side{text-align:right;flex:0 0 auto}
+  .rc-side .pnr{font-family:'Space Mono',monospace;font-size:12px;color:var(--acc-2);letter-spacing:.02em}
+  .rc-side .held{font-size:10.5px;color:var(--good);display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:3px}
+  .rc-side .held::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--good)}
+  .rc-foot{padding:11px 14px;display:flex;gap:9px}
+  .rc-foot .mini{flex:1;font-size:12.5px;font-weight:500;text-align:center;border-radius:10px;padding:9px;cursor:pointer;transition:.2s}
+  .rc-foot .mini.primary{background:var(--acc);color:#1a1305}
+  .rc-foot .mini.primary:hover{background:var(--acc-2)}
+  .rc-foot .mini.ghost{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .rc-foot .mini.ghost:hover{color:var(--text)}
+
+  .composer{
+    padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;
+    background:rgba(255,255,255,.012);
+  }
+  .composer .field{
+    flex:1;background:var(--surface);border:1px solid var(--line-2);border-radius:999px;
+    padding:10px 16px;font-size:13.5px;color:var(--faint);
+  }
+  .composer .send{
+    width:38px;height:38px;border-radius:50%;flex:0 0 auto;background:var(--acc);
+    display:grid;place-items:center;cursor:pointer;
+  }
+  .composer .send svg{stroke:#1a1305}
+
+  /* ---- trust strip ---- */
+  .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0;margin-top:30px}
+  .strip-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+  .stat .k{font-family:'Playfair Display',serif;font-size:30px;color:var(--acc-2);line-height:1}
+  .stat .v{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* ---- how ---- */
+  .how{padding:84px 0 40px}
+  .sec-eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .sec-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);font-weight:500;line-height:1.08;max-width:18ch}
+  .how-grid{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{
+    background:linear-gradient(180deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;transition:border-color .25s, transform .25s;
+  }
+  .card:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .card .n{font-family:'Space Mono',monospace;font-size:12px;color:var(--acc);letter-spacing:.1em}
+  .card h3{font-family:'Playfair Display',serif;font-weight:500;font-size:21px;margin:14px 0 10px}
+  .card p{color:var(--muted);font-size:14.5px;font-weight:300}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:42px 0 56px}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  .foot-links{display:flex;gap:24px;color:var(--faint);font-size:13px}
+  .foot-links a:hover{color:var(--text)}
+  .copyr{color:var(--faint);font-size:12.5px}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:46px;padding:46px 0 30px}
+    .phone-stage{order:2}
+    .strip-inner{grid-template-columns:repeat(2,1fr);gap:24px 16px}
+    .how-grid{grid-template-columns:1fr}
+    .subline{max-width:none}
+  }
+  @media (max-width:420px){
+    .wrap{padding:0 16px}
+    .nav-actions{gap:14px}
+    .nav-actions .nav-link{display:none}
+    .phone{width:100%}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .msg{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body data-page="cover">
+
+<nav>
+  <div class="wrap nav-inner">
+    <div class="mark">t<span class="spark">✦</span>ures</div>
+    <div class="nav-actions">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#" class="nav-link">Pricing</a>
+      <a href="#" class="signin">Sign in</a>
+      <button class="btn">Request access</button>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap hero">
+  <div class="hero-copy">
+    <span class="eyebrow"><span class="dot"></span> Your concierge, on 24/7</span>
+    <h1 class="hero-title serif">Stop planning<br>trips. <em>Start taking them.</em></h1>
+    <p class="subline">Tell Tures where. <b>It handles the rest</b> — every flight, hotel, and reservation, ending in confirmation numbers, not browser tabs.</p>
+    <div class="hero-cta">
+      <button class="btn">Request access</button>
+      <button class="btn btn-ghost">See a trip booked &nbsp;→</button>
+    </div>
+    <div class="reassure">
+      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Books for real</span>
+      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg> Watches & rebooks</span>
+      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.5 7.1 18l.9-5.5-4-3.9L9.5 8z"/></svg> Optimizes points</span>
+    </div>
+  </div>
+
+  <div class="phone-stage">
+    <div class="glow"></div>
+    <div class="phone" aria-label="Live message thread with the Tures concierge">
+      <div class="screen">
+        <div class="screen-top">
+          <div class="avatar serif">T</div>
+          <div class="who">
+            <span class="name">Tures</span>
+            <span class="status">Online</span>
+          </div>
+          <span class="menu">···</span>
+        </div>
+
+        <div class="thread" id="thread">
+          <!-- messages injected via JS for staged entrance; static fallback present -->
+        </div>
+
+        <div class="composer">
+          <div class="field">Message Tures…</div>
+          <div class="send" role="button" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="strip">
+  <div class="wrap strip-inner">
+    <div class="stat"><div class="k serif">11 sec</div><div class="v">from request to a held itinerary</div></div>
+    <div class="stat"><div class="k serif">24/7</div><div class="v">monitoring every leg you book</div></div>
+    <div class="stat"><div class="k serif">$0</div><div class="v">in change fees on rebookings, typical</div></div>
+    <div class="stat"><div class="k serif">Zero</div><div class="v">tabs, forms, or hold music</div></div>
+  </div>
+</section>
+
+<section class="how wrap" id="how">
+  <div class="sec-eyebrow">How it works</div>
+  <h2 class="sec-title serif">You describe the trip. It does the booking.</h2>
+  <div class="how-grid">
+    <div class="card">
+      <div class="n">01</div>
+      <h3 class="serif">Say it plainly</h3>
+      <p>“Five days on Maui in June, oceanfront, great food, business class if it is reasonable.” No forms, no filters, no comparison tabs.</p>
+    </div>
+    <div class="card">
+      <div class="n">02</div>
+      <h3 class="serif">It executes</h3>
+      <p>Tures holds flights and hotels, books the table at Mama’s Fish House, and returns confirmation numbers — not a list of links to chase.</p>
+    </div>
+    <div class="card">
+      <div class="n">03</div>
+      <h3 class="serif">It stays on watch</h3>
+      <p>Delays, weather, fare drops, loyalty points. While you are away, Tures quietly rebooks and optimizes, and tells you only when it matters.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div class="mark">t<span class="spark">✦</span>ures</div>
+    <div class="foot-links">
+      <a href="#">How it works</a>
+      <a href="#">Pricing</a>
+      <a href="#">Privacy</a>
+      <a href="#">Sign in</a>
+    </div>
+    <div class="copyr">© 2026 Tures. Your concierge, on 24/7.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var thread = document.getElementById('thread');
+
+  var resultCard =
+    '<div class="result-card msg">'+
+      '<div class="rc-head"><span class="rc-title serif">Held for you</span><span class="demo-tag">Sample</span></div>'+
+      '<div class="rc-row">'+
+        '<div class="rc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-7-7 13-2-6-6-2z"/></svg></div>'+
+        '<div class="rc-main"><div class="ln1">Hawaiian Airlines · Business</div><div class="ln2">SEA → OGG · Jun 12, nonstop · 2 seats</div></div>'+
+        '<div class="rc-side"><div class="pnr">HA · QK7T2P</div><div class="held">Held 24h</div></div>'+
+      '</div>'+
+      '<div class="rc-row">'+
+        '<div class="rc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13M9 21v-6h6v6"/></svg></div>'+
+        '<div class="rc-main"><div class="ln1">Montage Kapalua Bay</div><div class="ln2">Oceanfront suite · Jun 12–17 · 5 nights</div></div>'+
+        '<div class="rc-side"><div class="pnr">MKB · 5589</div><div class="held">Held 24h</div></div>'+
+      '</div>'+
+      '<div class="rc-foot">'+
+        '<div class="mini primary">Confirm both</div>'+
+        '<div class="mini ghost">Adjust</div>'+
+      '</div>'+
+    '</div>';
+
+  var steps = [
+    {html:'<div class="msg from-ai"><div class="bubble">Morning. Where are we headed.</div><div class="tstamp">Tures · 9:02</div></div>'},
+    {html:'<div class="msg from-me"><div class="bubble">My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.</div><div class="tstamp">You · 9:02</div></div>'},
+    {html:'<div class="msg from-ai"><div class="bubble">On it. Holding two business seats and a couple of oceanfront options, and I will pencil in dinner at Mama’s Fish House.</div><div class="tstamp">Tures · 9:02</div></div>'},
+    {typing:true},
+    {html:resultCard},
+    {html:'<div class="msg from-ai"><div class="bubble">Both held for 24 hours. Say the word and I confirm, add the rental, and start watching the fares.</div><div class="tstamp">Tures · 9:02</div></div>'}
+  ];
+
+  var typingNode =
+    '<div class="msg typing from-ai" id="typingNode"><div class="bubble">'+
+      '<span class="dot"></span><span class="dot"></span><span class="dot"></span>'+
+    '</div></div>';
+
+  function appendStep(s){
+    if(s.typing){
+      thread.insertAdjacentHTML('beforeend', typingNode);
+    } else {
+      thread.insertAdjacentHTML('beforeend', s.html);
+      var last = thread.lastElementChild;
+      requestAnimationFrame(function(){ last.classList.add('show'); });
+    }
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  if(reduce){
+    // render everything at once, no animation
+    steps.forEach(function(s){
+      if(s.typing) return; // skip typing indicator
+      thread.insertAdjacentHTML('beforeend', s.html.replace(/class="(msg[^"]*)"/, 'class="$1 show"').replace('result-card msg','result-card msg show'));
+    });
+    return;
+  }
+
+  var i = 0;
+  var delays = [500, 1300, 1500, 1300, 1500, 1700]; // before each step
+  function tick(){
+    if(i >= steps.length) return;
+    var s = steps[i];
+    // remove existing typing node before showing the next real message
+    var existingTyping = document.getElementById('typingNode');
+    if(existingTyping && !s.typing) existingTyping.remove();
+    appendStep(s);
+    i++;
+    setTimeout(tick, delays[Math.min(i, delays.length-1)]);
+  }
+  setTimeout(tick, 700);
+})();
+</script>
+<script src="assets/site.js" defer></script>
+<script src="_devkit.js"></script>
+</body>
+</html>

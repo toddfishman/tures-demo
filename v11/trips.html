@@ -1,0 +1,326 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — My Trips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<style>
+  /* ---- trip cards ---- */
+  .trip-card{padding:0;overflow:hidden;display:flex;flex-direction:column}
+  .trip-head{height:128px;position:relative;display:flex;align-items:flex-end;padding:16px}
+  .trip-head .initial{font-family:'Playfair Display',serif;font-weight:600;font-size:72px;color:rgba(255,255,255,.92);
+    position:absolute;right:14px;top:-6px;line-height:1;letter-spacing:-.02em}
+  .trip-head.maui{background:linear-gradient(135deg,var(--acc-2),var(--acc) 60%,var(--acc-deep))}
+  .trip-head.tokyo{background:linear-gradient(135deg,var(--rain),#2b3a55 70%,var(--text))}
+  .trip-head.kona{background:linear-gradient(135deg,var(--good),#1f6e54 65%,#143a2e)}
+  .trip-head .tag{position:relative;z-index:1;background:rgba(255,255,255,.92);color:var(--text);border-color:transparent}
+  .trip-body{padding:18px 20px 20px}
+  .trip-body .tname{font-family:'Playfair Display',serif;font-size:20px}
+  .trip-body .tsub{font-size:13px;color:var(--muted);margin-top:3px}
+  .trip-body .tdates{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--acc-deep);margin-top:12px}
+  .trip-body .topen{margin-top:14px;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text)}
+  .trip-body .topen svg{stroke:var(--acc-deep);transition:transform .18s}
+  .trip-card.hover:hover .topen svg{transform:translateX(3px)}
+
+  /* ---- opened trip ---- */
+  .detail-hero{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:6px}
+  .detail-hero .dh-initial{width:64px;height:64px;border-radius:16px;flex:0 0 auto;display:grid;place-items:center;
+    font-family:'Playfair Display',serif;font-weight:600;font-size:36px;color:#fff;background:linear-gradient(135deg,var(--acc-2),var(--acc) 60%,var(--acc-deep))}
+  .detail-hero .dh-t{flex:1;min-width:200px}
+  .detail-hero h2{font-size:clamp(26px,3vw,36px)}
+  .detail-hero .dh-meta{font-size:14px;color:var(--muted);margin-top:6px;display:flex;flex-wrap:wrap;gap:6px 16px}
+  .detail-hero .dh-meta .mono{color:var(--acc-deep)}
+
+  /* sticky tabs */
+  .tabs{position:sticky;top:var(--nav-h);z-index:30;display:flex;gap:6px;overflow-x:auto;padding:14px 0;
+    background:linear-gradient(to bottom,var(--bg) 70%,transparent);-webkit-overflow-scrolling:touch}
+  .tabs a{flex:0 0 auto;font-size:13px;font-weight:500;color:var(--muted);padding:8px 14px;border-radius:999px;
+    border:1px solid var(--line);transition:color .18s,border-color .18s,background .18s;white-space:nowrap}
+  .tabs a:hover{color:var(--text);border-color:var(--line-2)}
+  .tabs a.on{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
+
+  .cat{padding-top:30px;scroll-margin-top:calc(var(--nav-h) + 64px)}
+  .cat-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .cat-h .cn{font-family:'Playfair Display',serif;font-size:22px}
+  .cat-h .ci{width:34px;height:34px;border-radius:10px;background:var(--acc-dim);display:grid;place-items:center;flex:0 0 auto}
+  .cat-h .ci svg{stroke:var(--acc-deep)}
+
+  .item{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--bg);margin-bottom:12px}
+  .item .idot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:7px;background:var(--good)}
+  .item .idot.warn{background:var(--rain)}
+  .item .ibody{flex:1;min-width:0}
+  .item .it1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .item .it2{font-size:13.5px;color:var(--muted);margin-top:3px}
+  .item .iconf{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:10px;font-size:12.5px}
+  .item .iconf .mono{color:var(--acc-deep);font-size:12.5px}
+  .item .swap{font-size:12.5px;font-weight:600;color:var(--acc-deep)}
+  .item .swap:hover{text-decoration:underline}
+  .item .side{flex:0 0 auto;text-align:right;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--muted);line-height:1.5}
+  .item .moved{display:inline-flex;align-items:center;gap:5px;font-size:11px;letter-spacing:.04em;color:var(--rain);
+    background:rgba(59,111,176,.12);border-radius:6px;padding:3px 8px}
+
+  .tip{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-left:2px solid var(--acc-line);background:var(--surface);border-radius:0 12px 12px 0;margin-bottom:10px}
+  .tip .tav{width:30px;height:30px;border-radius:50%;flex:0 0 auto;
+    background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));display:grid;place-items:center;
+    color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:14px}
+  .tip p{font-size:13.5px;color:var(--text)}
+
+  @media (max-width:560px){
+    .item{flex-wrap:wrap}.item .side{text-align:left;width:100%}
+    .detail-hero .dh-initial{width:52px;height:52px;font-size:28px}
+  }
+</style>
+</head>
+<body data-page="trips">
+<main>
+
+  <!-- ── hero ── -->
+  <section class="section tight">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span> My Trips</span>
+      <h1 style="margin-top:20px">Every trip, <em>in one place.</em></h1>
+      <p class="lead" style="margin-top:16px">What is booked, what is held, what Tures is watching for you. Open one to see every leg down to the confirmation number.</p>
+    </div>
+  </section>
+
+  <!-- ── the three trips ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="grid-3">
+        <a href="#maui" class="card hover trip-card">
+          <div class="trip-head maui"><span class="initial">M</span><span class="tag">Upcoming</span></div>
+          <div class="trip-body">
+            <div class="tname">Maui</div>
+            <div class="tsub">Anniversary · two travelers</div>
+            <div class="tdates">JUN 12 – 19, 2026</div>
+            <span class="topen">Open trip <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </a>
+
+        <div class="card hover trip-card">
+          <div class="trip-head tokyo"><span class="initial">T</span><span class="tag">Completed</span></div>
+          <div class="trip-body">
+            <div class="tname">Tokyo</div>
+            <div class="tsub">Solo · a week of food and walking</div>
+            <div class="tdates">FEB 3 – 10, 2026</div>
+            <span class="topen">Open trip <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+
+        <div class="card hover trip-card">
+          <div class="trip-head kona"><span class="initial">B</span><span class="tag">Planning</span></div>
+          <div class="trip-body">
+            <div class="tname">Big Island</div>
+            <div class="tsub">Family · five, two rooms</div>
+            <div class="tdates">DEC 21 – 28, 2026</div>
+            <span class="topen">Open trip <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ── opened trip: Maui ── -->
+  <section class="section tight" id="maui" style="scroll-margin-top:var(--nav-h)">
+    <div class="wrap">
+      <div class="detail-hero">
+        <div class="dh-initial">M</div>
+        <div class="dh-t">
+          <span class="tag" style="margin-bottom:10px">Upcoming</span>
+          <h2>Maui · <em>anniversary</em></h2>
+          <div class="dh-meta">
+            <span class="mono">SEA ⇄ OGG</span>
+            <span>Jun 12 – 19, 2026</span>
+            <span>Two travelers</span>
+            <span>Montage Kapalua Bay</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- sticky category tabs -->
+      <nav class="tabs" aria-label="Trip categories">
+        <a href="#lodging" class="on">Lodging</a>
+        <a href="#flights">Flights &amp; transport</a>
+        <a href="#reservations">Reservations</a>
+        <a href="#excursions">Excursions</a>
+        <a href="#tips">Tips</a>
+      </nav>
+
+      <!-- LODGING -->
+      <div class="cat" id="lodging">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13M9 21v-6h6v6"/></svg></span>
+          <span class="cn">Lodging</span>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Montage Kapalua Bay <span class="demo-tag">Sample</span></div>
+            <div class="it2">Oceanfront suite · 5 nights · breakfast included</div>
+            <div class="iconf">
+              <span class="mono">Conf · MKB-5589</span>
+              <a href="#maui" class="swap">See alternatives / swap</a>
+            </div>
+          </div>
+          <div class="side">Check-in<br>Jun 12 · 3:00p</div>
+        </div>
+      </div>
+
+      <!-- FLIGHTS -->
+      <div class="cat" id="flights">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-7-7 13-2-6-6-2z"/></svg></span>
+          <span class="cn">Flights &amp; transport</span>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Hawaiian Airlines · Business <span class="demo-tag">Sample</span></div>
+            <div class="it2">SEA → OGG · Jun 12 · departs 8:05a, nonstop</div>
+            <div class="iconf">
+              <span class="mono">PNR · HA · QK7T2P</span>
+              <a href="#maui" class="swap">Swap</a>
+            </div>
+          </div>
+          <div class="side">Seats<br>2A · 2B</div>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Hawaiian Airlines · Business <span class="demo-tag">Sample</span></div>
+            <div class="it2">OGG → SEA · Jun 19 · departs 9:40p, nonstop</div>
+            <div class="iconf">
+              <span class="mono">PNR · HA · QK7T2P</span>
+              <a href="#maui" class="swap">Swap</a>
+            </div>
+          </div>
+          <div class="side">Seats<br>3A · 3B</div>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Private transfer · airport ⇄ resort <span class="demo-tag">Sample</span></div>
+            <div class="it2">Driver meets you at baggage claim, both directions</div>
+            <div class="iconf"><span class="mono">Conf · LX-2204</span></div>
+          </div>
+          <div class="side">Held</div>
+        </div>
+      </div>
+
+      <!-- RESERVATIONS -->
+      <div class="cat" id="reservations">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v16l-9-4-9 4V5a2 2 0 0 1 2-2z"/></svg></span>
+          <span class="cn">Reservations</span>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Mama&rsquo;s Fish House <span class="demo-tag">Sample</span></div>
+            <div class="it2">Friday Jun 14 · 7:30 PM · party of 2 · oceanfront side</div>
+            <div class="iconf"><span class="mono">Conf · MFH-3081</span></div>
+          </div>
+          <div class="side">Anniversary<br>dinner</div>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Merriman&rsquo;s Kapalua <span class="demo-tag">Sample</span></div>
+            <div class="it2">Sunday Jun 16 · 6:45 PM · party of 2 · sunset window table</div>
+            <div class="iconf"><span class="mono">Conf · MRM-7742</span></div>
+          </div>
+          <div class="side">Held</div>
+        </div>
+      </div>
+
+      <!-- EXCURSIONS -->
+      <div class="cat" id="excursions">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span class="cn">Excursions</span>
+        </div>
+        <div class="item">
+          <span class="idot warn"></span>
+          <div class="ibody">
+            <div class="it1">Molokini Crater snorkel <span class="demo-tag">Sample</span></div>
+            <div class="it2">Small-group catamaran · gear and breakfast aboard</div>
+            <div class="iconf">
+              <span class="mono">Conf · MOL-1190</span>
+              <span class="moved"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 18a5 5 0 0 1-1-9.9A6 6 0 0 1 18 8a4 4 0 0 1-1 7.9"/></svg> Moved to Wed by weather watch</span>
+            </div>
+          </div>
+          <div class="side">Wed Jun 17<br>8:00a</div>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Sunset sail · Ka&rsquo;anapali coast <span class="demo-tag">Sample</span></div>
+            <div class="it2">Two-hour catamaran · champagne and pupus at golden hour</div>
+            <div class="iconf"><span class="mono">Conf · SNS-4471</span></div>
+          </div>
+          <div class="side">Tue Jun 16<br>5:30p</div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div class="cat" id="tips">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A7 7 0 0 0 12 2z"/></svg></span>
+          <span class="cn">Tips from your concierge</span>
+        </div>
+        <div class="tip">
+          <span class="tav serif">T</span>
+          <p>The drive to Mama&rsquo;s on the Friday is about 50 minutes from Kapalua &mdash; I have the car arriving at 6:30 so you are never rushed. Order the stuffed mahi.</p>
+        </div>
+        <div class="tip">
+          <span class="tav serif">T</span>
+          <p>Trade winds pick up most afternoons on the west side, so I front-loaded the water days to mornings. The sail on Tuesday sits in the calm window before they build.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="section">
+    <div class="wrap center">
+      <h2>Want it watched, too.</h2>
+      <p class="lead" style="margin:16px auto 28px">The Concierge keeps an eye on every trip — flights, weather, points — and rebooks before you would have noticed.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a class="btn" href="proactive.html">Meet The Concierge
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="plan.html">Plan another trip</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  // sticky-tab active state via scroll-spy + smooth in-page jumps
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs a'));
+  if(!tabs.length) return;
+  var cats = tabs.map(function(t){ return document.querySelector(t.getAttribute('href')); });
+  var navH = 66;
+
+  function setActive(id){
+    tabs.forEach(function(t){ t.classList.toggle('on', t.getAttribute('href') === '#'+id); });
+  }
+  var spy = function(){
+    var best=null, bestTop=-Infinity;
+    cats.forEach(function(c){
+      if(!c) return;
+      var top = c.getBoundingClientRect().top - navH - 80;
+      if(top <= 0 && top > bestTop){ bestTop=top; best=c; }
+    });
+    if(best) setActive(best.id);
+  };
+  window.addEventListener('scroll', spy, {passive:true});
+  spy();
+})();
+</script>
+<script src="assets/site.js" defer></script>
+<script src="_devkit.js"></script>
+</body></html>

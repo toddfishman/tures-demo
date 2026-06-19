@@ -1,0 +1,225 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — Plan a trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<style>
+  /* ---- page-specific: the plan console ---- */
+  .console-wrap{max-width:1000px;margin:0 auto}
+  .browser .body{display:grid;grid-template-columns:1fr;background:var(--bg)}
+  .conv{display:flex;flex-direction:column;min-height:560px}
+  .conv-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .conv-head .ch{flex:1;line-height:1.25}
+  .conv-head .ch .n{font-family:'Playfair Display',serif;font-size:16px;font-weight:500}
+  .conv-head .ch .s{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .conv-head .ch .s::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .conv-head .route{font-family:'Space Mono',monospace;font-size:12px;color:var(--faint);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+
+  .thread{flex:1;padding:22px 22px 8px;overflow:hidden}
+  .msg{opacity:0;transform:translateY(10px)}
+  .msg.show{animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* typing indicator */
+  .typing .bubble{display:inline-flex;gap:5px;align-items:center;padding:13px 16px}
+  .typing .d{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;animation:blink 1.4s infinite}
+  .typing .d:nth-child(2){animation-delay:.2s}.typing .d:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+  /* option card inside the thread */
+  .opt{align-self:flex-start;max-width:92%;background:linear-gradient(180deg,var(--acc-dim),transparent 70%),var(--bg);
+    border:1px solid var(--acc-line);border-radius:var(--radius);overflow:hidden;margin-top:2px}
+  .opt .pick{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .opt .pick .star{font-size:14px;letter-spacing:0}
+  .opt .pick .demo-tag{margin-left:auto}
+  .opt .ob{padding:16px}
+  .opt .oname{font-family:'Playfair Display',serif;font-size:21px;line-height:1.15}
+  .opt .ometa{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  .opt .ometa .mono{color:var(--acc-deep)}
+  .opt .reason{margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:12px;font-size:13.5px;color:var(--text);line-height:1.5}
+  .opt .reason b{font-weight:600}
+  .opt .reason .tp{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--acc-deep);margin-right:7px;vertical-align:middle}
+  .opt .oact{display:flex;gap:10px;padding:0 16px 16px;flex-wrap:wrap}
+
+  /* composer */
+  .composer{display:flex;gap:10px;align-items:center;padding:16px 20px;border-top:1px solid var(--line);background:var(--surface)}
+  .composer .field{flex:1;border-radius:999px}
+  .composer .send{width:42px;height:42px;border-radius:50%;flex:0 0 auto;background:var(--acc);display:grid;place-items:center;
+    cursor:pointer;border:none;box-shadow:0 8px 22px -10px var(--acc);transition:transform .15s}
+  .composer .send:hover{transform:translateY(-1px)}
+  .composer .send svg{stroke:#fff}
+
+  /* "what Tures asks" rail */
+  .asks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ask{display:flex;gap:11px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+  .ask .tick{width:24px;height:24px;flex:0 0 auto;border-radius:50%;background:var(--acc-dim);display:grid;place-items:center;margin-top:1px}
+  .ask .tick svg{stroke:var(--acc-deep)}
+  .ask .ad .at{font-size:13.5px;font-weight:600}
+  .ask .ad .as{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .asks-note{display:flex;align-items:center;gap:9px;margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .asks-note svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .asks-note b{color:var(--text);font-weight:600}
+
+  @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
+  @media (max-width:560px){.opt .oact .btn{flex:1}}
+</style>
+</head>
+<body data-page="plan">
+<main>
+
+  <!-- ── intro ── -->
+  <section class="section tight">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> Plan a trip</span>
+      <h1 style="margin-top:22px">Just say where. <em>In plain English.</em></h1>
+      <p class="lead" style="margin:18px auto 0">No forms, no twelve tabs. Tell Tures the shape of the trip and it asks only for what it truly needs — then walks you through curated picks before a single thing is held.</p>
+    </div>
+  </section>
+
+  <!-- ── the console ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="console-wrap">
+        <div class="browser">
+          <div class="titlebar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="addr">app.tures.com / plan</span>
+          </div>
+          <div class="body">
+            <div class="conv">
+              <div class="conv-head">
+                <div class="avatar serif">T</div>
+                <div class="ch"><div class="n">New trip</div><div class="s">Tures · online</div></div>
+                <span class="route" id="route">Seattle ⇄ ?</span>
+              </div>
+              <div class="thread" id="thread" aria-label="Conversation with Tures"></div>
+              <form class="composer" id="composer" onsubmit="return false">
+                <input class="field" id="composer-input" placeholder="Message Tures…" aria-label="Message Tures" autocomplete="off">
+                <button class="send" id="send" type="submit" aria-label="Send message">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── what Tures asks ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:26px">
+        <span class="eyebrow"><span class="dot"></span> What Tures asks</span>
+        <h2 style="margin-top:18px">Six things, then it <em>goes to work.</em></h2>
+      </div>
+      <div class="asks">
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Origin</div><div class="as">Your departure city. Tures never guesses where you start.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Destination</div><div class="as">Where you are headed — a city, a coast, a country.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Dates</div><div class="as">Exact days, or a window it can shape around price.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Travelers</div><div class="as">Who is going. Two for the anniversary, or the whole family.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Style</div><div class="as">Oceanfront and design-forward, or quiet and close to the trail.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Budget</div><div class="as">A posture or a cap — business class if it is reasonable.</div></div></div>
+      </div>
+      <div class="asks-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Tures never books until you confirm. Everything you see first is held — <b>nothing is charged</b> until you say the word.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="section">
+    <div class="wrap center">
+      <h2>Ready when you are.</h2>
+      <p class="lead" style="margin:16px auto 28px">See a full trip come together in the live demo, or look through The Vault that makes booking instant.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a class="btn" href="app.html">See the live demo
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="vault.html">Open The Vault</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var thread = document.getElementById('thread');
+  var route  = document.getElementById('route');
+
+  var optCard =
+    '<div class="opt msg">'+
+      '<div class="pick"><span class="star spark">✦</span> Tures&rsquo; pick <span class="demo-tag">Sample</span></div>'+
+      '<div class="ob">'+
+        '<div class="oname">Montage Kapalua Bay</div>'+
+        '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
+        '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div>'+
+      '</div>'+
+      '<div class="oact">'+
+        '<button class="btn" type="button">Hold this</button>'+
+        '<button class="btn ghost" type="button">See alternatives</button>'+
+      '</div>'+
+    '</div>';
+
+  var steps = [
+    {html:'<div class="msg from-ai"><div class="bubble">Good to see you. Tell me the shape of the trip in your own words &mdash; where, roughly when, and what you are after. I will sort out the rest.</div></div><div class="tstamp">Tures · 9:02</div>'},
+    {html:'<div class="msg from-me"><div class="bubble">My wife and I want 5 days on Maui in June &mdash; oceanfront, great food, business class if it is reasonable.</div></div><div class="tstamp" style="text-align:right">You · 9:03</div>'},
+    {typing:true},
+    {html:'<div class="msg from-ai"><div class="bubble">Lovely &mdash; two of you, oceanfront Maui in June, leaning toward business if the fare is sensible. I have the destination, the travelers, and the style. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where are you flying from, and which days.</div></div><div class="tstamp">Tures · 9:03</div>'},
+    {html:'<div class="msg from-me"><div class="bubble">From Seattle, June 12 to 19.</div></div><div class="tstamp" style="text-align:right">You · 9:04</div>', route:'Seattle ⇄ Maui'},
+    {typing:true},
+    {html:'<div class="msg from-ai"><div class="bubble">That is everything I need: Seattle to Maui, Jun 12&ndash;19, two travelers, oceanfront, business if reasonable. Let me walk you through a few curated picks &mdash; starting with where you will stay.</div></div><div class="tstamp">Tures · 9:04</div>'},
+    {html:optCard},
+    {typing:true,persist:true}
+  ];
+
+  function render(s){
+    if(s.typing){
+      thread.insertAdjacentHTML('beforeend','<div class="msg typing from-ai"'+(s.persist?' id="persistType"':' data-temp="1"')+'><div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>');
+    } else {
+      thread.insertAdjacentHTML('beforeend', s.html);
+      Array.prototype.forEach.call(thread.querySelectorAll('.msg:not(.show)'), function(m){
+        requestAnimationFrame(function(){ m.classList.add('show'); });
+      });
+      if(s.route) route.textContent = s.route;
+    }
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  if(reduce){
+    steps.forEach(function(s){
+      if(s.typing && !s.persist) return;
+      if(s.typing){ render(s); return; }
+      thread.insertAdjacentHTML('beforeend', s.html.replace(/class="msg/g,'class="msg show').replace(/class="opt msg/g,'class="opt msg show'));
+      if(s.route) route.textContent = s.route;
+    });
+    return;
+  }
+
+  var i=0;
+  var delays=[700,1100,1300,1600,1100,1100,1600,1300,900];
+  function tick(){
+    if(i>=steps.length) return;
+    var prev = thread.querySelector('[data-temp="1"]');
+    if(prev) prev.remove();
+    render(steps[i]);
+    i++;
+    setTimeout(tick, delays[Math.min(i,delays.length-1)]);
+  }
+  setTimeout(tick, 600);
+
+  // composer is illustrative; keep focus affordance honest
+  document.getElementById('composer').addEventListener('submit', function(){
+    var inp = document.getElementById('composer-input');
+    inp.value=''; inp.blur();
+  });
+})();
+</script>
+<script src="assets/site.js" defer></script>
+<script src="_devkit.js"></script>
+</body></html>
