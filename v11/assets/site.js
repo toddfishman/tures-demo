@@ -25,8 +25,7 @@
     { title: "More", items: [
       { href: "about.html",     label: "About",            page: "about" },
       { href: "about.html#contact", label: "Contact",      page: "contact" },
-      { href: "legal.html",     label: "Privacy & Terms",  page: "legal" },
-      { href: "funnel.html",    label: "Funnel map",       page: "funnel" }
+      { href: "legal.html",     label: "Privacy & Terms",  page: "legal" }
     ]}
   ];
   var PRIMARY = [
@@ -108,8 +107,8 @@
         GROUPS[1].items.map(function (it) { return '<a href="' + it.href + '">' + it.label + '</a>'; }).join("") +
         '<a href="about.html">About</a><a href="about.html#contact">Contact</a>' +
       '</div>' +
-      '<div><h5>The map</h5>' +
-        '<a href="funnel.html">Funnel map</a><a href="legal.html">Privacy</a><a href="legal.html">Terms</a>' +
+      '<div><h5>Legal</h5>' +
+        '<a href="legal.html">Privacy</a><a href="legal.html">Terms</a>' +
       '</div>' +
     '</div>' +
     '<div class="legal"><span>© MMXXVI Tures · Your trip, handled.</span><span>Mockup · sample data throughout</span></div>';
