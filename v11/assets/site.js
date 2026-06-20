@@ -13,14 +13,13 @@
       { href: "plan.html",      label: "Plan a trip",      page: "plan",      n: "2" },
       { href: "taste.html",     label: "The Taste Engine", page: "taste",     n: "3" },
       { href: "vault.html",     label: "The Vault",        page: "vault",     n: "4" },
-      { href: "app.html",       label: "Live demo",        page: "demo",      n: "5" },
-      { href: "trips.html",     label: "My Trips",         page: "trips",     n: "6" },
-      { href: "proactive.html", label: "The Concierge",    page: "concierge", n: "7" },
+      { href: "trips.html",     label: "My Trips",         page: "trips",     n: "5" },
+      { href: "proactive.html", label: "The Concierge",    page: "concierge", n: "6" },
       { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup",    n: "·" }
     ]},
     { title: "Decide", items: [
-      { href: "pricing.html",   label: "Pricing",          page: "pricing",   n: "8" },
-      { href: "signup.html",    label: "Get started",      page: "signup",    n: "9" }
+      { href: "pricing.html",   label: "Pricing",          page: "pricing",   n: "7" },
+      { href: "signup.html",    label: "Get started",      page: "signup",    n: "8" }
     ]},
     { title: "More", items: [
       { href: "about.html",     label: "About",            page: "about" },
