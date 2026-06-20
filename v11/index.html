@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>t✦ures — Stop planning trips</title>
+<title>t✦ures — Books. Protects. Proves.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -25,6 +25,8 @@
     --acc:#ff4929;
     --acc-2:#ff775f;
     --acc-dim:rgba(255,73,41,.12);
+    --acc-deep:#cf3b1f;
+    --acc-line:rgba(255,73,41,.28);
     --bubble-me:#ececed;
     --bubble-ai:#f5f5f6;
     --good:#2e9e5b;
@@ -96,6 +98,56 @@
   .reassure{margin-top:22px;display:flex;gap:20px;color:var(--faint);font-size:13px;flex-wrap:wrap}
   .reassure span{display:inline-flex;align-items:center;gap:7px}
   .reassure svg{stroke:var(--acc);opacity:.8}
+
+  /* ===== three-act arc hero (synchronized stepper ↔ phone) ===== */
+  .arc-hero{max-width:var(--maxw);margin:0 auto;padding:54px 24px 56px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center}
+  .arc-hero .steps{margin:22px 0 0;display:flex;flex-direction:column;gap:6px}
+  .arc-hero .step{display:flex;align-items:center;gap:16px;cursor:pointer;padding:4px 0;border:none;background:none;text-align:left;font-family:'Playfair Display',serif;font-weight:500;line-height:1.0;font-size:clamp(34px,5vw,58px);color:#cdcdcd;transition:color .45s}
+  .arc-hero .step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#cdcdcd;width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
+  .arc-hero .step.on{color:var(--acc)}
+  .arc-hero .step.on .kick{color:var(--acc-deep)}
+  .arc-hero .step .beam{flex:1;height:2px;position:relative;opacity:0;transition:opacity .45s;min-width:24px}
+  .arc-hero .step.on .beam{opacity:1;background:linear-gradient(to right,var(--acc),transparent)}
+  .arc-hero .step.on .beam::after{content:"";position:absolute;top:50%;left:0;width:9px;height:9px;border-radius:50%;background:var(--acc);transform:translateY(-50%);animation:beam 1.5s linear infinite}
+  @keyframes beam{0%{left:0;opacity:1}80%{opacity:1}100%{left:100%;opacity:0}}
+  .arc-hero .sub{margin:24px 0 0;font-size:16px;color:var(--muted);max-width:42ch;min-height:48px;line-height:1.6;transition:opacity .3s}
+  .arc-hero .sub b{color:var(--text);font-weight:500}
+  .arc-hero .arc-cta{margin-top:24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .arc-hero .progress{display:flex;gap:6px;margin-top:22px}
+  .arc-hero .progress i{width:26px;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden;position:relative}
+  .arc-hero .progress i.on::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;animation:fillp var(--dwell,3800ms) linear forwards}
+  .arc-hero .progress i.done{background:var(--acc-line)}
+  @keyframes fillp{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .arc-hero .phone{width:372px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 40px 80px -42px rgba(0,0,0,.45)}
+  .arc-hero .screen{background:var(--bg);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;height:600px;border:1px solid var(--line)}
+  .arc-hero .sct{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .arc-hero .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+  .arc-hero .sct .nm{font-size:14px;font-weight:600}
+  .arc-hero .sct .ss{font-size:11.5px;color:var(--acc-deep);display:flex;align-items:center;gap:6px}
+  .arc-hero .sct .ss .pd{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:aopulse 1.6s infinite}
+  @keyframes aopulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .arc-hero .scenes{position:relative;flex:1}
+  .arc-hero .scene{position:absolute;inset:0;padding:16px 14px;display:flex;flex-direction:column;gap:11px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;pointer-events:none}
+  .arc-hero .scene.on{opacity:1;transform:none;pointer-events:auto}
+  .arc-hero .m{max-width:88%}.arc-hero .m.me{align-self:flex-end}.arc-hero .m.ai{align-self:flex-start}
+  .arc-hero .b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
+  .arc-hero .ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .arc-hero .me .b{background:#fff;border:1px solid var(--line-2);border-bottom-right-radius:4px}
+  .arc-hero .work{align-self:flex-start;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:9px 13px}
+  .arc-hero .work .sp{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:aospin .8s linear infinite}@keyframes aospin{to{transform:rotate(360deg)}}
+  .arc-hero .rc{align-self:flex-start;max-width:94%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 60%),var(--bg)}
+  .arc-hero .rc .h{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .arc-hero .rc .h .tag{margin-left:auto}
+  .arc-hero .rc .r{display:flex;justify-content:space-between;gap:10px;padding:7px 13px;font-size:12.5px;border-bottom:1px solid var(--line)}.arc-hero .rc .r:last-child{border:none}.arc-hero .rc .r .mono{color:var(--acc-deep)}
+  .arc-hero .wx{align-self:flex-start;max-width:94%;display:flex;gap:9px;background:rgba(59,111,176,.08);border:1px solid rgba(59,111,176,.22);border-radius:13px;padding:9px 12px;font-size:12.5px;line-height:1.45}.arc-hero .wx svg{stroke:var(--rain);flex:0 0 auto;margin-top:1px}
+  .arc-hero .home{align-self:stretch;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .arc-hero .home .hh{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--acc-dim)}
+  .arc-hero .home .hh .t{font-family:'Playfair Display',serif;font-size:15px}.arc-hero .home .hh .tag{margin-top:5px}
+  .arc-hero .home .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .arc-hero .home .cell{background:var(--bg);padding:10px 12px}.arc-hero .home .cell .n{font-family:'Space Mono',monospace;font-size:16px;color:var(--acc-deep)}.arc-hero .home .cell .l{font-size:10.5px;color:var(--muted)}
+  .arc-hero .home .foot{padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}.arc-hero .home .foot b{color:var(--text);font-weight:600}
+  .arc-hero .tag{font-family:'DM Sans',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line-2);border-radius:5px;padding:3px 7px;display:inline-flex}
+  @media(max-width:900px){.arc-hero{grid-template-columns:1fr;gap:34px;padding:38px 24px}.arc-hero .step{font-size:clamp(30px,9vw,46px)}.arc-hero .sub{min-height:0}}
 
   /* ---- Phone / Thread ---- */
   .phone-stage{display:flex;justify-content:center;position:relative}
@@ -276,48 +328,55 @@
   </div>
 </nav>
 
-<header class="wrap hero">
-  <div class="hero-copy">
-    <span class="eyebrow"><span class="dot"></span> Your concierge, on 24/7</span>
-    <h1 class="hero-title serif">Stop planning<br>trips. <em>Start taking them.</em></h1>
-    <p class="subline">Tell Tures where. <b>It handles the rest</b> — every flight, hotel, and reservation, ending in confirmation numbers, not browser tabs.</p>
-    <div class="hero-cta">
-      <a class="btn" href="signup.html">Request access</a>
-      <a class="btn btn-ghost" href="app.html">See a trip booked &nbsp;→</a>
+<header class="arc-hero">
+  <div>
+    <span class="eyebrow"><span class="dot"></span> Your concierge, end to end</span>
+    <div class="steps" id="steps">
+      <button class="step" data-i="0"><span class="kick">Before</span><span class="word">Books.</span><span class="beam"></span></button>
+      <button class="step" data-i="1"><span class="kick">During</span><span class="word">Protects.</span><span class="beam"></span></button>
+      <button class="step" data-i="2"><span class="kick">After</span><span class="word">Proves.</span><span class="beam"></span></button>
     </div>
-    <div class="reassure">
-      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Books for real</span>
-      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg> Watches & rebooks</span>
-      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.5 7.1 18l.9-5.5-4-3.9L9.5 8z"/></svg> Optimizes points</span>
+    <p class="sub" id="sub"></p>
+    <div class="progress" id="prog"><i></i><i></i><i></i></div>
+    <div class="arc-cta">
+      <a class="btn" href="plan.html">Plan a trip <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <span style="font-size:13px;color:var(--muted)">Other apps stop at <span style="color:var(--text)">Booked</span>.</span>
     </div>
   </div>
 
-  <div class="phone-stage">
-    <div class="glow"></div>
-    <div class="phone" aria-label="Live message thread with the Tures concierge">
-      <div class="screen">
-        <div class="screen-top">
-          <div class="avatar serif">T</div>
-          <div class="who">
-            <span class="name">Tures</span>
-            <span class="status">Online</span>
+  <div class="phone"><div class="screen">
+    <div class="sct"><div class="av serif">T</div><div><div class="nm">Tures</div><div class="ss"><span class="pd"></span><span id="pstatus">Booking your trip</span></div></div></div>
+    <div class="scenes">
+      <!-- BOOKS -->
+      <div class="scene on" data-s="0">
+        <div class="m me"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+        <div class="work"><span class="sp"></span> Comparing 38 fares · holding two oceanfront suites…</div>
+        <div class="rc"><div class="h"><span class="spark">✦</span> Trip held <span class="tag">Sample</span></div>
+          <div class="r"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+          <div class="r"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">oceanfront</span></div>
+          <div class="r"><span>Mama’s Fish House · anniversary</span><span class="mono">7:30p</span></div></div>
+      </div>
+      <!-- PROTECTS -->
+      <div class="scene" data-s="1">
+        <div class="m ai"><div class="b">Heads up — your flight home Thursday shifted two hours. I rebooked you on the 4:55, same cabin, no change fee.</div></div>
+        <div class="wx"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in for Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator. <span class="tag" style="margin-top:6px">Sample</span></div></div>
+        <div class="m ai"><div class="b">A better oceanfront table opened for your anniversary night — I took it. Nothing for you to do.</div></div>
+      </div>
+      <!-- PROVES -->
+      <div class="scene" data-s="2">
+        <div class="home">
+          <div class="hh"><div class="t serif">Welcome home, Andy — Maui, handled.</div><span class="tag">Sample</span></div>
+          <div class="grid">
+            <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
+            <div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>
+            <div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>
+            <div class="cell"><div class="n">1</div><div class="l">disaster dodged</div></div>
           </div>
-          <span class="menu">···</span>
-        </div>
-
-        <div class="thread" id="thread">
-          <!-- messages injected via JS for staged entrance; static fallback present -->
-        </div>
-
-        <div class="composer">
-          <div class="field">Message Tures…</div>
-          <div class="send" role="button" aria-label="Send">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </div>
+          <div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama’s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div>
         </div>
       </div>
     </div>
-  </div>
+  </div></div>
 </header>
 
 <section class="strip">
@@ -398,76 +457,37 @@
 </footer>
 
 <script>
+/* ===== EDIT THE THREE WORDS HERE — kicker + word + the line beneath =====
+   Alternates: Books it/Watches it/Wraps it · Booked/Protected/Proven
+   · Plans it/Watches it/Proves it · Arranges/Attends/Accounts                 */
+var ACTS=[
+  {kick:"Before", word:"Books.",    status:"Booking your trip",       sub:"One message books the whole trip — <b>flights, hotel, the table</b>. Confirmation numbers, not links."},
+  {kick:"During", word:"Protects.", status:"Watching your trip · 24/7", sub:"On the whole time. It catches the delay, the storm, the closure — and <b>fixes it before you notice</b>, good news too."},
+  {kick:"After",  word:"Proves.",   status:"Trip wrapped",            sub:"The receipts when you land — <b>what it saved, miles credited, hours back, expenses filed</b>, and a taste it learned."}
+];
 (function(){
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var thread = document.getElementById('thread');
-
-  var resultCard =
-    '<div class="result-card msg">'+
-      '<div class="rc-head"><span class="rc-title serif">Held for you</span><span class="demo-tag">Sample</span></div>'+
-      '<div class="rc-row">'+
-        '<div class="rc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-7-7 13-2-6-6-2z"/></svg></div>'+
-        '<div class="rc-main"><div class="ln1">Hawaiian Airlines · Business</div><div class="ln2">SEA → OGG · Jun 12, nonstop · 2 seats</div></div>'+
-        '<div class="rc-side"><div class="pnr">HA · QK7T2P</div><div class="held">Held 24h</div></div>'+
-      '</div>'+
-      '<div class="rc-row">'+
-        '<div class="rc-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13M9 21v-6h6v6"/></svg></div>'+
-        '<div class="rc-main"><div class="ln1">Montage Kapalua Bay</div><div class="ln2">Oceanfront suite · Jun 12–17 · 5 nights</div></div>'+
-        '<div class="rc-side"><div class="pnr">MKB · 5589</div><div class="held">Held 24h</div></div>'+
-      '</div>'+
-      '<div class="rc-foot">'+
-        '<div class="mini primary">Confirm both</div>'+
-        '<div class="mini ghost">Adjust</div>'+
-      '</div>'+
-    '</div>';
-
-  var steps = [
-    {html:'<div class="msg from-ai"><div class="bubble">Morning. Where are we headed.</div><div class="tstamp">Tures · 9:02</div></div>'},
-    {html:'<div class="msg from-me"><div class="bubble">My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.</div><div class="tstamp">You · 9:02</div></div>'},
-    {html:'<div class="msg from-ai"><div class="bubble">On it. Holding two business seats and a couple of oceanfront options, and I will pencil in dinner at Mama’s Fish House.</div><div class="tstamp">Tures · 9:02</div></div>'},
-    {typing:true},
-    {html:resultCard},
-    {html:'<div class="msg from-ai"><div class="bubble">Both held for 24 hours. Say the word and I confirm, add the rental, and start watching the fares.</div><div class="tstamp">Tures · 9:02</div></div>'}
-  ];
-
-  var typingNode =
-    '<div class="msg typing from-ai" id="typingNode"><div class="bubble">'+
-      '<span class="dot"></span><span class="dot"></span><span class="dot"></span>'+
-    '</div></div>';
-
-  function appendStep(s){
-    if(s.typing){
-      thread.insertAdjacentHTML('beforeend', typingNode);
-    } else {
-      thread.insertAdjacentHTML('beforeend', s.html);
-      var last = thread.lastElementChild;
-      requestAnimationFrame(function(){ last.classList.add('show'); });
-    }
-    thread.scrollTop = thread.scrollHeight;
+  var DWELL=3800;
+  var steps=[].slice.call(document.querySelectorAll('.arc-hero .step'));
+  var scenes=[].slice.call(document.querySelectorAll('.arc-hero .scene'));
+  var prog=[].slice.call(document.querySelectorAll('#prog i'));
+  var sub=document.getElementById('sub'), pstatus=document.getElementById('pstatus');
+  if(!steps.length) return;
+  document.documentElement.style.setProperty('--dwell',DWELL+'ms');
+  steps.forEach(function(s,i){ s.querySelector('.kick').textContent=ACTS[i].kick; s.querySelector('.word').textContent=ACTS[i].word; });
+  var i=0,timer=null;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function set(n){
+    i=n;
+    steps.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    scenes.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    prog.forEach(function(p,k){ p.classList.remove('on','done'); if(k<i)p.classList.add('done'); });
+    if(!reduce){ var bar=prog[i]; bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on'); }
+    sub.style.opacity=0; setTimeout(function(){ sub.innerHTML=ACTS[i].sub; sub.style.opacity=1; },150);
+    pstatus.textContent=ACTS[i].status;
   }
-
-  if(reduce){
-    // render everything at once, no animation
-    steps.forEach(function(s){
-      if(s.typing) return; // skip typing indicator
-      thread.insertAdjacentHTML('beforeend', s.html.replace(/class="(msg[^"]*)"/, 'class="$1 show"').replace('result-card msg','result-card msg show'));
-    });
-    return;
-  }
-
-  var i = 0;
-  var delays = [500, 1300, 1500, 1300, 1500, 1700]; // before each step
-  function tick(){
-    if(i >= steps.length) return;
-    var s = steps[i];
-    // remove existing typing node before showing the next real message
-    var existingTyping = document.getElementById('typingNode');
-    if(existingTyping && !s.typing) existingTyping.remove();
-    appendStep(s);
-    i++;
-    setTimeout(tick, delays[Math.min(i, delays.length-1)]);
-  }
-  setTimeout(tick, 700);
+  function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
+  steps.forEach(function(s){ s.addEventListener('click',function(){ set(+s.dataset.i); play(); }); });
+  set(0); play();
 })();
 </script>
 <script src="assets/site.js" defer></script>
