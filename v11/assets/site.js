@@ -15,7 +15,8 @@
       { href: "vault.html",     label: "The Vault",        page: "vault",     n: "4" },
       { href: "app.html",       label: "Live demo",        page: "demo",      n: "5" },
       { href: "trips.html",     label: "My Trips",         page: "trips",     n: "6" },
-      { href: "proactive.html", label: "The Concierge",    page: "concierge", n: "7" }
+      { href: "proactive.html", label: "The Concierge",    page: "concierge", n: "7" },
+      { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup",    n: "·" }
     ]},
     { title: "Decide", items: [
       { href: "pricing.html",   label: "Pricing",          page: "pricing",   n: "8" },
@@ -48,9 +49,10 @@
         PRIMARY.map(function (l) { return '<a class="' + on(l.page).trim() + '" href="' + l.href + '">' + l.label + '</a>'; }).join("") +
       '</nav>' +
       '<div class="right">' +
+        '<a class="v11-setup" id="v11-setup" href="taste.html" style="display:none"></a>' +
         '<button class="btn ghost sm" id="v11-pages" type="button">☰ Pages</button>' +
-        '<a class="signin" href="signup.html">Sign in</a>' +
-        '<a class="btn sm" href="signup.html">Request access</a>' +
+        '<a class="signin" id="v11-signin" href="signup.html">Sign in</a>' +
+        '<a class="btn sm" id="v11-cta" href="signup.html">Request access</a>' +
       '</div>' +
     '</div>';
   document.body.insertBefore(nav, document.body.firstChild);
@@ -98,4 +100,32 @@
     '</div>' +
     '<div class="legal"><span>© MMXXVI Tures · Your trip, handled.</span><span>Mockup · sample data throughout</span></div>';
   document.body.appendChild(foot);
+
+  /* ---- reflect account + setup progress (driven by funnel.js) ---- */
+  function refreshState() {
+    var f = window.turesFunnel;
+    var signed = f ? f.signedIn() : !!(window.tures && window.tures.signedIn);
+    var signin = document.getElementById("v11-signin");
+    var cta = document.getElementById("v11-cta");
+    var setup = document.getElementById("v11-setup");
+    if (signin) {
+      signin.textContent = signed ? "Account" : "Sign in";
+      signin.href = signed ? "trips.html" : "signup.html";
+    }
+    if (cta && signed) { cta.textContent = "Plan a trip"; cta.href = "plan.html"; }
+    if (setup && f) {
+      var st = f.setupStatus(), nx = f.nextStep();
+      if (st.complete) {
+        setup.style.display = ""; setup.href = "trips.html"; setup.title = "Your setup is complete";
+        setup.innerHTML = '<span class="ring done">✓</span><span class="lbl">Setup complete</span>';
+      } else if (st.done > 0 && nx) {
+        setup.style.display = ""; setup.href = nx.href; setup.title = "Next: " + nx.label;
+        setup.innerHTML = '<span class="ring">' + st.percent + '%</span><span class="lbl">Your setup</span>';
+      } else {
+        setup.style.display = "none";
+      }
+    }
+  }
+  refreshState();
+  if (window.turesFunnel) window.turesFunnel.on(refreshState);
 })();

@@ -27,6 +27,9 @@
   --radius:18px;
   --maxw:1180px;
   --nav-h:66px;
+  /* aliases so ported v10 assets (voice.js etc.) inherit the vermilion accent */
+  --gold:var(--acc);
+  --gold-bright:var(--acc-2);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -153,6 +156,12 @@ em,.it{font-style:italic;color:var(--acc-2)}
 .v11-nav .links a:hover,.v11-nav .links a.on{color:var(--text)}
 .v11-nav .right{display:flex;align-items:center;gap:16px}
 .v11-nav .signin{font-size:14px;color:var(--text)}
+.v11-setup{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text);border:1px solid var(--acc-line);background:var(--acc-dim);border-radius:999px;padding:4px 13px 4px 5px;transition:border-color .15s}
+.v11-setup:hover{border-color:var(--acc)}
+.v11-setup .ring{display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 6px;border-radius:999px;background:var(--acc);color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700}
+.v11-setup .ring.done{min-width:22px;padding:0}
+.v11-setup .lbl{font-weight:500}
+@media (max-width:980px){ .v11-setup .lbl{display:none} }
 .v11-nav .menu-btn{display:none;background:none;border:1px solid var(--line-2);border-radius:9px;padding:7px 10px;cursor:pointer;color:var(--text)}
 .v11-drawer{position:fixed;inset:0;z-index:90;background:rgba(20,20,20,.34);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s linear .25s}
 .v11-drawer.open{opacity:1;visibility:visible;transition:opacity .25s}

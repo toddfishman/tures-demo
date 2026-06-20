@@ -4,6 +4,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
 <style>
   /* ---- page-specific: the plan console ---- */
   .console-wrap{max-width:1000px;margin:0 auto}
@@ -51,6 +53,27 @@
     cursor:pointer;border:none;box-shadow:0 8px 22px -10px var(--acc);transition:transform .15s}
   .composer .send:hover{transform:translateY(-1px)}
   .composer .send svg{stroke:#fff}
+  .composer .send:disabled{opacity:.5;cursor:default;transform:none}
+
+  /* toolbar above the console */
+  .plan-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .plan-bar .spacer{flex:1}
+  .chip-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text);border:1px solid var(--line-2);border-radius:999px;padding:7px 13px;cursor:pointer;transition:border-color .15s,color .15s}
+  .chip-link:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .chip-link svg{stroke:currentColor}
+
+  /* action button rows + confirmation cards in-thread */
+  .actions{margin-top:2px}
+  .actions .row{display:flex;gap:10px;flex-wrap:wrap}
+  .conf{align-self:flex-start;max-width:94%;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;margin-top:2px}
+  .conf .ch{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}
+  .conf .ch .ok{color:var(--good)}
+  .conf .ch .demo-tag{margin-left:auto}
+  .conf .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+  .conf .ln:last-child{border-bottom:none}
+  .conf .ln .mono{color:var(--acc-deep);white-space:nowrap}
+  .nudge{align-self:flex-start;max-width:92%;display:flex;gap:10px;align-items:flex-start;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:14px;padding:12px 14px;margin-top:2px;font-size:13.5px;line-height:1.5}
+  .nudge svg{stroke:var(--acc-deep);flex:0 0 auto;margin-top:2px}
 
   /* "what Tures asks" rail */
   .asks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -83,6 +106,13 @@
   <section class="section tight" style="padding-top:0">
     <div class="wrap">
       <div class="console-wrap">
+        <div class="plan-bar">
+          <span data-voice-mount></span>
+          <a class="chip-link" id="text-tures" href="sms:&body=Hi%20Tures%2C%20I%27d%20like%20to%20plan%20a%20trip" title="Text Tures (SMS channel — preview)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg> Text Tures</a>
+          <span class="spacer"></span>
+          <button id="btn-demo" class="btn ghost sm" type="button">▷ Watch the example</button>
+        </div>
         <div class="browser">
           <div class="titlebar">
             <span class="dots"><i></i><i></i><i></i></span>
@@ -146,78 +176,201 @@
 
 </main>
 
+<script src="assets/voice.js" defer></script>
 <script>
 (function(){
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var thread = document.getElementById('thread');
   var route  = document.getElementById('route');
+  var input  = document.getElementById('composer-input');
+  var sendBtn= document.getElementById('send');
+  var form   = document.getElementById('composer');
+  var live   = !!(window.tures && window.tures.configured);
+  var history = [];
+  var busy = false;
 
-  var optCard =
-    '<div class="opt msg">'+
-      '<div class="pick"><span class="star spark">✦</span> Tures&rsquo; pick <span class="demo-tag">Sample</span></div>'+
-      '<div class="ob">'+
-        '<div class="oname">Montage Kapalua Bay</div>'+
-        '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
-        '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div>'+
-      '</div>'+
-      '<div class="oact">'+
-        '<button class="btn" type="button">Hold this</button>'+
-        '<button class="btn ghost" type="button">See alternatives</button>'+
-      '</div>'+
-    '</div>';
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function short(s){ s=String(s||''); return s.length>16 ? s.slice(0,15)+'…' : s; }
+  function reveal(el){ requestAnimationFrame(function(){ el.classList.add('show'); }); }
+  function scroll(){ thread.scrollTop = thread.scrollHeight; }
+  function setRoute(o,d){ if(o&&d) route.textContent = short(o)+' ⇄ '+short(d); }
 
-  var steps = [
-    {html:'<div class="msg from-ai"><div class="bubble">Good to see you. Tell me the shape of the trip in your own words &mdash; where, roughly when, and what you are after. I will sort out the rest.</div></div><div class="tstamp">Tures · 9:02</div>'},
-    {html:'<div class="msg from-me"><div class="bubble">My wife and I want 5 days on Maui in June &mdash; oceanfront, great food, business class if it is reasonable.</div></div><div class="tstamp" style="text-align:right">You · 9:03</div>'},
-    {typing:true},
-    {html:'<div class="msg from-ai"><div class="bubble">Lovely &mdash; two of you, oceanfront Maui in June, leaning toward business if the fare is sensible. I have the destination, the travelers, and the style. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where are you flying from, and which days.</div></div><div class="tstamp">Tures · 9:03</div>'},
-    {html:'<div class="msg from-me"><div class="bubble">From Seattle, June 12 to 19.</div></div><div class="tstamp" style="text-align:right">You · 9:04</div>', route:'Seattle ⇄ Maui'},
-    {typing:true},
-    {html:'<div class="msg from-ai"><div class="bubble">That is everything I need: Seattle to Maui, Jun 12&ndash;19, two travelers, oceanfront, business if reasonable. Let me walk you through a few curated picks &mdash; starting with where you will stay.</div></div><div class="tstamp">Tures · 9:04</div>'},
-    {html:optCard},
-    {typing:true,persist:true}
-  ];
-
-  function render(s){
-    if(s.typing){
-      thread.insertAdjacentHTML('beforeend','<div class="msg typing from-ai"'+(s.persist?' id="persistType"':' data-temp="1"')+'><div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>');
-    } else {
-      thread.insertAdjacentHTML('beforeend', s.html);
-      Array.prototype.forEach.call(thread.querySelectorAll('.msg:not(.show)'), function(m){
-        requestAnimationFrame(function(){ m.classList.add('show'); });
-      });
-      if(s.route) route.textContent = s.route;
-    }
-    thread.scrollTop = thread.scrollHeight;
+  function bubble(html, who){
+    var w=document.createElement('div'); w.className='msg '+(who==='me'?'from-me':'from-ai');
+    w.innerHTML='<div class="bubble">'+html+'</div>'; thread.appendChild(w); reveal(w);
+    var ts=document.createElement('div'); ts.className='tstamp'; if(who==='me') ts.style.textAlign='right';
+    ts.textContent=(who==='me'?'You':'Tures'); thread.appendChild(ts); reveal(ts); scroll(); return w;
+  }
+  var typingEl=null;
+  function typing(on){
+    if(on){ if(typingEl) return; typingEl=document.createElement('div'); typingEl.className='msg typing from-ai';
+      typingEl.innerHTML='<div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div>';
+      thread.appendChild(typingEl); reveal(typingEl); scroll(); }
+    else if(typingEl){ typingEl.remove(); typingEl=null; }
+  }
+  function actions(btns){
+    var w=document.createElement('div'); w.className='msg from-ai actions';
+    var row=document.createElement('div'); row.className='row';
+    btns.forEach(function(b){ var el=document.createElement('button'); el.type='button'; el.className='btn '+(b.cls||''); el.innerHTML=b.label; el.onclick=function(){ w.remove(); b.on(); }; row.appendChild(el); });
+    w.appendChild(row); thread.appendChild(w); reveal(w); scroll(); return w;
   }
 
-  if(reduce){
-    steps.forEach(function(s){
-      if(s.typing && !s.persist) return;
-      if(s.typing){ render(s); return; }
-      thread.insertAdjacentHTML('beforeend', s.html.replace(/class="msg/g,'class="msg show').replace(/class="opt msg/g,'class="opt msg show'));
-      if(s.route) route.textContent = s.route;
+  // ── live conversation ──
+  function send(text){
+    if(busy || !text) return;
+    bubble(esc(text),'me'); history.push({role:'user',content:text});
+    input.value=''; busy=true; sendBtn.disabled=true; typing(true);
+    var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
+    var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
+    window.tures.converse(history.slice(-12), undefined, ctx, uid).then(function(c){
+      typing(false); busy=false; sendBtn.disabled=false;
+      if(c && c.slots && c.slots.origin && c.slots.destination) setRoute(c.slots.origin, c.slots.destination);
+      if(c && c.ready && c.brief){
+        if(c.reply) bubble(esc(c.reply),'t');
+        resolveBrief(c.brief);
+      } else {
+        var reply=(c && c.reply) || 'Tell me a little more.';
+        bubble(esc(reply),'t'); history.push({role:'assistant',content:reply});
+      }
+    }).catch(function(e){ typing(false); busy=false; sendBtn.disabled=false; offline(e); });
+  }
+
+  // converse returns the brief as a sentence; /plan and /book need a structured brief → parse it first.
+  function resolveBrief(b){
+    if(b && typeof b==='object' && b.destination){ window.__brief=b; proposePlan(b); return; }
+    typing(true);
+    window.tures.parse(String(b||'')).then(function(pr){
+      typing(false);
+      if(pr && pr.brief){ window.__brief=pr.brief; proposePlan(pr.brief); }
+      else offline();
+    }).catch(function(){ typing(false); offline(); });
+  }
+
+  function proposePlan(brief){
+    window.__brief = brief; typing(true);
+    window.tures.plan(brief).then(function(p){
+      typing(false);
+      var total = (p && p.totalUsd!=null) ? ('about $'+Number(p.totalUsd).toLocaleString()+' all in') : 'a single, clean number';
+      var why = (p && p.rationale) ? p.rationale : 'flights and a hotel that fit exactly what you asked for';
+      bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet. Shall I book it.','t');
+      offerBook(brief);
+    }).catch(function(){
+      typing(false);
+      bubble('That is everything I need. Shall I hold it and book.','t'); offerBook(brief);
     });
-    return;
+  }
+  function offerBook(brief){
+    actions([
+      {label:'✦ Book it', on:function(){ executeBooking(brief); }},
+      {label:'Adjust', cls:'ghost', on:function(){ bubble('Of course — tell me what to change (dates, budget, a different hotel) and I will re-shape it.','t'); input.focus(); }}
+    ]);
   }
 
-  var i=0;
-  var delays=[700,1100,1300,1600,1100,1100,1600,1300,900];
-  function tick(){
-    if(i>=steps.length) return;
-    var prev = thread.querySelector('[data-temp="1"]');
-    if(prev) prev.remove();
-    render(steps[i]);
-    i++;
-    setTimeout(tick, delays[Math.min(i,delays.length-1)]);
+  function executeBooking(brief){
+    typing(true);
+    window.tures.book({brief:brief}).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId); })
+    .then(function(bk){
+      typing(false);
+      var comps=(bk && bk.components)||[];
+      var rows = comps.map(function(c){
+        var code=c.confirmation||c.pnr||c.ref||c.status||'';
+        return '<div class="ln"><span>'+esc(c.label||'Booked')+'</span><span class="mono">'+esc(code)+'</span></div>';
+      }).join('') || '<div class="ln"><span>Trip held</span><span class="mono">'+esc(bk.tripId||bk.id||'')+'</span></div>';
+      var card=document.createElement('div'); card.className='conf msg';
+      card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+rows;
+      thread.appendChild(card); reveal(card);
+      bubble('Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>','t');
+      maybeNudge(); scroll();
+    }).catch(function(e){
+      typing(false);
+      if(e && e.status===409){ paymentGate(brief, e); }
+      else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief); }}]); }
+    });
   }
-  setTimeout(tick, 600);
 
-  // composer is illustrative; keep focus affordance honest
-  document.getElementById('composer').addEventListener('submit', function(){
-    var inp = document.getElementById('composer-input');
-    inp.value=''; inp.blur();
-  });
+  function paymentGate(brief, e){
+    var why='Your trip is built and held — to book it for real I need a card on file.';
+    if(window.turesFunnel) window.turesFunnel.pendingTrip.set({brief:brief, total:(e&&e.body&&e.body.totalUsd)||null});
+    var n=document.createElement('div'); n.className='nudge msg';
+    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div>'+esc(why)+' Add a card to your Vault and I will pick this trip straight back up.</div>';
+    thread.appendChild(n); reveal(n);
+    var signed = window.tures && window.tures.signedIn;
+    actions([
+      {label:'Add a card &amp; book →', on:function(){ location.href = signed ? 'vault.html#payment' : 'signup.html'; }},
+      {label:'Not now', cls:'ghost', on:function(){ bubble('No rush — your trip is held. Pick it up whenever you like.','t'); }}
+    ]); scroll();
+  }
+
+  function maybeNudge(){
+    if(!window.turesFunnel) return;
+    var nx=window.turesFunnel.nextStep(); if(!nx) return;
+    var n=document.createElement('div'); n.className='nudge msg';
+    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg><div>To make the next one instant: <b>'+esc(nx.label)+'</b> — '+esc(nx.why)+'. <a href="'+nx.href+'" style="color:var(--acc-deep);font-weight:600">Set it up →</a></div>';
+    thread.appendChild(n); reveal(n); scroll();
+  }
+
+  function offline(e){
+    bubble('I could not reach the planner just now — nothing was lost. Watch the example to see how a trip comes together, and try again in a moment.','t');
+    actions([{label:'▷ Watch the example', on:runDemo}]);
+  }
+
+  // ── greeting ──
+  function greet(){
+    if(live){
+      bubble('Good to see you. Tell me the shape of the trip in your own words — where, roughly when, and what you are after. I will ask only for what I truly need.','t');
+      var tp = window.turesFunnel && window.turesFunnel.taste();
+      if(tp && tp.signature) bubble('I have your Taste Print on hand — <span style="color:var(--muted)">'+esc(tp.signature.slice(0,90))+'…</span> — so the picks land in your register.','t');
+      else bubble('You can <a href="taste.html" style="color:var(--acc-deep);font-weight:600">build your Taste Print</a> first so every pick is in your register — or just start here.','t');
+    } else {
+      bubble('Tures is offline in this preview. Watch the example to see a full trip come together.','t');
+      actions([{label:'▷ Watch the example', on:runDemo}]);
+    }
+  }
+
+  // ── demo replay (the scripted example) ──
+  var optCard =
+    '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> Tures&rsquo; pick <span class="demo-tag">Sample</span></div>'+
+    '<div class="ob"><div class="oname">Montage Kapalua Bay</div>'+
+    '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
+    '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div></div>'+
+    '<div class="oact"><button class="btn" type="button">Hold this</button><button class="btn ghost" type="button">See alternatives</button></div></div>';
+  var demoSteps = [
+    {t:'t',h:'Good to see you. Tell me the shape of the trip in your own words.'},
+    {t:'me',h:'My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.'},
+    {typing:1},
+    {t:'t',h:'Lovely — two of you, oceanfront Maui in June. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where from, and which days.'},
+    {t:'me',h:'From Seattle, June 12 to 19.', route:['Seattle','Maui']},
+    {typing:1},
+    {t:'t',h:'That is everything I need. Let me walk you through a few curated picks — starting with where you will stay.'},
+    {card:1}
+  ];
+  var demoRunning=false;
+  function runDemo(){
+    demoRunning=true; typing(false); thread.innerHTML=''; route.textContent='Seattle ⇄ ?';
+    var i=0;
+    (function tick(){
+      if(!demoRunning || i>=demoSteps.length){ return; }
+      var s=demoSteps[i++];
+      if(s.typing){ typing(true); setTimeout(function(){ typing(false); tick(); },1100); return; }
+      typing(false);
+      if(s.card){ thread.insertAdjacentHTML('beforeend', optCard); scroll(); }
+      else bubble(s.h, s.t==='me'?'me':'t');
+      if(s.route) setRoute(s.route[0], s.route[1]);
+      setTimeout(tick, s.t==='me'?700:1300);
+    })();
+  }
+
+  // ── wire ──
+  form.addEventListener('submit', function(ev){ ev.preventDefault(); demoRunning=false; send(input.value.trim()); });
+  document.getElementById('btn-demo').addEventListener('click', runDemo);
+  // voice.js sets #composer.value = brief then calls sendBrief() with no arg
+  window.sendBrief = function(b){
+    if(b==null){ try{ b = form.value; }catch(_){} }
+    if(!b) return;
+    demoRunning=false;
+    resolveBrief(b);
+  };
+
+  greet();
 })();
 </script>
 <script src="assets/site.js" defer></script>

@@ -4,6 +4,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
 <style>
   /* ── signup — page-specific only; everything else reuses v11.css ── */
   .signup-hero{padding-top:78px}
@@ -129,16 +131,47 @@
 </main>
 <script src="assets/site.js" defer></script>
 <script>
-  (function () {
-    var form = document.getElementById("req-form");
-    var ack = document.getElementById("ack");
-    if (!form) return;
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();                 // INERT — no real submission
-      ack.classList.add("show");
-      ack.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-  })();
+(function () {
+  var F = window.turesFunnel;
+  var form = document.getElementById("req-form"), ack = document.getElementById("ack");
+  if (!form) return;
+  var nameEl=document.getElementById('f-name'), emailEl=document.getElementById('f-email'), tripEl=document.getElementById('f-trip');
+  var tr = F ? F.traveler() : {};
+  if (tr.name) nameEl.value = tr.name;
+  if (tr.email) emailEl.value = tr.email;
+
+  function checklist(){
+    if(!F) return '';
+    var st=F.setupStatus();
+    var rows=F.steps.map(function(s){ var d=st.steps[s.key];
+      return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13.5px">'+
+        '<span style="width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:'+(d?'var(--good)':'var(--surface-2)')+';color:#fff;font-size:11px">'+(d?'✓':'')+'</span>'+
+        '<a href="'+s.href+'" style="color:'+(d?'var(--muted)':'var(--text)')+'">'+s.label+'</a></div>'; }).join('');
+    return '<div style="margin:18px auto 0;text-align:left;max-width:300px;border-top:1px solid var(--line);padding-top:14px">'+
+      '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Your setup · '+st.percent+'%</div>'+rows+'</div>';
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();                 // no password, no real auth — a soft profile only
+    var name=(nameEl.value||'').trim(), email=(emailEl.value||'').trim();
+    if (F) F.setTraveler({ name:name, email:email });
+    var pt = F ? F.pendingTrip.get() : null;
+    var check='<div class="ico-lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>';
+    var html;
+    if (pt) {
+      html = check + '<h3 class="serif">You are set — and a trip is held for you.</h3>'+
+        '<p>We have your details. Add a card to your Vault and Tures will book the trip you planned. Nothing has been charged.</p>'+
+        '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn" href="vault.html#payment">Add a card &amp; book →</a><a class="btn ghost" href="plan.html">Keep planning</a></div>';
+    } else {
+      html = check + '<h3 class="serif">You are set to start.</h3>'+
+        '<p>No account to fuss with tonight. Build your Taste Print or just start planning — Tures guides you the rest of the way.</p>'+
+        '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn" href="plan.html">Start planning →</a><a class="btn ghost" href="taste.html">Build your Taste Print</a></div>';
+    }
+    html += checklist() + '<span class="demo-tag" style="margin-top:14px;display:inline-block">Mockup · no password, no charge</span>';
+    ack.innerHTML = html; ack.classList.add("show");
+    ack.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+})();
 </script>
 <script src="_devkit.js"></script>
 </body></html>

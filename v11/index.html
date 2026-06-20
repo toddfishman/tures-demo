@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/v11.css" />
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
 <style>nav:not(.links){display:none !important}footer:not(.v11-foot){display:none !important}</style>
 <style>
   :root{
@@ -215,6 +217,25 @@
   .card h3{font-family:'Playfair Display',serif;font-weight:500;font-size:21px;margin:14px 0 10px}
   .card p{color:var(--muted);font-size:14.5px;font-weight:300}
 
+  /* ---- always-on band ---- */
+  .alwayson{border-top:1px solid var(--line);padding:70px 0 12px}
+  .alwayson .ao-eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .alwayson h2{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(26px,3.6vw,40px);line-height:1.08;max-width:20ch}
+  .alwayson h2 em{font-style:italic;color:var(--acc-2)}
+  .alwayson .ao-lead{margin-top:16px;color:var(--muted);font-size:16.5px;font-weight:300;max-width:52ch}
+  .alwayson .ao-lead b{color:var(--text);font-weight:500}
+  .alwayson .ao-see{display:inline-flex;align-items:center;gap:7px;margin-top:20px;font-size:14px;font-weight:500;color:var(--acc-2);border-radius:6px}
+  .alwayson .ao-see:hover{color:var(--acc)}
+  .alwayson .ao-see:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .ao-proof{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .ao-proof .cell{border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+  .ao-proof .cell .ph{display:flex;align-items:center;gap:10px}
+  .ao-proof .cell .pi{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;background:var(--acc-dim)}
+  .ao-proof .cell .pi svg{stroke:var(--acc-2)}
+  .ao-proof .cell .pt{font-family:'Playfair Display',serif;font-size:18px}
+  .ao-proof .cell p{margin-top:9px;color:var(--muted);font-size:13.5px;font-weight:300}
+  @media (max-width:760px){.ao-proof{grid-template-columns:1fr}}
+
   footer{border-top:1px solid var(--line);margin-top:70px;padding:42px 0 56px}
   .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
   .foot-links{display:flex;gap:24px;color:var(--faint);font-size:13px}
@@ -250,7 +271,7 @@
       <a href="#how" class="nav-link">How it works</a>
       <a href="#" class="nav-link">Pricing</a>
       <a href="#" class="signin">Sign in</a>
-      <button class="btn">Request access</button>
+      <a class="btn" href="signup.html">Request access</a>
     </div>
   </div>
 </nav>
@@ -261,8 +282,8 @@
     <h1 class="hero-title serif">Stop planning<br>trips. <em>Start taking them.</em></h1>
     <p class="subline">Tell Tures where. <b>It handles the rest</b> — every flight, hotel, and reservation, ending in confirmation numbers, not browser tabs.</p>
     <div class="hero-cta">
-      <button class="btn">Request access</button>
-      <button class="btn btn-ghost">See a trip booked &nbsp;→</button>
+      <a class="btn" href="signup.html">Request access</a>
+      <a class="btn btn-ghost" href="app.html">See a trip booked &nbsp;→</a>
     </div>
     <div class="reassure">
       <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg> Books for real</span>
@@ -326,6 +347,39 @@
       <div class="n">03</div>
       <h3 class="serif">It stays on watch</h3>
       <p>Delays, weather, fare drops, loyalty points. While you are away, Tures quietly rebooks and optimizes, and tells you only when it matters.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alwayson" aria-labelledby="ao-title">
+  <div class="wrap">
+    <div class="ao-eyebrow">Always on</div>
+    <h2 id="ao-title" class="serif">With you around the clock. <em>It moves first.</em></h2>
+    <p class="ao-lead">Tures does not clock out — <b>24/7, no days off, no holidays</b>. It watches every leg for trouble before it reaches you, and quietly surfaces the good news too: an upgrade that opened, a better table, a fare that dropped.</p>
+    <a class="ao-see" href="hiccup.html">See how it watches &nbsp;→</a>
+
+    <div class="ao-proof">
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="pt serif">On 24/7</span>
+        </div>
+        <p>No days off, no holidays. The trip is watched the whole time, not just at checkout.</p>
+      </div>
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          <span class="pt serif">Watches every leg</span>
+        </div>
+        <p>Delays, weather, closures, strikes, fare drops — caught before they reach you.</p>
+      </div>
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></span>
+          <span class="pt serif">Moves first</span>
+        </div>
+        <p>Quietly fixes the trouble and holds the better option, so you do not have to.</p>
+      </div>
     </div>
   </div>
 </section>

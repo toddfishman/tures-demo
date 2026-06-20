@@ -4,6 +4,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
 <style>
   /* page-specific only — reuses v11.css tokens + classes */
   .vault-hero{padding:84px 0 36px;text-align:center}
@@ -69,6 +71,12 @@
   .vault-cta{text-align:center}
   .vault-cta .btn{margin:6px 6px 0}
 
+  /* functional bits */
+  .vfield{display:flex;flex-direction:column;gap:6px}
+  .vfield span{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+  .add-form{display:none;flex-direction:column;gap:10px;margin-top:12px}
+  #basics-msg{display:none}
+
   @media (max-width:860px){
     .trust-divider{display:none}
     .trust-banner{justify-content:flex-start}
@@ -104,6 +112,26 @@
         <span class="tag">Tokenized, not stored</span>
       </div>
     </div>
+  </section>
+
+  <!-- TRAVEL BASICS + HELD TRIP (functional) -->
+  <section class="wrap section tight" id="basics" style="padding-top:18px">
+    <div id="held-wrap"></div>
+    <article class="card vault-card">
+      <div class="vhead">
+        <span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <div><h3 class="serif">Travel basics</h3><div class="vsub">Where you start and how Tures reaches you — so it never has to ask mid-plan.</div></div>
+      </div>
+      <div class="grid-3" style="gap:14px">
+        <label class="vfield"><span>Home airport</span><input class="field" id="f-home" placeholder="e.g. SEA" autocomplete="off"></label>
+        <label class="vfield"><span>Email</span><input class="field" id="f-email" type="email" placeholder="you@example.com" autocomplete="off"></label>
+        <label class="vfield"><span>Mobile</span><input class="field" id="f-phone" placeholder="+1 …" autocomplete="off"></label>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn sm" id="save-basics" type="button">Save basics</button>
+        <span id="basics-msg" class="tok">Saved</span>
+      </div>
+    </article>
   </section>
 
   <!-- CATEGORY CARDS -->
@@ -144,6 +172,16 @@
               <button class="edit" type="button">Edit</button>
             </span>
           </div>
+          <div id="saved-cards"></div>
+        </div>
+        <button class="btn ghost sm" id="add-card-btn" type="button" style="margin-top:14px;align-self:flex-start">+ Add a card</button>
+        <div id="add-card-form" class="add-form">
+          <div class="grid-3" style="gap:10px">
+            <input class="field" id="c-name" placeholder="Name on card" autocomplete="off">
+            <input class="field" id="c-brand" placeholder="Brand (Visa…)" autocomplete="off">
+            <input class="field" id="c-last4" placeholder="Last 4 digits" maxlength="4" inputmode="numeric" autocomplete="off">
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn sm" id="c-save" type="button">Connect card</button><span class="vsub">Tures stores a token, never the full number — enter only the last four.</span></div>
         </div>
       </article>
 
@@ -322,12 +360,90 @@
 </main>
 <script src="assets/site.js" defer></script>
 <script>
-  /* quiet, optional access toggles — purely local */
+(function(){
+  var F=window.turesFunnel, T=window.tures;
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function flash(t){ var m=document.getElementById('basics-msg'); if(m){ m.style.display='inline-flex'; m.textContent=t; setTimeout(function(){m.style.display='none';},2600); } }
+
+  // ----- travel basics -----
+  var tr = F?F.traveler():{};
+  var home=document.getElementById('f-home'), email=document.getElementById('f-email'), phone=document.getElementById('f-phone');
+  if(tr.homeAirport) home.value=tr.homeAirport;
+  if(tr.email) email.value=tr.email; if(tr.phone) phone.value=tr.phone;
+  document.getElementById('save-basics').addEventListener('click', function(){
+    var patch={ homeAirport:(home.value||'').trim().toUpperCase(), email:(email.value||'').trim(), phone:(phone.value||'').trim() };
+    if(F) F.setTraveler(patch);
+    if(T && T.signedIn){ try{ T.profile.set(patch); }catch(_){} }
+    flash('Saved');
+  });
+
+  // ----- saved cards + add a card -----
+  function renderCards(){
+    var box=document.getElementById('saved-cards'); if(!box) return;
+    var v=F?F.vault():{}; var pay=v.payment||[];
+    box.innerHTML = pay.map(function(c){
+      return '<div class="row"><span class="pill-card">CARD</span><span class="rl"><span class="rk">'+esc(c.name||'Your card')+'</span><span class="rv">'+esc(c.label||'')+'</span></span><span class="rtail"><span class="tag">VGS-tokenized</span></span></div>';
+    }).join('');
+  }
+  renderCards();
+  var addBtn=document.getElementById('add-card-btn'), addForm=document.getElementById('add-card-form');
+  addBtn.addEventListener('click', function(){ addForm.style.display = (addForm.style.display==='flex'?'none':'flex'); });
+  document.getElementById('c-save').addEventListener('click', function(){
+    var brand=(document.getElementById('c-brand').value||'Card').trim();
+    var last4=(document.getElementById('c-last4').value||'').replace(/\D/g,'').slice(-4);
+    var name=(document.getElementById('c-name').value||'').trim();
+    if(last4.length<4){ flash('Enter the last four digits'); return; }
+    var v=F?F.vault():{}; var pay=(v.payment||[]).concat([{ label:brand+' ···· '+last4, name:name||'Primary card' }]);
+    if(F) F.setVault({payment:pay});
+    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand} }); }catch(_){} }
+    document.getElementById('c-brand').value=''; document.getElementById('c-last4').value=''; document.getElementById('c-name').value='';
+    addForm.style.display='none'; renderCards(); renderHeld();
+    flash('Card connected — Tures can book now');
+  });
+
+  // ----- grants → state -----
   document.querySelectorAll('.tg').forEach(function(t){
     t.addEventListener('click', function(){
-      t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      var on = t.getAttribute('aria-pressed')!=='true'; t.setAttribute('aria-pressed', on?'true':'false');
+      var lbl=(t.getAttribute('aria-label')||'').toLowerCase(); var v=F?F.vault():{}; var acc=v.access||{};
+      if(/calendar/.test(lbl)) acc.calendar=on; else if(/inbox/.test(lbl)) acc.inbox=on; else if(/messag/.test(lbl)) acc.messaging=on;
+      if(F) F.setVault({access:acc});
     });
   });
+
+  // ----- held trip: book OUT of the chat -----
+  function renderHeld(){
+    var wrap=document.getElementById('held-wrap'); if(!wrap||!F) return;
+    var pt=F.pendingTrip.get();
+    if(!pt){ wrap.innerHTML=''; return; }
+    var route = (pt.brief && pt.brief.destination) ? (esc(pt.brief.origin||'')+' → '+esc(pt.brief.destination)) : 'Your last planned trip';
+    wrap.innerHTML='<article class="card" style="margin-bottom:18px;border-color:var(--acc-line);background:var(--acc-dim)">'+
+      '<div class="vhead" style="margin-bottom:10px"><span class="ico"><span class="spark" style="font-size:18px">✦</span></span>'+
+      '<div><h3 class="serif">A trip is held for you</h3><div class="vsub">'+route+' — book it the moment your card is in.</div></div></div>'+
+      '<div style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn" id="book-held" type="button">✦ Book the held trip</button>'+
+      '<button class="btn ghost" id="drop-held" type="button">Discard</button></div><div id="held-result" style="margin-top:12px"></div></article>';
+    document.getElementById('book-held').addEventListener('click', bookHeld);
+    document.getElementById('drop-held').addEventListener('click', function(){ F.pendingTrip.clear(); renderHeld(); });
+  }
+  function bookHeld(){
+    var pt=F.pendingTrip.get(); if(!pt||!T) return;
+    var res=document.getElementById('held-result'); res.innerHTML='<span class="vsub">Booking…</span>';
+    T.book({brief:pt.brief}).then(function(bk){ return T.confirm(bk.id||bk.tripId); }).then(function(bk){
+      var comps=(bk.components||[]);
+      var rows=comps.map(function(c){ return '<div class="row"><span class="rl"><span class="rv">'+esc(c.title||c.label||'Booked')+'</span></span><span class="rtail"><span class="tag">'+esc(c.confirmation||c.pnr||c.status||'')+'</span></span></div>'; }).join('');
+      res.innerHTML='<div class="tok" style="margin:6px 0 8px">Confirmed — verified twice · <span class="demo-tag">Sample</span></div>'+rows;
+      F.pendingTrip.clear();
+      flash('Booked — no card was charged (safe simulation)');
+    }).catch(function(e){
+      if(e && e.status===409){ res.innerHTML='<span class="vsub" style="color:var(--acc-deep)">Add a card above, then book.</span>'; }
+      else { res.innerHTML='<span class="vsub">Could not book just now — nothing was charged.</span>'; }
+    });
+  }
+  renderHeld();
+
+  // deep-link: open add-card if arriving at #payment, scroll to #basics
+  if(location.hash==='#payment'){ addForm.style.display='flex'; document.getElementById('add-card-btn').scrollIntoView({block:'center'}); }
+})();
 </script>
 <script src="_devkit.js"></script>
 </body></html>
