@@ -47,7 +47,7 @@
     '@media(prefers-reduced-motion:reduce){.cz-bub,.cz-panel{animation:none}.cz-typ i{animation:none}}';
   document.head.appendChild(css);
 
-  var AV = '<img src="assets/img/concierge.jpg" alt="Tures concierge" onerror="this.style.display=\'none\';this.parentNode.querySelector(\'.fb\').style.display=\'grid\'"><span class="fb" style="display:none">t<span style="color:#fff">✦</span></span>';
+  var AV = '<img src="assets/img/concierge.png" alt="Tures concierge" onerror="if(this.src.indexOf(\'.png\')>-1){this.src=\'assets/img/concierge.jpg\';}else{this.style.display=\'none\';this.parentNode.querySelector(\'.fb\').style.display=\'grid\';}"><span class="fb" style="display:none">t<span style="color:#fff">✦</span></span>';
 
   var launch = document.createElement("div");
   launch.className = "cz-l";
