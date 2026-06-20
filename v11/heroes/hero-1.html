@@ -1,0 +1,116 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — Plans it. Protects it. Proves it.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--surface:#f6f6f6;--surface-2:#efefef;--line:rgba(26,26,26,.10);--line-2:rgba(26,26,26,.16);--text:#1a1a1a;--muted:#6f6f6f;--faint:#9a9a9a;--acc:#ff4929;--acc-2:#ff775f;--acc-deep:#cf3b1f;--acc-dim:rgba(255,73,41,.10);--acc-line:rgba(255,73,41,.28);--good:#2e9e5b;--warn:#c77a00;--rain:#3b6fb0;--radius:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+a{color:inherit;text-decoration:none}.serif{font-family:'Playfair Display',Georgia,serif}.mono{font-family:'Space Mono',monospace}.spark{color:var(--acc)}
+em{font-style:italic;color:var(--acc-2)}
+.nv{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:linear-gradient(to bottom,rgba(255,255,255,.92),rgba(255,255,255,.7));border-bottom:1px solid var(--line)}
+.nv .in{max-width:1180px;margin:0 auto;padding:0 22px;height:64px;display:flex;align-items:center;gap:16px}
+.nv .lg{display:inline-flex;align-items:center;gap:7px;font-family:'Playfair Display',serif;font-size:23px;font-weight:600;flex:0 0 auto}.nv .lg .cv{font-size:11px;color:var(--muted)}
+.nv .pl{flex:1;max-width:540px;margin:0 auto;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line-2);border-radius:999px;padding:5px 6px 5px 16px}
+.nv .pl input{flex:1;border:none;outline:none;background:none;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);min-width:0}.nv .pl input::placeholder{color:var(--faint)}
+.nv .pl button{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:none;background:var(--acc);cursor:pointer;display:grid;place-items:center}
+.nv .ac{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+@media(max-width:620px){.nv .pl{max-width:none}.nv .lg{font-size:20px}}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:14px;cursor:pointer;border:none;border-radius:999px;padding:12px 22px;background:var(--acc);color:#fff}
+.btn.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-deep);border:1px solid var(--line-2);border-radius:999px;padding:6px 14px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line-2);border-radius:5px;padding:3px 7px}
+h1{font-family:'Playfair Display',serif;font-weight:500;line-height:1.04;letter-spacing:-.01em;font-size:clamp(36px,5.2vw,62px)}
+.lead{font-size:clamp(16px,1.5vw,19px);color:var(--muted);font-weight:300}
+/* concept 1 */
+.hw{max-width:1180px;margin:0 auto;padding:54px 24px;display:grid;grid-template-columns:1.02fr .98fr;gap:50px;align-items:center}
+.acts{display:flex;gap:18px;margin:26px 0 22px;flex-wrap:wrap}
+.act{flex:1;min-width:150px}
+.act .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc-deep);font-weight:600;margin-bottom:6px}
+.act .d{font-size:13.5px;color:var(--muted);line-height:1.5}
+.phone{width:370px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 40px 80px -42px rgba(0,0,0,.45)}
+.screen{background:var(--bg);border-radius:28px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;height:606px}
+.sct{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+.sct .nm{font-size:14px;font-weight:600}.sct .ss{font-size:11.5px;color:var(--good);display:flex;align-items:center;gap:5px}.sct .ss::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good)}
+.thr{flex:1;overflow:hidden;padding:14px;display:flex;flex-direction:column;gap:10px}
+.dv{align-self:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:6px 0 2px}
+.m{max-width:86%;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}.m.show{opacity:1;transform:none}
+.m.me{align-self:flex-end}.m.ai{align-self:flex-start}
+.b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
+.ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+.me .b{background:#fff;border:1px solid var(--line-2);border-bottom-right-radius:4px}
+.rc{align-self:flex-start;max-width:92%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 60%),var(--bg);opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}.rc.show{opacity:1;transform:none}
+.rc .h{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+.rc .h .tag{margin-left:auto}
+.rc .r{display:flex;justify-content:space-between;gap:10px;padding:7px 13px;font-size:12.5px;border-bottom:1px solid var(--line)}.rc .r:last-child{border:none}.rc .r .mono{color:var(--acc-deep)}
+.wx{align-self:flex-start;max-width:92%;display:flex;gap:9px;background:rgba(59,111,176,.08);border:1px solid rgba(59,111,176,.22);border-radius:13px;padding:9px 12px;font-size:12.5px;color:var(--text);line-height:1.45;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}.wx.show{opacity:1;transform:none}.wx svg{stroke:var(--rain);flex:0 0 auto;margin-top:1px}
+.home{align-self:flex-start;max-width:94%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg);opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}.home.show{opacity:1;transform:none}
+.home .hh{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--acc-dim)}
+.home .hh .t{font-family:'Playfair Display',serif;font-size:15px}.home .hh .tag{margin-top:4px}
+.home .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.home .cell{background:var(--bg);padding:9px 12px}.home .cell .n{font-family:'Space Mono',monospace;font-size:15px;color:var(--acc-deep)}.home .cell .l{font-size:10.5px;color:var(--muted)}
+.home .foot{padding:9px 13px;font-size:12px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}.home .foot b{color:var(--text);font-weight:600}
+@media(max-width:880px){.hw{grid-template-columns:1fr;gap:36px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.m,.rc,.wx,.home,.wx{opacity:1!important;transform:none!important}}
+</style></head>
+<body>
+<header class="nv"><div class="in">
+  <span class="lg">t<span class="spark">✦</span>ures <span class="cv">▾</span></span>
+  <form class="pl" onsubmit="return false"><input placeholder="Where to? Describe your trip and Tures plans it…" aria-label="Plan a trip"><button aria-label="Plan it"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+  <button class="ac" aria-label="Account"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>
+</div></header>
+
+<section class="hw">
+  <div>
+    <span class="eyebrow"><span class="dot"></span> Your concierge, end to end</span>
+    <h1 style="margin:22px 0 0">Plans it. <em>Protects it.</em> Proves it.</h1>
+    <div class="acts">
+      <div class="act"><div class="k">Before</div><div class="d">One message books the whole trip — flights, hotel, the table. Confirmation numbers, not links.</div></div>
+      <div class="act"><div class="k">During</div><div class="d">On 24/7. It catches the delay, the storm, the closure — and fixes it before you notice.</div></div>
+      <div class="act"><div class="k">After</div><div class="d">A homecoming report: what it saved, miles credited, hours back, expenses filed, taste learned.</div></div>
+    </div>
+    <p class="lead" style="max-width:42ch;margin-bottom:26px">Other apps stop at <span style="color:var(--text)">Booked</span>. Tures stays for the whole trip — and hands you the receipts when you land.</p>
+    <a class="btn" href="../plan.html">Plan a trip
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sct"><div class="av serif">T</div><div><div class="nm">Tures</div><div class="ss">on, the whole trip</div></div></div>
+    <div class="thr" id="thr">
+      <div class="dv" data-step>Before · Monday</div>
+      <div class="m me" data-step><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+      <div class="rc" data-step><div class="h"><span class="spark">✦</span> Trip held <span class="tag">Sample</span></div>
+        <div class="r"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+        <div class="r"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">oceanfront</span></div></div>
+      <div class="dv" data-step>During · Thursday, away</div>
+      <div class="m ai" data-step><div class="b">Your flight home shifted two hours — I rebooked you on the 4:55, same cabin, no fee.</div></div>
+      <div class="wx" data-step><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in for Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator.</div></div>
+      <div class="dv" data-step>After · Sunday, home</div>
+      <div class="home" data-step>
+        <div class="hh"><div class="t serif">Welcome home, Andy — Maui, handled.</div><span class="tag">Sample</span></div>
+        <div class="grid">
+          <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
+          <div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>
+          <div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>
+          <div class="cell"><div class="n">1</div><div class="l">disaster dodged</div></div>
+        </div>
+        <div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama’s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<script>
+(function(){
+  var steps=[].slice.call(document.querySelectorAll('[data-step]'));
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ steps.forEach(function(s){s.classList.add('show');}); return; }
+  var i=0;
+  (function tick(){ if(i>=steps.length) return; steps[i].classList.add('show');
+    var thr=document.getElementById('thr'); thr.scrollTop=thr.scrollHeight; i++; setTimeout(tick, 650); })();
+})();
+</script>
+</body></html>
