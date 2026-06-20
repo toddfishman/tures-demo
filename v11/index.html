@@ -81,7 +81,7 @@
   .hero{padding:78px 0 60px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
   .eyebrow{
     display:inline-flex;align-items:center;gap:9px;
-    font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-2);
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--text);
     border:1px solid var(--line-2);border-radius:999px;padding:6px 14px;margin-bottom:26px;
   }
   .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc);animation:pulse 2.6s infinite}
@@ -105,8 +105,7 @@
   .arc-hero .step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#cdcdcd;width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
   .arc-hero .step.on{color:var(--acc)}
   .arc-hero .step.on .kick{color:var(--acc-deep)}
-  .arc-hero .step .beam{flex:1;height:2px;position:relative;opacity:0;transition:opacity .45s;min-width:24px}
-  .arc-hero .step.on .beam{opacity:1;background:linear-gradient(to right,var(--acc),transparent)}
+  .arc-hero .step .beam{display:none}
   .arc-hero .sub{margin:24px 0 0;font-size:16px;color:var(--muted);max-width:42ch;min-height:48px;line-height:1.6;transition:opacity .3s}
   .arc-hero .sub b{color:var(--text);font-weight:500}
   .arc-hero .arc-cta{margin-top:26px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:540px}
@@ -149,7 +148,27 @@
   .arc-hero .home .cell{background:var(--bg);padding:10px 12px}.arc-hero .home .cell .n{font-family:'Space Mono',monospace;font-size:16px;color:var(--acc-deep)}.arc-hero .home .cell .l{font-size:10.5px;color:var(--muted)}
   .arc-hero .home .foot{padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}.arc-hero .home .foot b{color:var(--text);font-weight:600}
   .arc-hero .tag{font-family:'DM Sans',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line-2);border-radius:5px;padding:3px 7px;display:inline-flex}
-  @media(max-width:900px){.arc-hero{grid-template-columns:1fr;gap:34px;padding:38px 24px}.arc-hero .step{font-size:clamp(30px,9vw,46px)}.arc-hero .sub{min-height:0}}
+  @media(max-width:900px){
+    .arc-hero{grid-template-columns:1fr;gap:22px;padding:30px 22px 40px}
+    .arc-hero .steps{margin-top:14px;gap:2px}
+    .arc-hero .step{font-size:clamp(30px,9vw,46px)}
+    .arc-hero .step .kick{width:54px;font-size:10px}
+    .arc-hero .sub{min-height:0;margin-top:16px}
+    .arc-hero .phone{width:300px;padding:10px;border-radius:34px}
+    .arc-hero .screen{height:460px;border-radius:24px}
+  }
+  @media(max-width:600px){
+    .arc-hero{gap:16px;padding:24px 18px 34px}
+    .arc-hero .eyebrow{margin-bottom:18px;font-size:11px;letter-spacing:.1em}
+    .arc-hero .step{font-size:clamp(30px,11vw,42px);gap:12px}
+    .arc-hero .sub{font-size:14.5px;margin-top:14px}
+    .arc-hero .progress{margin-top:16px}
+    .arc-hero .arc-cta{margin-top:18px}
+    .arc-hero .hero-q{min-width:0;width:100%}
+    .arc-hero .arc-cta .btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:8px}
+    .arc-hero .phone{width:268px;padding:9px;border-radius:30px}
+    .arc-hero .screen{height:420px}
+  }
 
 
   /* ---- trust strip ---- */
@@ -221,7 +240,7 @@
 
 <header class="arc-hero">
   <div>
-    <span class="eyebrow"><span class="dot"></span> Your concierge, end to end</span>
+    <span class="eyebrow"><span class="dot"></span> Your end to end concierge, in your pocket.</span>
     <div class="steps" id="steps">
       <button class="step" data-i="0"><span class="kick">Before</span><span class="word">Books.</span><span class="beam"></span></button>
       <button class="step" data-i="1"><span class="kick">During</span><span class="word">Protects.</span><span class="beam"></span></button>

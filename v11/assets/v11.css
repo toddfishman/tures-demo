@@ -148,7 +148,7 @@ em,.it{font-style:italic;color:var(--acc-2)}
    Injected chrome (site.js) — nav + footer
    ============================================================ */
 .v11-nav{position:sticky;top:0;z-index:80;backdrop-filter:blur(14px);
-  background:linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.7));border-bottom:1px solid var(--line)}
+  background:linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.7))}
 .v11-nav .in{max-width:var(--maxw);margin:0 auto;padding:0 22px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:18px}
 .v11-nav .mark{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;letter-spacing:.5px}
 
