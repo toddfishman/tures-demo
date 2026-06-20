@@ -125,4 +125,7 @@
   }
   renderAcct();
   if (window.turesFunnel) window.turesFunnel.on(renderAcct);
+
+  /* ---- corner concierge (loads on every page; suppresses itself on Plan) ---- */
+  var cz = document.createElement("script"); cz.src = "assets/concierge.js"; cz.defer = true; document.body.appendChild(cz);
 })();

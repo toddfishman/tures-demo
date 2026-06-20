@@ -88,7 +88,7 @@
     var css = document.createElement("style");
     css.textContent =
       '#tk,#tk *{box-sizing:border-box;font-family:"DM Sans",system-ui,sans-serif}' +
-      '#tk{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:286px;max-height:84vh;overflow:auto;background:#0d0f12;color:#eee;border:1px solid rgba(255,255,255,.16);border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.6);font-size:12px}' +
+      '#tk{position:fixed;left:16px;bottom:16px;z-index:2147483646;width:286px;max-height:84vh;overflow:auto;background:#0d0f12;color:#eee;border:1px solid rgba(255,255,255,.16);border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.6);font-size:12px}' +
       '#tk.min{width:auto;overflow:visible}' +
       '#tk .hd{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;background:#0d0f12;border-radius:14px 14px 0 0}' +
       '#tk.min .hd{border-bottom:none}#tk .hd b{font-weight:600}#tk .hd .sp{color:#ff7a5c}#tk .hd .car{margin-left:auto;opacity:.6}' +
