@@ -107,11 +107,14 @@
   .arc-hero .step.on .kick{color:var(--acc-deep)}
   .arc-hero .step .beam{flex:1;height:2px;position:relative;opacity:0;transition:opacity .45s;min-width:24px}
   .arc-hero .step.on .beam{opacity:1;background:linear-gradient(to right,var(--acc),transparent)}
-  .arc-hero .step.on .beam::after{content:"";position:absolute;top:50%;left:0;width:9px;height:9px;border-radius:50%;background:var(--acc);transform:translateY(-50%);animation:beam 1.5s linear infinite}
-  @keyframes beam{0%{left:0;opacity:1}80%{opacity:1}100%{left:100%;opacity:0}}
   .arc-hero .sub{margin:24px 0 0;font-size:16px;color:var(--muted);max-width:42ch;min-height:48px;line-height:1.6;transition:opacity .3s}
   .arc-hero .sub b{color:var(--text);font-weight:500}
-  .arc-hero .arc-cta{margin-top:24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .arc-hero .arc-cta{margin-top:26px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:540px}
+  .arc-hero .hero-q{flex:1;min-width:230px;background:var(--bg);border:1px solid var(--line-2);border-radius:999px;padding:13px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+  .arc-hero .hero-q:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-dim)}
+  .arc-hero .hero-q::placeholder{color:var(--faint)}
+  .arc-hero .arc-cta .btn{flex:0 0 auto;padding:13px 22px}
+  .arc-hero .arc-note{margin-top:14px;font-size:13px;color:var(--muted)}
   .arc-hero .progress{display:flex;gap:6px;margin-top:22px}
   .arc-hero .progress i{width:26px;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden;position:relative}
   .arc-hero .progress i.on::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;animation:fillp var(--dwell,3800ms) linear forwards}
@@ -226,10 +229,11 @@
     </div>
     <p class="sub" id="sub"></p>
     <div class="progress" id="prog"><i></i><i></i><i></i></div>
-    <div class="arc-cta">
-      <a class="btn" href="plan.html">Plan a trip <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <span style="font-size:13px;color:var(--muted)">Other apps stop at <span style="color:var(--text)">Booked</span>.</span>
-    </div>
+    <form class="arc-cta" id="hero-plan">
+      <input class="hero-q" id="hero-q" autocomplete="off" placeholder="Where to? Describe your trip…" aria-label="Describe your trip">
+      <button class="btn" type="submit">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <p class="arc-note">Other apps stop at <span style="color:var(--text)">Booked</span>.</p>
   </div>
 
   <div class="phone"><div class="screen">
@@ -341,7 +345,7 @@ var ACTS=[
   {kick:"After",  word:"Proves.",   status:"Trip wrapped",            sub:"The receipts when you land — <b>what it saved, miles credited, hours back, expenses filed</b>, and a taste it learned."}
 ];
 (function(){
-  var DWELL=3800;
+  var DWELL=5400;
   var steps=[].slice.call(document.querySelectorAll('.arc-hero .step'));
   var scenes=[].slice.call(document.querySelectorAll('.arc-hero .scene'));
   var prog=[].slice.call(document.querySelectorAll('#prog i'));
@@ -363,6 +367,15 @@ var ACTS=[
   function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
   steps.forEach(function(s){ s.addEventListener('click',function(){ set(+s.dataset.i); play(); }); });
   set(0); play();
+})();
+(function(){
+  var f=document.getElementById('hero-plan'); if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var q=(document.getElementById('hero-q').value||'').trim();
+    if(q){ try{ localStorage.setItem('tures.seed', q); }catch(_){} }
+    location.href='plan.html';
+  });
 })();
 </script>
 <script src="assets/site.js" defer></script>

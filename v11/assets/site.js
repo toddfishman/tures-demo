@@ -54,10 +54,6 @@
           '<span class="mark">' + MARK + '</span><span class="chev">▾</span></button>' +
         '<div class="v11-menu" id="v11-menu" role="menu">' + menuHtml + '</div>' +
       '</div>' +
-      '<form class="v11-plan" id="v11-plan" role="search">' +
-        '<input id="v11-q" autocomplete="off" placeholder="Where to? Describe your trip and Tures plans it…" aria-label="Plan a trip">' +
-        '<button type="submit" aria-label="Plan it"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>' +
-      '</form>' +
       '<div class="v11-acct-wrap">' +
         '<button class="v11-acct" id="v11-acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account">' +
           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>' +
@@ -83,14 +79,6 @@
   document.addEventListener("click", function (e) { if (!e.target.closest(".v11-menu-wrap") && !e.target.closest(".v11-acct-wrap")) closeAll(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 
-  /* ---- the one CTA: type a trip → seed the chat ---- */
-  document.getElementById("v11-plan").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var q = (document.getElementById("v11-q").value || "").trim();
-    if (typeof window.turesPlanSeed === "function") { window.turesPlanSeed(q); document.getElementById("v11-q").value = ""; return; }
-    if (q) { try { localStorage.setItem("tures.seed", q); } catch (_) {} }
-    location.href = "plan.html";
-  });
 
   /* ---- footer ---- */
   var foot = document.createElement("footer");
