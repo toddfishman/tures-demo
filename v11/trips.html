@@ -12,9 +12,11 @@
   .trip-head{height:128px;position:relative;display:flex;align-items:flex-end;padding:16px}
   .trip-head .initial{font-family:'Playfair Display',serif;font-weight:600;font-size:72px;color:rgba(255,255,255,.92);
     position:absolute;right:14px;top:-6px;line-height:1;letter-spacing:-.02em}
-  .trip-head.maui{background:linear-gradient(135deg,var(--acc-2),var(--acc) 60%,var(--acc-deep))}
-  .trip-head.tokyo{background:linear-gradient(135deg,var(--rain),#2b3a55 70%,var(--text))}
-  .trip-head.kona{background:linear-gradient(135deg,var(--good),#1f6e54 65%,#143a2e)}
+  /* destination photos (Unsplash) layered over a scrim; gradient stays as fallback if an image fails */
+  .trip-head{background-size:cover;background-position:center}
+  .trip-head.maui{background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.45)),url('https://images.unsplash.com/photo-1507876466758-bc54f384809c?auto=format&fit=crop&w=1000&q=70') center/cover no-repeat,linear-gradient(135deg,var(--acc-2),var(--acc) 60%,var(--acc-deep))}
+  .trip-head.tokyo{background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.48)),url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=70') center/cover no-repeat,linear-gradient(135deg,var(--rain),#2b3a55 70%,var(--text))}
+  .trip-head.kona{background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.45)),url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1000&q=70') center/cover no-repeat,linear-gradient(135deg,var(--good),#1f6e54 65%,#143a2e)}
   .trip-head .tag{position:relative;z-index:1;background:rgba(255,255,255,.92);color:var(--text);border-color:transparent}
   .trip-body{padding:18px 20px 20px}
   .trip-body .tname{font-family:'Playfair Display',serif;font-size:20px}

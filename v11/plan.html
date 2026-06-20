@@ -161,18 +161,6 @@
     </div>
   </section>
 
-  <!-- ── CTA ── -->
-  <section class="section">
-    <div class="wrap center">
-      <h2>Ready when you are.</h2>
-      <p class="lead" style="margin:16px auto 28px">See a full trip come together in the live demo, or look through The Vault that makes booking instant.</p>
-      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-        <a class="btn" href="app.html">See the live demo
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="btn ghost" href="vault.html">Open The Vault</a>
-      </div>
-    </div>
-  </section>
 
 </main>
 
@@ -370,7 +358,17 @@
     resolveBrief(b);
   };
 
+  // nav "plan a trip" input → seed the chat (same page) ; or arriving with ?q= / stored seed
+  window.turesPlanSeed = function(t){ t=(t||'').trim(); if(!t || !live) return; demoRunning=false; send(t); };
+
   greet();
+
+  (function(){
+    var seed='';
+    try{ seed = new URLSearchParams(location.search).get('q') || ''; }catch(_){}
+    if(!seed){ try{ seed = localStorage.getItem('tures.seed') || ''; if(seed) localStorage.removeItem('tures.seed'); }catch(_){} }
+    if(seed && live){ setTimeout(function(){ send(seed); }, 520); }
+  })();
 })();
 </script>
 <script src="assets/site.js" defer></script>

@@ -39,46 +39,60 @@
   function on(p) { return p === cur ? " on" : ""; }
   var MARK = 't<span class="spark">✦</span>ures';
 
-  /* ---- top nav ---- */
+  /* ---- top nav: 3 zones — logo+menu · plan input · account ---- */
+  var menuHtml = GROUPS.map(function (g) {
+    return '<div class="grp">' + g.title + '</div>' +
+      g.items.map(function (it) {
+        return '<a class="' + on(it.page).trim() + '" href="' + it.href + '"><span class="n">' + (it.n || '') + '</span>' + it.label + '</a>';
+      }).join("");
+  }).join("");
+
   var nav = document.createElement("header");
   nav.className = "v11-nav";
   nav.innerHTML =
     '<div class="in">' +
-      '<a class="mark" href="index.html">' + MARK + '</a>' +
-      '<nav class="links">' +
-        PRIMARY.map(function (l) { return '<a class="' + on(l.page).trim() + '" href="' + l.href + '">' + l.label + '</a>'; }).join("") +
-      '</nav>' +
-      '<div class="right">' +
-        '<a class="v11-setup" id="v11-setup" href="taste.html" style="display:none"></a>' +
-        '<button class="btn ghost sm" id="v11-pages" type="button">☰ Pages</button>' +
-        '<a class="signin" id="v11-signin" href="signup.html">Sign in</a>' +
-        '<a class="btn sm" id="v11-cta" href="signup.html">Request access</a>' +
+      '<div class="v11-menu-wrap">' +
+        '<button class="v11-logo" id="v11-menu-btn" type="button" aria-haspopup="true" aria-expanded="false">' +
+          '<span class="mark">' + MARK + '</span><span class="chev">▾</span></button>' +
+        '<div class="v11-menu" id="v11-menu" role="menu">' + menuHtml + '</div>' +
+      '</div>' +
+      '<form class="v11-plan" id="v11-plan" role="search">' +
+        '<input id="v11-q" autocomplete="off" placeholder="Where to? Describe your trip and Tures plans it…" aria-label="Plan a trip">' +
+        '<button type="submit" aria-label="Plan it"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>' +
+      '</form>' +
+      '<div class="v11-acct-wrap">' +
+        '<button class="v11-acct" id="v11-acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>' +
+        '<div class="v11-acct-menu" id="v11-acct-menu" role="menu"></div>' +
       '</div>' +
     '</div>';
   document.body.insertBefore(nav, document.body.firstChild);
 
-  /* ---- slide-out full page menu ---- */
-  var drawer = document.createElement("div");
-  drawer.className = "v11-drawer";
-  drawer.innerHTML =
-    '<div class="panel">' +
-      '<div class="dh"><span class="mark serif" style="font-size:22px;font-weight:600">' + MARK + '</span><button class="x" id="v11-x" aria-label="Close">×</button></div>' +
-      GROUPS.map(function (g) {
-        return '<div class="grp">' + g.title + '</div>' +
-          g.items.map(function (it) {
-            return '<a class="' + on(it.page).trim() + '" href="' + it.href + '">' +
-              (it.n ? '<span class="n">' + it.n + '</span>' : '<span class="n"></span>') + it.label + '</a>';
-          }).join("");
-      }).join("") +
-    '</div>';
-  document.body.appendChild(drawer);
+  /* ---- dropdown open/close (logo menu + account menu) ---- */
+  var drops = [];
+  function closeAll() { drops.forEach(function (d) { d.panel.classList.remove("open"); d.btn.setAttribute("aria-expanded", "false"); }); }
+  function wireDrop(btnId, panelId) {
+    var btn = document.getElementById(btnId), panel = document.getElementById(panelId);
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var willOpen = !panel.classList.contains("open"); closeAll();
+      if (willOpen) { panel.classList.add("open"); btn.setAttribute("aria-expanded", "true"); }
+    });
+    drops.push({ btn: btn, panel: panel });
+  }
+  wireDrop("v11-menu-btn", "v11-menu");
+  wireDrop("v11-acct-btn", "v11-acct-menu");
+  document.addEventListener("click", function (e) { if (!e.target.closest(".v11-menu-wrap") && !e.target.closest(".v11-acct-wrap")) closeAll(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 
-  function openD() { drawer.classList.add("open"); }
-  function closeD() { drawer.classList.remove("open"); }
-  document.getElementById("v11-pages").addEventListener("click", openD);
-  document.getElementById("v11-x").addEventListener("click", closeD);
-  drawer.addEventListener("click", function (e) { if (e.target === drawer) closeD(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeD(); });
+  /* ---- the one CTA: type a trip → seed the chat ---- */
+  document.getElementById("v11-plan").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var q = (document.getElementById("v11-q").value || "").trim();
+    if (typeof window.turesPlanSeed === "function") { window.turesPlanSeed(q); document.getElementById("v11-q").value = ""; return; }
+    if (q) { try { localStorage.setItem("tures.seed", q); } catch (_) {} }
+    location.href = "plan.html";
+  });
 
   /* ---- footer ---- */
   var foot = document.createElement("footer");
@@ -101,31 +115,28 @@
     '<div class="legal"><span>© MMXXVI Tures · Your trip, handled.</span><span>Mockup · sample data throughout</span></div>';
   document.body.appendChild(foot);
 
-  /* ---- reflect account + setup progress (driven by funnel.js) ---- */
-  function refreshState() {
+  /* ---- account menu (the umbrella): My Trips · Vault · Taste · setup · auth ---- */
+  function renderAcct() {
     var f = window.turesFunnel;
     var signed = f ? f.signedIn() : !!(window.tures && window.tures.signedIn);
-    var signin = document.getElementById("v11-signin");
-    var cta = document.getElementById("v11-cta");
-    var setup = document.getElementById("v11-setup");
-    if (signin) {
-      signin.textContent = signed ? "Account" : "Sign in";
-      signin.href = signed ? "trips.html" : "signup.html";
-    }
-    if (cta && signed) { cta.textContent = "Plan a trip"; cta.href = "plan.html"; }
-    if (setup && f) {
-      var st = f.setupStatus(), nx = f.nextStep();
-      if (st.complete) {
-        setup.style.display = ""; setup.href = "trips.html"; setup.title = "Your setup is complete";
-        setup.innerHTML = '<span class="ring done">✓</span><span class="lbl">Setup complete</span>';
-      } else if (st.done > 0 && nx) {
-        setup.style.display = ""; setup.href = nx.href; setup.title = "Next: " + nx.label;
-        setup.innerHTML = '<span class="ring">' + st.percent + '%</span><span class="lbl">Your setup</span>';
-      } else {
-        setup.style.display = "none";
-      }
-    }
+    var acct = (window.tures && window.tures.account) || null;
+    var st = f ? f.setupStatus() : null;
+    var nx = f ? f.nextStep() : null;
+    var menu = document.getElementById("v11-acct-menu");
+    var head = '<div class="ah">' + (signed && acct ? (acct.name || acct.email) : "Your account") + '</div>';
+    var member =
+      '<a class="' + on("trips").trim() + '" href="trips.html">My Trips</a>' +
+      '<a class="' + on("vault").trim() + '" href="vault.html">The Vault</a>' +
+      '<a class="' + on("taste").trim() + '" href="taste.html">The Taste Engine</a>';
+    var setupRow = st ? '<a class="setup" href="' + ((nx && nx.href) || "trips.html") + '"><span>Your setup</span><span class="pct">' + st.percent + '%</span></a>' : '';
+    var auth = signed
+      ? '<button class="signout" id="v11-signout" type="button">Sign out</button>'
+      : '<a href="signup.html">Sign in</a><a class="req" href="signup.html">Request access</a>';
+    menu.innerHTML = head + '<div class="sec">' + member + '</div>' + (setupRow ? '<div class="sec">' + setupRow + '</div>' : '') + '<div class="sec">' + auth + '</div>';
+    var so = document.getElementById("v11-signout");
+    if (so) so.addEventListener("click", function () { try { window.tures.signOut(); } catch (_) {} location.reload(); });
+    document.getElementById("v11-acct-btn").classList.toggle("on", signed);
   }
-  refreshState();
-  if (window.turesFunnel) window.turesFunnel.on(refreshState);
+  renderAcct();
+  if (window.turesFunnel) window.turesFunnel.on(renderAcct);
 })();
