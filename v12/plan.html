@@ -1,0 +1,375 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — Plan a trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* ---- page-specific: the plan console ---- */
+  .console-wrap{max-width:1000px;margin:0 auto}
+  .browser .body{display:grid;grid-template-columns:1fr;background:var(--bg)}
+  .conv{display:flex;flex-direction:column;min-height:560px}
+  .conv-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .conv-head .ch{flex:1;line-height:1.25}
+  .conv-head .ch .n{font-family:'Playfair Display',serif;font-size:16px;font-weight:500}
+  .conv-head .ch .s{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .conv-head .ch .s::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .conv-head .route{font-family:'Space Mono',monospace;font-size:12px;color:var(--faint);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+
+  .thread{flex:1;padding:22px 22px 8px;overflow:hidden}
+  .msg{opacity:0;transform:translateY(10px)}
+  .msg.show{animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* typing indicator */
+  .typing .bubble{display:inline-flex;gap:5px;align-items:center;padding:13px 16px}
+  .typing .d{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;animation:blink 1.4s infinite}
+  .typing .d:nth-child(2){animation-delay:.2s}.typing .d:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+  /* option card inside the thread */
+  .opt{align-self:flex-start;max-width:92%;background:linear-gradient(180deg,var(--acc-dim),transparent 70%),var(--bg);
+    border:1px solid var(--acc-line);border-radius:var(--radius);overflow:hidden;margin-top:2px}
+  .opt .pick{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .opt .pick .star{font-size:14px;letter-spacing:0}
+  .opt .pick .demo-tag{margin-left:auto}
+  .opt .ob{padding:16px}
+  .opt .oname{font-family:'Playfair Display',serif;font-size:21px;line-height:1.15}
+  .opt .ometa{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  .opt .ometa .mono{color:var(--acc-deep)}
+  .opt .reason{margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:12px;font-size:13.5px;color:var(--text);line-height:1.5}
+  .opt .reason b{font-weight:600}
+  .opt .reason .tp{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--acc-deep);margin-right:7px;vertical-align:middle}
+  .opt .oact{display:flex;gap:10px;padding:0 16px 16px;flex-wrap:wrap}
+
+  /* composer */
+  .composer{display:flex;gap:10px;align-items:center;padding:16px 20px;border-top:1px solid var(--line);background:var(--surface)}
+  .composer .field{flex:1;border-radius:999px}
+  .composer .send{width:42px;height:42px;border-radius:50%;flex:0 0 auto;background:var(--acc);display:grid;place-items:center;
+    cursor:pointer;border:none;box-shadow:0 8px 22px -10px var(--acc);transition:transform .15s}
+  .composer .send:hover{transform:translateY(-1px)}
+  .composer .send svg{stroke:#fff}
+  .composer .send:disabled{opacity:.5;cursor:default;transform:none}
+
+  /* toolbar above the console */
+  .plan-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .plan-bar .spacer{flex:1}
+  .chip-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text);border:1px solid var(--line-2);border-radius:999px;padding:7px 13px;cursor:pointer;transition:border-color .15s,color .15s}
+  .chip-link:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .chip-link svg{stroke:currentColor}
+
+  /* action button rows + confirmation cards in-thread */
+  .actions{margin-top:2px}
+  .actions .row{display:flex;gap:10px;flex-wrap:wrap}
+  .conf{align-self:flex-start;max-width:94%;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;margin-top:2px}
+  .conf .ch{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}
+  .conf .ch .ok{color:var(--good)}
+  .conf .ch .demo-tag{margin-left:auto}
+  .conf .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+  .conf .ln:last-child{border-bottom:none}
+  .conf .ln .mono{color:var(--acc-deep);white-space:nowrap}
+  .nudge{align-self:flex-start;max-width:92%;display:flex;gap:10px;align-items:flex-start;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:14px;padding:12px 14px;margin-top:2px;font-size:13.5px;line-height:1.5}
+  .nudge svg{stroke:var(--acc-deep);flex:0 0 auto;margin-top:2px}
+
+  /* "what Tures asks" rail */
+  .asks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ask{display:flex;gap:11px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+  .ask .tick{width:24px;height:24px;flex:0 0 auto;border-radius:50%;background:var(--acc-dim);display:grid;place-items:center;margin-top:1px}
+  .ask .tick svg{stroke:var(--acc-deep)}
+  .ask .ad .at{font-size:13.5px;font-weight:600}
+  .ask .ad .as{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .asks-note{display:flex;align-items:center;gap:9px;margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .asks-note svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .asks-note b{color:var(--text);font-weight:600}
+
+  @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
+  @media (max-width:560px){.opt .oact .btn{flex:1}}
+</style>
+</head>
+<body data-page="plan">
+<main>
+
+  <!-- ── intro ── -->
+  <section class="section tight">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> Plan a trip</span>
+      <h1 style="margin-top:22px">Just say where. <em>In plain English.</em></h1>
+      <p class="lead" style="margin:18px auto 0">No forms, no twelve tabs. Tell Tures the shape of the trip and it asks only for what it truly needs — then walks you through curated picks before a single thing is held.</p>
+    </div>
+  </section>
+
+  <!-- ── the console ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="console-wrap">
+        <div class="plan-bar">
+          <span data-voice-mount></span>
+          <a class="chip-link" id="text-tures" href="sms:&body=Hi%20Tures%2C%20I%27d%20like%20to%20plan%20a%20trip" title="Text Tures (SMS channel — preview)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg> Text Tures</a>
+          <span class="spacer"></span>
+          <button id="btn-demo" class="btn ghost sm" type="button">▷ Watch the example</button>
+        </div>
+        <div class="browser">
+          <div class="titlebar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="addr">app.tures.com / plan</span>
+          </div>
+          <div class="body">
+            <div class="conv">
+              <div class="conv-head">
+                <div class="avatar serif">T</div>
+                <div class="ch"><div class="n">New trip</div><div class="s">Tures · online</div></div>
+                <span class="route" id="route">Seattle ⇄ ?</span>
+              </div>
+              <div class="thread" id="thread" aria-label="Conversation with Tures"></div>
+              <form class="composer" id="composer" onsubmit="return false">
+                <input class="field" id="composer-input" placeholder="Message Tures…" aria-label="Message Tures" autocomplete="off">
+                <button class="send" id="send" type="submit" aria-label="Send message">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── what Tures asks ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:26px">
+        <span class="eyebrow"><span class="dot"></span> What Tures asks</span>
+        <h2 style="margin-top:18px">Six things, then it <em>goes to work.</em></h2>
+      </div>
+      <div class="asks">
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Origin</div><div class="as">Your departure city. Tures never guesses where you start.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Destination</div><div class="as">Where you are headed — a city, a coast, a country.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Dates</div><div class="as">Exact days, or a window it can shape around price.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Travelers</div><div class="as">Who is going. Two for the anniversary, or the whole family.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Style</div><div class="as">Oceanfront and design-forward, or quiet and close to the trail.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Budget</div><div class="as">A posture or a cap — business class if it is reasonable.</div></div></div>
+      </div>
+      <div class="asks-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Tures never books until you confirm. Everything you see first is held — <b>nothing is charged</b> until you say the word.</span>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<script src="assets/voice.js" defer></script>
+<script>
+(function(){
+  var thread = document.getElementById('thread');
+  var route  = document.getElementById('route');
+  var input  = document.getElementById('composer-input');
+  var sendBtn= document.getElementById('send');
+  var form   = document.getElementById('composer');
+  var live   = !!(window.tures && window.tures.configured);
+  var history = [];
+  var busy = false;
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function short(s){ s=String(s||''); return s.length>16 ? s.slice(0,15)+'…' : s; }
+  function reveal(el){ requestAnimationFrame(function(){ el.classList.add('show'); }); }
+  function scroll(){ thread.scrollTop = thread.scrollHeight; }
+  function setRoute(o,d){ if(o&&d) route.textContent = short(o)+' ⇄ '+short(d); }
+
+  function bubble(html, who){
+    var w=document.createElement('div'); w.className='msg '+(who==='me'?'from-me':'from-ai');
+    w.innerHTML='<div class="bubble">'+html+'</div>'; thread.appendChild(w); reveal(w);
+    var ts=document.createElement('div'); ts.className='tstamp'; if(who==='me') ts.style.textAlign='right';
+    ts.textContent=(who==='me'?'You':'Tures'); thread.appendChild(ts); reveal(ts); scroll(); return w;
+  }
+  var typingEl=null;
+  function typing(on){
+    if(on){ if(typingEl) return; typingEl=document.createElement('div'); typingEl.className='msg typing from-ai';
+      typingEl.innerHTML='<div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div>';
+      thread.appendChild(typingEl); reveal(typingEl); scroll(); }
+    else if(typingEl){ typingEl.remove(); typingEl=null; }
+  }
+  function actions(btns){
+    var w=document.createElement('div'); w.className='msg from-ai actions';
+    var row=document.createElement('div'); row.className='row';
+    btns.forEach(function(b){ var el=document.createElement('button'); el.type='button'; el.className='btn '+(b.cls||''); el.innerHTML=b.label; el.onclick=function(){ w.remove(); b.on(); }; row.appendChild(el); });
+    w.appendChild(row); thread.appendChild(w); reveal(w); scroll(); return w;
+  }
+
+  // ── live conversation ──
+  function send(text){
+    if(busy || !text) return;
+    bubble(esc(text),'me'); history.push({role:'user',content:text});
+    input.value=''; busy=true; sendBtn.disabled=true; typing(true);
+    var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
+    var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
+    window.tures.converse(history.slice(-12), undefined, ctx, uid).then(function(c){
+      typing(false); busy=false; sendBtn.disabled=false;
+      if(c && c.slots && c.slots.origin && c.slots.destination) setRoute(c.slots.origin, c.slots.destination);
+      if(c && c.ready && c.brief){
+        if(c.reply) bubble(esc(c.reply),'t');
+        resolveBrief(c.brief);
+      } else {
+        var reply=(c && c.reply) || 'Tell me a little more.';
+        bubble(esc(reply),'t'); history.push({role:'assistant',content:reply});
+      }
+    }).catch(function(e){ typing(false); busy=false; sendBtn.disabled=false; offline(e); });
+  }
+
+  // converse returns the brief as a sentence; /plan and /book need a structured brief → parse it first.
+  function resolveBrief(b){
+    if(b && typeof b==='object' && b.destination){ window.__brief=b; proposePlan(b); return; }
+    typing(true);
+    window.tures.parse(String(b||'')).then(function(pr){
+      typing(false);
+      if(pr && pr.brief){ window.__brief=pr.brief; proposePlan(pr.brief); }
+      else offline();
+    }).catch(function(){ typing(false); offline(); });
+  }
+
+  function proposePlan(brief){
+    window.__brief = brief; typing(true);
+    window.tures.plan(brief).then(function(p){
+      typing(false);
+      var total = (p && p.totalUsd!=null) ? ('about $'+Number(p.totalUsd).toLocaleString()+' all in') : 'a single, clean number';
+      var why = (p && p.rationale) ? p.rationale : 'flights and a hotel that fit exactly what you asked for';
+      bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet. Shall I book it.','t');
+      offerBook(brief);
+    }).catch(function(){
+      typing(false);
+      bubble('That is everything I need. Shall I hold it and book.','t'); offerBook(brief);
+    });
+  }
+  function offerBook(brief){
+    actions([
+      {label:'✦ Book it', on:function(){ executeBooking(brief); }},
+      {label:'Adjust', cls:'ghost', on:function(){ bubble('Of course — tell me what to change (dates, budget, a different hotel) and I will re-shape it.','t'); input.focus(); }}
+    ]);
+  }
+
+  function executeBooking(brief){
+    typing(true);
+    window.tures.book({brief:brief}).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId); })
+    .then(function(bk){
+      typing(false);
+      var comps=(bk && bk.components)||[];
+      var rows = comps.map(function(c){
+        var code=c.confirmation||c.pnr||c.ref||c.status||'';
+        return '<div class="ln"><span>'+esc(c.label||'Booked')+'</span><span class="mono">'+esc(code)+'</span></div>';
+      }).join('') || '<div class="ln"><span>Trip held</span><span class="mono">'+esc(bk.tripId||bk.id||'')+'</span></div>';
+      var card=document.createElement('div'); card.className='conf msg';
+      card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+rows;
+      thread.appendChild(card); reveal(card);
+      bubble('Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>','t');
+      maybeNudge(); scroll();
+    }).catch(function(e){
+      typing(false);
+      if(e && e.status===409){ paymentGate(brief, e); }
+      else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief); }}]); }
+    });
+  }
+
+  function paymentGate(brief, e){
+    var why='Your trip is built and held — to book it for real I need a card on file.';
+    if(window.turesFunnel) window.turesFunnel.pendingTrip.set({brief:brief, total:(e&&e.body&&e.body.totalUsd)||null});
+    var n=document.createElement('div'); n.className='nudge msg';
+    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div>'+esc(why)+' Add a card to your Vault and I will pick this trip straight back up.</div>';
+    thread.appendChild(n); reveal(n);
+    var signed = window.tures && window.tures.signedIn;
+    actions([
+      {label:'Add a card &amp; book →', on:function(){ location.href = signed ? 'vault.html#payment' : 'signup.html'; }},
+      {label:'Not now', cls:'ghost', on:function(){ bubble('No rush — your trip is held. Pick it up whenever you like.','t'); }}
+    ]); scroll();
+  }
+
+  function maybeNudge(){
+    if(!window.turesFunnel) return;
+    var nx=window.turesFunnel.nextStep(); if(!nx) return;
+    var n=document.createElement('div'); n.className='nudge msg';
+    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg><div>To make the next one instant: <b>'+esc(nx.label)+'</b> — '+esc(nx.why)+'. <a href="'+nx.href+'" style="color:var(--acc-deep);font-weight:600">Set it up →</a></div>';
+    thread.appendChild(n); reveal(n); scroll();
+  }
+
+  function offline(e){
+    bubble('I could not reach the planner just now — nothing was lost. Watch the example to see how a trip comes together, and try again in a moment.','t');
+    actions([{label:'▷ Watch the example', on:runDemo}]);
+  }
+
+  // ── greeting ──
+  function greet(){
+    if(live){
+      bubble('Good to see you. Tell me the shape of the trip in your own words — where, roughly when, and what you are after. I will ask only for what I truly need.','t');
+      var tp = window.turesFunnel && window.turesFunnel.taste();
+      if(tp && tp.signature) bubble('I have your Taste Print on hand — <span style="color:var(--muted)">'+esc(tp.signature.slice(0,90))+'…</span> — so the picks land in your register.','t');
+      else bubble('You can <a href="taste.html" style="color:var(--acc-deep);font-weight:600">build your Taste Print</a> first so every pick is in your register — or just start here.','t');
+    } else {
+      bubble('Tures is offline in this preview. Watch the example to see a full trip come together.','t');
+      actions([{label:'▷ Watch the example', on:runDemo}]);
+    }
+  }
+
+  // ── demo replay (the scripted example) ──
+  var optCard =
+    '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> Tures&rsquo; pick <span class="demo-tag">Sample</span></div>'+
+    '<div class="ob"><div class="oname">Montage Kapalua Bay</div>'+
+    '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
+    '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div></div>'+
+    '<div class="oact"><button class="btn" type="button">Hold this</button><button class="btn ghost" type="button">See alternatives</button></div></div>';
+  var demoSteps = [
+    {t:'t',h:'Good to see you. Tell me the shape of the trip in your own words.'},
+    {t:'me',h:'My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.'},
+    {typing:1},
+    {t:'t',h:'Lovely — two of you, oceanfront Maui in June. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where from, and which days.'},
+    {t:'me',h:'From Seattle, June 12 to 19.', route:['Seattle','Maui']},
+    {typing:1},
+    {t:'t',h:'That is everything I need. Let me walk you through a few curated picks — starting with where you will stay.'},
+    {card:1}
+  ];
+  var demoRunning=false;
+  function runDemo(){
+    demoRunning=true; typing(false); thread.innerHTML=''; route.textContent='Seattle ⇄ ?';
+    var i=0;
+    (function tick(){
+      if(!demoRunning || i>=demoSteps.length){ return; }
+      var s=demoSteps[i++];
+      if(s.typing){ typing(true); setTimeout(function(){ typing(false); tick(); },1100); return; }
+      typing(false);
+      if(s.card){ thread.insertAdjacentHTML('beforeend', optCard); scroll(); }
+      else bubble(s.h, s.t==='me'?'me':'t');
+      if(s.route) setRoute(s.route[0], s.route[1]);
+      setTimeout(tick, s.t==='me'?700:1300);
+    })();
+  }
+
+  // ── wire ──
+  form.addEventListener('submit', function(ev){ ev.preventDefault(); demoRunning=false; send(input.value.trim()); });
+  document.getElementById('btn-demo').addEventListener('click', runDemo);
+  // voice.js sets #composer.value = brief then calls sendBrief() with no arg
+  window.sendBrief = function(b){
+    if(b==null){ try{ b = form.value; }catch(_){} }
+    if(!b) return;
+    demoRunning=false;
+    resolveBrief(b);
+  };
+
+  // nav "plan a trip" input → seed the chat (same page) ; or arriving with ?q= / stored seed
+  window.turesPlanSeed = function(t){ t=(t||'').trim(); if(!t || !live) return; demoRunning=false; send(t); };
+
+  greet();
+
+  (function(){
+    var seed='';
+    try{ seed = new URLSearchParams(location.search).get('q') || ''; }catch(_){}
+    if(!seed){ try{ seed = localStorage.getItem('tures.seed') || ''; if(seed) localStorage.removeItem('tures.seed'); }catch(_){} }
+    if(seed && live){ setTimeout(function(){ send(seed); }, 520); }
+  })();
+})();
+</script>
+<script src="assets/site.js" defer></script>
+</body></html>

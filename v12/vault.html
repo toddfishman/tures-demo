@@ -1,0 +1,553 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — The Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* page-specific only — reuses v11.css tokens + classes */
+  .vault-hero{padding:84px 0 36px;text-align:center}
+  .vault-hero .lead{margin:22px auto 0}
+
+  /* trust banner */
+  .trust-banner{
+    display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;
+    background:linear-gradient(180deg,var(--surface),var(--bg));
+    border:1px solid var(--line-2);border-radius:var(--radius);padding:22px 26px;
+  }
+  .trust-banner .seal{display:flex;align-items:center;gap:13px;text-align:left}
+  .trust-banner .lock{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--acc-dim);color:var(--acc-deep)}
+  .trust-banner .seal .st{font-family:'Playfair Display',serif;font-size:18px;line-height:1.15}
+  .trust-banner .seal .ss{font-size:12.5px;color:var(--muted)}
+  .trust-banner .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .trust-divider{width:1px;align-self:stretch;background:var(--line)}
+
+  /* category cards */
+  .vault-card{display:flex;flex-direction:column}
+  .vault-card .vhead{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+  .vault-card .vhead h3{margin:0}
+  .vault-card .vsub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .saved{display:flex;flex-direction:column;gap:11px;margin-top:2px}
+  .row{display:flex;align-items:center;gap:13px;padding:13px 14px;border:1px solid var(--line);
+    border-radius:12px;background:var(--surface)}
+  .row .rl{min-width:0;flex:1}
+  .row .rk{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+  .row .rv{font-family:'Space Mono',monospace;font-size:14px;color:var(--text);margin-top:3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .rtail{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .pill-card{width:34px;height:22px;border-radius:4px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--text);color:#fff;font-size:8px;font-weight:700;letter-spacing:.06em}
+  .edit{font-size:12.5px;font-weight:500;color:var(--acc-deep);background:none;border:none;cursor:pointer;
+    padding:5px 9px;border-radius:8px;transition:background .15s}
+  .edit:hover,.edit:focus-visible{background:var(--acc-dim)}
+  .tok{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--good);
+    display:inline-flex;align-items:center;gap:5px}
+  .tok::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good)}
+
+  /* access grants — demoted */
+  .grants{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .grants .ghead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+  .grant-row{display:flex;align-items:center;gap:15px;padding:15px 0;border-top:1px solid var(--line)}
+  .grant-row .gi{width:38px;height:38px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+    background:var(--surface-2);color:var(--muted)}
+  .grant-row .gm{flex:1;min-width:0}
+  .grant-row .gm .gt{font-size:14.5px;font-weight:500}
+  .grant-row .gm .gd{font-size:12.5px;color:var(--muted)}
+  /* toggle */
+  .tg{position:relative;width:42px;height:24px;flex:0 0 auto;border-radius:999px;border:1px solid var(--line-2);
+    background:var(--surface-2);cursor:pointer;transition:background .2s,border-color .2s;padding:0}
+  .tg::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+  .tg[aria-pressed="true"]{background:var(--acc);border-color:var(--acc)}
+  .tg[aria-pressed="true"]::after{transform:translateX(18px)}
+
+  .reassure{display:flex;align-items:center;gap:13px;justify-content:center;text-align:left;
+    color:var(--muted);font-size:14px;max-width:62ch;margin:0 auto}
+  .reassure svg{flex:0 0 auto;stroke:var(--good)}
+
+  .vault-cta{text-align:center}
+  .vault-cta .btn{margin:6px 6px 0}
+
+  /* functional bits */
+  .vfield{display:flex;flex-direction:column;gap:6px}
+  .vfield span{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+  .add-form{display:none;flex-direction:column;gap:10px;margin-top:12px}
+  #basics-msg,#nf-msg{display:none}
+
+  /* notifications */
+  .nf-block{margin-top:18px}
+  .nf-h{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .nf-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .nf-chip{border:1px solid var(--line-2);background:var(--bg);color:var(--text);border-radius:999px;padding:8px 15px;font:500 13px 'DM Sans',sans-serif;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .nf-chip:hover{border-color:var(--acc)}
+  .nf-chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+  .nf-times{display:none;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;max-width:320px}
+  .nf-times.show{display:grid}
+  .nf-cats{margin-top:4px}
+  .nf-cats .grant-row{border-top:1px solid var(--line)}
+  .nf-cats .grant-row:first-child{border-top:none}
+
+  @media (max-width:860px){
+    .trust-divider{display:none}
+    .trust-banner{justify-content:flex-start}
+  }
+</style>
+</head>
+<body data-page="vault">
+<main>
+
+  <!-- HERO -->
+  <section class="wrap vault-hero">
+    <span class="eyebrow"><span class="dot"></span> The Vault</span>
+    <h1 class="serif">Your details, <em>locked down.</em></h1>
+    <p class="lead center">So Tures can book the moment a trip is right — flights, hotels, the table you wanted — without stopping to ask for your card or your passport each time. Saved once, sealed, and never shown again.</p>
+  </section>
+
+  <!-- TRUST BANNER -->
+  <section class="wrap section tight" style="padding-top:8px">
+    <div class="trust-banner">
+      <div class="seal">
+        <span class="lock">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+        <span>
+          <span class="st serif">Secured by VGS</span>
+          <span class="ss">Bank-grade tokenization · the industry standard for holding payment and identity</span>
+        </span>
+      </div>
+      <span class="trust-divider"></span>
+      <div class="chips">
+        <span class="tag">PCI-DSS Level 1</span>
+        <span class="tag">SOC 2</span>
+        <span class="tag">Tokenized, not stored</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAVEL BASICS + HELD TRIP (functional) -->
+  <section class="wrap section tight" id="basics" style="padding-top:18px">
+    <div id="held-wrap"></div>
+    <article class="card vault-card">
+      <div class="vhead">
+        <span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <div><h3 class="serif">Travel basics</h3><div class="vsub">Where you start and how Tures reaches you — so it never has to ask mid-plan.</div></div>
+      </div>
+      <div class="grid-3" style="gap:14px">
+        <label class="vfield"><span>Home airport</span><input class="field" id="f-home" placeholder="e.g. SEA" autocomplete="off"></label>
+        <label class="vfield"><span>Email</span><input class="field" id="f-email" type="email" placeholder="you@example.com" autocomplete="off"></label>
+        <label class="vfield"><span>Mobile</span><input class="field" id="f-phone" placeholder="+1 …" autocomplete="off"></label>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn sm" id="save-basics" type="button">Save basics</button>
+        <span id="basics-msg" class="tok">Saved</span>
+      </div>
+    </article>
+  </section>
+
+  <!-- CATEGORY CARDS -->
+  <section class="wrap section tight" style="padding-top:18px">
+    <div class="grid-2">
+
+      <!-- Payment -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Payment</h3>
+            <div class="vsub">The card Tures charges — only when a booking is confirmed.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="pill-card">VISA</span>
+            <span class="rl">
+              <span class="rk">Visa · primary</span>
+              <span class="rv">•••• •••• •••• 6411</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="pill-card">AMEX</span>
+            <span class="rl">
+              <span class="rk">Amex · points</span>
+              <span class="rv">•••• •••••• •2008</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div id="saved-cards"></div>
+        </div>
+        <button class="btn ghost sm" id="add-card-btn" type="button" style="margin-top:14px;align-self:flex-start">+ Add a card</button>
+        <div id="add-card-form" class="add-form">
+          <div class="grid-3" style="gap:10px">
+            <input class="field" id="c-name" placeholder="Name on card" autocomplete="off">
+            <input class="field" id="c-brand" placeholder="Brand (Visa…)" autocomplete="off">
+            <input class="field" id="c-last4" placeholder="Last 4 digits" maxlength="4" inputmode="numeric" autocomplete="off">
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn sm" id="c-save" type="button">Connect card</button><span class="vsub">Tures stores a token, never the full number — enter only the last four.</span></div>
+        </div>
+      </article>
+
+      <!-- Travel documents -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="9.5" r="2.4"/><path d="M8.5 16c.8-1.8 6.2-1.8 7 0"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Travel documents</h3>
+            <div class="vsub">Pre-filled at booking so check-in and security move fast.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Passport · United States</span>
+              <span class="rv">••••• 8127 · exp 2029</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Known Traveler Number</span>
+              <span class="rv">•••••• 419</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Identity & trusted traveler -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Identity &amp; trusted traveler</h3>
+            <div class="vsub">Your faster lanes, applied automatically.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">TSA PreCheck</span>
+              <span class="rv">Enrolled · ID •••• 419</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Global Entry</span>
+              <span class="rv">Active · PASSID ••••• 27</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Loyalty -->
+      <article class="card vault-card">
+        <div class="vhead">
+          <span class="ico">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.2 5.8.9-4.2 4 1 5.7L12 16.9 6.8 18.8l1-5.7-4.2-4 5.8-.9L12 3z"/></svg>
+          </span>
+          <div>
+            <h3 class="serif">Loyalty</h3>
+            <div class="vsub">Status and numbers attached to every booking that earns.</div>
+          </div>
+        </div>
+        <div class="saved">
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Hawaiian · Pualani Platinum</span>
+              <span class="rv">HA •••• 6202</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">World of Hyatt · Globalist</span>
+              <span class="rv">HY •••• 8845</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+          <div class="row">
+            <span class="rl">
+              <span class="rk">Amex Membership Rewards</span>
+              <span class="rv">MR •••• 2008</span>
+            </span>
+            <span class="rtail">
+              <span class="tag">VGS-tokenized</span>
+              <button class="edit" type="button">Edit</button>
+            </span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ACCESS GRANTS — demoted, optional -->
+  <section class="wrap section tight" style="padding-top:8px">
+    <div class="grants" id="access-grants">
+      <div class="ghead">
+        <div>
+          <span class="demo-tag">Optional</span>
+          <h3 class="serif" style="margin-top:10px">Access grants</h3>
+          <p style="color:var(--muted);font-size:14px;max-width:54ch;margin-top:6px">Let Tures read just enough to stay one step ahead. Entirely your call, off by default, and revocable in a tap.</p>
+        </div>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Calendar</span><span class="gd">See trip dates and avoid double-booking your days.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant calendar access"></button>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Inbox</span><span class="gd">Catch confirmations and delays the airlines email you.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant inbox access"></button>
+      </div>
+
+      <div class="grant-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-5.4A8 8 0 1 1 21 11.5z"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Messaging</span><span class="gd">Reach you on WhatsApp or text when something needs you.</span></span>
+        <button class="tg" type="button" aria-pressed="false" aria-label="Grant messaging access"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTIFICATIONS -->
+  <section class="wrap section tight" style="padding-top:8px" id="reach">
+    <div class="grants">
+      <div class="ghead"><div>
+        <span class="demo-tag">Always on</span>
+        <h3 class="serif" style="margin-top:10px">How Tures reaches you</h3>
+        <p style="color:var(--muted);font-size:14px;max-width:56ch;margin-top:6px">The concierge watches around the clock — you decide how loudly, how often, and what it taps you for.</p>
+      </div></div>
+
+      <div class="nf-block"><div class="nf-h">Reach me with</div>
+        <div class="nf-chips" id="nf-mode">
+          <button class="nf-chip" data-v="all" type="button">Everything</button>
+          <button class="nf-chip" data-v="important" type="button">Important only</button>
+          <button class="nf-chip" data-v="emergency" type="button">Emergencies only</button>
+          <button class="nf-chip" data-v="silent" type="button">Silent</button>
+        </div>
+      </div>
+
+      <div class="nf-block"><div class="nf-h">On which channel</div>
+        <div class="nf-chips" id="nf-chan">
+          <button class="nf-chip" data-v="push" type="button">Push</button>
+          <button class="nf-chip" data-v="text" type="button">Text</button>
+          <button class="nf-chip" data-v="email" type="button">Email</button>
+        </div>
+      </div>
+
+      <div class="grant-row" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px">
+        <span class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>
+        <span class="gm"><span class="gt">Sleep — quiet hours</span><span class="gd">Hold everything but emergencies overnight.</span></span>
+        <button class="tg" id="nf-sleep" type="button" aria-pressed="true" aria-label="Quiet hours"></button>
+      </div>
+      <div class="nf-times" id="nf-times">
+        <label class="vfield"><span>From</span><input class="field" id="nf-from" type="time" value="22:00"></label>
+        <label class="vfield"><span>To</span><input class="field" id="nf-to" type="time" value="07:00"></label>
+      </div>
+
+      <div class="nf-block"><div class="nf-h">Ping me for</div>
+        <div class="nf-cats">
+          <div class="grant-row"><span class="gm"><span class="gt">Delays &amp; cancellations</span><span class="gd">Always — even in Sleep.</span></span><button class="tg" data-cat="delays" type="button" aria-pressed="true" aria-label="Delays"></button></div>
+          <div class="grant-row"><span class="gm"><span class="gt">Gate &amp; schedule changes</span></span><button class="tg" data-cat="changes" type="button" aria-pressed="true" aria-label="Schedule changes"></button></div>
+          <div class="grant-row"><span class="gm"><span class="gt">Fare drops &amp; upgrades</span></span><button class="tg" data-cat="deals" type="button" aria-pressed="true" aria-label="Deals"></button></div>
+          <div class="grant-row"><span class="gm"><span class="gt">Good news</span><span class="gd">A better table, an opened upgrade.</span></span><button class="tg" data-cat="good" type="button" aria-pressed="true" aria-label="Good news"></button></div>
+          <div class="grant-row"><span class="gm"><span class="gt">Pre-trip checklist</span></span><button class="tg" data-cat="pre" type="button" aria-pressed="true" aria-label="Pre-trip"></button></div>
+          <div class="grant-row"><span class="gm"><span class="gt">Post-trip wrap</span></span><button class="tg" data-cat="post" type="button" aria-pressed="true" aria-label="Post-trip"></button></div>
+        </div>
+      </div>
+
+      <div class="nf-block"><div class="nf-h">Non-urgent updates</div>
+        <div class="nf-chips" id="nf-cadence">
+          <button class="nf-chip" data-v="instant" type="button">As they happen</button>
+          <button class="nf-chip" data-v="daily" type="button">Daily digest</button>
+          <button class="nf-chip" data-v="weekly" type="button">Weekly</button>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn sm" id="nf-save" type="button">Save preferences</button>
+        <span id="nf-msg" class="tok">Saved</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- REASSURANCE -->
+  <section class="wrap section tight" style="padding-top:0">
+    <p class="reassure">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      Tures works from tokens, never your raw numbers — the actual digits stay sealed inside VGS, out of reach of Tures and of anyone else. Revoke any item, or wipe the Vault, anytime.
+    </p>
+  </section>
+
+  <!-- CTA -->
+  <section class="wrap section tight vault-cta">
+    <div class="rule" style="margin-bottom:40px"></div>
+    <h2 class="serif">Sealed. Now let it <em>work.</em></h2>
+    <p class="lead center" style="margin:16px auto 26px">With the Vault set, Tures can book end to end. Try it live, or look in on the trips already in motion.</p>
+    <a class="btn" href="plan.html">Plan a trip</a>
+    <a class="btn ghost" href="trips.html">See My Trips</a>
+  </section>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+(function(){
+  var F=window.turesFunnel, T=window.tures;
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function flash(t){ var m=document.getElementById('basics-msg'); if(m){ m.style.display='inline-flex'; m.textContent=t; setTimeout(function(){m.style.display='none';},2600); } }
+
+  // ----- travel basics -----
+  var tr = F?F.traveler():{};
+  var home=document.getElementById('f-home'), email=document.getElementById('f-email'), phone=document.getElementById('f-phone');
+  if(tr.homeAirport) home.value=tr.homeAirport;
+  if(tr.email) email.value=tr.email; if(tr.phone) phone.value=tr.phone;
+  document.getElementById('save-basics').addEventListener('click', function(){
+    var patch={ homeAirport:(home.value||'').trim().toUpperCase(), email:(email.value||'').trim(), phone:(phone.value||'').trim() };
+    if(F) F.setTraveler(patch);
+    if(T && T.signedIn){ try{ T.profile.set(patch); }catch(_){} }
+    flash('Saved');
+  });
+
+  // ----- saved cards + add a card -----
+  function renderCards(){
+    var box=document.getElementById('saved-cards'); if(!box) return;
+    var v=F?F.vault():{}; var pay=v.payment||[];
+    box.innerHTML = pay.map(function(c){
+      return '<div class="row"><span class="pill-card">CARD</span><span class="rl"><span class="rk">'+esc(c.name||'Your card')+'</span><span class="rv">'+esc(c.label||'')+'</span></span><span class="rtail"><span class="tag">VGS-tokenized</span></span></div>';
+    }).join('');
+  }
+  renderCards();
+  var addBtn=document.getElementById('add-card-btn'), addForm=document.getElementById('add-card-form');
+  addBtn.addEventListener('click', function(){ addForm.style.display = (addForm.style.display==='flex'?'none':'flex'); });
+  document.getElementById('c-save').addEventListener('click', function(){
+    var brand=(document.getElementById('c-brand').value||'Card').trim();
+    var last4=(document.getElementById('c-last4').value||'').replace(/\D/g,'').slice(-4);
+    var name=(document.getElementById('c-name').value||'').trim();
+    if(last4.length<4){ flash('Enter the last four digits'); return; }
+    var v=F?F.vault():{}; var pay=(v.payment||[]).concat([{ label:brand+' ···· '+last4, name:name||'Primary card' }]);
+    if(F) F.setVault({payment:pay});
+    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand} }); }catch(_){} }
+    document.getElementById('c-brand').value=''; document.getElementById('c-last4').value=''; document.getElementById('c-name').value='';
+    addForm.style.display='none'; renderCards(); renderHeld();
+    flash('Card connected — Tures can book now');
+  });
+
+  // ----- grants → state -----
+  document.querySelectorAll('#access-grants .tg').forEach(function(t){
+    t.addEventListener('click', function(){
+      var on = t.getAttribute('aria-pressed')!=='true'; t.setAttribute('aria-pressed', on?'true':'false');
+      var lbl=(t.getAttribute('aria-label')||'').toLowerCase(); var v=F?F.vault():{}; var acc=v.access||{};
+      if(/calendar/.test(lbl)) acc.calendar=on; else if(/inbox/.test(lbl)) acc.inbox=on; else if(/messag/.test(lbl)) acc.messaging=on;
+      if(F) F.setVault({access:acc});
+    });
+  });
+
+  // ----- held trip: book OUT of the chat -----
+  function renderHeld(){
+    var wrap=document.getElementById('held-wrap'); if(!wrap||!F) return;
+    var pt=F.pendingTrip.get();
+    if(!pt){ wrap.innerHTML=''; return; }
+    var route = (pt.brief && pt.brief.destination) ? (esc(pt.brief.origin||'')+' → '+esc(pt.brief.destination)) : 'Your last planned trip';
+    wrap.innerHTML='<article class="card" style="margin-bottom:18px;border-color:var(--acc-line);background:var(--acc-dim)">'+
+      '<div class="vhead" style="margin-bottom:10px"><span class="ico"><span class="spark" style="font-size:18px">✦</span></span>'+
+      '<div><h3 class="serif">A trip is held for you</h3><div class="vsub">'+route+' — book it the moment your card is in.</div></div></div>'+
+      '<div style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn" id="book-held" type="button">✦ Book the held trip</button>'+
+      '<button class="btn ghost" id="drop-held" type="button">Discard</button></div><div id="held-result" style="margin-top:12px"></div></article>';
+    document.getElementById('book-held').addEventListener('click', bookHeld);
+    document.getElementById('drop-held').addEventListener('click', function(){ F.pendingTrip.clear(); renderHeld(); });
+  }
+  function bookHeld(){
+    var pt=F.pendingTrip.get(); if(!pt||!T) return;
+    var res=document.getElementById('held-result'); res.innerHTML='<span class="vsub">Booking…</span>';
+    T.book({brief:pt.brief}).then(function(bk){ return T.confirm(bk.id||bk.tripId); }).then(function(bk){
+      var comps=(bk.components||[]);
+      var rows=comps.map(function(c){ return '<div class="row"><span class="rl"><span class="rv">'+esc(c.title||c.label||'Booked')+'</span></span><span class="rtail"><span class="tag">'+esc(c.confirmation||c.pnr||c.status||'')+'</span></span></div>'; }).join('');
+      res.innerHTML='<div class="tok" style="margin:6px 0 8px">Confirmed — verified twice · <span class="demo-tag">Sample</span></div>'+rows;
+      F.pendingTrip.clear();
+      flash('Booked — no card was charged (safe simulation)');
+    }).catch(function(e){
+      if(e && e.status===409){ res.innerHTML='<span class="vsub" style="color:var(--acc-deep)">Add a card above, then book.</span>'; }
+      else { res.innerHTML='<span class="vsub">Could not book just now — nothing was charged.</span>'; }
+    });
+  }
+  renderHeld();
+
+  // deep-link: open add-card if arriving at #payment, scroll to #basics
+  if(location.hash==='#payment'){ addForm.style.display='flex'; document.getElementById('add-card-btn').scrollIntoView({block:'center'}); }
+})();
+</script>
+<script>
+(function(){
+  var F=window.turesFunnel; if(!F) return;
+  var v=F.vault()||{};
+  var n=v.notify||{ mode:'important', channels:['push','text'], sleep:{on:true,from:'22:00',to:'07:00'}, cats:{delays:true,changes:true,deals:true,good:true,pre:true,post:true}, cadence:'instant' };
+  var modeW=document.getElementById('nf-mode'), chanW=document.getElementById('nf-chan'), cadW=document.getElementById('nf-cadence');
+  var sleepTg=document.getElementById('nf-sleep'), times=document.getElementById('nf-times'), fromI=document.getElementById('nf-from'), toI=document.getElementById('nf-to');
+  if(!modeW) return;
+  function selOne(w,val){ Array.prototype.forEach.call(w.querySelectorAll('.nf-chip'), function(c){ c.classList.toggle('on', c.dataset.v===val); }); }
+  function selMulti(w,arr){ arr=arr||[]; Array.prototype.forEach.call(w.querySelectorAll('.nf-chip'), function(c){ c.classList.toggle('on', arr.indexOf(c.dataset.v)>=0); }); }
+  // init from saved
+  selOne(modeW, n.mode); selMulti(chanW, n.channels); selOne(cadW, n.cadence);
+  sleepTg.setAttribute('aria-pressed', (n.sleep&&n.sleep.on)?'true':'false'); times.classList.toggle('show', !!(n.sleep&&n.sleep.on));
+  if(n.sleep){ fromI.value=n.sleep.from||'22:00'; toI.value=n.sleep.to||'07:00'; }
+  Object.keys(n.cats||{}).forEach(function(k){ var t=document.querySelector('.nf-cats .tg[data-cat="'+k+'"]'); if(t) t.setAttribute('aria-pressed', n.cats[k]?'true':'false'); });
+  // interactions
+  Array.prototype.forEach.call(modeW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ selOne(modeW, c.dataset.v); }); });
+  Array.prototype.forEach.call(cadW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ selOne(cadW, c.dataset.v); }); });
+  Array.prototype.forEach.call(chanW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ c.classList.toggle('on'); }); });
+  sleepTg.addEventListener('click', function(){ var on=sleepTg.getAttribute('aria-pressed')!=='true'; sleepTg.setAttribute('aria-pressed', on?'true':'false'); times.classList.toggle('show', on); });
+  Array.prototype.forEach.call(document.querySelectorAll('.nf-cats .tg'), function(t){ t.addEventListener('click', function(){ t.setAttribute('aria-pressed', t.getAttribute('aria-pressed')==='true'?'false':'true'); }); });
+  document.getElementById('nf-save').addEventListener('click', function(){
+    var modeEl=modeW.querySelector('.nf-chip.on'), cadEl=cadW.querySelector('.nf-chip.on');
+    var channels=Array.prototype.map.call(chanW.querySelectorAll('.nf-chip.on'), function(c){ return c.dataset.v; });
+    var cats={}; Array.prototype.forEach.call(document.querySelectorAll('.nf-cats .tg'), function(t){ cats[t.dataset.cat]=t.getAttribute('aria-pressed')==='true'; });
+    F.setVault({ notify:{ mode:modeEl?modeEl.dataset.v:'important', channels:channels, sleep:{on:sleepTg.getAttribute('aria-pressed')==='true', from:fromI.value, to:toI.value}, cats:cats, cadence:cadEl?cadEl.dataset.v:'instant' } });
+    var m=document.getElementById('nf-msg'); m.style.display='inline-flex'; m.textContent='Saved'; setTimeout(function(){ m.style.display='none'; },2400);
+  });
+})();
+</script>
+</body></html>

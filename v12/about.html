@@ -1,0 +1,199 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — About</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v11.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* ── about — page-specific only; everything else reuses v11.css ── */
+  .about-hero{padding-top:78px}
+  .about-hero h1{margin-top:22px;max-width:11ch}
+  .about-hero .lead{margin:18px auto 0}
+
+  .belief h3{margin-bottom:8px}
+  .belief .ico svg{stroke:var(--acc-deep)}
+
+  /* under the hood */
+  .hood{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  .hood .prose p{color:var(--muted);font-size:15.5px;margin-bottom:16px;max-width:46ch}
+  .hood .prose p:last-child{margin-bottom:0}
+  .hood .prose strong{color:var(--text);font-weight:600}
+  .pipe{display:flex;flex-direction:column;gap:0}
+  .pipe .step{display:flex;gap:14px;align-items:flex-start;padding:16px 0}
+  .pipe .step + .step{border-top:1px solid var(--line)}
+  .pipe .step .ic{width:36px;height:36px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;background:var(--acc-dim);color:var(--acc-deep)}
+  .pipe .step .ic svg{stroke:var(--acc-deep)}
+  .pipe .step .t{font-family:'Playfair Display',serif;font-size:16px}
+  .pipe .step .d{color:var(--muted);font-size:13.5px;margin-top:3px}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:start}
+  .mailrow{display:inline-flex;align-items:center;gap:11px;border:1px solid var(--line-2);border-radius:12px;padding:13px 16px;margin-top:18px;background:var(--bg)}
+  .mailrow .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--acc-dim);flex:0 0 auto}
+  .mailrow .ic svg{stroke:var(--acc-deep)}
+  .mailrow .e{font-family:'Space Mono',monospace;font-size:14px;color:var(--text)}
+  .mailrow .l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .socials{display:flex;gap:12px;margin-top:22px}
+  .socials a{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;border:1px solid var(--line-2);color:var(--muted);transition:border-color .2s,color .2s}
+  .socials a:hover{border-color:var(--acc-line);color:var(--acc-deep)}
+  .socials a svg{stroke:currentColor}
+
+  .msg-form .grp{margin-bottom:16px}
+  .msg-form label{display:block;font-size:13px;font-weight:500;margin-bottom:7px}
+  .msg-form textarea.field{resize:vertical;min-height:108px;line-height:1.5}
+  .msg-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .msg-form .btn{margin-top:2px}
+  .msg-ack{display:none;margin-top:14px;border:1px solid var(--acc-line);background:var(--acc-dim);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--text);align-items:center;gap:10px}
+  .msg-ack.show{display:flex}
+  .msg-ack svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .msg-ack .demo-tag{margin-left:auto}
+
+  @media (max-width:760px){ .hood,.contact-grid{grid-template-columns:1fr;gap:36px} .msg-form .row2{grid-template-columns:1fr} }
+</style>
+</head>
+<body data-page="about">
+<main>
+
+  <!-- HERO -->
+  <section class="section about-hero">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> About</span>
+      <h1 style="margin-left:auto;margin-right:auto">Travel, <em>handled.</em></h1>
+      <p class="lead center">We built Tures because planning a great trip still means twenty open tabs and a callback you're still waiting on. Tures is an executor, not a research tool. It doesn't hand you links to go finish — it ends with confirmation numbers.</p>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- WHAT WE BELIEVE -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:40px">
+        <span class="eyebrow"><span class="dot"></span> What we believe</span>
+        <h2 style="margin-top:18px">Four principles. <em>No exceptions.</em></h2>
+      </div>
+      <div class="grid-2 belief">
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+          <h3>An executor, not a search box</h3>
+          <p>A search engine hands you results. Tures does the work — flights, hotel, the table you actually want — and finishes the job. You describe it once; it returns a trip, booked.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/></svg></span>
+          <h3>The Brief is the boundary</h3>
+          <p>Your Brief is the authorization line. Tures acts inside it and pauses outside it — when something's ambiguous or pricier than you said, it asks before it acts. Never surprises you with a charge.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg></span>
+          <h3>No fake success states</h3>
+          <p>Every booking is two-source verified before Tures tells you it's done. If it can't confirm twice, it won't claim it. The confirmation number you see is one we checked — not one we hoped for.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.5"/><path d="M3 3l18 18" stroke-width="1.6"/></svg></span>
+          <h3>Discreet by default</h3>
+          <p>Your trips, your taste, your documents — held quietly and never traded. Tokenized through VGS, raw values never stored in plain text, and every action audit-logged so you can see exactly what was done on your behalf.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- UNDER THE HOOD -->
+  <section class="section">
+    <div class="wrap hood">
+      <div class="prose">
+        <span class="eyebrow"><span class="dot"></span> Under the hood</span>
+        <h2 style="margin:18px 0 16px">A model that understands you. <em>An engine that books.</em></h2>
+        <p>Tures splits the work the way it should be split. A <strong>language model reads your Brief</strong> the way a great concierge would — picking up the cabin you like, the room you mean, the table you'd actually want.</p>
+        <p>Then it hands a precise plan to a <strong>deterministic engine</strong> that does the booking. The part that touches your card and your loyalty is exact and repeatable — not improvised by a chatbot.</p>
+        <p>And <strong>every action is logged</strong>. You can see what Tures did, when, and why — a complete, calm audit trail of your trip being handled.</p>
+      </div>
+      <div class="pipe card">
+        <div class="step">
+          <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <div><div class="t serif">It understands you</div><div class="d">The model reads your Brief in plain English and turns it into an exact plan.</div></div>
+        </div>
+        <div class="step">
+          <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1H7a3 3 0 0 0 0 6h1v1a4 4 0 0 0 8 0v-1h1a3 3 0 0 0 0-6h-1V6a4 4 0 0 0-4-4z"/></svg></span>
+          <div><div class="t serif">The engine books</div><div class="d">A deterministic executor does the booking — exact, repeatable, two-source verified.</div></div>
+        </div>
+        <div class="step">
+          <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13l2 2 4-4"/></svg></span>
+          <div><div class="t serif">Everything is logged</div><div class="d">Every action recorded — a calm, complete audit trail you can read any time.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="wrap contact-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span> Contact</span>
+        <h2 style="margin:18px 0 14px">Say hello. <em>We read everything.</em></h2>
+        <p class="lead">Questions about access, the Vault, or whether Tures fits how you travel? Reach a real person — not a queue.</p>
+        <div class="mailrow">
+          <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+          <span><span class="l">Email us</span><br><span class="e">hello@tures.example</span></span>
+        </div>
+        <div class="socials">
+          <a href="#" aria-label="Tures on X"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M20 4L4 20"/></svg></a>
+          <a href="#" aria-label="Tures on Instagram"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="#" aria-label="Tures on LinkedIn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4M11 11v6"/></svg></a>
+        </div>
+      </div>
+
+      <!-- INERT message form -->
+      <form class="card msg-form" id="msg-form" novalidate>
+        <div class="row2">
+          <div class="grp">
+            <label for="c-name">Name</label>
+            <input class="field" type="text" id="c-name" name="name" placeholder="Andy Rockwell" autocomplete="name">
+          </div>
+          <div class="grp">
+            <label for="c-email">Email</label>
+            <input class="field" type="email" id="c-email" name="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="grp">
+          <label for="c-msg">Message</label>
+          <textarea class="field" id="c-msg" name="message" placeholder="Tell us how you travel, or what you'd want Tures to handle first."></textarea>
+        </div>
+        <button class="btn" type="submit">Send &nbsp;→</button>
+        <div class="msg-ack" id="msg-ack" role="status" aria-live="polite">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          <span>Thanks — we'll be in touch.</span>
+          <span class="demo-tag">Mockup</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- CLOSING CTA -->
+  <section class="section tight">
+    <div class="wrap center">
+      <h2>Describe your next trip. <em>Get it back booked.</em></h2>
+      <p class="lead center" style="margin:16px auto 28px">One sentence is all Tures needs to start. It does the rest, then stays on 24/7.</p>
+      <a class="btn" href="plan.html">Plan a trip &nbsp;→</a>
+    </div>
+  </section>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+  (function () {
+    var form = document.getElementById("msg-form");
+    var ack = document.getElementById("msg-ack");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();                 // INERT — no real submission
+      ack.classList.add("show");
+    });
+  })();
+</script>
+</body></html>
