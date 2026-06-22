@@ -69,6 +69,27 @@
     color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:14px}
   .tip p{font-size:13.5px;color:var(--text)}
 
+  /* ---- trip wrapped (post-trip summary) ---- */
+  .wrapped{border:1px solid var(--acc-line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .wrapped .wh{padding:22px 24px;background:linear-gradient(180deg,var(--acc-dim),transparent)}
+  .wrapped .wh .t{font-family:'Playfair Display',serif;font-size:clamp(20px,2.4vw,26px)}
+  .wrapped .wh .s{font-size:13.5px;color:var(--muted);margin-top:6px;max-width:62ch;line-height:1.5}
+  .wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+  .wgrid .wc{background:var(--bg);padding:18px 20px}
+  .wgrid .wc .n{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(22px,2.6vw,30px);color:var(--acc-deep);line-height:1}
+  .wgrid .wc .l{font-size:12px;color:var(--muted);margin-top:6px}
+  @media(max-width:720px){.wgrid{grid-template-columns:1fr 1fr}}
+
+  /* expense report */
+  .exp-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .exp{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .exp .er{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px}
+  .exp .er:last-child{border-bottom:none}
+  .exp .er .ec{color:var(--muted);font-size:12.5px}
+  .exp .er .ev{font-family:'Space Mono',monospace;color:var(--text);white-space:nowrap}
+  .exp .er.tot{background:var(--surface);font-weight:600}
+  .exp .er.tot .ev{color:var(--acc-deep)}
+
   @media (max-width:560px){
     .item{flex-wrap:wrap}.item .side{text-align:left;width:100%}
     .detail-hero .dh-initial{width:52px;height:52px;font-size:28px}
@@ -101,15 +122,15 @@
           </div>
         </a>
 
-        <div class="card hover trip-card">
+        <a href="#tokyo" class="card hover trip-card">
           <div class="trip-head tokyo"><span class="initial">T</span><span class="tag">Completed</span></div>
           <div class="trip-body">
             <div class="tname">Tokyo</div>
             <div class="tsub">Solo · a week of food and walking</div>
             <div class="tdates">FEB 3 – 10, 2026</div>
-            <span class="topen">Open trip <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <span class="topen">See the wrap <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </div>
-        </div>
+        </a>
 
         <div class="card hover trip-card">
           <div class="trip-head kona"><span class="initial">B</span><span class="tag">Planning</span></div>
@@ -286,6 +307,103 @@
     </div>
   </section>
 
+  <hr class="rule">
+
+  <!-- ── opened trip: Tokyo (post-trip wrap) ── -->
+  <section class="section tight" id="tokyo" style="scroll-margin-top:var(--nav-h)">
+    <div class="wrap">
+      <div class="detail-hero">
+        <div class="dh-initial" style="background:linear-gradient(135deg,var(--rain),#2b3a55 70%,var(--text))">T</div>
+        <div class="dh-t">
+          <span class="tag" style="margin-bottom:10px">Completed</span>
+          <h2>Tokyo · <em>wrapped</em></h2>
+          <div class="dh-meta">
+            <span class="mono">SEA ⇄ HND</span><span>Feb 3 – 10, 2026</span><span>Solo</span><span>The Okura Tokyo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrapped" style="margin-top:18px">
+        <div class="wh">
+          <div class="t serif">Welcome home — Tokyo, handled.</div>
+          <div class="s">Eight days, every leg watched. Here is what Tures saved you, earned you, and learned along the way. <span class="demo-tag">Sample</span></div>
+        </div>
+        <div class="wgrid">
+          <div class="wc"><div class="n">$480</div><div class="l">saved vs published</div></div>
+          <div class="wc"><div class="n">38,500</div><div class="l">points credited</div></div>
+          <div class="wc"><div class="n">9 hrs</div><div class="l">you never spent</div></div>
+          <div class="wc"><div class="n">2</div><div class="l">disruptions handled</div></div>
+        </div>
+      </div>
+
+      <!-- WHAT TURES HANDLED -->
+      <div class="cat" id="tok-handled" style="padding-top:30px">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <span class="cn">What Tures handled</span>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">Return flight moved 90 minutes <span class="demo-tag">Sample</span></div>
+            <div class="it2">ANA shifted NH106, so I rebooked you on the earlier nonstop — same business fare, no change fee.</div>
+            <div class="iconf"><span class="mono">PNR · NH · 7K2M9P</span></div>
+          </div>
+          <div class="side">Feb 10</div>
+        </div>
+        <div class="item">
+          <span class="idot"></span>
+          <div class="ibody">
+            <div class="it1">A counter omakase cancelled <span class="demo-tag">Sample</span></div>
+            <div class="it2">Your Ginza counter closed that night — I moved you to an equal-tier seating two doors down, same hour.</div>
+            <div class="iconf"><span class="mono">Conf · GZ-4410</span></div>
+          </div>
+          <div class="side">Feb 6</div>
+        </div>
+        <div class="item">
+          <span class="idot warn"></span>
+          <div class="ibody">
+            <div class="it1">Rain on day four <span class="demo-tag">Sample</span></div>
+            <div class="it2">Swapped the Yanaka walking tour into day six's clear window — same guide.</div>
+            <div class="iconf"><span class="moved"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 18a5 5 0 0 1-1-9.9A6 6 0 0 1 18 8a4 4 0 0 1-1 7.9"/></svg> Reshuffled by weather watch</span></div>
+          </div>
+          <div class="side">Feb 6 → 8</div>
+        </div>
+      </div>
+
+      <!-- EXPENSE REPORT -->
+      <div class="cat" id="tok-expense">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V5a2 2 0 0 1 2-2z"/><path d="M8 8h8M8 12h6"/></svg></span>
+          <span class="cn">Expense report</span>
+        </div>
+        <div class="exp-head">
+          <p class="lead" style="font-size:14px;margin:0;color:var(--muted)">Categorized and ready to file. <span class="demo-tag">Sample</span></p>
+          <button class="btn ghost sm" id="exp-export" type="button">Export CSV</button>
+        </div>
+        <div class="exp" id="exp-table"></div>
+      </div>
+
+      <!-- WHAT TURES LEARNED -->
+      <div class="cat" id="tok-taste">
+        <div class="cat-h">
+          <span class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.2 5.8.9-4.2 4 1 5.7L12 16.9 6.8 18.8l1-5.7-4.2-4 5.8-.9L12 3z"/></svg></span>
+          <span class="cn">What Tures learned</span>
+        </div>
+        <div class="tip">
+          <span class="tav serif">T</span>
+          <p>You lingered at the quiet kaiseki and skipped the second izakaya &mdash; I am weighting calm, chef-led rooms over buzzy ones next time.</p>
+        </div>
+        <div class="tip">
+          <span class="tav serif">T</span>
+          <p>Late starts, walking-heavy afternoons. I will stop putting anything on your morning before 10.</p>
+        </div>
+        <div style="margin-top:10px"><a class="btn ghost sm" href="taste.html">See your Taste Print
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ── CTA ── -->
   <section class="section">
     <div class="wrap center">
@@ -323,6 +441,36 @@
   };
   window.addEventListener('scroll', spy, {passive:true});
   spy();
+})();
+</script>
+<script>
+/* Post-trip expense report — render + real CSV export */
+(function(){
+  var rows=[
+    {c:'Flights',   d:'ANA · SEA ⇄ HND · business', a:1860},
+    {c:'Hotel',     d:'The Okura Tokyo · 7 nights',      a:2240},
+    {c:'Dining',    d:'Omakase, kaiseki, coffee',        a:610},
+    {c:'Transport', d:'Airport car, IC card, taxis',     a:140}
+  ];
+  var box=document.getElementById('exp-table'); if(!box) return;
+  var total=rows.reduce(function(s,r){ return s+r.a; },0);
+  function money(n){ return '$'+n.toLocaleString('en-US'); }
+  box.innerHTML = rows.map(function(r){
+    return '<div class="er"><span><b>'+r.c+'</b><span class="ec"> · '+r.d+'</span></span><span class="ev">'+money(r.a)+'</span></div>';
+  }).join('') + '<div class="er tot"><span>Total</span><span class="ev">'+money(total)+'</span></div>';
+
+  var btn=document.getElementById('exp-export');
+  if(btn) btn.addEventListener('click', function(){
+    var data=[['Category','Detail','Amount USD']]
+      .concat(rows.map(function(r){ return [r.c, r.d, r.a]; }))
+      .concat([['Total','',total]]);
+    var csv=data.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\r\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='tures-tokyo-expenses.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    var o=btn.textContent; btn.textContent='Downloaded ✓'; setTimeout(function(){ btn.textContent=o; }, 1800);
+  });
 })();
 </script>
 <script src="assets/site.js" defer></script>
