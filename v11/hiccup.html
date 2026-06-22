@@ -120,6 +120,40 @@
   .good-line svg{stroke:var(--good);flex:0 0 auto}
   .good-line b{color:var(--text);font-weight:600}
 
+  /* ---- live monitor (functional, wired to the engine) ---- */
+  .mon{border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;background:var(--bg);box-shadow:0 30px 70px -52px rgba(0,0,0,.4)}
+  .mon-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .mon-watch{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text)}
+  .mon-watch .live{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background .3s}
+  .mon.on .mon-watch .live{background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .mon-status{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--line-2);padding:6px 11px;border-radius:999px;transition:all .3s}
+  .mon-status.ok{color:var(--good);background:rgba(46,158,91,.10);border-color:rgba(46,158,91,.30)}
+  .mon-status.warn{color:var(--warn);background:rgba(199,122,0,.12);border-color:rgba(199,122,0,.34)}
+  .mon-status.act{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
+  .mon-feed{padding:4px 16px;min-height:188px;max-height:380px;overflow-y:auto}
+  .mon-empty{color:var(--faint);font-size:14px;padding:34px 6px;text-align:center;line-height:1.5}
+  .mon-row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);animation:monrise .32s ease both}
+  .mon-row:last-child{border-bottom:none}
+  @keyframes monrise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .mon-row .ic{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+  .mon-row.det .ic{background:var(--acc-dim);border-color:var(--acc-line);color:var(--acc-deep)}
+  .mon-row.good .ic{background:rgba(46,158,91,.12);border-color:rgba(46,158,91,.3);color:var(--good)}
+  .mon-row .ic .sp{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:monspin .8s linear infinite}
+  @keyframes monspin{to{transform:rotate(360deg)}}
+  .mon-row .bd{flex:1;min-width:0}
+  .mon-row .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
+  .mon-row .k .t{font-family:'Space Mono',monospace;color:var(--faint);margin-left:auto;text-transform:none;letter-spacing:0}
+  .mon-row .tx{font-size:14px;margin-top:3px;line-height:1.45}
+  .mon-row .tx b{font-weight:600}
+  .mon-prop{margin-top:9px;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:10px;padding:9px 13px}
+  .mon-prop .pr{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:3px 0}
+  .mon-prop .pr .mono{font-family:'Space Mono',monospace;color:var(--acc-deep)}
+  .mon-act{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+  .mon-controls{padding:14px 16px;border-top:1px solid var(--line);background:var(--surface);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .mon-disrupt{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .mon-dl{font-size:12px;color:var(--muted)}
+  .btn.sm:disabled{opacity:.5;cursor:default}
+
   @media (max-width:860px){
     .hero-grid{grid-template-columns:1fr;gap:42px}
     .ops-stage{order:-1}
@@ -200,6 +234,39 @@
         <span class="demo-tag">Sample</span>
         <span>Illustrative figures from a watched itinerary. The point is the posture: most of it never reaches you.</span>
       </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="rule"></div>
+
+  <!-- ════════ LIVE MONITOR (functional, wired to the engine) ════════ -->
+  <section class="section" id="live">
+    <div class="wrap">
+      <div style="max-width:56ch;margin-bottom:30px">
+        <span class="eyebrow"><span class="dot"></span> Watch it live</span>
+        <h2 style="margin-top:18px">Throw a wrench at a real trip. <em>Watch Tures catch it.</em></h2>
+        <p class="lead" style="margin-top:16px">No video, no mockup — this runs against the live Tures engine on a held sample itinerary (mock supplier · $0). Trigger a disruption and watch it detect, assess, and propose the fix in real time.</p>
+      </div>
+
+      <div class="mon" id="mon">
+        <div class="mon-head">
+          <span class="mon-watch"><span class="live"></span> <span id="mon-trip">Not watching yet</span></span>
+          <span class="mon-status" id="mon-status">Idle</span>
+        </div>
+        <div class="mon-feed" id="mon-feed">
+          <div class="mon-empty" id="mon-empty">Start a watched trip and Tures will hold a sample itinerary, then keep an eye on every leg.</div>
+        </div>
+        <div class="mon-controls">
+          <button class="btn sm" id="mon-start" type="button">Start a watched trip</button>
+          <div class="mon-disrupt" id="mon-disrupt" hidden>
+            <span class="mon-dl">Throw a wrench:</span>
+            <button class="btn ghost sm" data-kind="schedule_change" type="button">Schedule change</button>
+            <button class="btn ghost sm" data-kind="delay" type="button">Delay</button>
+            <button class="btn ghost sm" data-kind="cancellation" type="button">Cancellation</button>
+          </div>
+        </div>
+      </div>
+      <div class="strip-note" style="margin-top:14px"><span class="demo-tag">Live</span><span>Real calls to the Tures engine (mock supplier, $0 — no real bookings). Standing authority is <b style="color:var(--text)">propose-only</b>: Tures finds the fix and waits for your OK.</span></div>
     </div>
   </section>
 
@@ -482,6 +549,103 @@
   var replay = document.getElementById('replay');
   if(replay) replay.addEventListener('click', runScenario);
   finalState(); /* page lands on the resolved story; replay re-tells it */
+})();
+
+/* ---- LIVE MONITOR: real engine — hold a sample trip, then detect→assess→propose a fix ---- */
+(function(){
+  var T = window.tures;
+  var mon = document.getElementById('mon');
+  var feed = document.getElementById('mon-feed');
+  var emptyEl = document.getElementById('mon-empty');
+  var tripEl = document.getElementById('mon-trip');
+  var statusEl = document.getElementById('mon-status');
+  var startBtn = document.getElementById('mon-start');
+  var disruptWrap = document.getElementById('mon-disrupt');
+  if(!mon || !startBtn) return;
+
+  var booking = null, busy = false;
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function now(){ try{ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }catch(_){ return ''; } }
+  function setStatus(txt, cls){ statusEl.textContent = txt; statusEl.className = 'mon-status' + (cls?(' '+cls):''); }
+  function row(opts){
+    if(emptyEl){ emptyEl.remove(); emptyEl=null; }
+    var r = document.createElement('div');
+    r.className = 'mon-row' + (opts.cls?(' '+opts.cls):'');
+    r.innerHTML =
+      '<div class="ic">'+(opts.icon||'')+'</div>'+
+      '<div class="bd"><div class="k"><span>'+esc(opts.kicker||'')+'</span><span class="t">'+now()+'</span></div>'+
+      '<div class="tx">'+(opts.html||esc(opts.text||''))+'</div>'+(opts.extra||'')+'</div>';
+    feed.appendChild(r); feed.scrollTop = feed.scrollHeight; return r;
+  }
+  function disableDisrupt(d){ Array.prototype.forEach.call(disruptWrap.querySelectorAll('button'), function(b){ b.disabled = d; }); }
+
+  var SPIN = '<span class="sp"></span>';
+  var DET = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.3a1 1 0 0 1 1.7 0l8.5 14.7a1 1 0 0 1-.9 1.5H2.6a1 1 0 0 1-.9-1.5z"/><path d="M11 9v4M11 16.5v.01"/></svg>';
+  var FIX = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="4"/></svg>';
+  var CHK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  var DETAILS = {
+    schedule_change: 'Outbound SEA→OGG moved 2h10m earlier — misconnect risk on the island leg',
+    delay: 'Inbound OGG→SEA showing a ~3h delay — tight connection at risk',
+    cancellation: 'Outbound SEA→OGG cancelled by the carrier'
+  };
+  var KINDLABEL = { schedule_change:'Schedule change', delay:'Delay', cancellation:'Cancellation' };
+
+  startBtn.addEventListener('click', function(){
+    if(busy) return;
+    if(!(T && T.configured)){ row({cls:'det', icon:DET, kicker:'Offline', text:'Cannot reach the Tures engine from here — the live monitor needs the engine online.'}); return; }
+    busy = true; startBtn.disabled = true; startBtn.textContent = 'Holding a trip…'; setStatus('Booking','act');
+    T.parse('From Seattle, 5 days on Maui in late June for 2 adults, oceanfront luxury, business class if reasonable, budget around $9,000 total.')
+      .then(function(pw){ return T.book({brief: pw.brief}); })
+      .then(function(bk){ return T.confirm(bk.id).then(function(cf){ return {bk:bk, cf:cf}; }); })
+      .then(function(o){
+        booking = { id:o.bk.id, tripId:o.cf.tripId||o.bk.tripId };
+        mon.classList.add('on');
+        tripEl.textContent = 'Watching · SEA⇄OGG · ' + String(booking.tripId).slice(0,16);
+        setStatus('All clear','ok');
+        row({cls:'good', icon:CHK, kicker:'Held & watching', html:'Sample Maui trip held and confirmed (mock $0). Every leg is now under watch — flights, hotel, the table. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+        startBtn.style.display='none'; disruptWrap.hidden = false; disableDisrupt(false); busy = false;
+      })
+      .catch(function(e){
+        setStatus('Error','warn');
+        row({cls:'det', icon:DET, kicker:'Could not start', text:'The engine returned an error ('+((e&&e.status)||'network')+'). Try again in a moment.'});
+        startBtn.disabled = false; startBtn.textContent = 'Start a watched trip'; busy = false;
+      });
+  });
+
+  disruptWrap.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-kind]'); if(!b || busy || !booking) return;
+    var kind = b.dataset.kind; busy = true; disableDisrupt(true);
+    row({cls:'det', icon:DET, kicker:'Detected · '+KINDLABEL[kind], text:DETAILS[kind]});
+    setStatus('Handling','act');
+    var assessing = row({icon:SPIN, kicker:'Assessing', text:'Scoring alternatives against your Brief…'});
+    T.disrupt(booking.id, kind, DETAILS[kind]).then(function(d){
+      var r = (d && d.resolution) || {};
+      if(assessing) assessing.remove();
+      var prop = '<div class="mon-prop">'+
+        '<div class="pr"><span>From</span><span class="mono">'+esc(r.from||'current leg')+'</span></div>'+
+        '<div class="pr"><span>To</span><span class="mono">'+esc(r.to||'alternative')+'</span></div>'+
+        (r.upchargeUsd!=null?'<div class="pr"><span>Upcharge</span><span class="mono">+$'+esc(r.upchargeUsd)+'</span></div>':'')+
+        '</div>'+
+        '<div class="mon-act"><button class="btn sm" data-approve="1" type="button">Approve the swap</button><button class="btn ghost sm" data-hold="1" type="button">Hold</button></div>';
+      var pr = row({cls:'det', icon:FIX, kicker:'Proposed fix', html:esc(r.reason||'Found a workable alternative.'), extra:prop});
+      setStatus('Awaiting your OK','act');
+      pr.querySelector('[data-approve]').addEventListener('click', function(){
+        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
+        row({cls:'good', icon:CHK, kicker:'Rebooked', html:'Switched to <b>'+esc(r.to||'the alternative')+'</b> — confirmed, same cabin. Hotel and ground held to match. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+        setStatus('Handled','ok'); disableDisrupt(false); busy=false;
+      });
+      pr.querySelector('[data-hold]').addEventListener('click', function(){
+        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
+        row({kicker:'Held', text:'Kept the original for now — still watching.'});
+        setStatus('All clear','ok'); disableDisrupt(false); busy=false;
+      });
+    }).catch(function(e){
+      if(assessing) assessing.remove();
+      row({cls:'det', icon:DET, kicker:'Engine error', text:'Could not process that disruption ('+((e&&e.status)||'network')+').'});
+      setStatus('All clear','ok'); disableDisrupt(false); busy=false;
+    });
+  });
 })();
 </script>
 <script src="assets/site.js" defer></script>
