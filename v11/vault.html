@@ -546,7 +546,7 @@ window.turesBestCard = function(category, amount, cards){
     if(last4.length<4){ flash('Enter the last four digits'); return; }
     var v=F?F.vault():{}; var pay=(v.payment||[]).concat([{ label:brand+' ···· '+last4, name:name, key:key||undefined, brand:brand }]);
     if(F) F.setVault({payment:pay});
-    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand, key:key||undefined} }); }catch(_){} }
+    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand, key:key||undefined, cardKey:key||undefined} }); }catch(_){} }
     document.getElementById('c-brand').value=''; document.getElementById('c-last4').value=''; document.getElementById('c-name').value=''; if(knownSel) knownSel.value='';
     addForm.style.display='none'; renderCards(); renderHeld(); if(window.__bcRefresh) window.__bcRefresh();
     flash('Card connected — Tures can book now');
