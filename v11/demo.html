@@ -138,10 +138,26 @@
   .btn.ghost{background:#fff;color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
   .btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--acc)}
 
+  /* phone settles in on load */
+  .phone{animation:phin .6s cubic-bezier(.2,.85,.3,1) both}
+  @keyframes phin{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  /* the title recedes once it's playing, so the phone is the focus */
+  .lead{transition:opacity .5s,transform .5s}
+  .stage.playing .lead{opacity:.3;transform:scale(.95)}
+
+  @media (max-width:600px){
+    .stage{padding:60px 12px 20px;gap:13px}
+    .lead h1{font-size:20px}
+    .top{padding:12px 16px}.top .mark{font-size:20px}
+    .phone{width:min(300px,90vw);padding:10px;border-radius:34px}
+    .screen{height:min(440px,52vh);border-radius:26px}
+    .caption{font-size:14px;min-height:40px}
+    .outro .ot{font-size:26px}
+  }
   @media (prefers-reduced-motion:reduce){
     .prog .seg.on i{animation:none;width:100%}
     .act .r{opacity:1;transform:none}.act.on .r{animation:none}
-    .typ i,.work .sp,.sct .ss.watch .pd{animation:none}
+    .typ i,.work .sp,.sct .ss.watch .pd,.phone{animation:none}
   }
 </style>
 </head>
@@ -278,6 +294,7 @@
 
   function show(n){
     i = n;
+    document.querySelector('.stage').classList.add('playing');
     var a = ACTS[n];
     acts.forEach(function(el,k){ el.classList.toggle('on', k===n); });
     segs.forEach(function(s,k){ s.classList.remove('on','done'); if(k<n) s.classList.add('done'); });
@@ -318,16 +335,21 @@
       ? '<path d="M7 4l13 8-13 8z"></path>'
       : '<rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect>';
   }
+  function setAnim(state){
+    var seg = segs[i], fill = seg && seg.querySelector('i');
+    if(fill) fill.style.animationPlayState = state;
+    var act = document.querySelector('.act.on');
+    if(act){ [].forEach.call(act.querySelectorAll('.r,.sp,.typ i'), function(e){ e.style.animationPlayState = state; }); }
+  }
   function togglePause(){
     if(outro.classList.contains('show')){ restart(); return; }
     paused = !paused;
     if(paused){
       clearTimeout(timer);
       remaining = Math.max(0, remaining - (Date.now()-startedAt));
-      var seg = segs[i]; if(seg){ var fill = seg.querySelector('i'); if(fill){ var cs=getComputedStyle(fill); fill.style.width=cs.width; seg.classList.remove('on'); } }
+      setAnim('paused');
     } else {
-      var seg = segs[i];
-      if(seg){ /* resume the bar over the remaining time */ var fill=seg.querySelector('i'); if(fill){ fill.style.transition='width '+(remaining/1000)+'s linear'; void fill.offsetWidth; fill.style.width='100%'; } }
+      setAnim('running');
       scheduleNext(remaining);
     }
     setPP();
