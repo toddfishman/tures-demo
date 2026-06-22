@@ -379,6 +379,16 @@
         </div>
       </div>
 
+      <div class="nf-block"><div class="nf-h">Location <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">· optional</span></div>
+        <p style="color:var(--muted);font-size:13px;margin:-2px 0 10px;max-width:60ch">Sharpens the on-the-ground help — “you’ve landed, your car’s outside,” “leave now, traffic’s bad and your flight just moved up.” <b style="color:var(--text)">Monitoring works fully without it</b> — this only makes the in-the-moment saves possible.</p>
+        <div class="nf-chips" id="nf-loc">
+          <button class="nf-chip" data-v="off" type="button">Off</button>
+          <button class="nf-chip" data-v="while" type="button">While using</button>
+          <button class="nf-chip" data-v="always" type="button">Always · proactive</button>
+        </div>
+        <div id="nf-loc-note" style="display:none;margin-top:9px;font-size:12.5px;color:var(--muted)"></div>
+      </div>
+
       <div class="grant-row" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px">
         <span class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>
         <span class="gm"><span class="gt">Sleep — quiet hours</span><span class="gd">Hold everything but emergencies overnight.</span></span>
@@ -524,20 +534,40 @@
 (function(){
   var F=window.turesFunnel; if(!F) return;
   var v=F.vault()||{};
-  var n=v.notify||{ mode:'important', channels:['push','text'], sleep:{on:true,from:'22:00',to:'07:00'}, cats:{delays:true,changes:true,deals:true,good:true,pre:true,post:true}, cadence:'instant' };
-  var modeW=document.getElementById('nf-mode'), chanW=document.getElementById('nf-chan'), cadW=document.getElementById('nf-cadence');
+  var n=v.notify||{ mode:'important', channels:['push','text'], sleep:{on:true,from:'22:00',to:'07:00'}, cats:{delays:true,changes:true,deals:true,good:true,pre:true,post:true}, cadence:'instant', location:'off' };
+  var modeW=document.getElementById('nf-mode'), chanW=document.getElementById('nf-chan'), cadW=document.getElementById('nf-cadence'), locW=document.getElementById('nf-loc');
   var sleepTg=document.getElementById('nf-sleep'), times=document.getElementById('nf-times'), fromI=document.getElementById('nf-from'), toI=document.getElementById('nf-to');
   if(!modeW) return;
   function selOne(w,val){ Array.prototype.forEach.call(w.querySelectorAll('.nf-chip'), function(c){ c.classList.toggle('on', c.dataset.v===val); }); }
   function selMulti(w,arr){ arr=arr||[]; Array.prototype.forEach.call(w.querySelectorAll('.nf-chip'), function(c){ c.classList.toggle('on', arr.indexOf(c.dataset.v)>=0); }); }
   // init from saved
   selOne(modeW, n.mode); selMulti(chanW, n.channels); selOne(cadW, n.cadence);
+  if(locW) selOne(locW, n.location||'off');
   sleepTg.setAttribute('aria-pressed', (n.sleep&&n.sleep.on)?'true':'false'); times.classList.toggle('show', !!(n.sleep&&n.sleep.on));
   if(n.sleep){ fromI.value=n.sleep.from||'22:00'; toI.value=n.sleep.to||'07:00'; }
   Object.keys(n.cats||{}).forEach(function(k){ var t=document.querySelector('.nf-cats .tg[data-cat="'+k+'"]'); if(t) t.setAttribute('aria-pressed', n.cats[k]?'true':'false'); });
   // interactions
   Array.prototype.forEach.call(modeW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ selOne(modeW, c.dataset.v); }); });
   Array.prototype.forEach.call(cadW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ selOne(cadW, c.dataset.v); }); });
+  if(locW){
+    function locNote(txt,color){ var nt=document.getElementById('nf-loc-note'); if(!nt) return; nt.style.display='block'; nt.textContent=txt; nt.style.color=color||'var(--muted)'; }
+    function reqLoc(){
+      if(!navigator.geolocation){ locNote('This browser can’t share location — monitoring still works without it.'); return; }
+      locNote('Requesting location…');
+      navigator.geolocation.getCurrentPosition(
+        function(){ locNote('✓ Location on — Tures can help you on the ground. Switch it off anytime.', 'var(--good)'); },
+        function(){ locNote('Location is blocked in your browser — monitoring still works, it just won’t know you’re on the move. Allow it in site settings to turn this on.', 'var(--acc-deep)'); },
+        { timeout:8000, maximumAge:600000 }
+      );
+    }
+    Array.prototype.forEach.call(locW.querySelectorAll('.nf-chip'), function(c){
+      c.addEventListener('click', function(){
+        selOne(locW, c.dataset.v);
+        if(c.dataset.v==='off'){ var nt=document.getElementById('nf-loc-note'); if(nt) nt.style.display='none'; }
+        else { reqLoc(); }
+      });
+    });
+  }
   Array.prototype.forEach.call(chanW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ c.classList.toggle('on'); }); });
   sleepTg.addEventListener('click', function(){ var on=sleepTg.getAttribute('aria-pressed')!=='true'; sleepTg.setAttribute('aria-pressed', on?'true':'false'); times.classList.toggle('show', on); });
   Array.prototype.forEach.call(document.querySelectorAll('.nf-cats .tg'), function(t){ t.addEventListener('click', function(){ t.setAttribute('aria-pressed', t.getAttribute('aria-pressed')==='true'?'false':'true'); }); });
@@ -545,7 +575,8 @@
     var modeEl=modeW.querySelector('.nf-chip.on'), cadEl=cadW.querySelector('.nf-chip.on');
     var channels=Array.prototype.map.call(chanW.querySelectorAll('.nf-chip.on'), function(c){ return c.dataset.v; });
     var cats={}; Array.prototype.forEach.call(document.querySelectorAll('.nf-cats .tg'), function(t){ cats[t.dataset.cat]=t.getAttribute('aria-pressed')==='true'; });
-    F.setVault({ notify:{ mode:modeEl?modeEl.dataset.v:'important', channels:channels, sleep:{on:sleepTg.getAttribute('aria-pressed')==='true', from:fromI.value, to:toI.value}, cats:cats, cadence:cadEl?cadEl.dataset.v:'instant' } });
+    var locEl=locW?locW.querySelector('.nf-chip.on'):null;
+    F.setVault({ notify:{ mode:modeEl?modeEl.dataset.v:'important', channels:channels, sleep:{on:sleepTg.getAttribute('aria-pressed')==='true', from:fromI.value, to:toI.value}, cats:cats, cadence:cadEl?cadEl.dataset.v:'instant', location:locEl?locEl.dataset.v:'off' } });
     var m=document.getElementById('nf-msg'); m.style.display='inline-flex'; m.textContent='Saved'; setTimeout(function(){ m.style.display='none'; },2400);
   });
 })();
