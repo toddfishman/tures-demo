@@ -1,5 +1,18 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tures is rolling out by invitation. Join the waitlist and we'll open a seat — describe your first trip and we'll take it from there.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="Get started with Tures">
+<meta property="og:description" content="Tures is rolling out by invitation. Join the waitlist and we'll open a seat — describe your first trip and we'll take it from there.">
+<meta property="og:url" content="https://tures.app/signup.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Get started with Tures">
+<meta name="twitter:description" content="Tures is rolling out by invitation. Join the waitlist and we'll open a seat — describe your first trip and we'll take it from there.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
 <title>t✦ures — Get started</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -74,7 +87,7 @@
           <div class="ico-lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
           <h3 class="serif">Thanks — we'll be in touch shortly.</h3>
           <p>We've noted your request. A concierge will reach out by email when your seat opens. Nothing has been created or charged.</p>
-          <span class="demo-tag">Mockup · no account made</span>
+          <span class="demo-tag">On the list · no account or charge yet</span>
         </div>
       </form>
     </div>
@@ -155,6 +168,8 @@
     e.preventDefault();                 // no password, no real auth — a soft profile only
     var name=(nameEl.value||'').trim(), email=(emailEl.value||'').trim();
     if (F) F.setTraveler({ name:name, email:email });
+    // Real waitlist capture (engine /waitlist); graceful if offline or email invalid.
+    if (window.tures && window.tures.configured && email) { try { window.tures.waitlist(email, name); } catch (_) {} }
     var pt = F ? F.pendingTrip.get() : null;
     var check='<div class="ico-lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>';
     var html;
@@ -167,7 +182,7 @@
         '<p>No account to fuss with tonight. Build your Taste Print or just start planning — Tures guides you the rest of the way.</p>'+
         '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn" href="plan.html">Start planning →</a><a class="btn ghost" href="taste.html">Build your Taste Print</a></div>';
     }
-    html += checklist() + '<span class="demo-tag" style="margin-top:14px;display:inline-block">Mockup · no password, no charge</span>';
+    html += checklist() + '<span class="demo-tag" style="margin-top:14px;display:inline-block">You’re on the list · no account or charge yet</span>';
     ack.innerHTML = html; ack.classList.add("show");
     ack.scrollIntoView({ behavior: "smooth", block: "center" });
   });
