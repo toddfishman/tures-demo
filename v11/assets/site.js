@@ -9,6 +9,7 @@
   var GROUPS = [
     { title: "Start here", items: [
       { href: "what-is.html",   label: "What is Tures",    page: "what-is" },
+      { href: "demo.html",      label: "Watch the demo",   page: "demo" },
       { href: "plan.html",      label: "Plan a trip",      page: "plan" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
       { href: "signup.html",    label: "Join the waitlist", page: "signup" }
