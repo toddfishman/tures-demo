@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Describe a trip in plain English and Tures books every leg — flights, hotels, the table — then watches it 24/7 and rebooks around trouble. Confirmation numbers, not links.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="Tures — your end-to-end travel concierge">
+<meta property="og:description" content="Describe a trip in plain English and Tures books every leg — flights, hotels, the table — then watches it 24/7 and rebooks around trouble. Confirmation numbers, not links.">
+<meta property="og:url" content="https://tures.app/">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tures — your end-to-end travel concierge">
+<meta name="twitter:description" content="Describe a trip in plain English and Tures books every leg — flights, hotels, the table — then watches it 24/7 and rebooks around trouble. Confirmation numbers, not links.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — Books. Protects. Proves.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/v11.css" />
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  :root{
+    /* ── v11 palette — White · Vermilion · Ink (baked default) ── */
+    --bg:#ffffff;
+    --surface:#f4f4f4;
+    --surface-2:#eaeaea;
+    --line:rgba(26,26,26,.10);
+    --line-2:rgba(26,26,26,.16);
+    --text:#1a1a1a;
+    --muted:#7a7a7a;
+    --faint:#a8a8a8;
+    --acc:#ff4929;
+    --acc-2:#ff775f;
+    --acc-dim:rgba(255,73,41,.12);
+    --acc-deep:#cf3b1f;
+    --acc-line:rgba(255,73,41,.28);
+    --bubble-me:#ececed;
+    --bubble-ai:#f5f5f6;
+    --good:#2e9e5b;
+    --radius:18px;
+    --maxw:1120px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 700px at 82% -8%, rgba(255,73,41,.06), transparent 60%),
+      radial-gradient(900px 600px at 8% 12%, rgba(26,26,26,.035), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'DM Sans',system-ui,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--acc-dim);color:var(--acc-2)}
+  a{color:inherit;text-decoration:none}
+  .serif{font-family:'Playfair Display',Georgia,serif}
+  .mono{font-family:'Space Mono',monospace}
+  .spark{color:var(--acc);font-style:normal;letter-spacing:0}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---- Nav ---- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(14px);
+    background:linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.5));
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .mark{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;letter-spacing:.5px}
+  .nav-actions{display:flex;align-items:center;gap:22px;font-size:14px}
+  .nav-actions a{color:var(--muted);transition:color .2s}
+  .nav-actions a:hover{color:var(--text)}
+  .signin{color:var(--text)}
+  .btn{
+    font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;
+    border:none;cursor:pointer;border-radius:999px;padding:10px 20px;
+    background:var(--acc);color:#1a1305;transition:transform .15s, box-shadow .2s;
+    box-shadow:0 0 0 1px rgba(255,73,41,.2);
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(255,73,41,.22)}
+  .btn-ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .btn-ghost:hover{box-shadow:inset 0 0 0 1px var(--acc);color:var(--acc-2)}
+
+  /* ---- Hero ---- */
+  .hero{padding:78px 0 60px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--text);
+    border:1px solid var(--line-2);border-radius:999px;padding:6px 14px;margin-bottom:26px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc);animation:pulse 2.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1.hero-title{
+    font-family:'Playfair Display',serif;font-weight:500;
+    font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-.01em;
+  }
+  h1.hero-title em{font-style:italic;color:var(--acc-2)}
+  .subline{margin-top:22px;font-size:18px;color:var(--muted);max-width:34ch;font-weight:300}
+  .subline b{color:var(--text);font-weight:500}
+  .hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+  .reassure{margin-top:22px;display:flex;gap:20px;color:var(--faint);font-size:13px;flex-wrap:wrap}
+  .reassure span{display:inline-flex;align-items:center;gap:7px}
+  .reassure svg{stroke:var(--acc);opacity:.8}
+
+  /* ===== three-act arc hero (synchronized stepper ↔ phone) ===== */
+  .arc-hero{max-width:var(--maxw);margin:0 auto;padding:54px 24px 56px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center}
+  .arc-hero .steps{margin:22px 0 0;display:flex;flex-direction:column;gap:6px}
+  .arc-hero .step{display:flex;align-items:center;gap:16px;cursor:pointer;padding:4px 0;border:none;background:none;text-align:left;font-family:'Playfair Display',serif;font-weight:500;line-height:1.0;font-size:clamp(34px,5vw,58px);color:#cdcdcd;transition:color .45s}
+  .arc-hero .step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#cdcdcd;width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
+  .arc-hero .step.on{color:var(--acc)}
+  .arc-hero .step.on .kick{color:var(--acc-deep)}
+  .arc-hero .step .beam{display:none}
+  .arc-hero .sub{margin:24px 0 0;font-size:16px;color:var(--muted);max-width:42ch;min-height:48px;line-height:1.6;transition:opacity .3s}
+  .arc-hero .sub b{color:var(--text);font-weight:500}
+  .arc-hero .arc-cta{margin-top:26px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:540px}
+  .arc-hero .hero-q{flex:1;min-width:230px;background:var(--bg);border:1px solid var(--line-2);border-radius:999px;padding:13px 20px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+  .arc-hero .hero-q:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-dim)}
+  .arc-hero .hero-q::placeholder{color:var(--faint)}
+  .arc-hero .arc-cta .btn{flex:0 0 auto;padding:13px 22px}
+  .arc-hero .arc-note{margin-top:14px;font-size:13px;color:var(--muted)}
+  .arc-hero .progress{display:flex;gap:6px;margin-top:22px}
+  .arc-hero .progress i{width:26px;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden;position:relative}
+  .arc-hero .progress i.on::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;animation:fillp var(--dwell,3800ms) linear forwards}
+  .arc-hero .progress i.done{background:var(--acc-line)}
+  @keyframes fillp{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .arc-hero .phone{width:372px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 40px 80px -42px rgba(0,0,0,.45)}
+  .arc-hero .screen{background:var(--bg);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;height:600px;border:1px solid var(--line)}
+  .arc-hero .sct{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .arc-hero .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+  .arc-hero .sct .nm{font-size:14px;font-weight:600}
+  .arc-hero .sct .ss{font-size:11.5px;color:var(--acc-deep);display:flex;align-items:center;gap:6px}
+  .arc-hero .sct .ss .pd{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:aopulse 1.6s infinite}
+  @keyframes aopulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .arc-hero .scenes{position:relative;flex:1}
+  .arc-hero .scene{position:absolute;inset:0;padding:16px 14px;display:flex;flex-direction:column;gap:11px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;pointer-events:none}
+  .arc-hero .scene.on{opacity:1;transform:none;pointer-events:auto}
+  .arc-hero .m{max-width:88%}.arc-hero .m.me{align-self:flex-end}.arc-hero .m.ai{align-self:flex-start}
+  .arc-hero .b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
+  .arc-hero .ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .arc-hero .me .b{background:#fff;border:1px solid var(--line-2);border-bottom-right-radius:4px}
+  .arc-hero .work{align-self:flex-start;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:9px 13px}
+  .arc-hero .work .sp{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:aospin .8s linear infinite}@keyframes aospin{to{transform:rotate(360deg)}}
+  .arc-hero .rc{align-self:flex-start;max-width:94%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 60%),var(--bg)}
+  .arc-hero .rc .h{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .arc-hero .rc .h .tag{margin-left:auto}
+  .arc-hero .rc .r{display:flex;justify-content:space-between;gap:10px;padding:7px 13px;font-size:12.5px;border-bottom:1px solid var(--line)}.arc-hero .rc .r:last-child{border:none}.arc-hero .rc .r .mono{color:var(--acc-deep)}
+  .arc-hero .wx{align-self:flex-start;max-width:94%;display:flex;gap:9px;background:rgba(59,111,176,.08);border:1px solid rgba(59,111,176,.22);border-radius:13px;padding:9px 12px;font-size:12.5px;line-height:1.45}.arc-hero .wx svg{stroke:var(--rain);flex:0 0 auto;margin-top:1px}
+  .arc-hero .home{align-self:stretch;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .arc-hero .home .hh{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--acc-dim)}
+  .arc-hero .home .hh .t{font-family:'Playfair Display',serif;font-size:15px}.arc-hero .home .hh .tag{margin-top:5px}
+  .arc-hero .home .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .arc-hero .home .cell{background:var(--bg);padding:10px 12px}.arc-hero .home .cell .n{font-family:'Space Mono',monospace;font-size:16px;color:var(--acc-deep)}.arc-hero .home .cell .l{font-size:10.5px;color:var(--muted)}
+  .arc-hero .home .foot{padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}.arc-hero .home .foot b{color:var(--text);font-weight:600}
+  .arc-hero .tag{font-family:'DM Sans',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line-2);border-radius:5px;padding:3px 7px;display:inline-flex}
+  @media(max-width:900px){
+    .arc-hero{grid-template-columns:1fr;gap:22px;padding:30px 22px 40px}
+    .arc-hero .steps{margin-top:14px;gap:2px}
+    .arc-hero .step{font-size:clamp(30px,9vw,46px)}
+    .arc-hero .step .kick{width:54px;font-size:10px}
+    .arc-hero .sub{min-height:0;margin-top:16px}
+    .arc-hero .phone{width:300px;padding:10px;border-radius:34px}
+    .arc-hero .screen{height:460px;border-radius:24px}
+  }
+  @media(max-width:600px){
+    .arc-hero{gap:16px;padding:24px 18px 34px}
+    .arc-hero .eyebrow{margin-bottom:18px;font-size:11px;letter-spacing:.1em}
+    .arc-hero .step{font-size:clamp(30px,11vw,42px);gap:12px}
+    .arc-hero .sub{font-size:14.5px;margin-top:14px}
+    .arc-hero .progress{margin-top:16px}
+    .arc-hero .arc-cta{margin-top:18px}
+    .arc-hero .hero-q{min-width:0;width:100%}
+    .arc-hero .arc-cta .btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:8px}
+    .arc-hero .phone{width:268px;padding:9px;border-radius:30px}
+    .arc-hero .screen{height:420px}
+  }
+
+
+  /* ---- trust strip ---- */
+  .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0;margin-top:30px}
+  .strip-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+  .stat .k{font-family:'Playfair Display',serif;font-size:30px;color:var(--acc-2);line-height:1}
+  .stat .v{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* ---- how ---- */
+  .how{padding:84px 0 40px}
+  .sec-eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .sec-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);font-weight:500;line-height:1.08;max-width:18ch}
+  .how-grid{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{
+    background:linear-gradient(180deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;transition:border-color .25s, transform .25s;
+  }
+  .card:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .card .n{font-family:'Space Mono',monospace;font-size:12px;color:var(--acc);letter-spacing:.1em}
+  .card h3{font-family:'Playfair Display',serif;font-weight:500;font-size:21px;margin:14px 0 10px}
+  .card p{color:var(--muted);font-size:14.5px;font-weight:300}
+
+  /* ---- always-on band ---- */
+  .alwayson{border-top:1px solid var(--line);padding:70px 0 12px}
+  .alwayson .ao-eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .alwayson h2{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(26px,3.6vw,40px);line-height:1.08;max-width:20ch}
+  .alwayson h2 em{font-style:italic;color:var(--acc-2)}
+  .alwayson .ao-lead{margin-top:16px;color:var(--muted);font-size:16.5px;font-weight:300;max-width:52ch}
+  .alwayson .ao-lead b{color:var(--text);font-weight:500}
+  .alwayson .ao-see{display:inline-flex;align-items:center;gap:7px;margin-top:20px;font-size:14px;font-weight:500;color:var(--acc-2);border-radius:6px}
+  .alwayson .ao-see:hover{color:var(--acc)}
+  .alwayson .ao-see:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .ao-proof{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .ao-proof .cell{border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+  .ao-proof .cell .ph{display:flex;align-items:center;gap:10px}
+  .ao-proof .cell .pi{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;background:var(--acc-dim)}
+  .ao-proof .cell .pi svg{stroke:var(--acc-2)}
+  .ao-proof .cell .pt{font-family:'Playfair Display',serif;font-size:18px}
+  .ao-proof .cell p{margin-top:9px;color:var(--muted);font-size:13.5px;font-weight:300}
+  @media (max-width:760px){.ao-proof{grid-template-columns:1fr}}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:42px 0 56px}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  .foot-links{display:flex;gap:24px;color:var(--faint);font-size:13px}
+  .foot-links a:hover{color:var(--text)}
+  .copyr{color:var(--faint);font-size:12.5px}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:46px;padding:46px 0 30px}
+    .phone-stage{order:2}
+    .strip-inner{grid-template-columns:repeat(2,1fr);gap:24px 16px}
+    .how-grid{grid-template-columns:1fr}
+    .subline{max-width:none}
+  }
+  @media (max-width:420px){
+    .wrap{padding:0 16px}
+    .nav-actions{gap:14px}
+    .nav-actions .nav-link{display:none}
+    .phone{width:100%}
+  }
+  /* ===== minimal view (brutal restraint — the phone is the whole show) ===== */
+  .view-toggle{position:fixed;left:18px;bottom:18px;z-index:70;display:inline-flex;align-items:center;gap:8px;
+    background:#fff;border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;
+    font:500 12.5px 'DM Sans',sans-serif;color:var(--text);cursor:pointer;box-shadow:0 8px 24px -12px rgba(0,0,0,.35);transition:border-color .2s}
+  .view-toggle:hover{border-color:var(--acc)}
+  .view-toggle .vt-dot{width:8px;height:8px;border-radius:50%;background:var(--acc)}
+  body.minimal{background:var(--bg)}
+  body.minimal .arc-hero{grid-template-columns:1fr;justify-items:center;gap:26px;padding-top:42px;min-height:calc(100dvh - 120px)}
+  body.minimal .arc-hero > div:first-child{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;order:2}
+  body.minimal .arc-hero .phone{order:1}
+  body.minimal .arc-hero .eyebrow,
+  body.minimal .arc-hero .steps,
+  body.minimal .arc-hero #sub,
+  body.minimal .arc-hero .progress,
+  body.minimal .arc-hero .arc-note{display:none}
+  body.minimal .arc-hero .arc-cta{margin-top:0;width:min(440px,86vw);justify-content:center}
+  body.minimal .strip,
+  body.minimal .how,
+  body.minimal .alwayson,
+  body.minimal .v11-foot{display:none}
+
+  /* ===== digestible cover (option B): lean summary + expand-on-demand firehose ===== */
+  .cover-sumwrap{padding:8px 24px 0;text-align:center}
+  .cover-sum{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:var(--maxw);margin:0 auto}
+  .csum{font-size:13.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 15px}
+  .csum b{color:var(--text);font-weight:600}
+  .cover-toggle{display:inline-flex;align-items:center;gap:8px;margin:20px auto 0;background:none;border:none;cursor:pointer;font:600 14.5px 'DM Sans',sans-serif;color:var(--acc-deep)}
+  .cover-toggle svg{transition:transform .25s}
+  .cover-toggle.open svg{transform:rotate(180deg)}
+  .cover-details{max-height:0;overflow:hidden;transition:max-height .55s ease}
+  .cover-details.open{max-height:4000px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .msg{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+    .cover-details{transition:none}
+  }
+</style>
+</head>
+<body data-page="cover">
+
+<header class="arc-hero">
+  <div>
+    <span class="eyebrow"><span class="dot"></span> Your end to end concierge, in your pocket.</span>
+    <div class="steps" id="steps">
+      <button class="step" data-i="0"><span class="kick">Before</span><span class="word">Books.</span><span class="beam"></span></button>
+      <button class="step" data-i="1"><span class="kick">During</span><span class="word">Protects.</span><span class="beam"></span></button>
+      <button class="step" data-i="2"><span class="kick">After</span><span class="word">Proves.</span><span class="beam"></span></button>
+    </div>
+    <p class="sub" id="sub"></p>
+    <div class="progress" id="prog"><i></i><i></i><i></i></div>
+    <form class="arc-cta" id="hero-plan">
+      <input class="hero-q" id="hero-q" autocomplete="off" placeholder="Where to? Describe your trip…" aria-label="Describe your trip">
+      <button class="btn" type="submit">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <p class="arc-note"><a href="demo.html" style="display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--acc-deep)"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch it work — 60 seconds</a> &nbsp;·&nbsp; Other apps stop at <span style="color:var(--text)">Booked</span>.</p>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sct"><div class="av serif">T</div><div><div class="nm">Tures</div><div class="ss"><span class="pd"></span><span id="pstatus">Booking your trip</span></div></div></div>
+    <div class="scenes">
+      <!-- BOOKS -->
+      <div class="scene on" data-s="0">
+        <div class="m me"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+        <div class="work"><span class="sp"></span> Comparing 38 fares · holding two oceanfront suites…</div>
+        <div class="rc"><div class="h"><span class="spark">✦</span> Trip held <span class="tag">Sample</span></div>
+          <div class="r"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+          <div class="r"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">oceanfront</span></div>
+          <div class="r"><span>Mama’s Fish House · anniversary</span><span class="mono">7:30p</span></div></div>
+      </div>
+      <!-- PROTECTS -->
+      <div class="scene" data-s="1">
+        <div class="m ai"><div class="b">Heads up — your flight home Thursday shifted two hours. I rebooked you on the 4:55, same cabin, no change fee.</div></div>
+        <div class="wx"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in for Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator. <span class="tag" style="margin-top:6px">Sample</span></div></div>
+        <div class="m ai"><div class="b">A better oceanfront table opened for your anniversary night — I took it. Nothing for you to do.</div></div>
+      </div>
+      <!-- PROVES -->
+      <div class="scene" data-s="2">
+        <div class="home">
+          <div class="hh"><div class="t serif">Welcome home, Andy — Maui, handled.</div><span class="tag">Sample</span></div>
+          <div class="grid">
+            <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
+            <div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>
+            <div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>
+            <div class="cell"><div class="n">1</div><div class="l">disaster dodged</div></div>
+          </div>
+          <div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama’s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</header>
+
+<section class="wrap cover-sumwrap">
+  <div class="cover-sum">
+    <span class="csum"><b>Books</b> every leg — confirmation numbers, not links</span>
+    <span class="csum"><b>Protects</b> the trip 24/7 — rebooks before you notice</span>
+    <span class="csum"><b>Proves</b> it — saved, miles, hours, disasters dodged</span>
+  </div>
+  <button class="cover-toggle" id="cover-toggle" type="button" aria-expanded="false"><span id="ct-label">See how it all works</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+</section>
+
+<div class="cover-details" id="cover-details">
+
+<section class="strip">
+  <div class="wrap strip-inner">
+    <div class="stat"><div class="k serif">One message</div><div class="v">from plain English to a held itinerary</div></div>
+    <div class="stat"><div class="k serif">24/7</div><div class="v">watching every leg you book</div></div>
+    <div class="stat"><div class="k serif">Two-source</div><div class="v">every booking verified before it says booked</div></div>
+    <div class="stat"><div class="k serif">Zero</div><div class="v">tabs, forms, or hold music</div></div>
+  </div>
+</section>
+
+<section class="how wrap" id="how">
+  <div class="sec-eyebrow">How it works</div>
+  <h2 class="sec-title serif">You describe the trip. It does the booking.</h2>
+  <div class="how-grid">
+    <div class="card">
+      <div class="n">01</div>
+      <h3 class="serif">Say it plainly</h3>
+      <p>“Five days on Maui in June, oceanfront, great food, business class if it is reasonable.” No forms, no filters, no comparison tabs.</p>
+    </div>
+    <div class="card">
+      <div class="n">02</div>
+      <h3 class="serif">It executes</h3>
+      <p>Tures holds flights and hotels, books the table at Mama’s Fish House, and returns confirmation numbers — not a list of links to chase.</p>
+    </div>
+    <div class="card">
+      <div class="n">03</div>
+      <h3 class="serif">It stays on watch</h3>
+      <p>Delays, weather, fare drops, loyalty points. While you are away, Tures quietly rebooks and optimizes, and tells you only when it matters.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alwayson" aria-labelledby="ao-title">
+  <div class="wrap">
+    <div class="ao-eyebrow">Always on</div>
+    <h2 id="ao-title" class="serif">With you around the clock. <em>It moves first.</em></h2>
+    <p class="ao-lead">Tures does not clock out — <b>24/7, no days off, no holidays</b>. It watches every leg for trouble before it reaches you, and quietly surfaces the good news too: an upgrade that opened, a better table, a fare that dropped.</p>
+    <a class="ao-see" href="hiccup.html">See how it watches &nbsp;→</a>
+
+    <div class="ao-proof">
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="pt serif">On 24/7</span>
+        </div>
+        <p>No days off, no holidays. The trip is watched the whole time, not just at checkout.</p>
+      </div>
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          <span class="pt serif">Watches every leg</span>
+        </div>
+        <p>Delays, weather, closures, strikes, fare drops — caught before they reach you.</p>
+      </div>
+      <div class="cell">
+        <div class="ph">
+          <span class="pi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></span>
+          <span class="pt serif">Moves first</span>
+        </div>
+        <p>Quietly fixes the trouble and holds the better option, so you do not have to.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /cover-details -->
+
+<script>
+/* ===== EDIT THE THREE WORDS HERE — kicker + word + the line beneath =====
+   Alternates: Books it/Watches it/Wraps it · Booked/Protected/Proven
+   · Plans it/Watches it/Proves it · Arranges/Attends/Accounts                 */
+var ACTS=[
+  {kick:"Before", word:"Books.",    status:"Booking your trip",       sub:"One message books the whole trip — <b>flights, hotel, the table</b>. Confirmation numbers, not links."},
+  {kick:"During", word:"Protects.", status:"Watching your trip · 24/7", sub:"On the whole time. It catches the delay, the storm, the closure — and <b>fixes it before you notice</b>, good news too."},
+  {kick:"After",  word:"Proves.",   status:"Trip wrapped",            sub:"The receipts when you land — <b>what it saved, miles credited, hours back, expenses filed</b>, and a taste it learned."}
+];
+(function(){
+  var DWELL=5400;
+  var steps=[].slice.call(document.querySelectorAll('.arc-hero .step'));
+  var scenes=[].slice.call(document.querySelectorAll('.arc-hero .scene'));
+  var prog=[].slice.call(document.querySelectorAll('#prog i'));
+  var sub=document.getElementById('sub'), pstatus=document.getElementById('pstatus');
+  if(!steps.length) return;
+  document.documentElement.style.setProperty('--dwell',DWELL+'ms');
+  steps.forEach(function(s,i){ s.querySelector('.kick').textContent=ACTS[i].kick; s.querySelector('.word').textContent=ACTS[i].word; });
+  var i=0,timer=null;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function set(n){
+    i=n;
+    steps.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    scenes.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    prog.forEach(function(p,k){ p.classList.remove('on','done'); if(k<i)p.classList.add('done'); });
+    if(!reduce){ var bar=prog[i]; bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on'); }
+    sub.style.opacity=0; setTimeout(function(){ sub.innerHTML=ACTS[i].sub; sub.style.opacity=1; },150);
+    pstatus.textContent=ACTS[i].status;
+  }
+  function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
+  steps.forEach(function(s){ s.addEventListener('click',function(){ set(+s.dataset.i); play(); }); });
+  set(0); play();
+})();
+(function(){
+  var f=document.getElementById('hero-plan'); if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var q=(document.getElementById('hero-q').value||'').trim();
+    if(q){ try{ localStorage.setItem('tures.seed', q); }catch(_){} }
+    location.href='plan.html';
+  });
+})();
+</script>
+<script>
+/* Cover density (option B): lean by default, expand the firehose on demand */
+(function(){
+  var t=document.getElementById('cover-toggle'), d=document.getElementById('cover-details'), lab=document.getElementById('ct-label');
+  if(!t||!d) return;
+  t.addEventListener('click', function(){
+    var open=d.classList.toggle('open'); t.classList.toggle('open',open); t.setAttribute('aria-expanded',open?'true':'false');
+    if(lab) lab.textContent = open ? 'Hide the details' : 'See how it all works';
+    if(open) setTimeout(function(){ d.scrollIntoView({behavior:'smooth',block:'start'}); }, 140);
+  });
+})();
+</script>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
