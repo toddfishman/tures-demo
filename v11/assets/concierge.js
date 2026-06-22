@@ -71,7 +71,7 @@
   var launch = document.createElement("div");
   launch.className = "cz-l";
   launch.innerHTML =
-    '<div class="cz-bub" id="cz-bub" style="display:none">Evening — planning something. I can take it from here. <span class="x" id="cz-bx" aria-label="Dismiss">×</span></div>' +
+    '<div class="cz-bub" id="cz-bub" style="display:none">Planning something? I can take it from here. <span class="x" id="cz-bx" aria-label="Dismiss">×</span></div>' +
     '<button class="cz-av" id="cz-av" aria-label="Talk to your Tures concierge">' + AV + '<span class="dot"></span></button>';
   document.body.appendChild(launch);
 

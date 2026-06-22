@@ -146,7 +146,7 @@
 
   function greet() {
     setStatus('think', 'Waking up');
-    var hi = 'Evening. I’m Tures — a travel concierge that actually books your trips, not just suggests them. Ask me anything, or tell me a trip you’re dreaming up.';
+    var hi = 'Hi — I’m Tures, a travel concierge that actually books your trips, not just suggests them. Ask me anything, or tell me a trip you’re dreaming up.';
     sayTures(hi);
   }
 
