@@ -282,11 +282,11 @@
     </div>
     <p class="sub" id="sub"></p>
     <div class="progress" id="prog"><i></i><i></i><i></i></div>
-    <form class="arc-cta" id="hero-plan">
-      <input class="hero-q" id="hero-q" autocomplete="off" placeholder="Where to? Describe your trip…" aria-label="Describe your trip">
-      <button class="btn" type="submit">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    </form>
-    <p class="arc-note"><a href="demo.html" style="display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--acc-deep)"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch it work — 60 seconds</a> &nbsp;·&nbsp; Other apps stop at <span style="color:var(--text)">Booked</span>.</p>
+    <div class="arc-cta">
+      <a class="btn" id="hero-start" href="plan.html">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost" href="demo.html"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="margin-right:7px"><path d="M8 5v14l11-7z"/></svg> Watch Demo</a>
+    </div>
+    <p class="arc-note">Other apps stop at <span style="color:var(--text)">Booked</span>.</p>
   </div>
 
   <div class="phone"><div class="screen">
@@ -422,12 +422,10 @@ var ACTS=[
   set(0); play();
 })();
 (function(){
-  var f=document.getElementById('hero-plan'); if(!f) return;
-  f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var q=(document.getElementById('hero-q').value||'').trim();
-    if(q){ try{ localStorage.setItem('tures.seed', q); }catch(_){} }
-    location.href='plan.html';
+  // Get Started preloads one short example trip, then opens the planner.
+  var s=document.getElementById('hero-start'); if(!s) return;
+  s.addEventListener('click', function(){
+    try{ localStorage.setItem('tures.seed', '5 days on Maui in June — oceanfront, from Seattle.'); }catch(_){}
   });
 })();
 </script>
