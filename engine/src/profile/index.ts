@@ -102,3 +102,59 @@ export async function passengerSummary(accountId: string): Promise<{ note: strin
   ];
   return { note: bits.join(" · "), ktnApplied: !!p.knownTravelerNumber, passportOnFile: !!p.passport, loyaltyCredited };
 }
+
+// ---- per-leg loyalty crediting (carrier/chain-aware) ----
+export interface LoyaltyCredit {
+  program: string;
+  status?: string;
+  numberMasked?: string;
+  kind: Membership["kind"];
+  estPoints: number;
+  reason: string;
+}
+
+// Generic words that shouldn't drive a program↔carrier match.
+const LOYALTY_STOP = new Set([
+  "the", "of", "and", "rewards", "club", "airlines", "airline", "airways", "air", "hotels", "hotel",
+  "resorts", "resort", "group", "membership", "program", "world", "one", "plus", "gold", "platinum",
+  "titanium", "diamond", "elite", "status", "miles", "points", "by", "inn", "suites",
+]);
+function loyaltyTokens(s: string | undefined): string[] {
+  return (s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((t) => t && !LOYALTY_STOP.has(t));
+}
+function matchMembership(memberships: Membership[], wantKind: Membership["kind"], carrierOrChain: string): Membership | null {
+  const want = new Set(loyaltyTokens(carrierOrChain));
+  let best: Membership | null = null;
+  let bestScore = 0;
+  for (const m of memberships) {
+    if (m.kind !== wantKind) continue;
+    let score = 0;
+    for (const t of loyaltyTokens(m.program)) if (want.has(t)) score++;
+    if (score > bestScore) { bestScore = score; best = m; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+/** Returns a per-component crediter that matches the booked carrier/chain to a membership and
+ *  estimates accrual. Reveals the profile once; returns masked numbers only. */
+export async function loyaltyCrediter(
+  accountId: string,
+): Promise<(c: { kind: string; supplier?: string; title: string; amountUsd: number }) => LoyaltyCredit | null> {
+  const p = await getTravelerProfile(accountId);
+  const memberships = p?.memberships ?? [];
+  return (c) => {
+    const wantKind: Membership["kind"] | null = c.kind === "flight" ? "airline" : c.kind === "stay" ? "hotel" : null;
+    if (!wantKind) return null;
+    // The carrier/chain may live in the title (mock supplier: "Hawaiian SEA→OGG") or the supplier
+    // field (real adapters) — match against both.
+    const carrierOrChain = `${c.title || ""} ${c.supplier || ""}`;
+    const m = matchMembership(memberships, wantKind, carrierOrChain);
+    if (!m) return null;
+    const perDollar = wantKind === "airline" ? 5 : 8; // explainable estimate, not a guarantee
+    const statusBonus = m.status ? (wantKind === "airline" ? 1.4 : 1.3) : 1;
+    const estPoints = Math.round(c.amountUsd * perDollar * statusBonus);
+    const unit = wantKind === "airline" ? "miles" : "points";
+    const reason = `${m.program}${m.status ? ` (${m.status})` : ""} · ~${estPoints.toLocaleString()} ${unit}`;
+    return { program: m.program, status: m.status, numberMasked: mask(m.number), kind: m.kind, estPoints, reason };
+  };
+}

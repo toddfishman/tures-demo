@@ -12,7 +12,7 @@ import { runSearch } from "../search/service.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
 import { chooseCard, categoryForKind } from "../wallet/cards.ts";
-import { passengerSummary } from "../profile/index.ts";
+import { passengerSummary, loyaltyCrediter } from "../profile/index.ts";
 
 // Resolved Offer objects kept out of the serialized Booking (supplier.book needs the full offer).
 const offerCache = new Map<string, { flight?: Offer; stay?: Offer }>();
@@ -116,6 +116,8 @@ async function execute(booking: Booking): Promise<Booking> {
 
   try {
     const baseIdem = booking.idempotencyKey ?? booking.id;
+    // Loyalty: reveal the profile once, then credit each leg to its matching carrier/chain program.
+    const credit = await loyaltyCrediter(booking.accountId);
 
     // For each component: pick the best card for that charge type, charge it, then book it.
     for (const c of booking.components) {
@@ -142,6 +144,14 @@ async function execute(booking: Booking): Promise<Booking> {
       c.status = "confirmed";
       audit(booking, "agent", "component_booked", `${c.title} → ${confirmation}`);
       emitEvent(booking.tripId, "book", `Booked ${c.title}`, { detail: confirmation, data: { bookingId: booking.id, confirmation } });
+
+      // 4. Loyalty: credit the matching airline/hotel program for this leg, with estimated accrual.
+      const loyalty = credit({ kind: c.kind, supplier: c.supplier, title: c.title, amountUsd: c.amountUsd });
+      if (loyalty) {
+        c.loyalty = loyalty;
+        audit(booking, "agent", "loyalty_credited", `${c.title}: ${loyalty.reason}`);
+        emitEvent(booking.tripId, "book", `Credited ${loyalty.program}`, { detail: loyalty.reason, data: { bookingId: booking.id } });
+      }
       bookings.put(booking);
     }
 

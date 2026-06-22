@@ -20,6 +20,8 @@ export interface BookedComponent {
   rebookedFrom?: { title: string; confirmation?: string };
   /** Which card the wallet selector chose for this charge, and why. */
   card?: { connectionId: string; key: string; name: string; last4?: string; reason: string };
+  /** Which loyalty program this leg credits — matched to the booked carrier/chain, with estimated accrual. */
+  loyalty?: { program: string; status?: string; numberMasked?: string; kind: string; estPoints: number; reason: string };
   payment?: PaymentRecord;
 }
 
