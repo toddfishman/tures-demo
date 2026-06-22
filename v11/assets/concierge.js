@@ -102,6 +102,8 @@
   function open(){
     modal.classList.add("open");
     if(document.getElementById("cz-bub")) document.getElementById("cz-bub").style.display="none";
+    // Warm the engine the moment the user shows intent, so the first message isn't a cold-start.
+    try{ if(T && T.health) T.health(); }catch(_){}
     // re-trigger the "blow up / zoom in" each open
     var big = modal.querySelector(".cz-bigav");
     if(big){ big.style.animation="none"; void big.offsetWidth; big.style.animation=""; }
@@ -121,7 +123,14 @@
     bubble(esc(text), "me"); history.push({role:"user",content:text}); input.value=""; busy=true; sendBtn.disabled=true; typing(true);
     if(!(T && T.configured)){ typing(false); busy=false; sendBtn.disabled=false; bubble("Let me open this in the full planner.", "ai"); var b=document.createElement("button"); b.className="cz-cta"; b.textContent="Continue in Plan →"; b.onclick=function(){handoff(text);}; thread.appendChild(b); scroll(); return; }
     var ctx = F ? F.context() : undefined, uid = F ? F.uid() : undefined;
-    T.converse(history.slice(-12), undefined, ctx, uid).then(function(c){
+    // Retry once on failure — the engine machine can cold-start, so the first call may stall.
+    function attempt(n){
+      return T.converse(history.slice(-12), undefined, ctx, uid).catch(function(e){
+        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attempt(n-1).then(res,rej); }, 1800); });
+        throw e;
+      });
+    }
+    attempt(1).then(function(c){
       typing(false); busy=false; sendBtn.disabled=false;
       var reply=(c && c.reply) || "Tell me a little more.";
       bubble(esc(reply), "ai"); history.push({role:"assistant",content:reply});

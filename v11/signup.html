@@ -183,6 +183,8 @@
         '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn" href="plan.html">Start planning →</a><a class="btn ghost" href="taste.html">Build your Taste Print</a></div>';
     }
     html += checklist() + '<span class="demo-tag" style="margin-top:14px;display:inline-block">You’re on the list · no account or charge yet</span>';
+    // Collapse the form so only the acknowledgement shows (no duplicate/bleeding state).
+    [].forEach.call(form.querySelectorAll('.grp, button[type="submit"], .fine'), function (el) { el.style.display = "none"; });
     ack.innerHTML = html; ack.classList.add("show");
     ack.scrollIntoView({ behavior: "smooth", block: "center" });
   });
