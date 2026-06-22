@@ -33,6 +33,12 @@
   .same-line{text-align:center;max-width:60ch;margin:34px auto 0;color:var(--muted);font-size:15px}
   .same-line b{color:var(--text);font-weight:500}
 
+  /* billing toggle (Concierge monthly / yearly) */
+  .bill-toggle{display:inline-flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;margin:14px 0 2px}
+  .bill-toggle .bt{border:none;background:none;cursor:pointer;font:500 12.5px 'DM Sans',sans-serif;color:var(--muted);padding:7px 13px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;transition:background .18s,color .18s}
+  .bill-toggle .bt.on{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .bill-toggle .bt .save{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--acc-deep);background:var(--acc-dim);border-radius:6px;padding:2px 6px}
+
   /* trust strip */
   .trust{margin-top:8px}
   .trust .tcell{display:flex;align-items:center;gap:13px;padding:18px;border:1px solid var(--line);
@@ -85,7 +91,7 @@
   <section class="wrap price-hero">
     <span class="eyebrow"><span class="dot"></span> Pricing</span>
     <h1 class="serif">Two ways <em>in.</em></h1>
-    <p class="lead center">Pay per trip when you book, or keep Tures on around the clock. Same price either way — you are choosing how much you want it watching, not how much it costs.</p>
+    <p class="lead center">Pay per trip when you book, or keep Tures on around the clock with Concierge — the always-on watch that rebooks around trouble before it reaches you.</p>
   </section>
 
   <!-- TIERS -->
@@ -110,8 +116,12 @@
       <article class="card tier flag">
         <span class="tag">Most complete</span>
         <div class="tname"><h3 class="serif">Concierge</h3></div>
-        <div class="price"><span class="amt">$99</span><span class="per">/ month</span></div>
-        <p class="terms">Always on. No per-booking fee — book as much as you travel.</p>
+        <div class="bill-toggle" id="bill-toggle" role="group" aria-label="Billing period">
+          <button class="bt on" data-bill="monthly" type="button">Monthly</button>
+          <button class="bt" data-bill="yearly" type="button">Yearly <span class="save">–25%</span></button>
+        </div>
+        <div class="price"><span class="amt" id="cc-amt">$129</span><span class="per" id="cc-per">/ month</span></div>
+        <p class="terms" id="cc-terms">Always on. No per-booking fee — book as much as you travel.</p>
         <div class="adds">Everything in Per trip, plus</div>
         <ul class="feats">
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>Always-on <b>Hiccup Handler</b> — catches delays and weather, and rebooks before you notice.</span></li>
@@ -125,7 +135,7 @@
 
     </div>
 
-    <p class="same-line"><b>Per trip and Concierge cost the same on purpose</b> — the difference is what it does, not what it costs.</p>
+    <p class="same-line"><b>Per trip is pay-as-you-go; Concierge keeps the watch on.</b> The always-on Hiccup Handler is what the monthly buys — and it pays for itself the first time it saves a trip.</p>
 
     <div class="ao-band" aria-labelledby="ao-band-title">
       <div class="ao-top">
@@ -166,7 +176,7 @@
     <div class="faq">
       <details>
         <summary><span class="q">When am I charged</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="a">On Per trip, only when a trip actually books — confirmation numbers in hand. On Concierge, it is a flat $99 a month with no per-booking fee. Either way, nothing is charged for a trip that does not complete.</div>
+        <div class="a">On Per trip, only when a trip actually books — confirmation numbers in hand. On Concierge, it is $129 a month — or $97 a month billed yearly, saving 25% — with no per-booking fee. Either way, nothing is charged for a trip that does not complete.</div>
       </details>
       <details>
         <summary><span class="q">What is the Hiccup Handler</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
@@ -193,5 +203,21 @@
   </section>
 
 </main>
+<script>
+/* Concierge billing toggle — monthly $129 / yearly $97 (25% off, $1,161/yr) */
+(function(){
+  var tg=document.getElementById('bill-toggle'); if(!tg) return;
+  var amt=document.getElementById('cc-amt'), per=document.getElementById('cc-per'), terms=document.getElementById('cc-terms');
+  var COPY={
+    monthly:{amt:'$129', per:'/ month', terms:'Always on. No per-booking fee — book as much as you travel.'},
+    yearly:{amt:'$97', per:'/ mo, billed yearly', terms:'Save 25% — $1,161 billed annually. No per-booking fee.'}
+  };
+  tg.addEventListener('click', function(e){
+    var b=e.target.closest('.bt'); if(!b) return;
+    Array.prototype.forEach.call(tg.querySelectorAll('.bt'), function(x){ x.classList.remove('on'); }); b.classList.add('on');
+    var c=COPY[b.dataset.bill]; if(!c) return; amt.textContent=c.amt; per.textContent=c.per; terms.textContent=c.terms;
+  });
+})();
+</script>
 <script src="assets/site.js" defer></script>
 </body></html>
