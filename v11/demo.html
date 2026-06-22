@@ -58,8 +58,10 @@
   .actlabel b{color:var(--acc-deep)}
 
   /* ---- phone ---- */
-  .phone{position:relative;width:min(366px,86vw);background:var(--surface);border-radius:42px;padding:12px;border:2px solid var(--text);box-shadow:0 50px 90px -42px rgba(0,0,0,.45)}
-  .screen{background:var(--bg);border-radius:31px;overflow:hidden;display:flex;flex-direction:column;height:min(560px,60vh);border:1px solid var(--line);position:relative}
+  .phone{position:relative;width:min(338px,84vw);background:var(--surface);border-radius:46px;padding:11px;border:2px solid var(--text);box-shadow:0 50px 90px -42px rgba(0,0,0,.45)}
+  .phone .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:78px;height:19px;border-radius:14px;background:#1a1a1a;z-index:6}
+  .phone .homebar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:116px;height:5px;border-radius:5px;background:rgba(26,26,26,.3);z-index:6}
+  .screen{background:var(--bg);border-radius:35px;overflow:hidden;display:flex;flex-direction:column;height:min(612px,66vh);border:1px solid var(--line);position:relative}
   .sct{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto;z-index:2}
   .sct .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-weight:700;font-size:14px}
   .sct .nm{font-size:13.5px;font-weight:600}
@@ -69,8 +71,9 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
   .scenes{position:relative;flex:1;min-height:0}
-  .act{position:absolute;inset:0;padding:15px 13px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s;pointer-events:none;overflow-y:auto}
+  .act{position:absolute;inset:0;padding:16px 14px 30px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s;pointer-events:none;overflow-y:auto}
   .act.on{opacity:1;transform:none;pointer-events:auto}
+  .act[data-act="0"],.act[data-act="4"]{justify-content:center}
 
   /* reveal helper — children with .r animate in when act is .on */
   .act .r{opacity:0;transform:translateY(8px)}
@@ -92,7 +95,8 @@
   .ck{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
   .ck .dot{width:22px;height:22px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:var(--surface-2);color:#fff;font-size:12px;transition:background .3s}
   .ck.done .dot{background:var(--good)}
-  .ck .t{font-size:13.5px;font-weight:500}.ck .d{font-size:11.5px;color:var(--muted)}
+  .ck .t{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+  .ck .d{display:block;font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:1px}
   .setbar{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden;margin-top:4px}
   .setbar i{display:block;height:100%;width:0;background:var(--acc);border-radius:6px;transition:width .6s ease}
 
@@ -183,7 +187,7 @@
   </div>
   <div class="actlabel" id="actlabel"></div>
 
-  <div class="phone"><div class="screen">
+  <div class="phone"><div class="notch"></div><div class="homebar"></div><div class="screen">
     <div class="sct"><div class="av">T</div><div><div class="nm">Tures</div><div class="ss" id="sct-ss"><span class="pd"></span><span id="sct-status">Setting you up</span></div></div></div>
     <div class="scenes">
 
