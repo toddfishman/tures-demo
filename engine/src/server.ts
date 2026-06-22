@@ -1,4 +1,8 @@
 // Tures Engine — gateway bootstrap. Fastify HTTP + SSE. Run with `npm run dev`.
+import dns from "node:dns";
+// Prefer IPv4 for outbound DNS. Fly machines can have a flaky IPv6 path to external APIs,
+// which surfaces as "Premature close" mid-response from api.anthropic.com. IPv4-first avoids it.
+dns.setDefaultResultOrder("ipv4first");
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
