@@ -166,8 +166,9 @@
           <div class="row">
             <span class="pill-card">VISA</span>
             <span class="rl">
-              <span class="rk">Visa · primary</span>
+              <span class="rk">Chase Sapphire Reserve</span>
               <span class="rv">•••• •••• •••• 6411</span>
+              <span class="rv" style="color:var(--acc-deep)">3× travel &amp; dining · Priority Pass</span>
             </span>
             <span class="rtail">
               <span class="tag">VGS-tokenized</span>
@@ -177,8 +178,9 @@
           <div class="row">
             <span class="pill-card">AMEX</span>
             <span class="rl">
-              <span class="rk">Amex · points</span>
+              <span class="rk">Amex Gold</span>
               <span class="rv">•••• •••••• •2008</span>
+              <span class="rv" style="color:var(--acc-deep)">4× dining &amp; groceries · dining credit</span>
             </span>
             <span class="rtail">
               <span class="tag">VGS-tokenized</span>
@@ -189,6 +191,8 @@
         </div>
         <button class="btn ghost sm" id="add-card-btn" type="button" style="margin-top:14px;align-self:flex-start">+ Add a card</button>
         <div id="add-card-form" class="add-form">
+          <label class="vfield" style="margin-bottom:10px"><span>Card — so Tures earns the most on every charge</span>
+            <select class="field" id="c-known"><option value="">Choose a known card (optional)…</option></select></label>
           <div class="grid-3" style="gap:10px">
             <input class="field" id="c-name" placeholder="Name on card" autocomplete="off">
             <input class="field" id="c-brand" placeholder="Brand (Visa…)" autocomplete="off">
@@ -353,6 +357,33 @@
     </div>
   </section>
 
+  <!-- WHICH CARD, AUTOMATICALLY -->
+  <section class="wrap section tight" id="bestcard" style="padding-top:0">
+    <article class="card" style="border-color:var(--acc-line);background:linear-gradient(180deg,var(--acc-dim),transparent 70%)">
+      <div class="vhead">
+        <span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19"/><path d="M6 14h4"/></svg></span>
+        <div>
+          <h3 class="serif">The right card, automatically</h3>
+          <div class="vsub">Every charge goes on whichever of your cards earns the most. <span class="demo-tag">Illustrative</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-top:6px">
+        <div>
+          <div class="nf-h" style="margin-bottom:7px">Charge type</div>
+          <div class="nf-chips" id="bc-cat">
+            <button class="nf-chip on" data-v="airfare" type="button">Flights</button>
+            <button class="nf-chip" data-v="hotel" type="button">Hotel</button>
+            <button class="nf-chip" data-v="dining" type="button">Dining</button>
+            <button class="nf-chip" data-v="other" type="button">Everyday</button>
+          </div>
+        </div>
+        <label class="vfield" style="max-width:150px"><span>Amount (USD)</span><input class="field" id="bc-amt" type="number" min="1" value="2666"></label>
+      </div>
+      <div id="bc-result" style="margin-top:16px"></div>
+      <p class="vsub" style="margin-top:8px;font-size:12px">Estimated from published earn rates (~$0.018 per point; cash-back at face value). Tures applies your best card at booking — connect your cards above to personalize.</p>
+    </article>
+  </section>
+
   <!-- NOTIFICATIONS -->
   <section class="wrap section tight" style="padding-top:8px" id="reach">
     <div class="grants">
@@ -445,6 +476,35 @@
 </main>
 <script src="assets/site.js" defer></script>
 <script>
+/* Transparent card-benefits model — published earn rates (illustrative).
+   Tures uses this to put each charge on the card that earns the most. */
+window.TURES_BENEFITS = {
+  amex_platinum:{n:'Amex Platinum',net:'Amex',pv:1.8,m:{airfare:5,hotel:5,dining:1,travel:1,groceries:1,other:1},perk:'5× flights & prepaid hotels · lounges, airline credit'},
+  amex_gold:{n:'Amex Gold',net:'Amex',pv:1.8,m:{dining:4,groceries:4,airfare:3,travel:1,hotel:1,other:1},perk:'4× dining & groceries · dining credit'},
+  chase_sapphire_reserve:{n:'Chase Sapphire Reserve',net:'Visa',pv:1.8,m:{travel:3,dining:3,airfare:3,hotel:3,groceries:1,other:1},perk:'3× travel & dining · Priority Pass, $300 credit'},
+  chase_sapphire_preferred:{n:'Chase Sapphire Preferred',net:'Visa',pv:1.8,m:{dining:3,groceries:3,travel:2,airfare:2,hotel:2,other:1},perk:'3× dining · 2× travel'},
+  capital_one_venture_x:{n:'Capital One Venture X',net:'Visa',pv:1.8,m:{airfare:5,hotel:5,travel:2,dining:2,groceries:2,other:2},perk:'2× everything · 5× portal travel'},
+  citi_strata_premier:{n:'Citi Strata Premier',net:'Mastercard',pv:1.7,m:{dining:3,airfare:3,hotel:3,groceries:3,travel:1,other:1},perk:'3× dining, flights & hotels'},
+  generic_cashback:{n:'Cash-back card',net:'—',pv:1.0,flat:0.015,m:{airfare:1.5,hotel:1.5,dining:1.5,travel:1.5,groceries:1.5,other:1.5},perk:'1.5% flat cash back'}
+};
+window.TURES_CATWORD = {airfare:'flights',hotel:'hotels',dining:'dining',travel:'travel',groceries:'groceries',other:'everyday'};
+window.turesCardValue = function(key, category, amount){
+  var b = window.TURES_BENEFITS[key] || window.TURES_BENEFITS.generic_cashback;
+  var mult = (b.m && b.m[category]) || 1;
+  var est = b.flat ? amount*b.flat : amount*mult*(b.pv/100);
+  return { b:b, mult:mult, est:est };
+};
+window.turesBestCard = function(category, amount, cards){
+  var best=null;
+  (cards||[]).forEach(function(c){
+    var v = window.turesCardValue(c.key||'generic_cashback', category, amount);
+    var item = { card:c, b:v.b, mult:v.mult, est:v.est };
+    if(!best || item.est>best.est) best=item;
+  });
+  return best;
+};
+</script>
+<script>
 (function(){
   var F=window.turesFunnel, T=window.tures;
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -467,22 +527,27 @@
     var box=document.getElementById('saved-cards'); if(!box) return;
     var v=F?F.vault():{}; var pay=v.payment||[];
     box.innerHTML = pay.map(function(c){
-      return '<div class="row"><span class="pill-card">CARD</span><span class="rl"><span class="rk">'+esc(c.name||'Your card')+'</span><span class="rv">'+esc(c.label||'')+'</span></span><span class="rtail"><span class="tag">VGS-tokenized</span></span></div>';
+      var B=(c.key && window.TURES_BENEFITS) ? window.TURES_BENEFITS[c.key] : null;
+      var pill=(c.brand||'CARD').toUpperCase().slice(0,4);
+      var perk=B?'<span class="rv" style="color:var(--acc-deep)">'+esc(B.perk)+'</span>':'';
+      return '<div class="row"><span class="pill-card">'+esc(pill)+'</span><span class="rl"><span class="rk">'+esc(c.name||'Your card')+'</span><span class="rv">'+esc(c.label||'')+'</span>'+perk+'</span><span class="rtail"><span class="tag">VGS-tokenized</span></span></div>';
     }).join('');
   }
   renderCards();
   var addBtn=document.getElementById('add-card-btn'), addForm=document.getElementById('add-card-form');
   addBtn.addEventListener('click', function(){ addForm.style.display = (addForm.style.display==='flex'?'none':'flex'); });
   document.getElementById('c-save').addEventListener('click', function(){
-    var brand=(document.getElementById('c-brand').value||'Card').trim();
+    var knownSel=document.getElementById('c-known'); var key=knownSel?knownSel.value:'';
+    var B=(key && window.TURES_BENEFITS) ? window.TURES_BENEFITS[key] : null;
+    var brand=((B?B.net:document.getElementById('c-brand').value)||'Card').trim();
     var last4=(document.getElementById('c-last4').value||'').replace(/\D/g,'').slice(-4);
-    var name=(document.getElementById('c-name').value||'').trim();
+    var name=(document.getElementById('c-name').value||'').trim() || (B?B.n:'Primary card');
     if(last4.length<4){ flash('Enter the last four digits'); return; }
-    var v=F?F.vault():{}; var pay=(v.payment||[]).concat([{ label:brand+' ···· '+last4, name:name||'Primary card' }]);
+    var v=F?F.vault():{}; var pay=(v.payment||[]).concat([{ label:brand+' ···· '+last4, name:name, key:key||undefined, brand:brand }]);
     if(F) F.setVault({payment:pay});
-    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand} }); }catch(_){} }
-    document.getElementById('c-brand').value=''; document.getElementById('c-last4').value=''; document.getElementById('c-name').value='';
-    addForm.style.display='none'; renderCards(); renderHeld();
+    if(T){ try{ T.connections.connect({ kind:'payment', label:brand+' ···· '+last4, secret:{customerId:'cus_demo', paymentMethodId:'pm_'+last4}, meta:{last4:last4, brand:brand, key:key||undefined} }); }catch(_){} }
+    document.getElementById('c-brand').value=''; document.getElementById('c-last4').value=''; document.getElementById('c-name').value=''; if(knownSel) knownSel.value='';
+    addForm.style.display='none'; renderCards(); renderHeld(); if(window.__bcRefresh) window.__bcRefresh();
     flash('Card connected — Tures can book now');
   });
 
@@ -579,6 +644,58 @@
     F.setVault({ notify:{ mode:modeEl?modeEl.dataset.v:'important', channels:channels, sleep:{on:sleepTg.getAttribute('aria-pressed')==='true', from:fromI.value, to:toI.value}, cats:cats, cadence:cadEl?cadEl.dataset.v:'instant', location:locEl?locEl.dataset.v:'off' } });
     var m=document.getElementById('nf-msg'); m.style.display='inline-flex'; m.textContent='Saved'; setTimeout(function(){ m.style.display='none'; },2400);
   });
+})();
+</script>
+<script>
+/* "The right card, automatically" — picks the best connected card per charge */
+(function(){
+  var F=window.turesFunnel;
+  var catW=document.getElementById('bc-cat'), amtI=document.getElementById('bc-amt'), out=document.getElementById('bc-result');
+  if(!catW||!out) return;
+  var SEED=[
+    {name:'Chase Sapphire Reserve',key:'chase_sapphire_reserve',brand:'Visa',last4:'6411'},
+    {name:'Amex Gold',key:'amex_gold',brand:'Amex',last4:'2008'}
+  ];
+  function wallet(){
+    var added=((F&&F.vault().payment)||[]).map(function(c){ return {name:c.name||c.label, key:c.key||'generic_cashback', brand:c.brand||'Card', last4:(c.label||'').replace(/\D/g,'').slice(-4)}; });
+    return SEED.concat(added);
+  }
+  function fmt(n){ return n>=100? Math.round(n) : (Math.round(n*10)/10); }
+  function pill(b){ return (b||'CARD').toUpperCase().slice(0,4); }
+  function cat(){ var c=catW.querySelector('.nf-chip.on'); return c?c.dataset.v:'airfare'; }
+  function render(){
+    var category=cat(), amount=Math.max(1, parseFloat(amtI.value)||0), cards=wallet();
+    var best=window.turesBestCard(category, amount, cards);
+    if(!best){ out.innerHTML='<div class="vsub">Add a card above and Tures will pick the best one for each charge.</div>'; return; }
+    var word=window.TURES_CATWORD[category]||category;
+    var multLabel = best.b.flat ? '1.5% cash back' : (best.mult+'× '+word);
+    var genEst=amount*0.015, delta=best.est-genEst;
+    var deltaLine = (!best.b.flat && delta>0.5) ? ('About <b>$'+fmt(delta)+' more</b> than a flat cash-back card on this charge.') : 'Charged automatically the moment this books.';
+    out.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        '<span class="pill-card">'+pill(best.card.brand)+'</span>'+
+        '<span class="serif" style="font-size:17px"><b>'+(best.card.name||best.b.n)+'</b></span>'+
+        '<span class="tag" style="border-color:var(--acc-line);color:var(--acc-deep)">'+multLabel+'</span>'+
+        '<span style="font-family:\'Space Mono\',monospace;color:var(--acc-deep);font-weight:700">≈ $'+fmt(best.est)+' back</span>'+
+      '</div>'+
+      '<div class="vsub" style="margin-top:7px">'+best.b.perk+'. '+deltaLine+'</div>';
+  }
+  Array.prototype.forEach.call(catW.querySelectorAll('.nf-chip'), function(c){ c.addEventListener('click', function(){ Array.prototype.forEach.call(catW.querySelectorAll('.nf-chip'),function(x){x.classList.remove('on');}); c.classList.add('on'); render(); }); });
+  amtI.addEventListener('input', render);
+  window.__bcRefresh = render;
+  // populate the add-card catalog select (engine catalog if available, else the local model)
+  var sel=document.getElementById('c-known');
+  if(sel){
+    function fill(list){ list.forEach(function(o){ var op=document.createElement('option'); op.value=o.key; op.textContent=o.name; sel.appendChild(op); }); }
+    if(window.tures && window.tures.configured){
+      window.tures.wallet.catalog().then(function(c){ fill((c.cards||[]).map(function(x){return {key:x.key,name:x.name};})); }).catch(function(){
+        fill(Object.keys(window.TURES_BENEFITS).map(function(k){return {key:k,name:window.TURES_BENEFITS[k].n};}));
+      });
+    } else {
+      fill(Object.keys(window.TURES_BENEFITS).map(function(k){return {key:k,name:window.TURES_BENEFITS[k].n};}));
+    }
+  }
+  render();
 })();
 </script>
 </body></html>
