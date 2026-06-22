@@ -216,13 +216,21 @@
   }
 
   // ── live conversation ──
+  // Warm the engine on load so the first message isn't a cold-start.
+  try{ if(window.tures && window.tures.health) window.tures.health(); }catch(_){}
   function send(text){
     if(busy || !text) return;
     bubble(esc(text),'me'); history.push({role:'user',content:text});
     input.value=''; busy=true; sendBtn.disabled=true; typing(true);
     var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
     var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
-    window.tures.converse(history.slice(-12), undefined, ctx, uid).then(function(c){
+    function attempt(n){
+      return window.tures.converse(history.slice(-12), undefined, ctx, uid).catch(function(e){
+        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attempt(n-1).then(res,rej); }, 1800); });
+        throw e;
+      });
+    }
+    attempt(1).then(function(c){
       typing(false); busy=false; sendBtn.disabled=false;
       if(c && c.slots && c.slots.origin && c.slots.destination) setRoute(c.slots.origin, c.slots.destination);
       if(c && c.ready && c.brief){

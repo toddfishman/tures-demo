@@ -7,30 +7,23 @@
 (function () {
   // The funnel, grouped. n = stop number in the journey.
   var GROUPS = [
-    { title: "The journey", items: [
-      { href: "index.html",     label: "Cover",            page: "cover",     n: "0" },
-      { href: "what-is.html",   label: "What is Tures",    page: "what-is",   n: "1" },
-      { href: "plan.html",      label: "Plan a trip",      page: "plan",      n: "2" },
-      { href: "taste.html",     label: "The Taste Engine", page: "taste",     n: "3" },
-      { href: "vault.html",     label: "The Vault",        page: "vault",     n: "4" },
-      { href: "trips.html",     label: "My Trips",         page: "trips",     n: "5" },
-      { href: "proactive.html", label: "The Concierge",    page: "concierge", n: "6" },
-      { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup",    n: "·" }
+    { title: "Start here", items: [
+      { href: "what-is.html",   label: "What is Tures",    page: "what-is" },
+      { href: "plan.html",      label: "Plan a trip",      page: "plan" },
+      { href: "pricing.html",   label: "Pricing",          page: "pricing" },
+      { href: "signup.html",    label: "Join the waitlist", page: "signup" }
     ]},
-    { title: "Decide", items: [
-      { href: "pricing.html",   label: "Pricing",          page: "pricing",   n: "7" },
-      { href: "signup.html",    label: "Get started",      page: "signup",    n: "8" }
+    { title: "Features", items: [
+      { href: "taste.html",     label: "The Taste Engine",  page: "taste" },
+      { href: "vault.html",     label: "The Vault",         page: "vault" },
+      { href: "trips.html",     label: "My Trips",          page: "trips" },
+      { href: "proactive.html", label: "The Concierge",     page: "concierge" },
+      { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup" }
     ]},
     { title: "More", items: [
       { href: "about.html",     label: "About",            page: "about" },
-      { href: "about.html#contact", label: "Contact",      page: "contact" },
       { href: "legal.html",     label: "Privacy & Terms",  page: "legal" }
     ]}
-  ];
-  var PRIMARY = [
-    { href: "what-is.html", label: "How it works", page: "what-is" },
-    { href: "plan.html",    label: "Plan a trip",  page: "plan" },
-    { href: "pricing.html", label: "Pricing",      page: "pricing" }
   ];
 
   var cur = document.body.getAttribute("data-page") || "";
@@ -41,7 +34,7 @@
   var menuHtml = GROUPS.map(function (g) {
     return '<div class="grp">' + g.title + '</div>' +
       g.items.map(function (it) {
-        return '<a class="' + on(it.page).trim() + '" href="' + it.href + '"><span class="n">' + (it.n || '') + '</span>' + it.label + '</a>';
+        return '<a class="' + on(it.page).trim() + '" href="' + it.href + '">' + it.label + '</a>';
       }).join("");
   }).join("");
 
@@ -54,10 +47,13 @@
           '<span class="mark">' + MARK + '</span><span class="chev">▾</span></button>' +
         '<div class="v11-menu" id="v11-menu" role="menu">' + menuHtml + '</div>' +
       '</div>' +
-      '<div class="v11-acct-wrap">' +
-        '<button class="v11-acct" id="v11-acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account">' +
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>' +
-        '<div class="v11-acct-menu" id="v11-acct-menu" role="menu"></div>' +
+      '<div class="v11-right">' +
+        (cur === "plan" ? '' : '<a class="v11-cta" href="plan.html">Plan a trip</a>') +
+        '<div class="v11-acct-wrap">' +
+          '<button class="v11-acct" id="v11-acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account">' +
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>' +
+          '<div class="v11-acct-menu" id="v11-acct-menu" role="menu"></div>' +
+        '</div>' +
       '</div>' +
     '</div>';
   document.body.insertBefore(nav, document.body.firstChild);
@@ -86,19 +82,13 @@
   foot.innerHTML =
     '<div class="in">' +
       '<div><div class="mark">' + MARK + '</div>' +
-        '<p class="blurb">The AI travel concierge that books, watches, and rebooks — so you get confirmation numbers, not links.</p></div>' +
-      '<div><h5>The journey</h5>' +
-        GROUPS[0].items.slice(1).map(function (it) { return '<a href="' + it.href + '">' + it.label + '</a>'; }).join("") +
-      '</div>' +
-      '<div><h5>Decide</h5>' +
-        GROUPS[1].items.map(function (it) { return '<a href="' + it.href + '">' + it.label + '</a>'; }).join("") +
-        '<a href="about.html">About</a><a href="about.html#contact">Contact</a>' +
-      '</div>' +
-      '<div><h5>Legal</h5>' +
-        '<a href="legal.html">Privacy</a><a href="legal.html">Terms</a>' +
-      '</div>' +
+        '<p class="blurb">The AI travel concierge that books, watches, and rebooks — confirmation numbers, not links.</p></div>' +
+      GROUPS.map(function (g) {
+        return '<div><h5>' + g.title + '</h5>' +
+          g.items.map(function (it) { return '<a href="' + it.href + '">' + it.label + '</a>'; }).join("") + '</div>';
+      }).join("") +
     '</div>' +
-    '<div class="legal"><span>© MMXXVI Tures · Your trip, handled.</span><span>Mockup · sample data throughout</span></div>';
+    '<div class="legal"><span>© MMXXVI Tures · Your trip, handled.</span></div>';
   document.body.appendChild(foot);
 
   /* ---- account menu (the umbrella): My Trips · Vault · Taste · setup · auth ---- */
@@ -117,7 +107,7 @@
     var setupRow = st ? '<a class="setup" href="' + ((nx && nx.href) || "trips.html") + '"><span>Your setup</span><span class="pct">' + st.percent + '%</span></a>' : '';
     var auth = signed
       ? '<button class="signout" id="v11-signout" type="button">Sign out</button>'
-      : '<a href="signup.html">Sign in</a><a class="req" href="signup.html">Request access</a>';
+      : '<a href="signup.html">Sign in</a><a class="req" href="signup.html">Join the waitlist</a>';
     menu.innerHTML = head + '<div class="sec">' + member + '</div>' + (setupRow ? '<div class="sec">' + setupRow + '</div>' : '') + '<div class="sec">' + auth + '</div>';
     var so = document.getElementById("v11-signout");
     if (so) so.addEventListener("click", function () { try { window.tures.signOut(); } catch (_) {} location.reload(); });
@@ -125,6 +115,52 @@
   }
   renderAcct();
   if (window.turesFunnel) window.turesFunnel.on(renderAcct);
+
+  /* ---- styles for the new chrome (primary CTA, right cluster, onboarding bar) ---- */
+  (function () {
+    var s = document.createElement("style");
+    s.textContent =
+      '.v11-right{display:flex;align-items:center;gap:14px}' +
+      '.v11-cta{display:inline-flex;align-items:center;gap:7px;background:var(--acc,#ff4929);color:#fff;font:600 13.5px "Inter","DM Sans",sans-serif;border-radius:999px;padding:9px 16px;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,73,41,.18);transition:transform .15s,box-shadow .2s}' +
+      '.v11-cta:hover{transform:translateY(-1px);box-shadow:0 8px 20px -6px rgba(255,73,41,.45)}' +
+      '.v11-onboard{display:none;background:linear-gradient(to bottom,var(--acc-dim,rgba(255,73,41,.10)),rgba(255,255,255,0));border-bottom:1px solid var(--line,rgba(26,26,26,.10))}' +
+      '.v11-onboard.show{display:block}' +
+      '.v11-onboard .ob-in{max-width:var(--maxw,1120px);margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px}' +
+      '.v11-onboard .ob-lbl{font:600 12px "Inter",sans-serif;color:var(--text,#1a1a1a);white-space:nowrap}' +
+      '.v11-onboard .ob-track{flex:0 0 120px;height:5px;border-radius:999px;background:var(--surface-2,#eaeaea);overflow:hidden}' +
+      '.v11-onboard .ob-fill{height:100%;background:var(--acc,#ff4929);border-radius:999px;transition:width .4s}' +
+      '.v11-onboard .ob-next{font:500 13px "Inter",sans-serif;color:var(--acc-deep,#cf3b1f);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}' +
+      '.v11-onboard .ob-next:hover{text-decoration:underline}' +
+      '.v11-onboard .ob-x{margin-left:auto;background:none;border:none;color:var(--muted,#7a7a7a);font-size:18px;line-height:1;cursor:pointer;padding:4px}' +
+      '@media(max-width:620px){.v11-cta{display:none}.v11-onboard .ob-track{flex-basis:64px}.v11-onboard .ob-lbl .full{display:none}}';
+    document.head.appendChild(s);
+  })();
+
+  /* ---- onboarding progress bar: surfaces funnel.js setupStatus for users who've started ---- */
+  (function () {
+    var F = window.turesFunnel; if (!F) return;
+    if (["cover", "legal", "signup"].indexOf(cur) > -1) return; // not on the pitch, legal, or the waitlist page itself
+    var bar = document.createElement("div"); bar.className = "v11-onboard"; bar.id = "v11-onboard";
+    nav.insertAdjacentElement("afterend", bar);
+    var dismissed = false; try { dismissed = sessionStorage.getItem("tures.ob.x") === "1"; } catch (_) {}
+    function started() { var st = F.setupStatus(); return st.done > 0 || F.signedIn() || !!F.taste() || !!F.pendingTrip.get(); }
+    function render() {
+      var st = F.setupStatus(), nx = F.nextStep();
+      if (dismissed || st.complete || !nx || !started()) { bar.classList.remove("show"); return; }
+      bar.innerHTML =
+        '<div class="ob-in">' +
+          '<span class="ob-lbl"><span class="full">Your setup · </span>' + st.done + ' of ' + st.total + '</span>' +
+          '<span class="ob-track"><span class="ob-fill" style="width:' + st.percent + '%"></span></span>' +
+          '<a class="ob-next" href="' + nx.href + '">Next: ' + nx.label + ' →</a>' +
+          '<button class="ob-x" id="ob-x" type="button" aria-label="Dismiss">×</button>' +
+        '</div>';
+      bar.classList.add("show");
+      var x = document.getElementById("ob-x");
+      if (x) x.addEventListener("click", function () { dismissed = true; try { sessionStorage.setItem("tures.ob.x", "1"); } catch (_) {} bar.classList.remove("show"); });
+    }
+    render();
+    F.on(render);
+  })();
 
   /* ---- TEMP: Inter for all headlines/titles sitewide (was Playfair) ----
      Centralized swap so we don't touch 24 files. Any element computed as

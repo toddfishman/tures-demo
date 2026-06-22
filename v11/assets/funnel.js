@@ -102,7 +102,11 @@
     setTaste:    function (tp) { write(K.taste, tp); },
     setTraveler: function (patch) { write(K.traveler, Object.assign(traveler(), patch || {})); },
     setVault:    function (patch) { write(K.vault, Object.assign(vault(), patch || {})); },
-    pendingTrip: { get: function () { return read(K.pending, null); }, set: function (t) { write(K.pending, t); }, clear: function () { localStorage.removeItem(K.pending); emit(); } },
+    pendingTrip: {
+      get: function () { var t = read(K.pending, null); if (t && t._ts && (Date.now() - t._ts > 12 * 3600 * 1000)) { localStorage.removeItem(K.pending); return null; } return t; },
+      set: function (t) { t = t || {}; t._ts = Date.now(); write(K.pending, t); },
+      clear: function () { localStorage.removeItem(K.pending); emit(); }
+    },
     on: function (f) { subs.push(f); return function () { subs = subs.filter(function (x) { return x !== f; }); }; }
   };
 })();

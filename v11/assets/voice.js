@@ -175,7 +175,8 @@
       if (!said) { setStatus('', 'Didn’t catch that'); micState('ready'); elHint.textContent = 'Didn’t catch that — tap to try again'; return; }
       bubble(said, 'me'); history.push({ role: 'user', content: said });
       setStatus('think', 'Tures is thinking');
-      return tures.converse(history.slice(-12)).then(function (c) {
+      function attempt(n) { return tures.converse(history.slice(-12)).catch(function (e) { if (n > 0) return new Promise(function (res, rej) { setTimeout(function () { attempt(n - 1).then(res, rej); }, 1800); }); throw e; }); }
+      return attempt(1).then(function (c) {
         var reply = (c && c.reply || '').trim() || 'I’m here — tell me a trip and I’ll handle it.';
         if (c && c.ready && c.brief) {
           // Tures has enough — speak the wrap-up, then hand the brief to the planner.
