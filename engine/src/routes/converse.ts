@@ -83,15 +83,29 @@ export async function converseRoutes(app: FastifyInstance) {
       }
 
       const { default: Anthropic } = await import("@anthropic-ai/sdk");
-      const client = new Anthropic({ apiKey: config.anthropicKey });
-      const resp = await client.messages.create({
-        model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
-        max_tokens: 320,
-        system,
-        tools: TOOLS,
-        messages: msgs,
-      });
-      const text = resp.content.filter((b) => b.type === "text").map((b: any) => b.text).join(" ").trim();
+      const client = new Anthropic({ apiKey: config.anthropicKey, maxRetries: 3 });
+      // The connection to Anthropic can drop mid-response ("Premature close"); retry such
+      // transient network errors a couple of times before surfacing a failure.
+      async function createWithRetry(tries: number): Promise<any> {
+        try {
+          return await client.messages.create({
+            model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
+            max_tokens: 320,
+            system,
+            tools: TOOLS,
+            messages: msgs,
+          });
+        } catch (err) {
+          const m = String((err && (err as any).message) || err);
+          if (tries > 0 && /premature close|fetcherror|econnreset|terminated|socket hang up|fetch failed|network|aborted/i.test(m)) {
+            await new Promise((r) => setTimeout(r, 600));
+            return createWithRetry(tries - 1);
+          }
+          throw err;
+        }
+      }
+      const resp = await createWithRetry(2);
+      const text = resp.content.filter((b: any) => b.type === "text").map((b: any) => b.text).join(" ").trim();
       // Learn from this turn (fire-and-forget) so future recommendations sharpen.
       void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
       const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
