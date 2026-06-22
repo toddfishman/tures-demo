@@ -13,7 +13,7 @@ import { log } from "../logger.ts";
 import type { ProposedPlan } from "./orchestrator.ts";
 import type { TravelerContext } from "./context.ts";
 
-const AGENT_MODEL = process.env.AGENT_MODEL ?? "claude-sonnet-4-6";
+const AGENT_MODEL = process.env.AGENT_MODEL ?? "claude-opus-4-8";
 const MAX_TURNS = 6;
 
 const SYSTEM = `You are Tures, an autonomous travel booking agent. You are given a TRAVELER CONTEXT

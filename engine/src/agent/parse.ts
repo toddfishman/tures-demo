@@ -103,7 +103,7 @@ export async function parseBrief(text: string): Promise<ParseResult> {
     const { default: Anthropic } = await import("@anthropic-ai/sdk");
     const client = new Anthropic({ apiKey: config.anthropicKey });
     const resp = await client.messages.create({
-      model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
+      model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
       max_tokens: 512,
       system:
         `Today is ${new Date().toISOString().slice(0, 10)}. ` +

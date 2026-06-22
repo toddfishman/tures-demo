@@ -89,7 +89,7 @@ export async function converseRoutes(app: FastifyInstance) {
       async function createWithRetry(tries: number): Promise<any> {
         try {
           return await client.messages.create({
-            model: process.env.AGENT_MODEL ?? "claude-sonnet-4-6",
+            model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
             max_tokens: 320,
             system,
             tools: TOOLS,
