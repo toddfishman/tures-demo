@@ -5,6 +5,28 @@ import { config } from "../config.ts";
 import { geocode } from "../geo/index.ts";
 
 export async function debugRoutes(app: FastifyInstance) {
+  // Raw Google Geocoding probe — surfaces Google's own status/error_message (REQUEST_DENIED, etc.).
+  app.get("/debug/geo", async (req) => {
+    const q = String((req.query as any)?.q || "Tulum, Mexico");
+    if (!config.googleMapsKey) return { error: "no_google_key" };
+    try {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(q)}&key=${config.googleMapsKey}`;
+      const res = await fetch(url);
+      const j: any = await res.json();
+      return {
+        keyPresent: true,
+        keyLen: config.googleMapsKey.length,
+        httpStatus: res.status,
+        googleStatus: j?.status,
+        errorMessage: j?.error_message ?? null,
+        firstResult: j?.results?.[0]?.formatted_address ?? null,
+        loc: j?.results?.[0]?.geometry?.location ?? null,
+      };
+    } catch (e: any) {
+      return { error: String(e?.message ?? e) };
+    }
+  });
+
   app.get("/debug/stays", async (req) => {
     const q = (req.query as any) || {};
     const dest = String(q.dest || "OGG").toUpperCase();
