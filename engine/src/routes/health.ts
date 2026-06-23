@@ -10,8 +10,10 @@ export async function healthRoutes(app: FastifyInstance) {
     supplierIsLive: config.supplier === "duffel" ? config.duffel.isLive : false,
     capabilities: {
       search: true,
+      realInventorySearch: config.supplier === "duffel", // real flights via Duffel when a token is set
+      bookingSimulated: !config.allowLiveBooking, // confirmations are labeled samples; no money moves
       agentLoop: !!config.anthropicKey, // Chunk 2 — Claude tool-use loop
-      booking: true, // Chunk 3 — gate + mock execution always available
+      booking: true, // Chunk 3 — gate + mock/simulated execution always available
       paymentProvider: config.payments, // "mock" until a Stripe key is set
       liveBookingAllowed: config.allowLiveBooking, // hard safety switch
       vault: true, // Chunk 4 — connected services + scoped grants

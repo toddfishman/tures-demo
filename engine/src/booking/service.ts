@@ -5,7 +5,7 @@
 import type { Brief, Offer } from "../types.ts";
 import type { Booking, BookedComponent } from "./types.ts";
 import { bookings, nextBookingId } from "./store.ts";
-import { checkPolicy, canAutoBook } from "./policy.ts";
+import { checkPolicy, canAutoBook, isSimulatedBooking, simulatedConfirmation } from "./policy.ts";
 import { getPayments } from "./payments.ts";
 import { getSupplier } from "../suppliers/index.ts";
 import { runSearch } from "../search/service.ts";
@@ -122,7 +122,7 @@ async function execute(booking: Booking): Promise<Booking> {
     // For each component: pick the best card for that charge type, charge it, then book it.
     for (const c of booking.components) {
       const offer = c.kind === "flight" ? offers.flight : offers.stay;
-      if (!offer || !supplier.book) throw new Error(`cannot book ${c.kind} (${c.offerId})`);
+      if (!offer) throw new Error(`no offer to book for ${c.kind} (${c.offerId})`);
 
       // 1. Wallet: choose the best card for this charge category (airfare vs hotel earn differently).
       const choice = chooseCard(booking.accountId, { category: categoryForKind(c.kind), amountUsd: c.amountUsd });
@@ -138,12 +138,20 @@ async function execute(booking: Booking): Promise<Booking> {
       audit(booking, "system", "payment_charged", `${c.title}: ${pay.provider} ${pay.intentId} · $${c.amountUsd.toLocaleString()}${c.card ? ` on ${c.card.name}` : ""}`);
       emitEvent(booking.tripId, "book", `Charged $${c.amountUsd.toLocaleString()} for ${c.title}`, { detail: c.card ? c.card.reason : pay.provider, data: { bookingId: booking.id } });
 
-      // 3. Commit with the supplier.
-      const { confirmation } = await supplier.book(offer);
-      c.confirmation = confirmation;
+      // 3. Commit the order. A REAL order is placed only when live booking is explicitly enabled
+      //    AND the supplier can place one; otherwise the order is SIMULATED — the offer came from
+      //    real (or mock) search, but no order is sent to any supplier and no money moves.
+      if (!isSimulatedBooking() && supplier.book) {
+        const { confirmation } = await supplier.book(offer);
+        c.confirmation = confirmation;
+      } else {
+        c.confirmation = simulatedConfirmation(c.kind, offer.id);
+        c.simulated = true;
+      }
       c.status = "confirmed";
-      audit(booking, "agent", "component_booked", `${c.title} → ${confirmation}`);
-      emitEvent(booking.tripId, "book", `Booked ${c.title}`, { detail: confirmation, data: { bookingId: booking.id, confirmation } });
+      const verb = c.simulated ? "Simulated" : "Booked";
+      audit(booking, "agent", c.simulated ? "component_simulated" : "component_booked", `${c.title} → ${c.confirmation}`);
+      emitEvent(booking.tripId, "book", `${verb} ${c.title}`, { detail: c.confirmation, data: { bookingId: booking.id, confirmation: c.confirmation, simulated: !!c.simulated } });
 
       // 4. Loyalty: credit the matching airline/hotel program for this leg, with estimated accrual.
       const loyalty = credit({ kind: c.kind, supplier: c.supplier, title: c.title, amountUsd: c.amountUsd });
@@ -164,8 +172,9 @@ async function execute(booking: Booking): Promise<Booking> {
     }
 
     booking.status = "booked";
-    audit(booking, "system", "booked", "all components confirmed");
-    emitEvent(booking.tripId, "notify", "Trip booked", { detail: `${booking.components.length} components · $${booking.totalUsd.toLocaleString()}`, data: { bookingId: booking.id } });
+    const anySim = booking.components.some((c) => c.simulated);
+    audit(booking, "system", "booked", anySim ? "all components confirmed (simulated)" : "all components confirmed");
+    emitEvent(booking.tripId, "notify", anySim ? "Trip booked (simulated)" : "Trip booked", { detail: `${booking.components.length} components · $${booking.totalUsd.toLocaleString()}${anySim ? " · sample confirmations, no money moved" : ""}`, data: { bookingId: booking.id, simulated: anySim } });
   } catch (e) {
     booking.status = "failed";
     booking.violations.push(String(e));

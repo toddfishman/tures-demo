@@ -15,6 +15,9 @@ export interface BookedComponent {
   title: string;
   amountUsd: number;
   confirmation?: string; // PNR / booking ref once booked
+  /** True when this confirmation is a SIMULATED sample (real inventory may have been searched,
+   *  but no real order was placed and no money moved). Set whenever live booking is off. */
+  simulated?: boolean;
   status: "pending" | "confirmed" | "failed" | "rebooked";
   /** Set when the Hiccup Handler replaced a disrupted component. */
   rebookedFrom?: { title: string; confirmation?: string };

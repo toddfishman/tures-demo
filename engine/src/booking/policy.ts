@@ -32,17 +32,36 @@ export function checkPolicy(input: PolicyInput): string[] {
     v.push("no payment method connected (grant payment:charge by connecting a card)");
   }
 
-  // Real-money safety: refuse a live supplier unless explicitly allowed.
-  if (input.supplier.isLive && !config.allowLiveBooking) {
-    v.push("live supplier blocked (set ALLOW_LIVE_BOOKING=true to permit real bookings)");
-  }
-
-  // Supplier must actually be able to commit the order.
-  if (!input.supplier.book) {
-    v.push(`supplier "${input.supplier.name}" cannot book yet (no order API wired)`);
+  // Real-money safety lives in ONE place: ALLOW_LIVE_BOOKING. With it OFF (the default demo
+  // posture) bookings are SIMULATED — real inventory can be searched (Duffel), but no order is
+  // ever placed and no money moves, so any supplier is allowed through to a labeled sample
+  // confirmation. Only when live booking is explicitly enabled do we require a supplier that can
+  // actually commit the order. (execute() in service.ts is the matching money gate.)
+  if (config.allowLiveBooking && !input.supplier.book) {
+    v.push(`supplier "${input.supplier.name}" cannot place real orders (no order API wired)`);
   }
 
   return v;
+}
+
+/** True when bookings should be simulated rather than really placed (the default until
+ *  ALLOW_LIVE_BOOKING=true). Real search still happens; only the order is faked. */
+export function isSimulatedBooking(): boolean {
+  return !config.allowLiveBooking;
+}
+
+/** A clearly-labeled SAMPLE confirmation for a simulated booking. Deterministic per offer
+ *  (stable for idempotency/tests), and obviously not a real PNR — "no fake success states". */
+export function simulatedConfirmation(kind: Offer["kind"], offerId: string): string {
+  let h = 2166136261;
+  const s = offerId + ":sim";
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const code = (h >>> 0).toString(36).toUpperCase().padStart(6, "0").slice(0, 6);
+  const ref = kind === "flight" ? "PNR" : "CONF";
+  return `SAMPLE-${ref}-${code}`;
 }
 
 /** Does the brief's bookingMode allow skipping the human-confirm gate? Only auto_within_brief,

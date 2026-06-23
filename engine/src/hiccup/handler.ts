@@ -6,6 +6,7 @@ import { bookings } from "../booking/store.ts";
 import { runSearch } from "../search/service.ts";
 import { getSupplier } from "../suppliers/index.ts";
 import { getPayments } from "../booking/payments.ts";
+import { isSimulatedBooking, simulatedConfirmation } from "../booking/policy.ts";
 import { chooseCard, categoryForKind } from "../wallet/cards.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
@@ -88,8 +89,16 @@ export async function handleDisruption(bookingId: string, disruption: Disruption
       booking.charges.push(pay);
       audit(booking, "payment_charged", `rebooking fare difference $${upchargeUsd.toLocaleString()}${choice ? ` on ${choice.name}` : ""}`);
     }
-    if (!supplier.book) throw new Error("supplier cannot rebook");
-    const { confirmation } = await supplier.book(alt);
+    // Real order only when live booking is on AND the supplier can place it; otherwise simulate
+    // a labeled sample confirmation (consistent with the booking service's simulated path).
+    let confirmation: string;
+    let simulated = false;
+    if (!isSimulatedBooking() && supplier.book) {
+      ({ confirmation } = await supplier.book(alt));
+    } else {
+      confirmation = simulatedConfirmation("flight", alt.id);
+      simulated = true;
+    }
 
     flight.rebookedFrom = { title: flight.title, confirmation: flight.confirmation };
     flight.status = "rebooked";
@@ -97,10 +106,11 @@ export async function handleDisruption(bookingId: string, disruption: Disruption
     flight.title = alt.title;
     flight.amountUsd = alt.priceUsd;
     flight.confirmation = confirmation;
+    flight.simulated = simulated;
     booking.totalUsd = newTotal;
 
-    audit(booking, "rebooked", `${flight.rebookedFrom.title} → ${alt.title} (${confirmation}), +$${upchargeUsd.toLocaleString()}`);
-    emitEvent(tripId, "hiccup", `Rebooked: ${alt.title}`, { detail: `${confirmation} · +$${upchargeUsd.toLocaleString()} — handled automatically`, data: { bookingId, confirmation } });
+    audit(booking, "rebooked", `${flight.rebookedFrom.title} → ${alt.title} (${confirmation})${simulated ? " [simulated]" : ""}, +$${upchargeUsd.toLocaleString()}`);
+    emitEvent(tripId, "hiccup", `Rebooked: ${alt.title}`, { detail: `${confirmation} · +$${upchargeUsd.toLocaleString()} — handled automatically`, data: { bookingId, confirmation, simulated } });
     emitEvent(tripId, "notify", "Disruption handled", { detail: `You're rebooked on ${alt.title}. Nothing for you to do.`, data: { bookingId } });
 
     const resolution: RebookResolution = { status: "rebooked", disruption, from: flight.rebookedFrom.title, to: alt.title, upchargeUsd, reason: `auto-rebooked on ${alt.title} (+$${upchargeUsd.toLocaleString()})` };
