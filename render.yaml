@@ -20,6 +20,12 @@ services:
         sync: false
       - key: DEEPGRAM_API_KEY       # voice (STT/TTS)
         sync: false
+      # Real flight inventory via Duffel. SET THIS to make /search + /plan return real flights.
+      # A test token (duffel_test_…) returns synthetic offers; a live token returns real
+      # airlines/prices. Either way booking stays SIMULATED — no order is placed, no money moves,
+      # because ALLOW_LIVE_BOOKING is left unset (false). Search/offer-requests cost nothing.
+      - key: DUFFEL_API_TOKEN       # optional — unset = mock flights
+        sync: false
       - key: AGENT_MODEL
         value: claude-opus-4-8
       - key: CORS_ORIGINS
