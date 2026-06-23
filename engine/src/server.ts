@@ -28,6 +28,7 @@ import { waitlistRoutes } from "./routes/waitlist.ts";
 import { voiceRoutes } from "./routes/voice.ts";
 import { converseRoutes } from "./routes/converse.ts";
 import { streamRoutes } from "./routes/stream.ts";
+import { debugRoutes } from "./routes/debug.ts";
 
 export async function build() {
   const app = Fastify({ logger: false });
@@ -82,6 +83,7 @@ export async function build() {
   await app.register(voiceRoutes);
   await app.register(converseRoutes);
   await app.register(streamRoutes);
+  await app.register(debugRoutes); // TEMP — remove after stays diagnosis
 
   return app;
 }
