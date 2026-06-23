@@ -88,13 +88,15 @@ export async function converseRoutes(app: FastifyInstance) {
       // transient network errors a couple of times before surfacing a failure.
       async function createWithRetry(tries: number): Promise<any> {
         try {
-          return await client.messages.create({
+          // Stream the response and assemble it — reads the body in chunks (SSE), which
+          // survives transport quirks that break a single one-shot body read ("Premature close").
+          return await client.messages.stream({
             model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
             max_tokens: 320,
             system,
             tools: TOOLS,
             messages: msgs,
-          });
+          }).finalMessage();
         } catch (err) {
           const m = String((err && (err as any).message) || err);
           if (tries > 0 && /premature close|fetcherror|econnreset|terminated|socket hang up|fetch failed|network|aborted/i.test(m)) {
