@@ -48,6 +48,10 @@ const Env = z.object({
   // mem0 — managed memory layer for personalization (taste, learned preferences, trip-history
   // notes), keyed by user_id. Unset → memory is a no-op and the engine runs identically.
   MEM0_API_KEY: z.string().optional(),
+  // Google Maps Platform key (Geocoding API + Places API New). Powers IATA/city→coordinates
+  // (used by Duffel Stays) and real restaurant/things-to-do discovery. Unset → a built-in
+  // airport table handles geocoding and discovery is skipped/mock.
+  GOOGLE_MAPS_API_KEY: z.string().optional(),
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
@@ -67,6 +71,7 @@ export const config = {
   anthropicKey: parsed.ANTHROPIC_API_KEY,
   deepgramKey: parsed.DEEPGRAM_API_KEY,
   mem0Key: parsed.MEM0_API_KEY,
+  googleMapsKey: parsed.GOOGLE_MAPS_API_KEY,
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
   rateLimitMax: parsed.RATE_LIMIT_MAX,

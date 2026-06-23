@@ -2,14 +2,22 @@
 // so the request/response shapes are explicit and auditable. Used automatically when
 // DUFFEL_API_TOKEN is set; otherwise the engine uses the mock supplier.
 //
-// Scope note (Chunk 1): flights are real Duffel offers. Duffel Stays requires geographic
-// coordinates, and IATA→coordinates geocoding is a Chunk-1 follow-up — until then stays are
-// delegated to the mock supplier and clearly tagged supplier:"mock" on each offer.
+// Both flights (/air/offer_requests) and stays (/stays/search) are real Duffel offers. Stays are
+// searched around a coordinate from geo/geocode() (airport table + Google); if a destination can't
+// be geocoded or the search errors/empties, stays fall back to the mock supplier so the flow holds.
 import type { SupplierAdapter } from "./adapter.ts";
 import type { Brief, Offer } from "../types.ts";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { MockSupplier } from "./mock.ts";
+import { geocode } from "../geo/index.ts";
+
+/** Add N nights to a YYYY-MM-DD date (used when the brief has no explicit return date). */
+function addNights(date: string, nights: number): string {
+  const d = new Date(date + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + nights);
+  return d.toISOString().slice(0, 10);
+}
 
 const DUFFEL_VERSION = "v2";
 
@@ -86,10 +94,64 @@ export class DuffelSupplier implements SupplierAdapter {
   }
 
   async searchStays(brief: Brief): Promise<Offer[]> {
-    // Duffel Stays needs geo-coordinates; until IATA→coords geocoding lands, use mock stays.
-    log.warn("duffel: stays delegated to mock (geocoding is a Chunk-1 follow-up)", {
-      destination: brief.destination,
-    });
-    return this.stayFallback.searchStays(brief);
+    // Duffel Stays searches around a coordinate. Geocode the destination IATA → lat/lng; if we
+    // can't (off-table + no Google key) or the search errors/returns nothing, fall back to mock
+    // stays so the flow never breaks.
+    const geo = await geocode(brief.destination);
+    if (!geo) {
+      log.warn("duffel stays: no coordinates for destination — using mock", { destination: brief.destination });
+      return this.stayFallback.searchStays(brief);
+    }
+
+    const checkIn = brief.departDate;
+    const checkOut = brief.returnDate ?? addNights(brief.departDate, 3);
+    const nights = Math.max(1, Math.round((Date.parse(checkOut) - Date.parse(checkIn)) / 86400000));
+    const guests: Array<{ type: "adult" } | { type: "child"; age: number }> = [
+      ...Array.from({ length: brief.adults }, () => ({ type: "adult" as const })),
+      ...Array.from({ length: brief.children }, () => ({ type: "child" as const, age: 8 })),
+    ];
+
+    try {
+      const json = await this.post("/stays/search", {
+        rooms: 1,
+        location: { radius: 8, geographic_coordinates: { latitude: geo.lat, longitude: geo.lng } },
+        check_in_date: checkIn,
+        check_out_date: checkOut,
+        guests,
+      });
+      const results: any[] = json?.data?.results ?? [];
+      const offers = results.slice(0, 8).map((r, i) => {
+        const acc = r.accommodation ?? {};
+        const amount = Number(r.cheapest_rate_total_amount ?? 0);
+        const currency = r.cheapest_rate_currency ?? "USD";
+        const photo = Array.isArray(acc.photos) && acc.photos[0]?.url ? acc.photos[0].url : undefined;
+        const stars = acc.rating ? `${acc.rating}-star` : null;
+        const review = acc.review_score ? `${acc.review_score}/10 guests` : null;
+        return {
+          id: r.id ?? `duffel-st-${i}`,
+          kind: "stay",
+          supplier: this.name,
+          title: acc.name ?? `Stay in ${geo.label}`,
+          priceUsd: amount, // in `currency`; FX→USD normalization is a known follow-up.
+          currency,
+          raw: {
+            searchResultId: r.id,
+            address: acc.location?.address,
+            photo,
+            rating: acc.rating,
+            reviewScore: acc.review_score,
+            nights,
+            expiresAt: r.expires_at,
+          },
+          summary: [stars, review, `${currency} ${amount.toLocaleString()} · ${nights} nights`].filter(Boolean) as string[],
+        } satisfies Offer;
+      });
+      if (offers.length) return offers;
+      log.warn("duffel stays: no results — using mock", { destination: brief.destination, label: geo.label });
+      return this.stayFallback.searchStays(brief);
+    } catch (e) {
+      log.warn("duffel stays search failed — using mock", { destination: brief.destination, err: String(e) });
+      return this.stayFallback.searchStays(brief);
+    }
   }
 }

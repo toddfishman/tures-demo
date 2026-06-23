@@ -24,7 +24,12 @@ services:
       # A test token (duffel_test_…) returns synthetic offers; a live token returns real
       # airlines/prices. Either way booking stays SIMULATED — no order is placed, no money moves,
       # because ALLOW_LIVE_BOOKING is left unset (false). Search/offer-requests cost nothing.
-      - key: DUFFEL_API_TOKEN       # optional — unset = mock flights
+      - key: DUFFEL_API_TOKEN       # optional — unset = mock flights/hotels
+        sync: false
+      # Google Maps Platform key — Geocoding API (New) + Places API (New). Powers IATA/city →
+      # coordinates (Duffel Stays needs them) and real restaurant / things-to-do discovery.
+      # Unset → built-in airport table for geocoding, discovery skipped/mock.
+      - key: GOOGLE_MAPS_API_KEY    # optional
         sync: false
       - key: AGENT_MODEL
         value: claude-opus-4-8
