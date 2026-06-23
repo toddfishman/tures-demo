@@ -123,17 +123,13 @@ export async function converseRoutes(app: FastifyInstance) {
       }
       return { reply: text };
     } catch (e: any) {
-      // TEMP DIAGNOSTIC: surface the real error so we can see why the Anthropic call fails
-      // on both Fly and Render. Revert to a bare { error: "converse_failed" } once diagnosed.
-      const detail = {
+      log.error("converse failed", {
         message: String(e?.message ?? e),
         name: e?.name,
         status: e?.status,
         type: e?.error?.type ?? e?.type,
-        cause: e?.cause ? String(e.cause?.message ?? e.cause) : undefined,
-      };
-      log.error("converse failed", detail);
-      return reply.status(502).send({ error: "converse_failed", detail });
+      });
+      return reply.status(502).send({ error: "converse_failed" });
     }
   });
 }

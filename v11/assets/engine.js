@@ -16,7 +16,7 @@
     if (fromQuery) localStorage.setItem(KEY, fromQuery.replace(/\/$/, ""));
     else localStorage.removeItem(KEY);
   }
-  var DEFAULT_ENGINE = "https://tures-engine-tf.fly.dev";
+  var DEFAULT_ENGINE = "https://tures-engine.onrender.com";
   var url = localStorage.getItem(KEY) || DEFAULT_ENGINE;
   var token = localStorage.getItem(TOKEN) || "";
   var account = null;
