@@ -113,6 +113,11 @@
 
   /* ===== three-act arc hero (synchronized stepper ↔ phone) ===== */
   .arc-hero{max-width:var(--maxw);margin:0 auto;padding:54px 24px 56px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center}
+  .arc-hero .hero-h1{font-family:'Playfair Display',Georgia,serif;font-weight:600;font-size:clamp(40px,6vw,66px);line-height:1.03;letter-spacing:-.02em;color:var(--text)}
+  .arc-hero .phrase-rot{margin-top:18px;display:flex;align-items:center;gap:11px;font-family:'Playfair Display',Georgia,serif;font-weight:600;font-size:clamp(22px,3vw,32px);line-height:1.1;color:var(--acc-deep);min-height:44px}
+  .arc-hero .ph-spark{color:var(--acc);flex:0 0 auto;font-size:.82em}
+  .arc-hero .ph-text{transition:opacity .3s ease,transform .3s ease;display:inline-block}
+  .arc-hero .ph-text.fade{opacity:0;transform:translateY(8px)}
   .arc-hero .steps{margin:22px 0 0;display:flex;flex-direction:column;gap:6px}
   .arc-hero .step{display:flex;align-items:center;gap:16px;cursor:pointer;padding:4px 0;border:none;background:none;text-align:left;font-family:'Playfair Display',serif;font-weight:500;line-height:1.0;font-size:clamp(34px,5vw,58px);color:#cdcdcd;transition:color .45s}
   .arc-hero .step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#cdcdcd;width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
@@ -252,9 +257,8 @@
   body.minimal .arc-hero{grid-template-columns:1fr;justify-items:center;gap:26px;padding-top:42px;min-height:calc(100dvh - 120px)}
   body.minimal .arc-hero > div:first-child{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;order:2}
   body.minimal .arc-hero .phone{order:1}
-  body.minimal .arc-hero .eyebrow,
-  body.minimal .arc-hero .steps,
-  body.minimal .arc-hero #sub,
+  body.minimal .arc-hero .hero-h1,
+  body.minimal .arc-hero .phrase-rot,
   body.minimal .arc-hero .progress,
   body.minimal .arc-hero .arc-note{display:none}
   body.minimal .arc-hero .arc-cta{margin-top:0;width:min(440px,86vw);justify-content:center}
@@ -274,13 +278,8 @@
 
 <header class="arc-hero">
   <div>
-    <span class="eyebrow"><span class="dot"></span> Your end to end concierge, in your pocket.</span>
-    <div class="steps" id="steps">
-      <button class="step" data-i="0"><span class="kick">Before</span><span class="word">Books.</span><span class="beam"></span></button>
-      <button class="step" data-i="1"><span class="kick">During</span><span class="word">Protects.</span><span class="beam"></span></button>
-      <button class="step" data-i="2"><span class="kick">After</span><span class="word">Proves.</span><span class="beam"></span></button>
-    </div>
-    <p class="sub" id="sub"></p>
+    <h1 class="hero-h1">Your Travel Concierge</h1>
+    <div class="phrase-rot"><span class="ph-spark">✦</span><span class="ph-text" id="ph-text">Tures Books For You</span></div>
     <div class="progress" id="prog"><i></i><i></i><i></i></div>
     <div class="arc-cta">
       <a class="btn" id="hero-start" href="plan.html">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -389,36 +388,31 @@
 </section>
 
 <script>
-/* ===== EDIT THE THREE WORDS HERE — kicker + word + the line beneath =====
-   Alternates: Books it/Watches it/Wraps it · Booked/Protected/Proven
-   · Plans it/Watches it/Proves it · Arranges/Attends/Accounts                 */
+/* ===== The three synced acts: phrase (left) ↔ phone scene + status (right) ===== */
 var ACTS=[
-  {kick:"Before", word:"Books.",    status:"Booking your trip",       sub:"One message books the whole trip — <b>flights, hotel, the table</b>. Confirmation numbers, not links."},
-  {kick:"During", word:"Protects.", status:"Watching your trip · 24/7", sub:"On the whole time. It catches the delay, the storm, the closure — and <b>fixes it before you notice</b>, good news too."},
-  {kick:"After",  word:"Proves.",   status:"Trip wrapped",            sub:"The receipts when you land — <b>what it saved, miles credited, hours back, expenses filed</b>, and a taste it learned."}
+  {phrase:"Tures Books For You",          status:"Booking your trip"},
+  {phrase:"Tures Has Your Back",          status:"Watching your trip · 24/7"},
+  {phrase:"Tures Maximizes & Summarizes", status:"Trip wrapped"}
 ];
 (function(){
   var DWELL=5400;
-  var steps=[].slice.call(document.querySelectorAll('.arc-hero .step'));
   var scenes=[].slice.call(document.querySelectorAll('.arc-hero .scene'));
   var prog=[].slice.call(document.querySelectorAll('#prog i'));
-  var sub=document.getElementById('sub'), pstatus=document.getElementById('pstatus');
-  if(!steps.length) return;
+  var phText=document.getElementById('ph-text'), pstatus=document.getElementById('pstatus');
+  if(!scenes.length) return;
   document.documentElement.style.setProperty('--dwell',DWELL+'ms');
-  steps.forEach(function(s,i){ s.querySelector('.kick').textContent=ACTS[i].kick; s.querySelector('.word').textContent=ACTS[i].word; });
   var i=0,timer=null;
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function set(n){
     i=n;
-    steps.forEach(function(s,k){ s.classList.toggle('on',k===i); });
     scenes.forEach(function(s,k){ s.classList.toggle('on',k===i); });
     prog.forEach(function(p,k){ p.classList.remove('on','done'); if(k<i)p.classList.add('done'); });
     if(!reduce){ var bar=prog[i]; bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on'); }
-    sub.style.opacity=0; setTimeout(function(){ sub.innerHTML=ACTS[i].sub; sub.style.opacity=1; },150);
-    pstatus.textContent=ACTS[i].status;
+    if(phText){ phText.classList.add('fade'); setTimeout(function(){ phText.textContent=ACTS[i].phrase; phText.classList.remove('fade'); }, reduce?0:200); }
+    if(pstatus) pstatus.textContent=ACTS[i].status;
   }
   function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
-  steps.forEach(function(s){ s.addEventListener('click',function(){ set(+s.dataset.i); play(); }); });
+  prog.forEach(function(p,k){ p.style.cursor='pointer'; p.addEventListener('click',function(){ set(k); play(); }); });
   set(0); play();
 })();
 (function(){
