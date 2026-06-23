@@ -44,8 +44,8 @@
   nav.innerHTML =
     '<div class="in">' +
       '<div class="v11-menu-wrap">' +
-        '<button class="v11-logo" id="v11-menu-btn" type="button" aria-haspopup="true" aria-expanded="false">' +
-          '<span class="mark">' + MARK + '</span><span class="chev">▾</span></button>' +
+        '<a class="v11-home" href="index.html" aria-label="Tures — home"><span class="mark">' + MARK + '</span></a>' +
+        '<button class="v11-logo" id="v11-menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu"><span class="chev">▾</span></button>' +
         '<div class="v11-menu" id="v11-menu" role="menu">' + menuHtml + '</div>' +
       '</div>' +
       '<div class="v11-right">' +
@@ -121,6 +121,10 @@
   (function () {
     var s = document.createElement("style");
     s.textContent =
+      '.v11-menu-wrap{display:flex;align-items:center;gap:2px;position:relative}' +
+      '.v11-home{display:inline-flex;align-items:center;text-decoration:none;color:inherit;transition:opacity .2s}' +
+      '.v11-home:hover{opacity:.82}' +
+      '.v11-logo{background:none;border:none;cursor:pointer;padding:6px 2px;display:inline-flex;align-items:center}' +
       '.v11-right{display:flex;align-items:center;gap:14px}' +
       '.v11-cta{display:inline-flex;align-items:center;gap:7px;background:var(--acc,#ff4929);color:#fff;font:600 13.5px "Inter","DM Sans",sans-serif;border-radius:999px;padding:9px 16px;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,73,41,.18);transition:transform .15s,box-shadow .2s}' +
       '.v11-cta:hover{transform:translateY(-1px);box-shadow:0 8px 20px -6px rgba(255,73,41,.45)}' +
