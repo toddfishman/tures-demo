@@ -1,0 +1,28 @@
+# Render Blueprint — Tures engine.
+# Moved off Fly.io (its egress to api.anthropic.com was dropping connections, "Premature close").
+# Render builds the existing engine/Dockerfile. Connect this repo in Render → it reads this file.
+# Set the three secret keys (sync:false) in the Render dashboard when prompted.
+services:
+  - type: web
+    name: tures-engine
+    runtime: docker
+    rootDir: engine
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter            # always-on (no cold starts). Switch to "free" for $0 (sleeps when idle).
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY      # required — the planner/agent
+        sync: false
+      - key: MEM0_API_KEY           # personalization memory
+        sync: false
+      - key: DEEPGRAM_API_KEY       # voice (STT/TTS)
+        sync: false
+      - key: AGENT_MODEL
+        value: claude-opus-4-8
+      - key: CORS_ORIGINS
+        value: https://toddfishman.github.io,http://localhost:8123
+      # Optional later (persistence + security hardening): DATA_DIR (+ a Render disk),
+      # VAULT_KEY, AUTH_SECRET, STRIPE_* . Unset is fine for the demo (in-memory, ephemeral key).

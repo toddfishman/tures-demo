@@ -10,8 +10,8 @@ RUN npm ci
 
 COPY . .
 
-ENV PORT=8787
+# No hardcoded PORT: the host (Render/Fly) injects PORT and the app binds it on 0.0.0.0
+# (src/server.ts → config.port, default 8787 if unset). EXPOSE is doc-only.
 EXPOSE 8787
 
-# Honors PORT; binds 0.0.0.0 (see src/server.ts).
 CMD ["npm", "start"]
