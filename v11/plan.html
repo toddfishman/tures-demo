@@ -99,8 +99,24 @@
   .asks-note svg{stroke:var(--acc-deep);flex:0 0 auto}
   .asks-note b{color:var(--text);font-weight:600}
 
+  /* trip extras — real discovery (where to eat / things to do / getting around) */
+  .xwrap{align-self:flex-start;max-width:96%;margin-top:2px;display:flex;flex-direction:column;gap:12px}
+  .xgroup{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .xgroup .xh{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--acc-deep)}
+  .xgroup .xh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .xgroup .xh .demo-tag{margin-left:auto}
+  .xrow{display:flex;align-items:center;gap:12px;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .xrow:last-child{border-bottom:none}
+  .xrow .xinfo{flex:1;min-width:0}
+  .xrow .xname{font-size:14px;font-weight:600;line-height:1.25}
+  .xrow .xmeta{font-size:12px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .xrow .xbtn{flex:0 0 auto;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);cursor:pointer;transition:border-color .15s,color .15s}
+  .xrow .xbtn:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .xrow .xbtn:disabled{opacity:.6;cursor:default}
+  .xrow .xdone{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--good);white-space:nowrap}
+
   @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
-  @media (max-width:560px){.opt .oact .btn{flex:1}}
+  @media (max-width:560px){.opt .oact .btn{flex:1}.xrow .xmeta{white-space:normal}}
 </style>
 </head>
 <body data-page="plan">
@@ -260,8 +276,11 @@
       typing(false);
       var total = (p && p.totalUsd!=null) ? ('about $'+Number(p.totalUsd).toLocaleString()+' all in') : 'a single, clean number';
       var why = (p && p.rationale) ? p.rationale : 'flights and a hotel that fit exactly what you asked for';
-      bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet. Shall I book it.','t');
-      offerBook(brief);
+      bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet.','t');
+      presentExtras(brief, function(){
+        bubble('That is the trip, end to end. Shall I book the flights and hotel.','t');
+        offerBook(brief);
+      });
     }).catch(function(){
       typing(false);
       bubble('That is everything I need. Shall I hold it and book.','t'); offerBook(brief);
@@ -294,6 +313,58 @@
       if(e && e.status===409){ paymentGate(brief, e); }
       else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief); }}]); }
     });
+  }
+
+  // ── trip extras: real where-to-eat / things-to-do / getting-around (Google Places) ──
+  function xIcon(kind){
+    if(kind==='dining') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a2 2 0 0 0 2 2v9"/><path d="M9 3v18M9 3v7"/><path d="M16 3c-1.6 0-3 1.8-3 4s1.4 4 3 4v9"/></svg>';
+    if(kind==='activity') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>';
+  }
+  function xRow(item, kind){
+    var row=document.createElement('div'); row.className='xrow';
+    var meta=(item.summary||[]).join(' · ');
+    row.innerHTML='<div class="xinfo"><div class="xname">'+esc(item.title)+'</div><div class="xmeta">'+esc(meta)+'</div></div>';
+    var btn=document.createElement('button'); btn.type='button'; btn.className='xbtn';
+    btn.textContent = kind==='transport' ? 'Arrange' : (kind==='dining' ? 'Reserve' : 'Add');
+    btn.onclick=function(){
+      btn.disabled=true; btn.textContent='…';
+      window.tures.reserve({kind:kind, id:item.id, title:item.title}).then(function(r){
+        var done=document.createElement('span'); done.className='xdone';
+        done.textContent='✓ '+(r&&r.confirmation ? r.confirmation : 'reserved');
+        btn.replaceWith(done);
+      }).catch(function(){ btn.disabled=false; btn.textContent='Try again'; });
+    };
+    row.appendChild(btn); return row;
+  }
+  function xGroup(title, kind, items){
+    if(!items || !items.length) return null;
+    var g=document.createElement('div'); g.className='xgroup';
+    var h=document.createElement('div'); h.className='xh';
+    h.innerHTML=xIcon(kind)+'<span>'+esc(title)+'</span><span class="demo-tag">Sample</span>';
+    g.appendChild(h);
+    items.slice(0,4).forEach(function(it){ g.appendChild(xRow(it,kind)); });
+    return g;
+  }
+  function presentExtras(brief, done){
+    done = done || function(){};
+    if(!live || !brief){ done(); return; }
+    bubble('And while you are there — here is where I would eat, what I would do, and how to get around. Real spots; tap and I will handle the reservation.','t');
+    typing(true);
+    window.tures.discover(brief).then(function(d){
+      typing(false);
+      var groups=[
+        xGroup('Where to eat','dining',d&&d.dining),
+        xGroup('Things to do','activity',d&&d.activities),
+        xGroup('Getting around','transport',d&&d.transport)
+      ].filter(Boolean);
+      if(groups.length){
+        var wrap=document.createElement('div'); wrap.className='msg from-ai xwrap';
+        groups.forEach(function(g){ wrap.appendChild(g); });
+        thread.appendChild(wrap); reveal(wrap); scroll();
+      }
+      done();
+    }).catch(function(){ typing(false); done(); });
   }
 
   function paymentGate(brief, e){

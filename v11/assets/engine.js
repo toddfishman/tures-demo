@@ -68,6 +68,10 @@
     /* ----- planning (free) ----- */
     parse: function (text) { return api("/parse", { method: "POST", body: JSON.stringify({ text: text }) }); },
     plan: function (brief) { return api("/plan", { method: "POST", body: JSON.stringify(brief) }); },
+    /* Real trip extras: hotels + restaurants + things-to-do (Google Places) + transport estimate. */
+    discover: function (brief) { return api("/discover", { method: "POST", body: JSON.stringify(brief) }); },
+    /* Simulated reservation of an extra → { confirmation, simulated, note }. */
+    reserve: function (item) { return api("/reserve", { method: "POST", body: JSON.stringify(item || {}) }); },
 
     /* ----- booking (session-scoped) ----- */
     book: function (body) { body = body || {}; if (!body.accountId) body.accountId = acctId(); return api("/book", { method: "POST", body: JSON.stringify(body) }); },
