@@ -47,11 +47,19 @@ interface RawPlace {
 async function textSearch(
   textQuery: string,
   geo: GeoPoint,
-  includedType: string,
+  includedType: string | undefined,
   maxResultCount = 8,
 ): Promise<RawPlace[]> {
   if (!config.googleMapsKey) return [];
   try {
+    const body: Record<string, unknown> = {
+      textQuery,
+      maxResultCount,
+      locationBias: {
+        circle: { center: { latitude: geo.lat, longitude: geo.lng }, radius: 20000 },
+      },
+    };
+    if (includedType) body.includedType = includedType;
     const res = await fetch(ENDPOINT, {
       method: "POST",
       headers: {
@@ -59,14 +67,7 @@ async function textSearch(
         "X-Goog-Api-Key": config.googleMapsKey,
         "X-Goog-FieldMask": FIELD_MASK,
       },
-      body: JSON.stringify({
-        textQuery,
-        includedType,
-        maxResultCount,
-        locationBias: {
-          circle: { center: { latitude: geo.lat, longitude: geo.lng }, radius: 20000 },
-        },
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const t = await res.text().catch(() => "");
@@ -91,6 +92,13 @@ function photoRef(p: RawPlace): string | undefined {
 function priceTier(p: RawPlace): number {
   const idx = p.priceLevel ? PRICE_INDEX[p.priceLevel] : undefined;
   return idx ?? 2;
+}
+
+// Nudge the modeled price by rating so options aren't all identical when Places omits priceLevel.
+// ~0.85x at 3.5★ up to ~1.35x at 5★. Returns 1.0 when there's no rating.
+function ratingMult(p: RawPlace): number {
+  if (!p.rating) return 1;
+  return Math.round((0.5 + p.rating / 6) * 100) / 100;
 }
 
 function toOffer(p: RawPlace, kind: OfferKind, i: number, priceUsd: number, extraSummary: string[]): Offer {
@@ -128,7 +136,7 @@ export async function searchHotels(geo: GeoPoint, brief: Brief): Promise<Offer[]
     : 3;
   const NIGHTLY = [120, 180, 260, 420, 650]; // by price tier 0..4
   return places.map((p, i) => {
-    const nightly = NIGHTLY[priceTier(p)] ?? 180;
+    const nightly = Math.round((NIGHTLY[priceTier(p)] ?? 180) * ratingMult(p));
     const total = nightly * nights;
     return toOffer(p, "stay", i, total, [`~$${nightly}/night`, `${nights} nights · ~$${total.toLocaleString()}`, "est. price"]);
   });
@@ -140,14 +148,26 @@ export async function searchDining(geo: GeoPoint, brief: Brief): Promise<Offer[]
   const PER_PERSON = [15, 25, 45, 85, 140];
   const pax = Math.max(1, brief.adults + brief.children);
   return places.map((p, i) => {
-    const pp = PER_PERSON[priceTier(p)] ?? 25;
+    const pp = Math.round((PER_PERSON[priceTier(p)] ?? 25) * ratingMult(p));
     return toOffer(p, "dining", i, pp * pax, [`~$${pp}/person`, `table for ${pax}`, "est. price"]);
   });
 }
 
-/** Things to do via Places (tourist attractions). Modeled ticket price from the priceLevel bucket. */
+// Result types that aren't "things to do" — the locality itself, lodging, dining, transit hubs.
+const NON_ACTIVITY = new Set([
+  "locality", "political", "administrative_area_level_1", "administrative_area_level_2",
+  "country", "lodging", "hotel", "restaurant", "food", "airport", "bus_station", "train_station",
+]);
+
+/** Things to do via Places. No includedType (it over-filtered to just the town) — open text query,
+ *  then drop results that are really the city/hotels/restaurants. Modeled ticket price by tier. */
 export async function searchActivities(geo: GeoPoint, brief: Brief): Promise<Offer[]> {
-  const places = await textSearch(`top things to do in ${geo.label}`, geo, "tourist_attraction", 10);
+  const raw = await textSearch(`top attractions, tours and things to do in ${geo.label}`, geo, undefined, 14);
+  const places = raw.filter((p) => {
+    const types = p.types ?? [];
+    if (types.some((t) => NON_ACTIVITY.has(t))) return false;
+    return (p.userRatingCount ?? 0) >= 20; // real, reviewed attractions
+  }).slice(0, 10);
   const TICKET = [0, 25, 55, 110, 200];
   const pax = Math.max(1, brief.adults + brief.children);
   return places.map((p, i) => {
