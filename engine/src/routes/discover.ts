@@ -17,7 +17,7 @@ export async function discoverRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "invalid_brief", issues: parsed.error.issues });
     }
     const brief = parsed.data;
-    const [destGeo, originGeo] = await Promise.all([geocode(brief.destination), geocode(brief.origin)]);
+    const destGeo = await geocode(brief.destination);
     if (!destGeo) {
       return reply.status(422).send({ error: "could_not_locate_destination", destination: brief.destination });
     }
@@ -27,7 +27,7 @@ export async function discoverRoutes(app: FastifyInstance) {
       searchDining(destGeo, brief),
       searchActivities(destGeo, brief),
     ]);
-    const transport = estimateTransport(originGeo, destGeo, brief);
+    const transport = estimateTransport(destGeo, brief);
 
     return {
       tripId: `disc_${Date.now().toString(36)}_${discoverCounter++}`,
