@@ -448,9 +448,7 @@
   // ── greeting ──
   function greet(){
     if(live){
-      var tp = window.turesFunnel && window.turesFunnel.taste();
-      if(tp && tp.signature) bubble('Good to see you. Tell me the trip in your own words — I have your Taste Print, so the picks land right.','t');
-      else bubble('Good to see you. Tell me the trip in your own words — where, when, who. <a href="taste.html" style="color:var(--acc-deep);font-weight:600">Build a Taste Print</a> first, or just start.','t');
+      bubble("Hey — I'm Tures. You'll be surprised by how much I can take off your plate, most of it travel. So, what are you looking to do? You can <b>talk to me</b> up top, or just type below.","t");
     } else {
       bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');
       actions([{label:'▷ Watch the example', on:runDemo}]);
