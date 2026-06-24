@@ -19,7 +19,7 @@
 <title>t✦ures — Books. Protects. Proves.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Inter:wght@600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/v11.css" />
 <script src="assets/engine.js"></script>
 <script src="assets/funnel.js"></script>
@@ -112,12 +112,21 @@
   .reassure svg{stroke:var(--acc);opacity:.8}
 
   /* ===== three-act arc hero (synchronized stepper ↔ phone) ===== */
-  .arc-hero{max-width:var(--maxw);margin:0 auto;padding:54px 24px 56px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center}
+  .arc-hero{max-width:var(--maxw);margin:0 auto;padding:54px 24px 56px;display:grid;grid-template-columns:1.12fr .88fr;gap:48px;align-items:center}
   .arc-hero .hero-h1{font-family:'Playfair Display',Georgia,serif;font-weight:600;font-size:clamp(40px,6vw,66px);line-height:1.03;letter-spacing:-.02em;color:var(--text)}
   .arc-hero .phrase-rot{margin-top:18px;display:flex;align-items:center;gap:11px;font-family:'Playfair Display',Georgia,serif;font-weight:600;font-size:clamp(22px,3vw,32px);line-height:1.1;color:var(--acc-deep);min-height:44px}
   .arc-hero .ph-spark{color:var(--acc);flex:0 0 auto;font-size:.82em}
   .arc-hero .ph-text{transition:opacity .3s ease,transform .3s ease;display:inline-block}
   .arc-hero .ph-text.fade{opacity:0;transform:translateY(8px)}
+  /* ── Direction C — editorial, oversized cycling verbs ── */
+  .arc-hero .hero-c{align-self:center}
+  .arc-hero .lead-line{font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:clamp(16px,1.9vw,21px);line-height:1.4;letter-spacing:-.01em;color:var(--text);max-width:21ch}
+  .arc-hero .verbs{margin-top:20px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+  .arc-hero .verb{font-family:'Inter',system-ui,sans-serif;font-weight:900;font-size:clamp(48px,7.6vw,88px);line-height:.98;letter-spacing:-.04em;color:rgba(26,26,26,.14);background:none;border:none;padding:0;cursor:pointer;display:inline-block;transition:color .5s ease,transform .5s cubic-bezier(.2,.7,.3,1);transform-origin:left center}
+  .arc-hero .verb.on{color:var(--acc)}
+  .arc-hero .verb:not(.on):hover{color:rgba(26,26,26,.32)}
+  @keyframes phonepop{0%{transform:scale(.972)}58%{transform:scale(1.012)}100%{transform:scale(1)}}
+  .arc-hero .phone.tick{animation:phonepop .62s cubic-bezier(.2,.7,.3,1)}
   .arc-hero .steps{margin:22px 0 0;display:flex;flex-direction:column;gap:6px}
   .arc-hero .step{display:flex;align-items:center;gap:16px;cursor:pointer;padding:4px 0;border:none;background:none;text-align:left;font-family:'Playfair Display',serif;font-weight:500;line-height:1.0;font-size:clamp(34px,5vw,58px);color:#cdcdcd;transition:color .45s}
   .arc-hero .step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#cdcdcd;width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
@@ -137,7 +146,7 @@
   .arc-hero .progress i.on::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;animation:fillp var(--dwell,3800ms) linear forwards}
   .arc-hero .progress i.done{background:var(--acc-line)}
   @keyframes fillp{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-  .arc-hero .phone{width:372px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 40px 80px -42px rgba(0,0,0,.45)}
+  .arc-hero .phone{width:360px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 26px 60px -30px rgba(0,0,0,.5),0 3px 10px rgba(0,0,0,.07);will-change:transform}
   .arc-hero .screen{background:var(--bg);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;height:600px;border:1px solid var(--line)}
   .arc-hero .sct{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
   .arc-hero .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
@@ -146,7 +155,7 @@
   .arc-hero .sct .ss .pd{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:aopulse 1.6s infinite}
   @keyframes aopulse{0%,100%{opacity:1}50%{opacity:.3}}
   .arc-hero .scenes{position:relative;flex:1}
-  .arc-hero .scene{position:absolute;inset:0;padding:16px 14px;display:flex;flex-direction:column;gap:11px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;pointer-events:none}
+  .arc-hero .scene{position:absolute;inset:0;padding:16px 14px;display:flex;flex-direction:column;gap:11px;opacity:0;transform:translateY(6px);transition:opacity .3s ease,transform .3s ease;pointer-events:none}
   .arc-hero .scene.on{opacity:1;transform:none;pointer-events:auto}
   .arc-hero .m{max-width:88%}.arc-hero .m.me{align-self:flex-end}.arc-hero .m.ai{align-self:flex-start}
   .arc-hero .b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
@@ -179,6 +188,9 @@
     .arc-hero{gap:16px;padding:24px 18px 34px}
     .arc-hero .eyebrow{margin-bottom:18px;font-size:11px;letter-spacing:.1em}
     .arc-hero .step{font-size:clamp(30px,11vw,42px);gap:12px}
+    .arc-hero .verb{font-size:clamp(40px,13vw,56px)}
+    .arc-hero .lead-line{font-size:16px}
+    .arc-hero .phone{width:262px}
     .arc-hero .sub{font-size:14.5px;margin-top:14px}
     .arc-hero .progress{margin-top:16px}
     .arc-hero .arc-cta{margin-top:18px}
@@ -257,9 +269,8 @@
   body.minimal .arc-hero{grid-template-columns:1fr;justify-items:center;gap:26px;padding-top:42px;min-height:calc(100dvh - 120px)}
   body.minimal .arc-hero > div:first-child{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;order:2}
   body.minimal .arc-hero .phone{order:1}
-  body.minimal .arc-hero .hero-h1,
-  body.minimal .arc-hero .phrase-rot,
-  body.minimal .arc-hero .progress,
+  body.minimal .arc-hero .lead-line,
+  body.minimal .arc-hero .verbs,
   body.minimal .arc-hero .arc-note{display:none}
   body.minimal .arc-hero .arc-cta{margin-top:0;width:min(440px,86vw);justify-content:center}
   body.minimal .strip,
@@ -277,10 +288,13 @@
 <body data-page="cover">
 
 <header class="arc-hero">
-  <div>
-    <h1 class="hero-h1">Your Travel Concierge</h1>
-    <div class="phrase-rot"><span class="ph-spark">✦</span><span class="ph-text" id="ph-text">Tures Books For You</span></div>
-    <div class="progress" id="prog"><i></i><i></i><i></i></div>
+  <div class="hero-c">
+    <p class="lead-line">Describe a trip. Tures does it all — and travels with you.</p>
+    <div class="verbs" id="verbs">
+      <button class="verb on" type="button" data-v="0">Books.</button>
+      <button class="verb" type="button" data-v="1">Protects.</button>
+      <button class="verb" type="button" data-v="2">Proves.</button>
+    </div>
     <div class="arc-cta">
       <a class="btn" id="hero-start" href="plan.html">Get Started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn btn-ghost" href="demo.html"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="margin-right:7px"><path d="M8 5v14l11-7z"/></svg> Watch Demo</a>
@@ -343,22 +357,21 @@ var ACTS=[
 (function(){
   var DWELL=5400;
   var scenes=[].slice.call(document.querySelectorAll('.arc-hero .scene'));
-  var prog=[].slice.call(document.querySelectorAll('#prog i'));
-  var phText=document.getElementById('ph-text'), pstatus=document.getElementById('pstatus');
+  var verbs=[].slice.call(document.querySelectorAll('.arc-hero .verb'));
+  var phone=document.querySelector('.arc-hero .phone');
+  var pstatus=document.getElementById('pstatus');
   if(!scenes.length) return;
-  document.documentElement.style.setProperty('--dwell',DWELL+'ms');
   var i=0,timer=null;
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function set(n){
     i=n;
     scenes.forEach(function(s,k){ s.classList.toggle('on',k===i); });
-    prog.forEach(function(p,k){ p.classList.remove('on','done'); if(k<i)p.classList.add('done'); });
-    if(!reduce){ var bar=prog[i]; bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on'); }
-    if(phText){ phText.classList.add('fade'); setTimeout(function(){ phText.textContent=ACTS[i].phrase; phText.classList.remove('fade'); }, reduce?0:200); }
+    verbs.forEach(function(v,k){ v.classList.toggle('on',k===i); });
     if(pstatus) pstatus.textContent=ACTS[i].status;
+    if(phone && !reduce){ phone.classList.remove('tick'); void phone.offsetWidth; phone.classList.add('tick'); }
   }
   function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
-  prog.forEach(function(p,k){ p.style.cursor='pointer'; p.addEventListener('click',function(){ set(k); play(); }); });
+  verbs.forEach(function(v,k){ v.addEventListener('click',function(){ set(k); play(); }); });
   set(0); play();
 })();
 (function(){
