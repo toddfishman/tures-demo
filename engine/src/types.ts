@@ -42,7 +42,7 @@ export const BriefSchema = z.object({
 });
 export type Brief = z.infer<typeof BriefSchema>;
 
-export type OfferKind = "flight" | "stay";
+export type OfferKind = "flight" | "stay" | "dining" | "activity" | "transport";
 
 /** Normalized offer — every supplier adapter maps its native response into this. */
 export interface Offer {
