@@ -123,6 +123,21 @@
   .from-ai .who{color:var(--acc-deep)}
   .from-ai .bubble{color:var(--acc-deep)}
 
+  /* one-time "set up to book" card (in-chat Vault hand-off) */
+  .vaultset{align-self:flex-start;max-width:96%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 58%),var(--bg);margin-top:2px}
+  .vaultset .vh{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .vaultset .vh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .vaultset .vh .demo-tag{margin-left:auto}
+  .vaultset .vbody{padding:13px 14px;display:flex;flex-direction:column;gap:11px}
+  .vaultset .vsafe{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--silver-deep);background:var(--surface);border:1px solid var(--silver-2);border-radius:9px;padding:8px 11px;line-height:1.4}
+  .vaultset .vsafe svg{stroke:var(--silver-deep);flex:0 0 auto}
+  .vaultset .vgrp{display:flex;flex-direction:column;gap:5px}
+  .vaultset .gl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  .vaultset .vfield{display:flex;gap:8px;flex-wrap:wrap}
+  .vaultset input{flex:1;min-width:110px;background:var(--bg);border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font:14px 'Inter',system-ui,sans-serif;color:var(--text);outline:none}
+  .vaultset input:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-dim)}
+  .vaultset .vact{display:flex;gap:10px;flex-wrap:wrap;padding:2px 14px 14px}
+
   @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
   @media (max-width:560px){.opt .oact .btn{flex:1}.xrow .xmeta{white-space:normal}}
 </style>
@@ -301,7 +316,7 @@
     ]);
   }
 
-  function executeBooking(brief){
+  function executeBooking(brief, fromSetup){
     typing(true);
     window.tures.book({brief:brief}).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId); })
     .then(function(bk){
@@ -318,7 +333,10 @@
       maybeNudge(); scroll();
     }).catch(function(e){
       typing(false);
-      if(e && e.status===409){ paymentGate(brief, e); }
+      if(e && e.status===409){
+        if(fromSetup){ bubble('Hm — that did not go through. Your trip is still held; want me to try the booking once more.','t'); actions([{label:'Try booking again', on:function(){ executeBooking(brief, true); }}]); }
+        else { vaultSetup(brief); }
+      }
       else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief); }}]); }
     });
   }
@@ -375,17 +393,43 @@
     }).catch(function(){ typing(false); done(); });
   }
 
-  function paymentGate(brief, e){
-    var why='Your trip is built and held — to book it for real I need a card on file.';
-    if(window.turesFunnel) window.turesFunnel.pendingTrip.set({brief:brief, total:(e&&e.body&&e.body.totalUsd)||null});
-    var n=document.createElement('div'); n.className='nudge msg';
-    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div>'+esc(why)+' Add a card to your Vault and I will pick this trip straight back up.</div>';
-    thread.appendChild(n); reveal(n);
-    var signed = window.tures && window.tures.signedIn;
-    actions([
-      {label:'Add a card &amp; book →', on:function(){ location.href = signed ? 'vault.html#payment' : 'signup.html'; }},
-      {label:'Not now', cls:'ghost', on:function(){ bubble('No rush — your trip is held. Pick it up whenever you like.','t'); }}
-    ]); scroll();
+  // First-booking hand-off — collected ONCE, in-chat, into the Vault, then reused forever.
+  // Because Tures books as your agent (not by logging into your airline), it needs DATA, not
+  // passwords: where to send confirmations, a card, and who's traveling. Demo = sample details.
+  function vaultSetup(brief){
+    if(window.turesFunnel) window.turesFunnel.pendingTrip.set({brief:brief, total:null});
+    bubble('Your trip is built and held. To book it in your name I need three things — just once, sealed in your Vault. I book as your agent, so I never need your airline logins.','t');
+    var c=document.createElement('div'); c.className='vaultset msg';
+    c.innerHTML=
+      '<div class="vh"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> One-time setup <span class="demo-tag">Safe demo</span></div>'+
+      '<div class="vbody">'+
+        '<div class="vsafe"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Sample details — nothing real is stored or charged. Edit them or just seal.</div>'+
+        '<div class="vgrp"><span class="gl">Where to send confirmations</span><div class="vfield"><input id="vs-email" value="you@example.com" aria-label="Email"></div></div>'+
+        '<div class="vgrp"><span class="gl">Payment</span><div class="vfield"><input id="vs-card" value="Visa •••• 4242" aria-label="Card"><input id="vs-exp" value="08 / 29" aria-label="Expiry" style="flex:0 0 92px;min-width:0"></div></div>'+
+        '<div class="vgrp"><span class="gl">Traveler (as on ID)</span><div class="vfield"><input id="vs-name" value="Andy Rockwell" aria-label="Full legal name"><input id="vs-dob" value="1979-04-12" aria-label="Date of birth" style="flex:0 0 130px;min-width:0"></div></div>'+
+      '</div>'+
+      '<div class="vact"></div>';
+    thread.appendChild(c); reveal(c);
+    var act=c.querySelector('.vact');
+    var seal=document.createElement('button'); seal.type='button'; seal.className='btn'; seal.innerHTML='✦ Seal &amp; book &rarr;';
+    var later=document.createElement('button'); later.type='button'; later.className='btn ghost'; later.textContent='Not now';
+    act.appendChild(seal); act.appendChild(later); scroll();
+    later.onclick=function(){ c.remove(); bubble('No rush — your trip is held. Pick it up whenever you like.','t'); };
+    seal.onclick=function(){
+      seal.disabled=true; later.disabled=true; seal.innerHTML='Sealing…';
+      var v=function(id){ var el=c.querySelector(id); return el? String(el.value||'').trim() : ''; };
+      var email=v('#vs-email'), name=v('#vs-name'), dob=v('#vs-dob');
+      var last4='4242'; var m=v('#vs-card').match(/(\d{4})\s*$/); if(m) last4=m[1]; // only a display last4 — never a full card number
+      var jobs=[];
+      // secret is a mock demo token (never a real card number); the engine stores it tokenized.
+      if(window.tures.connections) jobs.push(window.tures.connections.connect({kind:'payment', label:'Visa •••• '+last4, scopes:['payment:charge'], secret:{token:'tok_demo_'+last4, last4:last4}, meta:{cardKey:'visa_platinum', last4:last4}}).catch(function(){}));
+      if(window.tures.profile) jobs.push(window.tures.profile.set({fullName:name, dob:dob, email:email}).catch(function(){}));
+      Promise.all(jobs).then(function(){
+        c.remove();
+        bubble('Sealed in your Vault — and that is the last time I will ask. Booking now.','t');
+        executeBooking(brief, true);
+      });
+    };
   }
 
   function maybeNudge(){
