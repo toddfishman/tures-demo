@@ -167,31 +167,10 @@
     F.on(render);
   })();
 
-  /* ---- TEMP: Inter for all headlines/titles sitewide (was Playfair) ----
-     Centralized swap so we don't touch 24 files. Any element computed as
-     Playfair/Georgia (i.e. every serif headline, title or mark) is forced to
-     Inter; a MutationObserver catches late/dynamic headings (concierge modal,
-     etc.). To restore the serif look, delete this block. */
-  (function () {
-    var fl = document.createElement("link"); fl.rel = "stylesheet";
-    fl.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
-    document.head.appendChild(fl);
-    var INTER = "'Inter',system-ui,sans-serif";
-    function fix(el) {
-      if (!el || el.nodeType !== 1 || el.__interDone) return;
-      var ff = getComputedStyle(el).fontFamily || "";
-      if (/Playfair|Georgia/i.test(ff)) { el.style.setProperty("font-family", INTER, "important"); el.__interDone = true; }
-    }
-    function scan(root) { fix(root); var ns = root.querySelectorAll ? root.querySelectorAll("*") : []; for (var i = 0; i < ns.length; i++) fix(ns[i]); }
-    scan(document.body);
-    try {
-      var mo = new MutationObserver(function (muts) {
-        for (var i = 0; i < muts.length; i++) { var a = muts[i].addedNodes; for (var j = 0; j < a.length; j++) if (a[j].nodeType === 1) scan(a[j]); }
-      });
-      mo.observe(document.body, { childList: true, subtree: true });
-    } catch (_) {}
-    setTimeout(function () { scan(document.body); }, 700);
-  })();
+  /* Headings are now heavy Inter via the real stylesheets (v11.css + per-page);
+     the t✦ures wordmark and concierge avatars stay Playfair by design. (The old
+     runtime "force Inter on everything serif" hack was removed — it overrode the
+     wordmark/avatars too.) */
 
   /* ---- corner concierge (loads on every page; suppresses itself on Plan) ---- */
   var cz = document.createElement("script"); cz.src = "assets/concierge.js"; cz.defer = true; document.body.appendChild(cz);
