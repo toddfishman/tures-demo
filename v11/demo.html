@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Watch Tures work start to finish — setup, a plain-English conversation, booking with confirmation numbers, 24/7 monitoring, and the trip wrapped." />
+<meta name="description" content="Watch Tures work, sped up — a conversation, booking with confirmation numbers, 24/7 monitoring, and the trip wrapped." />
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#ff4929" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Tures" />
 <meta property="og:title" content="Watch Tures work — start to finish" />
-<meta property="og:description" content="A 70-second walkthrough: setup, conversation, booking, monitoring, the trip wrapped." />
+<meta property="og:description" content="A sped-up walkthrough: a conversation, booking, 24/7 monitoring, and the trip wrapped." />
 <meta property="og:url" content="https://tures.app/demo.html" />
 <meta property="og:image" content="https://tures.app/assets/img/og.svg" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -83,7 +83,7 @@
   /* chat bubbles */
   .m{max-width:88%}.m.me{align-self:flex-end}.m.ai{align-self:flex-start}
   .b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
-  .ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px;color:var(--acc-deep)}
   .me .b{background:#fff;border:1px solid var(--line-2);border-bottom-right-radius:4px}
   .typ{align-self:flex-start}.typ .b{display:inline-flex;gap:4px;padding:12px 14px}
   .typ i{width:6px;height:6px;border-radius:50%;background:var(--muted);opacity:.5;animation:bl 1.3s infinite}.typ i:nth-child(2){animation-delay:.2s}.typ i:nth-child(3){animation-delay:.4s}
@@ -197,7 +197,7 @@
 <main class="stage">
   <div class="lead">
     <div class="ey">Watch it work</div>
-    <h1 id="lead-h">One trip, start to finish — in about a minute.</h1>
+    <h1 id="lead-h">One trip, start to finish — sped up.</h1>
   </div>
 
   <div class="prog" id="prog">
@@ -215,11 +215,12 @@
 
       <!-- ACT 1 · THE ASK -->
       <div class="act" data-act="0">
-        <div class="m me r" style="--d:.1s"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
-        <div class="typ r" style="--d:1.3s"><div class="b"><i></i><i></i><i></i></div></div>
-        <div class="m ai r" style="--d:2.9s"><div class="b">On it. Two of you, treat-yourselves on the budget?</div></div>
-        <div class="m me r" style="--d:4.7s"><div class="b">Exactly.</div></div>
-        <div class="m ai r" style="--d:6.1s"><div class="b">Perfect — building it now.</div></div>
+        <div class="m ai r" style="--d:.1s"><div class="b">Good to see you — tell me the trip in your own words.</div></div>
+        <div class="m me r" style="--d:1.6s"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+        <div class="typ r" style="--d:3s"><div class="b"><i></i><i></i><i></i></div></div>
+        <div class="m ai r" style="--d:4.4s"><div class="b">On it. Two of you, treat-yourselves on the budget?</div></div>
+        <div class="m me r" style="--d:6s"><div class="b">Exactly.</div></div>
+        <div class="m ai r" style="--d:7.2s"><div class="b">Perfect — building it now.</div></div>
       </div>
 
       <!-- ACT 2 · THE PLAN + EXTRAS -->
@@ -291,7 +292,7 @@
 
 <!-- OUTRO -->
 <div class="outro" id="outro">
-  <div class="lead"><div class="ey">That took a minute</div></div>
+  <div class="lead"><div class="ey">Start to finish</div></div>
   <div class="ot">Your trip takes <span class="spark">one message.</span></div>
   <div class="os">Tell Tures where and when — it books every leg, watches the whole trip, and hands you the receipts.</div>
   <div class="cta">
@@ -304,7 +305,7 @@
 <script>
 (function(){
   var ACTS = [
-    { label:"Act 1 · The ask",      status:"Listening",                 watch:false, dur:8500,
+    { label:"Act 1 · The ask",      status:"Listening",                 watch:false, dur:9800,
       caption:"It starts with a conversation — bring <b>every detail or just a vibe</b>. No forms, no tabs." },
     { label:"Act 2 · The plan",     status:"Planning your trip",        watch:false, dur:11500,
       caption:"Tures shapes the whole trip — then shows you <b>where to eat, what to do, and how to get around</b>, all real." },

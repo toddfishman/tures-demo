@@ -374,13 +374,8 @@ var ACTS=[
   verbs.forEach(function(v,k){ v.addEventListener('click',function(){ set(k); play(); }); });
   set(0); play();
 })();
-(function(){
-  // Get Started preloads one short example trip, then opens the planner.
-  var s=document.getElementById('hero-start'); if(!s) return;
-  s.addEventListener('click', function(){
-    try{ localStorage.setItem('tures.seed', '5 days on Maui in June — oceanfront, from Seattle.'); }catch(_){}
-  });
-})();
+// Get Started opens a fresh planning session — Tures greets and the composer is
+// empty (no canned message is sent on the user's behalf).
 </script>
 <button class="view-toggle" id="view-toggle" type="button" aria-pressed="false">
   <span class="vt-dot"></span><span id="vt-label">Minimal view</span>
