@@ -115,6 +115,14 @@
   .xrow .xbtn:disabled{opacity:.6;cursor:default}
   .xrow .xdone{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--good);white-space:nowrap}
 
+  /* silver outline around the chat console */
+  .browser{border:1.5px solid var(--silver)}
+  /* sender name ABOVE the bubble; Tures speaks in vermilion */
+  .msg .who{font-size:11px;font-weight:600;color:var(--faint);margin:0 4px 5px;letter-spacing:.02em}
+  .from-me .who{text-align:right}
+  .from-ai .who{color:var(--acc-deep)}
+  .from-ai .bubble{color:var(--acc-deep)}
+
   @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
   @media (max-width:560px){.opt .oact .btn{flex:1}.xrow .xmeta{white-space:normal}}
 </style>
@@ -127,7 +135,7 @@
     <div class="wrap center">
       <span class="eyebrow"><span class="dot"></span> Plan a trip</span>
       <h1 style="margin-top:22px">Just have a <em>conversation.</em></h1>
-      <p class="lead" style="margin:18px auto 0">No forms, no twelve tabs — just talk to Tures. Bring every detail, down to the hotel and the seat, or just a vibe and some dates; it takes the trip as far as you want, then walks you through the picks before a single thing is held.</p>
+      <p class="lead" style="margin:18px auto 0">No forms, no tabs — just talk. Bring every detail, or just a vibe and some dates; Tures takes it as far as you want.</p>
     </div>
   </section>
 
@@ -176,16 +184,16 @@
         <h2 style="margin-top:18px">Six things, then it <em>goes to work.</em></h2>
       </div>
       <div class="asks">
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Origin</div><div class="as">Your departure city. Tures never guesses where you start.</div></div></div>
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Destination</div><div class="as">Where you are headed — a city, a coast, a country.</div></div></div>
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Dates</div><div class="as">Exact days, or a window it can shape around price.</div></div></div>
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Travelers</div><div class="as">Who is going. Two for the anniversary, or the whole family.</div></div></div>
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Style</div><div class="as">Oceanfront and design-forward, or quiet and close to the trail.</div></div></div>
-        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Budget</div><div class="as">A posture or a cap — business class if it is reasonable.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Origin</div><div class="as">Your departure city — never guessed.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Destination</div><div class="as">A city, a coast, a country.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Dates</div><div class="as">Exact days, or a window to price around.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Travelers</div><div class="as">Just you two, or the whole family.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Style</div><div class="as">Oceanfront and design-led, or quiet by the trail.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Budget</div><div class="as">A posture, or a hard cap.</div></div></div>
       </div>
       <div class="asks-note">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        <span>Tures never books until you confirm. Everything you see first is held — <b>nothing is charged</b> until you say the word.</span>
+        <span>Nothing is booked or charged until you confirm — <b>everything is held first</b>.</span>
       </div>
     </div>
   </section>
@@ -212,10 +220,10 @@
   function setRoute(o,d){ if(o&&d) route.textContent = short(o)+' ⇄ '+short(d); }
 
   function bubble(html, who){
-    var w=document.createElement('div'); w.className='msg '+(who==='me'?'from-me':'from-ai');
-    w.innerHTML='<div class="bubble">'+html+'</div>'; thread.appendChild(w); reveal(w);
-    var ts=document.createElement('div'); ts.className='tstamp'; if(who==='me') ts.style.textAlign='right';
-    ts.textContent=(who==='me'?'You':'Tures'); thread.appendChild(ts); reveal(ts); scroll(); return w;
+    var me = who==='me';
+    var w=document.createElement('div'); w.className='msg '+(me?'from-me':'from-ai');
+    w.innerHTML='<div class="who">'+(me?'You':'Tures')+'</div><div class="bubble">'+html+'</div>';
+    thread.appendChild(w); reveal(w); scroll(); return w;
   }
   var typingEl=null;
   function typing(on){
@@ -396,12 +404,11 @@
   // ── greeting ──
   function greet(){
     if(live){
-      bubble('Good to see you. Tell me the shape of the trip in your own words — where, roughly when, and what you are after. I will ask only for what I truly need.','t');
       var tp = window.turesFunnel && window.turesFunnel.taste();
-      if(tp && tp.signature) bubble('I have your Taste Print on hand — <span style="color:var(--muted)">'+esc(tp.signature.slice(0,90))+'…</span> — so the picks land in your register.','t');
-      else bubble('You can <a href="taste.html" style="color:var(--acc-deep);font-weight:600">build your Taste Print</a> first so every pick is in your register — or just start here.','t');
+      if(tp && tp.signature) bubble('Good to see you. Tell me the trip in your own words — I have your Taste Print, so the picks land right.','t');
+      else bubble('Good to see you. Tell me the trip in your own words — where, when, who. <a href="taste.html" style="color:var(--acc-deep);font-weight:600">Build a Taste Print</a> first, or just start.','t');
     } else {
-      bubble('Tures is offline in this preview. Watch the example to see a full trip come together.','t');
+      bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');
       actions([{label:'▷ Watch the example', on:runDemo}]);
     }
   }
