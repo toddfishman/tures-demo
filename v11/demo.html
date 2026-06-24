@@ -112,6 +112,28 @@
   .pick .pn{font-weight:600;font-size:14.5px;margin-top:3px}
   .pick .pd2{font-size:12px;color:var(--muted);margin-top:2px}
 
+  /* ---- real app components (dogfood: same look as plan.html) ---- */
+  .demo-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line-2);border-radius:5px;padding:2px 6px}
+  .conf{align-self:stretch;border:1px solid var(--line-2);border-radius:14px;overflow:hidden}
+  .conf .ch{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}
+  .conf .ch .ok{color:var(--good)}
+  .conf .ch .demo-tag{margin-left:auto}
+  .conf .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 13px;font-size:12.5px;border-bottom:1px solid var(--line)}
+  .conf .ln:last-child{border-bottom:none}
+  .conf .ln .mono{color:var(--acc-deep);white-space:nowrap}
+  .xwrap{align-self:stretch;display:flex;flex-direction:column;gap:11px}
+  .xgroup{border:1px solid var(--line-2);border-radius:13px;overflow:hidden;background:var(--bg)}
+  .xgroup .xh{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--acc-deep)}
+  .xgroup .xh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .xgroup .xh .demo-tag{margin-left:auto}
+  .xrow{display:flex;align-items:center;gap:11px;padding:9px 13px;border-bottom:1px solid var(--line)}
+  .xrow:last-child{border-bottom:none}
+  .xrow .xinfo{flex:1;min-width:0}
+  .xrow .xname{font-size:13px;font-weight:600;line-height:1.25}
+  .xrow .xmeta{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .xrow .xbtn{flex:0 0 auto;font-size:11.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text)}
+  .xrow .xdone{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:11px;color:var(--good);white-space:nowrap}
+
   /* weather note */
   .wx{align-self:flex-start;max-width:94%;display:flex;gap:9px;background:rgba(59,111,176,.08);border:1px solid rgba(59,111,176,.22);border-radius:13px;padding:9px 12px;font-size:12.5px;line-height:1.45}.wx svg{stroke:var(--rain);flex:0 0 auto;margin-top:1px}
 
@@ -191,48 +213,61 @@
     <div class="sct"><div class="av" style="position:relative">T<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div><div><div class="nm">Tures</div><div class="ss" id="sct-ss"><span class="pd"></span><span id="sct-status">Setting you up</span></div></div></div>
     <div class="scenes">
 
-      <!-- ACT 1 · SETUP -->
+      <!-- ACT 1 · THE ASK -->
       <div class="act" data-act="0">
-        <div class="r" style="--d:.05s"><div class="setup-h">Welcome to Tures</div><div class="setup-s">A two-minute setup, once.</div></div>
-        <div class="ck r" id="ck1" style="--d:.3s"><span class="dot">✓</span><span><span class="t">Taste Print</span><span class="d">how you like to travel</span></span></div>
-        <div class="ck r" id="ck2" style="--d:.6s"><span class="dot">✓</span><span><span class="t">Home airport · SEA</span><span class="d">so it never guesses where you start</span></span></div>
-        <div class="ck r" id="ck3" style="--d:.9s"><span class="dot">✓</span><span><span class="t">Card in the Vault</span><span class="d">tokenized — so it can actually book</span></span></div>
-        <div class="r" style="--d:1.1s;margin-top:2px"><div class="setbar"><i id="setfill"></i></div></div>
+        <div class="m me r" style="--d:.1s"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+        <div class="typ r" style="--d:1.3s"><div class="b"><i></i><i></i><i></i></div></div>
+        <div class="m ai r" style="--d:2.9s"><div class="b">On it. Two of you, treat-yourselves on the budget?</div></div>
+        <div class="m me r" style="--d:4.7s"><div class="b">Exactly.</div></div>
+        <div class="m ai r" style="--d:6.1s"><div class="b">Perfect — building it now.</div></div>
       </div>
 
-      <!-- ACT 2 · CONVERSATION -->
+      <!-- ACT 2 · THE PLAN + EXTRAS -->
       <div class="act" data-act="1">
-        <div class="m me r" style="--d:.1s"><div class="b">5 days on Maui in June — oceanfront, great food, business if it’s reasonable, from Seattle.</div></div>
-        <div class="typ r" id="chat-typ" style="--d:1.2s"><div class="b"><i></i><i></i><i></i></div></div>
-        <div class="m ai r" id="chat-ai1" style="--d:2.8s"><div class="b">On it. Two of you, treat-yourselves on the budget?</div></div>
-        <div class="m me r" id="chat-me2" style="--d:4.6s"><div class="b">Exactly.</div></div>
-        <div class="m ai r" id="chat-ai2" style="--d:6s"><div class="b">I have everything — putting it together now.</div></div>
+        <div class="m ai r" style="--d:.1s"><div class="b">Here is the shape — Hawaiian business SEA→OGG, 5 nights oceanfront at Montage Kapalua Bay, the anniversary table at Mama's Fish House. About <b>$9,240</b> all in, nothing held yet.</div></div>
+        <div class="m ai r" style="--d:1.7s"><div class="b">And while you are there — where I would eat, what I would do, and how to get around.</div></div>
+        <div class="xwrap r" style="--d:2.7s">
+          <div class="xgroup">
+            <div class="xh">Where to eat <span class="demo-tag">Sample</span></div>
+            <div class="xrow"><div class="xinfo"><div class="xname">Mama's Fish House</div><div class="xmeta">4.6★ · 9,400 reviews · ~$120/person</div></div><span class="xdone">✓ booked</span></div>
+            <div class="xrow"><div class="xinfo"><div class="xname">Merriman's Kapalua</div><div class="xmeta">4.5★ · 3,200 reviews · ~$95/person</div></div><span class="xbtn">Reserve</span></div>
+          </div>
+          <div class="xgroup">
+            <div class="xh">Things to do <span class="demo-tag">Sample</span></div>
+            <div class="xrow"><div class="xinfo"><div class="xname">Road to Hana tour</div><div class="xmeta">4.8★ · 2,100 reviews · ~$180/person</div></div><span class="xbtn">Add</span></div>
+            <div class="xrow"><div class="xinfo"><div class="xname">Molokini snorkel cruise</div><div class="xmeta">4.7★ · 5,600 reviews · ~$140/person</div></div><span class="xbtn">Add</span></div>
+          </div>
+          <div class="xgroup">
+            <div class="xh">Getting around <span class="demo-tag">Sample</span></div>
+            <div class="xrow"><div class="xinfo"><div class="xname">Private airport transfer</div><div class="xmeta">airport → Kapalua · ~45 min · ~$110</div></div><span class="xbtn">Arrange</span></div>
+          </div>
+        </div>
       </div>
 
-      <!-- ACT 3 · BOOKING -->
+      <!-- ACT 3 · IT BOOKS -->
       <div class="act" data-act="2">
-        <div class="work r" style="--d:.1s"><span class="sp"></span> Comparing 38 fares · holding two oceanfront suites…</div>
-        <div class="pick r" style="--d:1.4s"><div class="pk">✦ Tures’ pick</div><div class="pn">Montage Kapalua Bay</div><div class="pd2">Oceanfront suite · 5 nights · in your register for calm, design-led stays</div></div>
-        <div class="rc r" style="--d:3s">
-          <div class="h"><span class="spark">✦</span> Booked — verified twice <span class="tag">Sample</span></div>
-          <div class="r2"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
-          <div class="r2"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">MKB-5589</span></div>
-          <div class="r2"><span>Mama’s Fish House · anniversary</span><span class="mono">7:30p</span></div>
+        <div class="work r" style="--d:.1s"><span class="sp"></span> Booking every leg · verifying each twice…</div>
+        <div class="conf r" style="--d:1.7s">
+          <div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>
+          <div class="ln"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+          <div class="ln"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">MKB-5589</span></div>
+          <div class="ln"><span>Mama's Fish House · anniversary</span><span class="mono">7:30p</span></div>
         </div>
+        <div class="m ai r" style="--d:3.4s"><div class="b">Booked and double-checked. <span style="color:var(--muted)">A safe simulation — no card was charged.</span></div></div>
       </div>
 
       <!-- ACT 4 · MONITORING -->
       <div class="act" data-act="3">
         <div class="r" style="--d:.05s;align-self:center;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Thursday · in Maui</div>
         <div class="m ai r" style="--d:.5s"><div class="b">Heads up — your flight home shifted two hours. I rebooked you on the 4:55, same cabin, no change fee. Nothing for you to do.</div></div>
-        <div class="rc r" style="--d:2.4s"><div class="h">Rebooked first <span class="tag">Sample</span></div><div class="r2"><span>HA 18 · 4:55p · seats 2A·2C</span><span class="mono">NX9R4D</span></div></div>
+        <div class="conf r" style="--d:2.4s"><div class="ch"><span class="ok">✓</span> Rebooked first <span class="demo-tag">Sample</span></div><div class="ln"><span>HA 18 · 4:55p · seats 2A·2C</span><span class="mono">NX9R4D</span></div></div>
         <div class="wx r" style="--d:4s"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator.</div></div>
       </div>
 
       <!-- ACT 5 · SUMMARY -->
       <div class="act" data-act="4">
         <div class="home r" style="--d:.1s">
-          <div class="hh"><div class="t">Welcome home, Andy — Maui, handled.</div></div>
+          <div class="hh"><div class="t">Welcome home — Maui, handled.</div></div>
           <div class="grid">
             <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
             <div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>
@@ -269,15 +304,15 @@
 <script>
 (function(){
   var ACTS = [
-    { label:"Act 1 · Setup",        status:"Setting you up",          watch:false, dur:9000,
-      caption:"First, a quick one-time setup — your <b>taste</b>, your <b>home airport</b>, and a <b>card sealed in the Vault</b>." },
-    { label:"Act 2 · The ask",      status:"Listening",               watch:false, dur:9500,
-      caption:"Then just <b>describe the trip in plain words</b>. No forms, no filters, no tabs." },
-    { label:"Act 3 · It books",     status:"Booking your trip",       watch:false, dur:7500,
-      caption:"Tures books <b>every leg</b> — and hands back <b>confirmation numbers</b>, not links to chase." },
+    { label:"Act 1 · The ask",      status:"Listening",                 watch:false, dur:8500,
+      caption:"It starts with a sentence — just <b>describe the trip in plain words</b>. No forms, no tabs." },
+    { label:"Act 2 · The plan",     status:"Planning your trip",        watch:false, dur:11500,
+      caption:"Tures shapes the whole trip — then shows you <b>where to eat, what to do, and how to get around</b>, all real." },
+    { label:"Act 3 · It books",     status:"Booking your trip",         watch:false, dur:8500,
+      caption:"It books <b>every leg</b> and hands back <b>confirmation numbers</b> — verified twice, never faked." },
     { label:"Act 4 · It watches",   status:"Watching your trip · 24/7", watch:true,  dur:8000,
       caption:"Then it stays on, <b>around the clock</b> — catching trouble and fixing it <b>before you feel it</b>." },
-    { label:"Act 5 · The receipts", status:"Trip wrapped",            watch:false, dur:8500,
+    { label:"Act 5 · The receipts", status:"Trip wrapped",              watch:false, dur:8500,
       caption:"And when you land, the <b>receipts</b> — what it saved, the miles, the hours, the disaster it dodged." }
   ];
 
@@ -287,7 +322,6 @@
   var labEl  = document.getElementById('actlabel');
   var statEl = document.getElementById('sct-status');
   var ssEl   = document.getElementById('sct-ss');
-  var setfill= document.getElementById('setfill');
   var outro  = document.getElementById('outro');
   var leadH  = document.getElementById('lead-h');
   var ppLabel= document.getElementById('pp-label');
@@ -308,7 +342,6 @@
     ssEl.classList.toggle('watch', !!a.watch);
     capEl.style.opacity = 0;
     setTimeout(function(){ capEl.innerHTML = a.caption; capEl.style.opacity = 1; }, 180);
-    if(n===0){ setfill.style.width='0'; setTimeout(function(){ setfill.style.width='100%'; }, 1200); }
     if(leadH) leadH.style.opacity = .4;
   }
 
