@@ -55,6 +55,20 @@ const Env = z.object({
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
+  // Per-trip concierge fee (USD) charged to non-subscribers on a booking. Server-derived from
+  // the account's plan — never trusted from the request body.
+  PER_TRIP_FEE_USD: z.coerce.number().nonnegative().default(99),
+  // ── Situational-awareness "Signals" layer ──────────────────────────────────────────────
+  // The watcher that monitors active booked trips and surfaces proactive signals. Minutes
+  // between sweeps; 0 disables the background watcher (still available on-demand via /signals).
+  SIGNAL_WATCH_INTERVAL_MIN: z.coerce.number().int().nonnegative().default(0),
+  // Optional dedicated feeds. Weather + air-quality + travel-advisory are keyless (real, free);
+  // the web/news/events provider uses ANTHROPIC_API_KEY. These are for higher-fidelity feeds
+  // (traffic, transit status, local news/X) and are GUARDED — a provider with no key returns
+  // nothing and reports itself "not configured" (never fabricates a signal).
+  NEWS_API_KEY: z.string().optional(),
+  X_BEARER_TOKEN: z.string().optional(),
+  TRAFFIC_API_KEY: z.string().optional(),
 });
 
 const parsed = Env.parse(process.env);
@@ -72,6 +86,13 @@ export const config = {
   deepgramKey: parsed.DEEPGRAM_API_KEY,
   mem0Key: parsed.MEM0_API_KEY,
   googleMapsKey: parsed.GOOGLE_MAPS_API_KEY,
+  perTripFeeUsd: parsed.PER_TRIP_FEE_USD,
+  signals: {
+    watchIntervalMin: parsed.SIGNAL_WATCH_INTERVAL_MIN,
+    newsApiKey: parsed.NEWS_API_KEY,
+    xBearerToken: parsed.X_BEARER_TOKEN,
+    trafficApiKey: parsed.TRAFFIC_API_KEY,
+  },
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
   rateLimitMax: parsed.RATE_LIMIT_MAX,

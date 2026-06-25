@@ -1,6 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { handleDisruption } from "../hiccup/handler.ts";
+import { bookings } from "../booking/store.ts";
+import { actsFor } from "../auth/index.ts";
 
 const Body = z.object({
   bookingId: z.string(),
@@ -14,6 +16,10 @@ export async function disruptionRoutes(app: FastifyInstance) {
   app.post("/disruptions", async (req, reply) => {
     const parsed = Body.safeParse(req.body);
     if (!parsed.success) return reply.status(400).send({ error: "invalid_request", issues: parsed.error.issues });
+    // Ownership: this can move money (auto-rebook fare difference) — only the booking's owner may
+    // trigger it. 404 on a mismatch so booking ids can't be probed.
+    const owner = bookings.get(parsed.data.bookingId);
+    if (!owner || !actsFor(req, owner.accountId)) return reply.status(404).send({ error: "booking_not_found" });
     const result = await handleDisruption(parsed.data.bookingId, { kind: parsed.data.kind, detail: parsed.data.detail });
     if (!result) return reply.status(404).send({ error: "booking_not_found" });
     return result;

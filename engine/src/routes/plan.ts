@@ -14,7 +14,10 @@ export async function planRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "invalid_brief", issues: parsed.error.issues });
     }
     const tripId = `trip_${Date.now().toString(36)}_p${planCounter++}`;
-    const plan = await proposePlan(tripId, parsed.data, resolveAccountId(req));
+    // Optional stable memory id (same one the conversational agent uses) so the planner shares the
+    // traveler's mem0 memory. Read alongside the brief; BriefSchema ignores it.
+    const memoryKey = typeof (req.body as any)?.userId === "string" ? (req.body as any).userId : undefined;
+    const plan = await proposePlan(tripId, parsed.data, resolveAccountId(req), memoryKey);
     return plan;
   });
 }

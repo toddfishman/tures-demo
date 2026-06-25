@@ -344,6 +344,65 @@ let bookingId = "";
   ok("taste signal feeds the planner — where you've been changes the suggestions");
 }
 
+// 14.6 auth ownership: one account cannot confirm/read/disrupt another's booking, or revoke its card
+{
+  const A = (await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "owner@b.com", name: "Owner", password: "password123" } })).json();
+  const B = (await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "intruder@b.com", name: "Intruder", password: "password123" } })).json();
+  const authA = { authorization: "Bearer " + A.token };
+  const authB = { authorization: "Bearer " + B.token };
+
+  // A connects a card and opens a booking
+  const aCard = (await app.inject({ method: "POST", url: "/connections", headers: authA, payload: { kind: "payment", label: "Amex", secret: { customerId: "c", paymentMethodId: "p" }, meta: { cardKey: "amex_platinum" } } })).json();
+  const aBooking = (await app.inject({ method: "POST", url: "/book", headers: authA, payload: { brief } })).json();
+  assert.equal(aBooking.accountId, A.user.id, "A owns the booking");
+
+  // B is refused everywhere with 404 (not 403 → no enumeration)
+  assert.equal((await app.inject({ method: "POST", url: `/book/${aBooking.id}/confirm`, headers: authB })).statusCode, 404, "B cannot confirm A's booking");
+  assert.equal((await app.inject({ method: "GET", url: `/book/${aBooking.id}`, headers: authB })).statusCode, 404, "B cannot read A's booking");
+  assert.equal((await app.inject({ method: "POST", url: "/disruptions", headers: authB, payload: { bookingId: aBooking.id, kind: "delay" } })).statusCode, 404, "B cannot disrupt A's booking");
+  assert.equal((await app.inject({ method: "POST", url: `/connections/${aCard.id}/revoke`, headers: authB })).statusCode, 404, "B cannot revoke A's card");
+
+  // A still can (sanity: the guard isn't a blanket block)
+  assert.equal((await app.inject({ method: "GET", url: `/book/${aBooking.id}`, headers: authA })).statusCode, 200, "A can read its own booking");
+  ok("auth ownership: a second account cannot touch another's booking or card (404)");
+}
+
+// 14.7 scope hardening: client-supplied scopes are ignored — scopes are derived from kind
+{
+  const su = (await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "scopes@b.com", password: "password123" } })).json();
+  const auth = { authorization: "Bearer " + su.token };
+  // try to self-grant payment:charge via a loyalty connection — must NOT work
+  const sneaky = (await app.inject({ method: "POST", url: "/connections", headers: auth, payload: { kind: "loyalty", label: "United", scopes: ["payment:charge"], secret: { n: "x" } } })).json();
+  assert.deepEqual(sneaky.scopes, ["loyalty:read"], "loyalty connection gets only loyalty:read, not the smuggled payment:charge");
+  // with no real payment method, a booking is still blocked at the policy gate
+  const blocked = await app.inject({ method: "POST", url: "/book", headers: auth, payload: { brief } });
+  assert.equal(blocked.statusCode, 409, "no payment:charge → booking blocked despite the scope smuggling attempt");
+  ok("scope hardening: client cannot self-grant payment:charge via the scopes field");
+}
+
+// 14.8 situational-awareness /signals: locates a destination, returns ranked signals + provider status
+{
+  const res = await app.inject({ method: "POST", url: "/signals", payload: { destination: "OGG", departDate: "2026-09-12", returnDate: "2026-09-19" } });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.ok(body.destination && body.location, "destination located");
+  assert.ok(Array.isArray(body.signals), "signals is an array");
+  assert.ok(Array.isArray(body.providers) && body.providers.some((p: any) => p.category === "weather" && p.configured), "weather provider is wired + configured (keyless)");
+  assert.ok(body.providers.some((p: any) => p.name.includes("web search")), "the web scout provider is registered");
+  ok("signals: /signals locates a trip and returns ranked signals + provider status");
+
+  // an unlocatable destination is refused cleanly (no fabricated radar)
+  const bad = await app.inject({ method: "POST", url: "/signals", payload: { destination: "ZZ" } });
+  assert.equal(bad.statusCode, 422, "unlocatable destination → 422");
+  ok("signals: an unlocatable destination is refused (no fake signals)");
+
+  // health surfaces the signals layer + provider status
+  const h = (await app.inject({ method: "GET", url: "/health" })).json();
+  assert.equal(h.capabilities.situationalAwareness, true, "health reports the situational-awareness capability");
+  assert.ok(Array.isArray(h.signals.providers), "health lists signal providers");
+  ok("health: reports the situational-awareness layer + provider status");
+}
+
 // 15. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });

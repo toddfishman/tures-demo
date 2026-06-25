@@ -23,6 +23,9 @@
   try { account = JSON.parse(localStorage.getItem(ACCT) || "null"); } catch (_) {}
 
   function acctId() { return (account && account.id) || "demo"; }
+  // Stable memory id — the same one the conversational agent uses (turesFunnel.uid), so the planner
+  // shares the traveler's mem0 memory. Undefined when the funnel isn't loaded.
+  function memId() { try { return (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : undefined; } catch (_) { return undefined; } }
   function setSession(t, u) { token = t || ""; account = u || null; if (token) localStorage.setItem(TOKEN, token); else localStorage.removeItem(TOKEN); if (account) localStorage.setItem(ACCT, JSON.stringify(account)); else localStorage.removeItem(ACCT); }
 
   function api(path, opts) {
@@ -67,9 +70,12 @@
 
     /* ----- planning (free) ----- */
     parse: function (text) { return api("/parse", { method: "POST", body: JSON.stringify({ text: text }) }); },
-    plan: function (brief) { return api("/plan", { method: "POST", body: JSON.stringify(brief) }); },
+    plan: function (brief) { var body = Object.assign({}, brief || {}); var u = memId(); if (u) body.userId = u; return api("/plan", { method: "POST", body: JSON.stringify(body) }); },
     /* Real trip extras: hotels + restaurants + things-to-do (Google Places) + transport estimate. */
     discover: function (brief) { return api("/discover", { method: "POST", body: JSON.stringify(brief) }); },
+    /* Situational awareness — weather/air/events/advisories/transit for this trip. deep=true adds the
+       live web scout (slower). The "Trip Radar": this is the always-on watch, made visible. */
+    signals: function (brief, deep) { var b = brief || {}; return api("/signals", { method: "POST", body: JSON.stringify({ destination: b.destination, origin: b.origin, departDate: b.departDate, returnDate: b.returnDate, deep: !!deep }) }); },
     /* Simulated reservation of an extra → { confirmation, simulated, note }. */
     reserve: function (item) { return api("/reserve", { method: "POST", body: JSON.stringify(item || {}) }); },
 

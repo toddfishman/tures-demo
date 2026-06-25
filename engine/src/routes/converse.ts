@@ -31,6 +31,8 @@ THIS CONVERSATION: a natural back-and-forth, spoken or typed. Your job here is t
 
 WHAT YOU NEED before you can plan (gather it conversationally, one natural question at a time, skipping anything already known): where they're leaving from, where they're going (a vibe like "somewhere warm, you pick" is fine), when and for how long, who's coming, how they like to fly and stay, and how freely they want to spend. Origin is required — if you do not know their home airport, ask; never guess it. Accept vague answers and refine later. The moment you have enough for a strong first plan, stop asking, recap it in one line, and offer to build it.
 
+LOOKING THINGS UP: you can web_search for real, current facts when it genuinely helps the traveler — the season and weather pattern at a destination, whether dates collide with a festival, marathon, holiday, or strike, entry rules, or a current safety/event note. Use it sparingly and only when it changes your advice; never let a search slow down simple slot-gathering, and never invent a fact you could have checked. Cite what you found in plain language, briefly.
+
 READING THEM: notice how they communicate and match it — terse or chatty, detail-first or vibe-first, reading or listening (you can speak, via voice). If they arrive ready, confirm the gaps and go. If they arrive with a wish, take the lead warmly and teach as you go.
 
 THE REAL RULES:
@@ -64,6 +66,11 @@ const TOOLS = [
     },
   },
 ];
+
+// Anthropic server-side web search — executed by Anthropic mid-turn (no client round-trip). Gives
+// the conversational agent real, current facts (weather/season, events, advisories) instead of
+// only training data. Bounded so it can't run away with latency or cost.
+const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_uses: 2 } as const;
 
 export async function converseRoutes(app: FastifyInstance) {
   app.post("/converse", async (req, reply) => {
@@ -99,7 +106,7 @@ export async function converseRoutes(app: FastifyInstance) {
             model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
             max_tokens: 320,
             system,
-            tools: TOOLS,
+            tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
             messages: msgs,
           }).finalMessage();
         } catch (err) {

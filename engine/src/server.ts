@@ -29,6 +29,8 @@ import { voiceRoutes } from "./routes/voice.ts";
 import { converseRoutes } from "./routes/converse.ts";
 import { streamRoutes } from "./routes/stream.ts";
 import { discoverRoutes } from "./routes/discover.ts";
+import { signalRoutes } from "./routes/signals.ts";
+import { startSignalWatcher } from "./signals/watcher.ts";
 
 export async function build() {
   const app = Fastify({ logger: false });
@@ -84,6 +86,7 @@ export async function build() {
   await app.register(converseRoutes);
   await app.register(streamRoutes);
   await app.register(discoverRoutes);
+  await app.register(signalRoutes);
 
   return app;
 }
@@ -102,6 +105,8 @@ if (isMain) {
         live: config.supplier === "duffel" ? config.duffel.isLive : false,
         authProtected: !!config.apiKey,
       });
+      // Start the situational-awareness watcher (no-op unless SIGNAL_WATCH_INTERVAL_MIN>0).
+      startSignalWatcher();
     })
     .catch((err) => {
       log.error("failed to start", { err: String(err) });

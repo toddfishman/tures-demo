@@ -12,6 +12,7 @@ import { runSearch } from "../search/service.ts";
 import { assembleContext } from "./context.ts";
 import { emitEvent } from "../events/bus.ts";
 import { config } from "../config.ts";
+import { recall } from "../mem0.ts";
 
 export interface ProposedPlan {
   tripId: string;
@@ -25,11 +26,27 @@ export interface ProposedPlan {
 }
 
 /** Entry point. Uses the Claude tool-use agent loop when ANTHROPIC_API_KEY is set; otherwise
- *  the deterministic planner below. Same return shape either way. */
-export async function proposePlan(tripId: string, brief: Brief, accountId = "demo"): Promise<ProposedPlan> {
+ *  the deterministic planner below. Same return shape either way.
+ *  `memoryKey` (when given) keys mem0 personalization — the front-end passes the same stable id
+ *  the conversational agent uses, so the planner remembers what the chat learned (and vice-versa). */
+export async function proposePlan(tripId: string, brief: Brief, accountId = "demo", memoryKey?: string): Promise<ProposedPlan> {
   // Fold standing memory (Taste Print, loyalty, "where you've been") + this-trip brief into one
   // coherent picture before planning. Both planners see the effective brief + the context prose.
   const { context, brief: effBrief } = assembleContext(accountId, brief);
+
+  // mem0: long-term, cross-session memories (what they've loved, learned preferences). Keyed by the
+  // shared memoryKey when present, else the account id. Folded into the SAME context prose both the
+  // scorer and the agent read — so the planner is personalized, not just the chat. No-op without a key.
+  const memId = memoryKey || (accountId !== "demo" ? accountId : undefined);
+  if (memId) {
+    try {
+      const mems = await recall(memId, `${brief.destination} ${(brief.placeTypes ?? []).join(" ")} ${context.tasteTags.join(" ")}`.trim());
+      if (mems.length) {
+        context.prose = `${context.prose} Remembered: ${mems.slice(0, 4).join("; ")}.`.trim();
+      }
+    } catch { /* memory is best-effort — never block a plan on it */ }
+  }
+
   if (context.prose) emitEvent(tripId, "status", "Personalizing for you", { detail: context.prose.slice(0, 280) });
 
   if (config.anthropicKey) {

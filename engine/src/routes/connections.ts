@@ -1,13 +1,15 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { connect, list, revoke } from "../vault/index.ts";
-import { resolveAccountId } from "../auth/index.ts";
+import { connect, list, revoke, connectionById } from "../vault/index.ts";
+import { resolveAccountId, actsFor } from "../auth/index.ts";
 
 const ConnectBody = z.object({
   accountId: z.string().optional(),
   kind: z.enum(["payment", "email", "calendar", "loyalty"]),
   label: z.string().min(1),
-  scopes: z.array(z.string()).optional(),
+  // NOTE: `scopes` is intentionally NOT accepted from the client. Scopes are the authorization
+  // boundary (hasScope gates payment:charge), so they are derived server-side from `kind`
+  // (DEFAULT_SCOPES) — a client must not be able to self-grant a scope it didn't earn.
   secret: z.record(z.unknown()),
   meta: z.record(z.unknown()).optional(),
 });
@@ -28,8 +30,10 @@ export async function connectionRoutes(app: FastifyInstance) {
     return { connections: list(resolveAccountId(req, req.query.accountId)) };
   });
 
-  // POST /connections/:id/revoke — pull the plug. Immediate for new actions.
+  // POST /connections/:id/revoke — pull the plug. Immediate for new actions. Owner only.
   app.post<{ Params: { id: string } }>("/connections/:id/revoke", async (req, reply) => {
+    const existing = connectionById(req.params.id);
+    if (!existing || !actsFor(req, existing.accountId)) return reply.status(404).send({ error: "not_found" });
     const c = revoke(req.params.id);
     if (!c) return reply.status(404).send({ error: "not_found" });
     return c;

@@ -115,6 +115,32 @@
   .xrow .xbtn:disabled{opacity:.6;cursor:default}
   .xrow .xdone{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--good);white-space:nowrap}
 
+  /* trip radar — situational awareness (the always-on watch, made visible) */
+  .radar{align-self:flex-start;max-width:96%;margin-top:2px;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .radar .rh{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--acc-deep)}
+  .radar .rh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .radar .rh .pulse{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .radar .rh .demo-tag{margin-left:auto}
+  .radar .ritem{display:flex;gap:11px;align-items:flex-start;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .radar .ritem:last-child{border-bottom:none}
+  .radar .ritem .sev{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:5px;background:var(--muted)}
+  .radar .ritem .sev.info{background:var(--muted)}
+  .radar .ritem .sev.watch{background:#d9a514}
+  .radar .ritem .sev.warning{background:var(--acc)}
+  .radar .ritem .sev.critical{background:var(--acc-deep);box-shadow:0 0 8px var(--acc)}
+  .radar .ritem .rinfo{flex:1;min-width:0}
+  .radar .ritem .rt{font-size:13.5px;font-weight:600;line-height:1.3}
+  .radar .ritem .rt .cat{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-left:7px;font-weight:400}
+  .radar .ritem .rd{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .radar .ritem .rd a{color:var(--acc-deep);border-bottom:1px solid var(--acc-line)}
+  .radar .rclear{padding:13px 15px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .radar .rclear svg{stroke:var(--good);flex:0 0 auto}
+  .radar .rfoot{padding:10px 15px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .radar .rscan{font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);cursor:pointer;transition:border-color .15s,color .15s}
+  .radar .rscan:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .radar .rscan:disabled{opacity:.6;cursor:default}
+  .radar .rnote{font-size:11.5px;color:var(--faint)}
+
   /* silver outline around the chat console */
   .browser{border:1.5px solid var(--silver)}
   /* sender name ABOVE the bubble; Tures speaks in vermilion */
@@ -300,9 +326,11 @@
       var total = (p && p.totalUsd!=null) ? ('about $'+Number(p.totalUsd).toLocaleString()+' all in') : 'a single, clean number';
       var why = (p && p.rationale) ? p.rationale : 'flights and a hotel that fit exactly what you asked for';
       bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet.','t');
-      presentExtras(brief, function(){
-        bubble('That is the trip, end to end. Shall I book the flights and hotel.','t');
-        offerBook(brief);
+      presentRadar(brief, function(){
+        presentExtras(brief, function(){
+          bubble('That is the trip, end to end. Shall I book the flights and hotel.','t');
+          offerBook(brief);
+        });
       });
     }).catch(function(){
       typing(false);
@@ -389,6 +417,49 @@
         groups.forEach(function(g){ wrap.appendChild(g); });
         thread.appendChild(wrap); reveal(wrap); scroll();
       }
+      done();
+    }).catch(function(){ typing(false); done(); });
+  }
+
+  // ── trip radar: situational awareness (the always-on watch, made visible) ──
+  function sevDot(sev){ return '<span class="sev '+esc(sev||'info')+'"></span>'; }
+  function radarItem(s){
+    var cat = s.category ? '<span class="cat">'+esc(s.category)+'</span>' : '';
+    var url = s.url ? ' · <a href="'+esc(s.url)+'" target="_blank" rel="noopener">source</a>' : '';
+    var detail = s.detail ? '<div class="rd">'+esc(s.detail)+url+'</div>' : (url ? '<div class="rd">'+url+'</div>' : '');
+    return '<div class="ritem">'+sevDot(s.severity)+'<div class="rinfo"><div class="rt">'+esc(s.title)+cat+'</div>'+detail+'</div></div>';
+  }
+  function presentRadar(brief, done){
+    done = done || function(){};
+    if(!live || !brief || !window.tures.signals){ done(); return; }
+    bubble('And I have already started watching this trip — weather, air, events, anything that could get in the way. This is the part that never sleeps.','t');
+    typing(true);
+    window.tures.signals(brief, false).then(function(d){
+      typing(false);
+      var sigs = (d && d.signals) || [];
+      var card=document.createElement('div'); card.className='radar msg';
+      var head='<div class="rh"><span class="pulse"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>Trip radar · watching</span><span class="demo-tag">Live</span></div>';
+      var bodyHtml = sigs.length ? sigs.slice(0,5).map(radarItem).join('')
+        : '<div class="rclear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> All clear right now — I will keep watching and tell you the moment something changes.</div>';
+      var foot='<div class="rfoot"><button type="button" class="rscan">Scan live sources &rarr;</button><span class="rnote">strikes · events · advisories · traffic</span></div>';
+      card.innerHTML=head+bodyHtml+foot;
+      thread.appendChild(card); reveal(card); scroll();
+      var scan=card.querySelector('.rscan');
+      scan.onclick=function(){
+        scan.disabled=true; scan.textContent='Scanning the live web…';
+        window.tures.signals(brief, true).then(function(dd){
+          var deep=((dd&&dd.signals)||[]).filter(function(s){ return s.source==='web'; });
+          if(deep.length){
+            var rc=card.querySelector('.rclear'); if(rc) rc.parentNode.removeChild(rc);
+            card.querySelector('.rfoot').insertAdjacentHTML('beforebegin', deep.slice(0,5).map(radarItem).join(''));
+            if(scan.parentNode) scan.parentNode.removeChild(scan);
+            card.querySelector('.rnote').textContent='Live web scan complete';
+          } else {
+            scan.textContent='Nothing new on the live web';
+          }
+          scroll();
+        }).catch(function(){ scan.disabled=false; scan.textContent='Scan live sources →'; });
+      };
       done();
     }).catch(function(){ typing(false); done(); });
   }

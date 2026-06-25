@@ -3,10 +3,20 @@
 // QUEUE. Replays recent history on connect so a late-joining browser catches up.
 import type { FastifyInstance } from "fastify";
 import { bus } from "../events/bus.ts";
+import { bookings } from "../booking/store.ts";
+import { actsFor } from "../auth/index.ts";
 
 export async function streamRoutes(app: FastifyInstance) {
   app.get<{ Params: { tripId: string } }>("/stream/:tripId", async (req, reply) => {
     const { tripId } = req.params;
+
+    // If this tripId belongs to a booking, only its owner may stream it (it carries prices,
+    // confirmation numbers, and card-selection reasoning). Planning-time tripIds aren't persisted
+    // as bookings and remain open — their ids are ephemeral and known only to their creator.
+    const booking = bookings.getByTripId(tripId);
+    if (booking && !actsFor(req, booking.accountId)) {
+      return reply.status(404).send({ error: "not_found" });
+    }
 
     reply.raw.writeHead(200, {
       "Content-Type": "text/event-stream",

@@ -14,6 +14,16 @@ class BookingStore {
     return this.byId.values().find((b) => b.idempotencyKey === key);
   }
 
+  /** Lookup by execution tripId — used to authorize the per-trip SSE stream. */
+  getByTripId(tripId: string): Booking | undefined {
+    return this.byId.values().find((b) => b.tripId === tripId);
+  }
+
+  /** Active booked trips whose travel window is current/upcoming — the watcher's worklist. */
+  activeBooked(): Booking[] {
+    return this.byId.values().filter((b) => b.status === "booked");
+  }
+
   /** All bookings for an account, newest first — the account dashboard's trip list. */
   listByAccount(accountId: string): Booking[] {
     return this.byId

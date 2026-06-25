@@ -106,3 +106,11 @@ export function publicUser(u: User) {
 export function resolveAccountId(req: any, _explicit?: string): string {
   return req?.accountId || "demo";
 }
+
+/** Ownership guard for id-addressed records. A record is reachable only by the account that
+ *  owns it (the session, or "demo" for anonymous). Returns true when the acting account may act
+ *  on `ownerAccountId`. Use a 404 (not 403) on failure so record ids can't be enumerated. */
+export function actsFor(req: any, ownerAccountId: string | undefined): boolean {
+  if (!ownerAccountId) return false;
+  return ownerAccountId === resolveAccountId(req);
+}
