@@ -25,25 +25,63 @@
   .ts-hero h1{margin-top:20px;max-width:12ch}
   .ts-hero .lead{margin:18px auto 0}
 
-  /* Taste Print panel */
-  .print-wrap{margin-top:38px}
-  .print{border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);overflow:hidden;
-    box-shadow:0 40px 90px -60px rgba(0,0,0,.3)}
-  .print .ph{display:flex;align-items:center;gap:13px;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
-  .print .ph .avatar{width:42px;height:42px;font-size:19px}
-  .print .ph .who{flex:1}
-  .print .ph .who .nm{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em}
-  .print .ph .who .sub{font-size:12.5px;color:var(--muted)}
-  .print .ph .edit{font-size:12.5px;color:var(--acc-deep);border:1px solid var(--acc-line);border-radius:999px;padding:6px 13px;background:var(--acc-dim)}
-  .print .pb{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
-  .pcell{background:var(--bg);padding:18px 20px}
-  .pcell .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  /* ── two-profile panel: standing print + per-trip lens ── */
+  .tprofile{margin-top:38px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);
+    overflow:hidden;box-shadow:0 40px 90px -60px rgba(0,0,0,.3)}
+  .tp-head{display:flex;align-items:center;gap:13px;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .tp-head .avatar{width:42px;height:42px;font-size:19px}
+  .tp-head .who{flex:1}
+  .tp-head .nm{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em}
+  .tp-head .sub{font-size:12.5px;color:var(--muted)}
+  .tp-head .edit{font-size:12.5px;color:var(--acc-deep);border:1px solid var(--acc-line);border-radius:999px;padding:6px 13px;background:var(--acc-dim)}
+
+  .lens-row{padding:20px 22px 8px}
+  .lens-row .ll{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:13px}
+
+  /* slick symmetrical selector — replaces pill buttons */
+  .choiceset{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:9px}
+  .choice{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;padding:16px 10px 13px;
+    border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;color:var(--text);
+    transition:transform .16s,border-color .16s,background .16s,box-shadow .16s,color .16s}
+  .choice:hover{transform:translateY(-2px);border-color:var(--acc-line);box-shadow:0 14px 30px -24px rgba(0,0,0,.4)}
+  .choice:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  .choice .ci{color:var(--silver-deep);line-height:0;transition:color .16s}
+  .choice .ci svg{stroke:currentColor}
+  .choice .cl{font-size:12.5px;font-weight:500;letter-spacing:-.01em}
+  .choice[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff;
+    box-shadow:0 16px 32px -20px rgba(255,73,41,.66)}
+  .choice[aria-pressed="true"] .ci{color:#fff}
+
+  .tp-legend{display:flex;align-items:center;flex-wrap:wrap;gap:7px 18px;padding:18px 22px 2px;font-size:12px;color:var(--muted)}
+  .tp-legend .lg{display:flex;align-items:center;gap:6px}
+  .tp-legend i.usu{width:2px;height:13px;border-radius:2px;background:var(--silver-deep)}
+  .tp-legend i.trp{width:15px;height:9px;border-radius:3px;background:linear-gradient(90deg,var(--acc-2),var(--acc))}
+  .tp-sig{flex:1;min-width:100%;color:var(--text);font-size:13.5px;line-height:1.55;margin-top:4px}
+  .tp-sig b{color:var(--acc-deep);font-weight:600}
+
+  .tp-dims{padding:14px 22px 10px}
+  .tdim{margin-bottom:15px}
+  .tdim:last-child{margin-bottom:4px}
+  .tdim .tnrow{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+  .tdim .tn{font-size:12.5px;font-weight:500;color:var(--text)}
+  .tdim .tdelta{font-size:11px;font-family:'Space Mono',monospace}
+  .tdim .tdelta.up{color:var(--acc-deep)}
+  .tdim .tdelta.down{color:var(--silver-deep)}
+  .tdim .ttrack{position:relative;height:8px;border-radius:999px;background:var(--surface-2)}
+  .tdim .tfill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--acc-2),var(--acc));transition:width .6s cubic-bezier(.5,0,.2,1)}
+  .tdim .tmark{position:absolute;top:-4px;bottom:-4px;width:2px;border-radius:2px;background:var(--silver-deep);
+    transition:left .6s cubic-bezier(.5,0,.2,1)}
+  .tdim .tpoles{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--faint);letter-spacing:.02em}
+
+  .tp-foot{padding:13px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;align-items:center;gap:8px}
+  .tp-foot .demo-tag{margin-left:auto}
+
+  /* attribute chips (read-only tags) */
   .chips{display:flex;flex-wrap:wrap;gap:7px}
   .chip{font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:5px 12px}
   .chip.av{color:var(--muted);background:var(--bg);border-style:dashed}
   .chip.lv{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
-  .print .pf{padding:11px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;align-items:center;gap:8px}
-  .print .pf .demo-tag{margin-left:auto}
 
   /* Because you loved */
   .byl{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
@@ -152,7 +190,7 @@
     <div class="wrap center">
       <span class="eyebrow"><span class="dot"></span> The Taste Engine</span>
       <h1 style="margin-left:auto;margin-right:auto">It gets to know <em>you.</em></h1>
-      <p class="lead center">Tures learns what you love, what you avoid, and where you should go next &mdash; then books in that vein. The more you travel, the more it sounds like the friend who already knows your taste.</p>
+      <p class="lead center">You have a usual taste &mdash; and every trip bends it a little. Tures keeps both: who you are <em>in general</em>, and what <em>this</em> trip is really for &mdash; then books in that vein. The more you travel, the sharper both get.</p>
 
       <!-- saved Taste Print surfaces here on load -->
       <div id="tpLive" class="tp-live" hidden>
@@ -167,57 +205,42 @@
     </div>
   </section>
 
-  <!-- TASTE PRINT -->
+  <!-- TWO PROFILES: standing print + per-trip lens -->
   <section class="section tight">
     <div class="wrap">
       <div class="center">
-        <span class="eyebrow"><span class="dot"></span> Your Taste Print</span>
-        <h2 style="margin-top:18px">A profile that <em>books like you would.</em></h2>
+        <span class="eyebrow"><span class="dot"></span> Two profiles, one of you</span>
+        <h2 style="margin-top:18px">Your usual taste &mdash; and how each trip <em>bends it.</em></h2>
+        <p class="lead center" style="margin:14px auto 0;max-width:60ch">Pick what a trip is for. Watch your standing Taste Print flex to fit it &mdash; the outliers move, the rest stays you.</p>
       </div>
 
-      <div class="print-wrap">
-        <div class="print">
-          <div class="ph">
-            <span class="avatar">A</span>
-            <div class="who">
-              <div class="nm">Andy Rockwell</div>
-              <div class="sub">Taste Print &middot; learned across 11 trips</div>
-            </div>
-            <a class="edit" href="vault.html">Edit preferences</a>
+      <div class="tprofile">
+        <div class="tp-head">
+          <span class="avatar" id="tpAv">A</span>
+          <div class="who">
+            <div class="nm" id="tpName">Andy Rockwell</div>
+            <div class="sub" id="tpSub">Standing Taste Print &middot; learned across 11 trips</div>
           </div>
+          <a class="edit" href="vault.html">Edit</a>
+        </div>
 
-          <div class="pb">
-            <div class="pcell">
-              <div class="l">Cabin</div>
-              <div class="chips"><span class="chip">Business</span><span class="chip">Lie-flat on red-eyes</span></div>
-            </div>
-            <div class="pcell">
-              <div class="l">Hotels</div>
-              <div class="chips"><span class="chip">Design-forward</span><span class="chip">Boutique</span><span class="chip">Under 80 rooms</span></div>
-            </div>
-            <div class="pcell">
-              <div class="l">Cuisine</div>
-              <div class="chips"><span class="chip">Tasting menus</span><span class="chip">Local seafood</span></div>
-            </div>
-            <div class="pcell">
-              <div class="l">Pace</div>
-              <div class="chips"><span class="chip">Unhurried mornings</span><span class="chip">One thing a day</span></div>
-            </div>
-            <div class="pcell">
-              <div class="l">Avoid</div>
-              <div class="chips"><span class="chip av">Big resorts</span><span class="chip av">Crowds</span><span class="chip av">Early flights</span></div>
-            </div>
-            <div class="pcell">
-              <div class="l">Loves</div>
-              <div class="chips"><span class="chip lv">Coastal towns</span><span class="chip lv">Walkable old quarters</span></div>
-            </div>
-          </div>
+        <div class="lens-row">
+          <div class="ll">What&rsquo;s this trip for?</div>
+          <div class="choiceset" id="lensSet" role="group" aria-label="Trip purpose"></div>
+        </div>
 
-          <div class="pf">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--faint)"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            <span>Yours to edit any time. Tures books inside it, asks outside it.</span>
-            <span class="demo-tag">Sample</span>
-          </div>
+        <div class="tp-legend">
+          <span class="lg"><i class="usu"></i> Your usual</span>
+          <span class="lg"><i class="trp"></i> This trip</span>
+          <p class="tp-sig" id="lensSig"></p>
+        </div>
+
+        <div class="tp-dims" id="tpDims"></div>
+
+        <div class="tp-foot">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--faint)"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Both profiles are yours &mdash; editable any time. Tures books inside them, asks outside them.</span>
+          <span class="demo-tag" id="tpTag">Sample</span>
         </div>
       </div>
     </div>
@@ -344,7 +367,9 @@
     map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
     grid:'<path d="M3 9h18M9 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/>',
     spark:'<path d="M12 3v6M12 15v6M3 12h6M15 12h6"/><path d="m6 6 3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/>',
-    feather:'<path d="M20 4 8.5 15.5a5 5 0 0 0-1.5 3.5V21h2a5 5 0 0 0 3.5-1.5L20 8z"/><path d="M16 8 4 20M14 10H8"/>'
+    feather:'<path d="M20 4 8.5 15.5a5 5 0 0 0-1.5 3.5V21h2a5 5 0 0 0 3.5-1.5L20 8z"/><path d="M16 8 4 20M14 10H8"/>',
+    briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+    heart:'<path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/>'
   };
   function ico(p){return '<span class="oi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg></span>';}
 
@@ -516,6 +541,7 @@
 
     renderResult(tp, sig);
     surface(tp);
+    renderProfile();
   }
 
   function stripHtml(s){ var d=document.createElement('div'); d.innerHTML=s; return d.textContent; }
@@ -563,13 +589,106 @@
     elBuild.innerHTML = 'Refine your Taste Print &nbsp;&#10022;';
   }
 
+  /* ===========================================================
+     Two-profile lens panel — standing Taste Print, bent per trip
+     The lens maps to brief.tripSentiment {purpose, pace, avoid}.
+     =========================================================== */
+  var POLES = {
+    pace:['Slow','Packed'], register:['Casual','Refined'], energy:['Mellow','High'],
+    palate:['Familiar','Adventurous'], planning:['Spontaneous','Mapped'], aesthetic:['Rustic','Designed']
+  };
+  // verbs shown when a lens nudges a dimension down (0) / up (1)
+  var POLE_VERB = {
+    pace:['easier','fuller'], register:['looser','sharper'], energy:['calmer','livelier'],
+    palate:['safer','bolder'], planning:['looser','tighter'], aesthetic:['warmer','cleaner']
+  };
+  var SAMPLE_DIMS = {pace:32,register:36,energy:34,palate:74,planning:50,aesthetic:82};
+
+  var LENSES = [
+    {id:'usual', label:'My usual', ic:'feather', d:{},
+      sig:'This is <b>you, in general</b> — what Tures reaches for when nothing about the trip says otherwise.'},
+    {id:'celebrate', label:'Celebrate', ic:'spark', d:{register:24,energy:30,palate:12,aesthetic:6},
+      sig:'A celebration <b>trades up</b> — louder energy, sharper rooms, bolder plates than your everyday. The rest stays you.'},
+    {id:'unwind', label:'Unwind', ic:'moon', d:{pace:-26,energy:-22,planning:-18,palate:-8},
+      sig:'To decompress, Tures <b>drops the pace hard</b> — slow mornings, low energy, nothing over-planned.'},
+    {id:'adventure', label:'Adventure', ic:'compass', d:{energy:30,pace:22,palate:16,planning:-16,aesthetic:-8},
+      sig:'On an adventure it <b>pushes out</b> — full days, high energy, food you&rsquo;ve never tried, loosely mapped.'},
+    {id:'work', label:'Work', ic:'briefcase', d:{planning:28,pace:22,register:16,energy:-10},
+      sig:'A work trip <b>tightens up</b> — mapped, efficient, a notch more polished — energy dialed down.'},
+    {id:'romance', label:'Romance', ic:'heart', d:{register:22,aesthetic:14,energy:-16,pace:-12},
+      sig:'Romance goes <b>quieter and finer</b> — refined, beautiful rooms, unhurried and low-key.'},
+    {id:'family', label:'Family', ic:'users', d:{pace:-20,palate:-22,energy:8,planning:12},
+      sig:'With family it <b>simplifies</b> — gentler pace, crowd-pleasing food, a little more structure.'}
+  ];
+
+  var lensSet = document.getElementById('lensSet');
+  var lensSig = document.getElementById('lensSig');
+  var tpDims  = document.getElementById('tpDims');
+  var tpName  = document.getElementById('tpName');
+  var tpSub   = document.getElementById('tpSub');
+  var tpAv    = document.getElementById('tpAv');
+  var tpTag   = document.getElementById('tpTag');
+  var curLens = LENSES[0];
+
+  function baseline(){
+    var saved = F.taste && F.taste();
+    if (saved && saved.dims){
+      var acc = (T && T.account) ? T.account() : null;
+      var nm = (acc && acc.name) || 'You';
+      return { dims:saved.dims, name:nm, sub:'Your standing Taste Print', sample:false };
+    }
+    return { dims:SAMPLE_DIMS, name:'Andy Rockwell', sub:'Standing Taste Print · learned across 11 trips', sample:true };
+  }
+  function clampD(n){ return Math.max(6, Math.min(96, Math.round(n))); }
+  function bend(dims, lens){
+    var o = {}; DIM_KEYS.forEach(function(k){ o[k] = clampD(dims[k] + (lens.d[k]||0)); }); return o;
+  }
+  function renderDims(usual, trip){
+    var h = '';
+    DIM_KEYS.forEach(function(k){
+      var u = usual[k], t = trip[k], dlt = t - u, p = POLES[k];
+      var ann = '';
+      if (dlt >= 8)      ann = '<span class="tdelta up">&uarr; '+POLE_VERB[k][1]+'</span>';
+      else if (dlt <= -8) ann = '<span class="tdelta down">&darr; '+POLE_VERB[k][0]+'</span>';
+      h += '<div class="tdim"><div class="tnrow"><span class="tn">'+DIM_LABEL[k]+'</span>'+ann+'</div>'+
+           '<div class="ttrack"><i class="tfill" style="width:'+t+'%"></i><i class="tmark" style="left:'+u+'%"></i></div>'+
+           '<div class="tpoles"><span>'+p[0]+'</span><span>'+p[1]+'</span></div></div>';
+    });
+    tpDims.innerHTML = h;
+  }
+  function selectLens(lens){
+    curLens = lens;
+    [].forEach.call(lensSet.children, function(b){ b.setAttribute('aria-pressed', b.dataset.id === lens.id ? 'true' : 'false'); });
+    var base = baseline();
+    renderDims(base.dims, bend(base.dims, lens));
+    lensSig.innerHTML = lens.sig;
+  }
+  function renderProfile(){
+    var base = baseline();
+    tpName.textContent = base.name;
+    tpSub.textContent  = base.sub;
+    tpAv.textContent   = (base.name || 'Y').trim().charAt(0).toUpperCase();
+    tpTag.hidden = !base.sample;
+    if (!lensSet.children.length){
+      LENSES.forEach(function(l){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'choice'; b.dataset.id = l.id; b.setAttribute('aria-pressed','false');
+        b.innerHTML = '<span class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+SVG[l.ic]+'</svg></span><span class="cl">'+l.label+'</span>';
+        b.addEventListener('click', function(){ selectLens(l); });
+        lensSet.appendChild(b);
+      });
+    }
+    selectLens(curLens);
+  }
+
   elBuild.addEventListener('click', start);
   closeBtn.addEventListener('click', close);
   modal.addEventListener('click', function(e){ if (e.target === modal) close(); });
 
-  // on load: surface any saved Taste Print
+  // on load: surface any saved Taste Print + render the two-profile panel
   var existing = F.taste();
   if (existing && existing.signature) surface(existing);
+  renderProfile();
 })();
 </script>
 
