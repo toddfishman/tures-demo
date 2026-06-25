@@ -3,6 +3,7 @@ import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { recall, remember } from "../mem0.ts";
+import { fuguChat } from "../agent/fugu.ts";
 
 // Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
 // to the planner. Not scripted: a strong identity (the system prompt) plus a hard checklist (the
@@ -76,8 +77,9 @@ export async function converseRoutes(app: FastifyInstance) {
   app.post("/converse", async (req, reply) => {
     const p = Body.safeParse(req.body);
     if (!p.success) return reply.status(400).send({ error: "invalid_request" });
-    if (!config.anthropicKey) {
-      return reply.status(501).send({ error: "agent_not_configured", reply: "My brain isn't connected yet — the planning key isn't set." });
+    // A chat brain is either Sakana Fugu (primary, experimental) or Anthropic (fallback). Need one.
+    if (!config.anthropicKey && !config.sakana.enabled) {
+      return reply.status(501).send({ error: "agent_not_configured", reply: "My brain isn't connected yet — no chat model is set." });
     }
     const msgs = p.data.messages.slice(-12);
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
@@ -94,41 +96,76 @@ export async function converseRoutes(app: FastifyInstance) {
         system += `\n\nWHAT YOU REMEMBER about this traveler (from past trips and chats — use it to personalize and to reference what they've loved before, but confirm before assuming):\n- ${memories.join("\n- ")}`;
       }
 
-      const { default: Anthropic } = await import("@anthropic-ai/sdk");
-      const client = new Anthropic({ apiKey: config.anthropicKey, maxRetries: 3 });
-      // The connection to Anthropic can drop mid-response ("Premature close"); retry such
-      // transient network errors a couple of times before surfacing a failure.
-      async function createWithRetry(tries: number): Promise<any> {
+      let text = "";
+      let slots: Record<string, any> | null = null; // submit_brief args when the model committed a brief
+      let via: "fugu" | "anthropic" = "anthropic";
+
+      // ── Primary brain: Sakana Fugu (experiment) ──
+      // When keyed, Fugu answers the chat. ANY failure (missing/expired key, wrong endpoint,
+      // unexpected shape, network) falls through to Anthropic so chat never breaks. Note: the
+      // Anthropic-only web_search server tool isn't available on the Fugu path.
+      if (config.sakana.enabled) {
         try {
-          // Stream the response and assemble it — reads the body in chunks (SSE), which
-          // survives transport quirks that break a single one-shot body read ("Premature close").
-          return await client.messages.stream({
-            model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
-            max_tokens: 320,
+          const f = await fuguChat(
             system,
-            tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
-            messages: msgs,
-          }).finalMessage();
+            msgs,
+            { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
+            320,
+          );
+          text = f.text;
+          slots = f.toolInput;
+          via = "fugu";
         } catch (err) {
-          const m = String((err && (err as any).message) || err);
-          if (tries > 0 && /premature close|fetcherror|econnreset|terminated|socket hang up|fetch failed|network|aborted/i.test(m)) {
-            await new Promise((r) => setTimeout(r, 600));
-            return createWithRetry(tries - 1);
-          }
-          throw err;
+          log.warn("sakana fugu failed — falling back to anthropic", { err: String((err as any)?.message ?? err) });
+          via = "anthropic";
         }
       }
-      const resp = await createWithRetry(2);
-      const text = resp.content.filter((b: any) => b.type === "text").map((b: any) => b.text).join(" ").trim();
-      // Learn from this turn (fire-and-forget) so future recommendations sharpen.
-      void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
-      const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
-      if (tool) {
-        const slots = tool.input || {};
-        const brief = String(slots.brief || "").trim();
-        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots };
+
+      // ── Fallback brain: Anthropic ──
+      if (via !== "fugu") {
+        if (!config.anthropicKey) {
+          // Fugu was the only brain configured and it failed — no fallback to reach.
+          return reply.status(502).send({ error: "chat_brain_unavailable" });
+        }
+        const { default: Anthropic } = await import("@anthropic-ai/sdk");
+        const client = new Anthropic({ apiKey: config.anthropicKey, maxRetries: 3 });
+        // The connection to Anthropic can drop mid-response ("Premature close"); retry such
+        // transient network errors a couple of times before surfacing a failure.
+        async function createWithRetry(tries: number): Promise<any> {
+          try {
+            // Stream the response and assemble it — reads the body in chunks (SSE), which
+            // survives transport quirks that break a single one-shot body read ("Premature close").
+            return await client.messages.stream({
+              model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
+              max_tokens: 320,
+              system,
+              tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
+              messages: msgs,
+            }).finalMessage();
+          } catch (err) {
+            const m = String((err && (err as any).message) || err);
+            if (tries > 0 && /premature close|fetcherror|econnreset|terminated|socket hang up|fetch failed|network|aborted/i.test(m)) {
+              await new Promise((r) => setTimeout(r, 600));
+              return createWithRetry(tries - 1);
+            }
+            throw err;
+          }
+        }
+        const resp = await createWithRetry(2);
+        text = resp.content.filter((b: any) => b.type === "text").map((b: any) => b.text).join(" ").trim();
+        const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
+        slots = tool ? (tool.input || {}) : null;
       }
-      return { reply: text };
+
+      // Learn from this turn (fire-and-forget), regardless of which brain answered.
+      void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
+
+      // submit_brief committed → hand the structured brief to the planner.
+      if (slots && Object.keys(slots).length) {
+        const brief = String(slots.brief || "").trim();
+        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via };
+      }
+      return { reply: text, via };
     } catch (e: any) {
       log.error("converse failed", {
         message: String(e?.message ?? e),

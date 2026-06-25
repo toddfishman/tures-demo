@@ -55,6 +55,13 @@ const Env = z.object({
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
+  // ── Sakana Fugu — experimental primary brain for Tures' conversational chats ──────────────
+  // When SAKANA_API_KEY is set, /converse routes through Fugu first and falls back to Anthropic
+  // on any error. Implemented against the OpenAI-compatible /chat/completions shape (the de-facto
+  // standard) — VERIFY against Sakana's real docs and override the URL/model below if they differ.
+  SAKANA_API_KEY: z.string().optional(),
+  SAKANA_API_URL: z.string().url().default("https://api.sakana.ai/v1"),
+  SAKANA_MODEL: z.string().default("fugu"),
   // Per-trip concierge fee (USD) charged to non-subscribers on a booking. Server-derived from
   // the account's plan — never trusted from the request body.
   PER_TRIP_FEE_USD: z.coerce.number().nonnegative().default(99),
@@ -116,6 +123,15 @@ export const config = {
     return process.env.ENGINE_API_KEY || undefined;
   },
   allowLiveBooking: parsed.ALLOW_LIVE_BOOKING === "true",
+  /** Sakana Fugu — primary chat brain when keyed (OpenAI-compatible). Falls back to Anthropic. */
+  sakana: {
+    apiKey: parsed.SAKANA_API_KEY,
+    apiUrl: parsed.SAKANA_API_URL,
+    model: parsed.SAKANA_MODEL,
+    get enabled(): boolean {
+      return !!parsed.SAKANA_API_KEY;
+    },
+  },
   /** Which provider charges cards for bookings. Stays mock until STRIPE_CHARGE_CARDS=true AND a
    *  real saved-card flow exists — so enabling subscriptions never breaks bookings. */
   get payments(): "stripe" | "mock" {

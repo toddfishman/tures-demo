@@ -14,6 +14,10 @@ export async function healthRoutes(app: FastifyInstance) {
       realInventorySearch: config.supplier === "duffel", // real flights via Duffel when a token is set
       bookingSimulated: !config.allowLiveBooking, // confirmations are labeled samples; no money moves
       agentLoop: !!config.anthropicKey, // Chunk 2 — Claude tool-use loop
+      // Conversational chat brain: Sakana Fugu when keyed (experimental primary), else Anthropic.
+      // Fugu auto-falls-back to Anthropic on any error, so chat works as long as either is set.
+      chatBrain: config.sakana.enabled ? "sakana-fugu" : (config.anthropicKey ? "anthropic" : "none"),
+      chatFallback: config.sakana.enabled ? (config.anthropicKey ? "anthropic" : "none") : undefined,
       booking: true, // Chunk 3 — gate + mock/simulated execution always available
       paymentProvider: config.payments, // "mock" until a Stripe key is set
       liveBookingAllowed: config.allowLiveBooking, // hard safety switch
