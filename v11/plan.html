@@ -141,6 +141,18 @@
   .radar .rscan:disabled{opacity:.6;cursor:default}
   .radar .rnote{font-size:11.5px;color:var(--faint)}
 
+  /* demo homecoming "proof" card (Books → Protects → Proves, in-product) */
+  .dhome{align-self:stretch;max-width:96%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg);margin-top:2px}
+  .dhome .hh{padding:12px 15px;border-bottom:1px solid var(--line);background:var(--acc-dim);display:flex;align-items:center;gap:8px}
+  .dhome .hh .t{font-family:'Playfair Display',Georgia,serif;font-size:16px}
+  .dhome .hh .demo-tag{margin-left:auto}
+  .dhome .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .dhome .cell{background:var(--bg);padding:12px 14px}
+  .dhome .cell .n{font-family:'Space Mono',monospace;font-size:19px;color:var(--acc-deep);line-height:1.1}
+  .dhome .cell .l{font-size:11px;color:var(--muted);margin-top:3px}
+  .dhome .foot{padding:11px 15px;font-size:12.5px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}
+  .dhome .foot b{color:var(--text);font-weight:600}
+
   /* silver outline around the chat console */
   .browser{border:1.5px solid var(--silver)}
   /* sender name ABOVE the bubble; Tures speaks in vermilion */
@@ -533,6 +545,31 @@
     '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
     '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div></div>'+
     '<div class="oact"><button class="btn" type="button">Hold this</button><button class="btn ghost" type="button">See alternatives</button></div></div>';
+
+  // Scripted confirmation, radar, and homecoming cards — the demo tells the whole Books→Protects→
+  // Proves arc, all clearly Sample-labeled (no fake success: this is the example, not a real booking).
+  var demoConf =
+    '<div class="conf msg show"><div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+
+    '<div class="ln"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>'+
+    '<div class="ln"><span>Return · OGG→SEA · Jun 19</span><span class="mono">HA · QK7T2P</span></div>'+
+    '<div class="ln"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">MNT · 4471-LX</span></div>'+
+    '<div class="ln"><span>Total · all in</span><span class="mono">$9,840</span></div></div>';
+  var radarSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+  var demoRadar =
+    '<div class="radar msg show"><div class="rh"><span class="pulse"></span>'+radarSvg+'<span>Trip radar · watching</span><span class="demo-tag">Sample</span></div>'+
+    '<div class="ritem"><span class="sev warning"></span><div class="rinfo"><div class="rt">Thunderstorms Thursday afternoon<span class="cat">weather</span></div><div class="rd">Maui, HI: storms rolling into your snorkeling window — I have a fix staged.</div></div></div>'+
+    '<div class="ritem"><span class="sev watch"></span><div class="rinfo"><div class="rt">Lane work on Honoapiilani Hwy<span class="cat">traffic</span></div><div class="rd">Mornings near Kapalua — I will route your transfers around it.</div></div></div>'+
+    '<div class="ritem"><span class="sev info"></span><div class="rinfo"><div class="rt">Whale-watch season opens<span class="cat">event</span></div><div class="rd">First boats run your second morning — want two seats held?</div></div></div></div>';
+  var demoHome =
+    '<div class="dhome msg show"><div class="hh"><div class="t serif">Welcome home — Maui, handled.</div><span class="demo-tag">Sample</span></div>'+
+    '<div class="grid">'+
+      '<div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>'+
+      '<div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>'+
+      '<div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>'+
+      '<div class="cell"><div class="n">1</div><div class="l">disruption dodged</div></div>'+
+    '</div>'+
+    '<div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama&rsquo;s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div></div>';
+
   var demoSteps = [
     {t:'t',h:'Good to see you. Tell me the shape of the trip in your own words.'},
     {t:'me',h:'My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.'},
@@ -540,8 +577,22 @@
     {t:'t',h:'Lovely — two of you, oceanfront Maui in June. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where from, and which days.'},
     {t:'me',h:'From Seattle, June 12 to 19.', route:['Seattle','Maui']},
     {typing:1},
-    {t:'t',h:'That is everything I need. Let me walk you through a few curated picks — starting with where you will stay.'},
-    {card:1}
+    {t:'t',h:'That is everything I need. Here is where I would put you — and why.'},
+    {card:1},
+    {t:'me',h:'Perfect. Hold it, and book the flights too.'},
+    {typing:1},
+    {t:'t',h:'Done — both flights and the suite, in your name, each leg verified twice. Nothing for you to chase.'},
+    {conf:1},
+    {typing:1},
+    {t:'t',h:'And from here I am watching the whole trip. This is the part that never sleeps.'},
+    {radar:1},
+    {typing:1},
+    {t:'t',h:'Heads up — your flight home Thursday shifted two hours. I already moved you to the 4:55, same cabin, no change fee.'},
+    {t:'t',h:'And with those storms over your snorkeling morning, I shifted Molokini to Wednesday — clear water, same operator. Nothing for you to do.'},
+    {typing:1},
+    {t:'t',h:'Welcome home. Here is how it went.'},
+    {home:1},
+    {t:'t',h:'Booked, watched, and accounted for — the whole loop. Want to plan yours? Type below, or talk to me up top.'}
   ];
   var demoRunning=false;
   function runDemo(){
@@ -552,10 +603,15 @@
       var s=demoSteps[i++];
       if(s.typing){ typing(true); setTimeout(function(){ typing(false); tick(); },1100); return; }
       typing(false);
-      if(s.card){ thread.insertAdjacentHTML('beforeend', optCard); scroll(); }
+      var bigCard = false;
+      if(s.card){ thread.insertAdjacentHTML('beforeend', optCard); bigCard=true; }
+      else if(s.conf){ thread.insertAdjacentHTML('beforeend', demoConf); bigCard=true; }
+      else if(s.radar){ thread.insertAdjacentHTML('beforeend', demoRadar); bigCard=true; }
+      else if(s.home){ thread.insertAdjacentHTML('beforeend', demoHome); bigCard=true; }
       else bubble(s.h, s.t==='me'?'me':'t');
       if(s.route) setRoute(s.route[0], s.route[1]);
-      setTimeout(tick, s.t==='me'?700:1300);
+      scroll();
+      setTimeout(tick, s.t==='me' ? 750 : (bigCard ? 2100 : 1400));
     })();
   }
 
