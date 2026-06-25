@@ -57,8 +57,8 @@ const Env = z.object({
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
   // ── Sakana Fugu — experimental primary brain for Tures' conversational chats ──────────────
   // When SAKANA_API_KEY is set, /converse routes through Fugu first and falls back to Anthropic
-  // on any error. Implemented against the OpenAI-compatible /chat/completions shape (the de-facto
-  // standard) — VERIFY against Sakana's real docs and override the URL/model below if they differ.
+  // on any error. OpenAI-compatible /chat/completions — confirmed 2026-06-25 against Sakana's docs:
+  // base https://api.sakana.ai/v1, Bearer auth, models "fugu" (standard) / "fugu-ultra-20260615".
   SAKANA_API_KEY: z.string().optional(),
   SAKANA_API_URL: z.string().url().default("https://api.sakana.ai/v1"),
   SAKANA_MODEL: z.string().default("fugu"),

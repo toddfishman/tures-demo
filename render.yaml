@@ -33,6 +33,16 @@ services:
         sync: false
       - key: AGENT_MODEL
         value: claude-opus-4-8
+      # Sakana Fugu — experimental PRIMARY chat brain for /converse (OpenAI-compatible). The key is
+      # a dashboard secret; the URL + model are non-secret config, pinned here. Confirmed against
+      # Sakana's docs: base https://api.sakana.ai/v1, models "fugu" (standard) / "fugu-ultra-20260615".
+      # On ANY Fugu error the chat auto-falls-back to Anthropic, so this can never break chat.
+      - key: SAKANA_API_KEY         # set in dashboard — presence flips Fugu on as the chat brain
+        sync: false
+      - key: SAKANA_API_URL
+        value: https://api.sakana.ai/v1
+      - key: SAKANA_MODEL
+        value: fugu
       - key: CORS_ORIGINS
         value: https://toddfishman.github.io,http://localhost:8123
       # Optional later (persistence + security hardening): DATA_DIR (+ a Render disk),
