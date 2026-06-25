@@ -21,6 +21,28 @@ export interface FuguResult {
   text: string;
   /** Parsed tool arguments when the model called `tool.name`, else null. */
   toolInput: Record<string, any> | null;
+  /** Raw assistant message — for diagnosing tool-call shape across providers (gated debug only). */
+  raw?: any;
+}
+
+/** Pull the tool arguments out of an assistant message across the shape variants providers use:
+ *  new-style `tool_calls[].function.arguments` (string or already-parsed object) and the legacy
+ *  single `function_call.arguments`. Returns null when the tool wasn't called. */
+function extractToolInput(msg: any, toolName: string): Record<string, any> | null {
+  let args: unknown;
+  const call = (msg?.tool_calls ?? []).find((c: any) => c?.function?.name === toolName || c?.name === toolName);
+  if (call) args = call.function?.arguments ?? call.arguments;
+  else if (msg?.function_call?.name === toolName) args = msg.function_call.arguments;
+  if (args == null) return null;
+  if (typeof args === "object") return args as Record<string, any>;
+  if (typeof args === "string") {
+    try {
+      return JSON.parse(args);
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
 /** One non-streaming chat turn through Fugu with a single optional function tool. */
@@ -53,17 +75,12 @@ export async function fuguChat(
 
   const json: any = await res.json();
   const msg = json?.choices?.[0]?.message ?? {};
-  const text = typeof msg.content === "string" ? msg.content.trim() : "";
+  // Content can be a plain string or an array of content parts (some OpenAI-compatible providers).
+  const text = typeof msg.content === "string"
+    ? msg.content.trim()
+    : Array.isArray(msg.content)
+      ? msg.content.map((p: any) => (typeof p === "string" ? p : p?.text ?? "")).join(" ").trim()
+      : "";
 
-  let toolInput: Record<string, any> | null = null;
-  const call = (msg.tool_calls ?? []).find((c: any) => c?.function?.name === tool.name);
-  if (call) {
-    try {
-      toolInput = JSON.parse(call.function.arguments || "{}");
-    } catch {
-      toolInput = null; // malformed args → treat as "no clean brief yet"
-    }
-  }
-
-  return { text, toolInput };
+  return { text, toolInput: extractToolInput(msg, tool.name), raw: msg };
 }

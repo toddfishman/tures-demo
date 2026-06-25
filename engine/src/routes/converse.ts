@@ -16,6 +16,9 @@ const Body = z.object({
   context: z.string().optional(),
   // Stable id for this traveler — keys their mem0 memory (personalization across sessions).
   userId: z.string().optional(),
+  // Diagnostics: when true, the response includes the raw Fugu assistant message so we can see how
+  // (or whether) it emitted the submit_brief tool. Safe — it's the model's own message, no secrets.
+  debug: z.boolean().optional(),
 });
 
 const SYSTEM = `You are Tures — a portable, do-it-all AI travel concierge who actually books the trip and then travels with the customer, watching it around the clock. You are warm, sharp, and genuinely useful, and you know the ways of the world and especially of travel: how flights connect, how time zones and red-eyes and layovers really work, when a fare is a trap, what a place is like in a given season.
@@ -99,6 +102,7 @@ export async function converseRoutes(app: FastifyInstance) {
       let text = "";
       let slots: Record<string, any> | null = null; // submit_brief args when the model committed a brief
       let via: "fugu" | "anthropic" = "anthropic";
+      let fuguRaw: any = null; // raw Fugu message, surfaced only under the debug flag
 
       // ── Primary brain: Sakana Fugu (experiment) ──
       // When keyed, Fugu answers the chat. ANY failure (missing/expired key, wrong endpoint,
@@ -114,6 +118,7 @@ export async function converseRoutes(app: FastifyInstance) {
           );
           text = f.text;
           slots = f.toolInput;
+          fuguRaw = f.raw;
           via = "fugu";
         } catch (err) {
           log.warn("sakana fugu failed — falling back to anthropic", { err: String((err as any)?.message ?? err) });
@@ -160,12 +165,13 @@ export async function converseRoutes(app: FastifyInstance) {
       // Learn from this turn (fire-and-forget), regardless of which brain answered.
       void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
 
+      const dbg = p.data.debug ? { _debug: { via, fuguMessage: fuguRaw } } : {};
       // submit_brief committed → hand the structured brief to the planner.
       if (slots && Object.keys(slots).length) {
         const brief = String(slots.brief || "").trim();
-        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via };
+        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via, ...dbg };
       }
-      return { reply: text, via };
+      return { reply: text, via, ...dbg };
     } catch (e: any) {
       log.error("converse failed", {
         message: String(e?.message ?? e),
