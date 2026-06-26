@@ -32,7 +32,7 @@ import { discoverRoutes } from "./routes/discover.ts";
 import { signalRoutes } from "./routes/signals.ts";
 import { assistRoutes } from "./routes/assist.ts";
 import { channelRoutes } from "./routes/channels.ts";
-import { telegramRoutes } from "./routes/telegram.ts";
+import { telegramRoutes, registerTelegramWebhook } from "./routes/telegram.ts";
 import { startSignalWatcher } from "./signals/watcher.ts";
 
 export async function build() {
@@ -113,6 +113,8 @@ if (isMain) {
       });
       // Start the situational-awareness watcher (no-op unless SIGNAL_WATCH_INTERVAL_MIN>0).
       startSignalWatcher();
+      // Point Telegram at this engine's webhook (no-op unless a bot token is set).
+      void registerTelegramWebhook();
     })
     .catch((err) => {
       log.error("failed to start", { err: String(err) });

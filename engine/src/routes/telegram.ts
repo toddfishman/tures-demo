@@ -25,6 +25,30 @@ function history(chatId: string) {
   return h;
 }
 
+/** Point Telegram at THIS engine's webhook. Idempotent; called on boot so setting the token in
+ *  Render is all it takes (no manual setWebhook curl). Uses Render's RENDER_EXTERNAL_URL by default. */
+export async function registerTelegramWebhook(): Promise<void> {
+  if (!config.telegram.enabled) return;
+  const base = (process.env.TELEGRAM_WEBHOOK_URL || process.env.RENDER_EXTERNAL_URL || "").replace(/\/$/, "");
+  if (!base) {
+    log.warn("telegram: no base URL (set RENDER_EXTERNAL_URL or TELEGRAM_WEBHOOK_URL) — webhook not auto-registered");
+    return;
+  }
+  const url = `${base}/telegram/webhook`;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${config.telegram.token}/setWebhook`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, secret_token: config.telegram.webhookSecret || undefined, allowed_updates: ["message", "edited_message"] }),
+    });
+    const j: any = await r.json();
+    if (j.ok) log.info("telegram: webhook registered", { url });
+    else log.warn("telegram: setWebhook failed", { description: j.description });
+  } catch (e) {
+    log.warn("telegram: setWebhook error", { err: String(e) });
+  }
+}
+
 async function send(chatId: string, text: string) {
   if (!config.telegram.token) return;
   try {
@@ -46,6 +70,26 @@ function planSummary(plan: any): string {
 }
 
 export async function telegramRoutes(app: FastifyInstance) {
+  // GET /telegram/status — diagnostic: is the token valid, and is the webhook pointed at us?
+  // Uses the server-side token; returns NO secret (bot username + webhook url are public).
+  app.get("/telegram/status", async () => {
+    if (!config.telegram.enabled) return { enabled: false };
+    const out: any = { enabled: true, configuredUsername: config.telegram.username };
+    try {
+      const me: any = await (await fetch(`https://api.telegram.org/bot${config.telegram.token}/getMe`)).json();
+      out.tokenValid = !!me.ok;
+      if (me.ok) out.bot = { username: me.result.username, id: me.result.id, name: me.result.first_name };
+      const wh: any = await (await fetch(`https://api.telegram.org/bot${config.telegram.token}/getWebhookInfo`)).json();
+      if (wh.ok) {
+        out.webhook = { url: wh.result.url || null, pending: wh.result.pending_update_count, lastError: wh.result.last_error_message || null };
+        out.pointsToUs = typeof wh.result.url === "string" && wh.result.url.includes("/telegram/webhook");
+      }
+    } catch (e) {
+      out.error = String((e as any)?.message ?? e);
+    }
+    return out;
+  });
+
   app.post("/telegram/webhook", async (req, reply) => {
     if (!config.telegram.enabled) return reply.status(404).send({ error: "telegram_not_configured" });
     // Only Telegram (which knows the secret) may post here.
