@@ -36,12 +36,12 @@
 
   // The six things that make the funnel "complete". Ordered = nudge priority.
   var STEPS = [
-    { key: "taste",   label: "Build your Taste Print",     href: "taste.html",  why: "so every pick is in your register" },
-    { key: "home",    label: "Set your home airport",      href: "vault.html#basics", why: "so Tures never has to guess where you start" },
-    { key: "contact", label: "Add a way to reach you",     href: "vault.html#basics", why: "so it can send the one calm message" },
-    { key: "payment", label: "Add a card to your Vault",   href: "vault.html#payment", why: "so it can actually book, not just hold" },
-    { key: "docs",    label: "Add your travel documents",  href: "vault.html#docs", why: "passport and Known Traveler, tokenized" },
-    { key: "loyalty", label: "Connect loyalty programs",   href: "vault.html#loyalty", why: "so your miles and status apply automatically" }
+    { key: "taste",   label: "Build your Taste Print",     href: "onboard.html#c-taste",   why: "so every pick is in your register" },
+    { key: "home",    label: "Set your home airport",      href: "onboard.html#c-essentials", why: "so Tures never has to guess where you start" },
+    { key: "contact", label: "Add a way to reach you",     href: "onboard.html#c-essentials", why: "so it can send the one calm message" },
+    { key: "payment", label: "Add a card to your Vault",   href: "onboard.html#c-essentials", why: "so it can actually book, not just hold" },
+    { key: "docs",    label: "Add your travel documents",  href: "onboard.html#c-docs",    why: "passport and Known Traveler, tokenized" },
+    { key: "loyalty", label: "Connect loyalty programs",   href: "onboard.html#c-loyalty", why: "so your miles and status apply automatically" }
   ];
 
   function done(key) {

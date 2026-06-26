@@ -11,6 +11,7 @@
       { href: "what-is.html",   label: "What is Tures",    page: "what-is" },
       { href: "demo.html",      label: "Watch the demo",   page: "demo" },
       { href: "plan.html",      label: "Plan a trip",      page: "plan" },
+      { href: "onboard.html",   label: "Set up Tures",     page: "onboard" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
       { href: "signup.html",    label: "Join the waitlist", page: "signup" }
     ]},
