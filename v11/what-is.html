@@ -30,8 +30,9 @@
   .wi-asks{margin-top:22px;display:flex;flex-direction:column;gap:12px}
   .wi-asks .ask{font-size:clamp(17px,1.7vw,21px);line-height:1.35;color:var(--text);font-weight:300}
   .wi-asks .ask .a{color:var(--acc-deep);font-weight:600;white-space:nowrap}
-  .wi-asks .getit{margin-top:8px;font-size:15.5px;color:var(--muted)}
-  .wi-asks .getit b{color:var(--text);font-weight:500}
+  /* "You get the idea." — matches the hero's "An executor." (heavy Inter, coral, h1 size) */
+  .wi-asks .getit{margin-top:16px;font-family:'Inter',system-ui,sans-serif;font-weight:800;
+    font-size:clamp(38px,5.4vw,64px);line-height:1.04;letter-spacing:-.022em;color:var(--acc-2)}
 
   /* hero demo phone */
   .wi-demo{justify-self:end}
@@ -104,8 +105,7 @@
           <p class="ask">Lost your passport? <span class="a">Just tell Tures.</span></p>
           <p class="ask">Missed your connection? <span class="a">Just tell Tures.</span></p>
           <p class="ask">Need a 6am car and a late checkout? <span class="a">Just tell Tures.</span></p>
-          <p class="ask">Want to leave a glowing review on the way home? <span class="a">Just tell Tures.</span></p>
-          <p class="getit"><b>You get the idea.</b> Describe it &mdash; it&rsquo;s handled, start to finish.</p>
+          <p class="getit">You get the idea.</p>
         </div>
         <div class="cta">
           <a class="btn" href="plan.html">Plan a trip &nbsp;→</a>
