@@ -51,8 +51,8 @@ services:
         sync: false
       - key: TELEGRAM_WEBHOOK_SECRET   # any random string; checked on the webhook
         sync: false
-      - key: TELEGRAM_BOT_USERNAME     # the bot's @handle (without @), for t.me deep links
-        sync: false
+      - key: TELEGRAM_BOT_USERNAME     # public @handle (no @), for t.me deep links
+        value: Tures_Travel_Bot
       - key: CORS_ORIGINS
         value: https://toddfishman.github.io,http://localhost:8123
       # Optional later (persistence + security hardening): DATA_DIR (+ a Render disk),
