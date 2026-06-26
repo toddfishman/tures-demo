@@ -62,6 +62,13 @@ const Env = z.object({
   SAKANA_API_KEY: z.string().optional(),
   SAKANA_API_URL: z.string().url().default("https://api.sakana.ai/v1"),
   SAKANA_MODEL: z.string().default("fugu"),
+  // ── Telegram channel — the same Tures, reachable on Telegram (cross-channel memory) ──────────
+  // Set TELEGRAM_BOT_TOKEN (from @BotFather) to turn the channel on. USERNAME is the bot's @handle
+  // (without @) used for t.me deep links. WEBHOOK_SECRET (any random string) is checked on the
+  // webhook so only Telegram can post to it. Unset → the channel is off and /telegram/webhook 404s.
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  TELEGRAM_BOT_USERNAME: z.string().optional(),
+  TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
   // Per-trip concierge fee (USD) charged to non-subscribers on a booking. Server-derived from
   // the account's plan — never trusted from the request body.
   PER_TRIP_FEE_USD: z.coerce.number().nonnegative().default(99),
@@ -130,6 +137,15 @@ export const config = {
     model: parsed.SAKANA_MODEL,
     get enabled(): boolean {
       return !!parsed.SAKANA_API_KEY;
+    },
+  },
+  /** Telegram channel — same Tures, reachable on Telegram. Off until a bot token is set. */
+  telegram: {
+    token: parsed.TELEGRAM_BOT_TOKEN,
+    username: parsed.TELEGRAM_BOT_USERNAME,
+    webhookSecret: parsed.TELEGRAM_WEBHOOK_SECRET,
+    get enabled(): boolean {
+      return !!parsed.TELEGRAM_BOT_TOKEN;
     },
   },
   /** Which provider charges cards for bookings. Stays mock until STRIPE_CHARGE_CARDS=true AND a

@@ -638,6 +638,23 @@
   // ── wire ──
   form.addEventListener('submit', function(ev){ ev.preventDefault(); demoRunning=false; send(input.value.trim()); });
   document.getElementById('btn-demo').addEventListener('click', runDemo);
+
+  // "Text Tures" → open the SAME Tures on Telegram (cross-channel). Mints a one-time link code and
+  // opens the deep link when the bot is live; otherwise leaves the default sms: preview behavior.
+  (function(){
+    var tt=document.getElementById('text-tures'); if(!tt) return;
+    tt.addEventListener('click', function(ev){
+      if(!(window.tures && tures.configured && tures.channels)) return; // fall back to the sms href
+      ev.preventDefault();
+      tures.channels.linkCode().then(function(r){
+        if(r && r.telegramDeepLink){ window.open(r.telegramDeepLink, '_blank'); }
+        else { bubble('Telegram is rolling out shortly — soon this button opens your Tures chat there, picking up right where we are now.','t'); }
+      }).catch(function(e){
+        if(e && e.status===401){ bubble('Sign in first and I can text you on Telegram — same conversation, any device.','t'); }
+        else { bubble('Could not open Telegram just now — try again in a moment.','t'); }
+      });
+    });
+  })();
   // voice.js sets #composer.value = brief then calls sendBrief() with no arg
   window.sendBrief = function(b){
     if(b==null){ try{ b = form.value; }catch(_){} }

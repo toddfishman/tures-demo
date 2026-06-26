@@ -252,18 +252,21 @@
     setDone(document.getElementById('c-loyalty'), rows.length>0); refresh(); openNext(document.getElementById('c-loyalty'));
   };
 
-  // ── telegram (guarded: deep-links when a bot is configured, else captures intent) ──
-  var BOT = (window.TURES_TELEGRAM_BOT || '').trim(); // set when the bot is live
+  // ── telegram: mint a one-time link code from the engine and open the deep link when the bot is
+  //    live; otherwise capture intent gracefully. The link binds this Telegram to the account so the
+  //    same Tures (memory + trips) follows you there.
   document.getElementById('tg-connect').onclick=function(){
     F.setTraveler({ telegram:'requested' });
     setDone(document.getElementById('c-telegram'), true); refresh();
-    if(BOT){
-      // a real link code comes from the engine's channel-link endpoint when wired; placeholder for now
-      var code = (T&&T.accountId) ? T.accountId : (F.uid()||'');
-      window.open('https://t.me/'+BOT+'?start='+encodeURIComponent(code), '_blank');
-    } else {
-      document.getElementById('tg-soon').textContent = 'Noted — Telegram is rolling out shortly. We will open your Tures chat there the moment it is live.';
-    }
+    var soon=document.getElementById('tg-soon');
+    if(!(T && T.configured && T.channels)){ soon.textContent='Telegram is rolling out shortly — we will open your Tures chat there the moment it is live.'; return; }
+    soon.textContent='Starting the link…';
+    T.channels.linkCode().then(function(r){
+      if(r && r.telegramDeepLink){ window.open(r.telegramDeepLink, '_blank'); soon.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; }
+      else { soon.textContent='Your account is ready. Telegram is rolling out shortly — we will open your Tures chat there the moment the channel is live.'; }
+    }).catch(function(e){
+      soon.textContent = (e && e.status===401) ? 'Sign in first, then connect Telegram so it links to your account.' : 'Could not start the link just now — try again in a moment.';
+    });
   };
 
   // ── skip handlers ──

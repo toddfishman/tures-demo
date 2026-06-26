@@ -31,6 +31,8 @@ import { streamRoutes } from "./routes/stream.ts";
 import { discoverRoutes } from "./routes/discover.ts";
 import { signalRoutes } from "./routes/signals.ts";
 import { assistRoutes } from "./routes/assist.ts";
+import { channelRoutes } from "./routes/channels.ts";
+import { telegramRoutes } from "./routes/telegram.ts";
 import { startSignalWatcher } from "./signals/watcher.ts";
 
 export async function build() {
@@ -89,6 +91,8 @@ export async function build() {
   await app.register(discoverRoutes);
   await app.register(signalRoutes);
   await app.register(assistRoutes);
+  await app.register(channelRoutes);
+  await app.register(telegramRoutes);
 
   return app;
 }

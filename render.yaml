@@ -43,6 +43,16 @@ services:
         value: https://api.sakana.ai/v1
       - key: SAKANA_MODEL
         value: fugu
+      # Telegram channel — the same Tures, reachable on Telegram (cross-channel memory). OFF until
+      # TELEGRAM_BOT_TOKEN is set. Steps: create a bot via @BotFather → set the 3 secrets below →
+      # register the webhook once:
+      #   curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://tures-engine.onrender.com/telegram/webhook&secret_token=<SECRET>"
+      - key: TELEGRAM_BOT_TOKEN        # from @BotFather — presence turns the channel on
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET   # any random string; checked on the webhook
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME     # the bot's @handle (without @), for t.me deep links
+        sync: false
       - key: CORS_ORIGINS
         value: https://toddfishman.github.io,http://localhost:8123
       # Optional later (persistence + security hardening): DATA_DIR (+ a Render disk),

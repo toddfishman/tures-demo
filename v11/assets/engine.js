@@ -112,6 +112,14 @@
     /* Situational awareness — weather/air/events/advisories/transit for this trip. deep=true adds the
        live web scout (slower). The "Trip Radar": this is the always-on watch, made visible. */
     signals: function (brief, deep) { var b = brief || {}; return api("/signals", { method: "POST", body: JSON.stringify({ destination: b.destination, origin: b.origin, departDate: b.departDate, returnDate: b.returnDate, deep: !!deep }) }); },
+
+    /* Cross-channel — link another surface (Telegram, …) to this account so the same Tures (memory,
+       Vault, trips) reaches you there. linkCode() mints a one-time code + a ready Telegram deep link. */
+    channels: {
+      linkCode: function () { return api("/channels/link-code", { method: "POST" }); },
+      list: function () { return api("/channels"); },
+      unlink: function (channel) { return api("/channels/" + channel + "/unlink", { method: "POST" }); },
+    },
     /* Simulated reservation of an extra → { confirmation, simulated, note }. */
     reserve: function (item) { return api("/reserve", { method: "POST", body: JSON.stringify(item || {}) }); },
 

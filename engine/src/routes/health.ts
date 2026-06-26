@@ -27,6 +27,8 @@ export async function healthRoutes(app: FastifyInstance) {
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
       situationalAwareness: true, // Signals layer — weather/air/events/advisories radar + watcher
       assist: !!config.anthropicKey, // "handle anything" concierge — web research + permissioned actions
+      crossChannel: true, // channel-link identity (web/voice/Telegram resolve to one account + memory)
+      telegram: config.telegram.enabled, // the same Tures, reachable on Telegram (off until a bot token is set)
       accounts: true, // email+password logins with sessions
       travelers: true, // family/companion travelers on the account
       placesGraph: true, // "where you've been" personalization signal

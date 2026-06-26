@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { build } from "../src/server.ts";
 import { bus } from "../src/events/bus.ts";
 import { encrypt, decrypt } from "../src/vault/crypto.ts";
+import { consumeLinkCode, resolveAccount, unlinkChannel } from "../src/channels/index.ts";
 
 let passed = 0;
 function ok(name: string) {
@@ -401,6 +402,36 @@ let bookingId = "";
   assert.equal(h.capabilities.situationalAwareness, true, "health reports the situational-awareness capability");
   assert.ok(Array.isArray(h.signals.providers), "health lists signal providers");
   ok("health: reports the situational-awareness layer + provider status");
+}
+
+// 14.9 cross-channel: link-code needs sign-in; the channel store binds/resolves/unlinks; webhook guarded
+{
+  // unauthenticated → 401
+  assert.equal((await app.inject({ method: "POST", url: "/channels/link-code" })).statusCode, 401, "link-code needs sign-in");
+
+  const su = (await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "chan@b.com", password: "password123" } })).json();
+  const auth = { authorization: "Bearer " + su.token };
+  const lc = await app.inject({ method: "POST", url: "/channels/link-code", headers: auth });
+  assert.equal(lc.statusCode, 200);
+  const code = lc.json().code;
+  assert.ok(code && lc.json().telegramEnabled === false, "returns a code; telegram off in test");
+
+  // the channel store: consume the code from "telegram" → binds chat to the account; resolves; one-time
+  assert.equal(consumeLinkCode(code, "telegram", "tg-chat-1"), su.user.id, "code consumed → bound to the account");
+  assert.equal(resolveAccount("telegram", "tg-chat-1"), su.user.id, "chat resolves to the account");
+  assert.equal(consumeLinkCode(code, "telegram", "tg-chat-1"), null, "code is one-time");
+  const listed = (await (await app.inject({ method: "GET", url: "/channels", headers: auth })).json()).channels;
+  assert.ok(listed.some((c: any) => c.channel === "telegram"), "linked channel is listed");
+  assert.equal(unlinkChannel(su.user.id, "telegram"), true, "unlink works");
+  assert.equal(resolveAccount("telegram", "tg-chat-1"), null, "resolves null after unlink");
+  ok("cross-channel: link-code + channel store bind/resolve/unlink (one account, any channel)");
+
+  // telegram webhook 404s until a bot token is configured (guarded, like the other providers)
+  assert.equal((await app.inject({ method: "POST", url: "/telegram/webhook", payload: { message: { chat: { id: 1 }, text: "hi" } } })).statusCode, 404, "telegram off → webhook 404");
+  const h = (await app.inject({ method: "GET", url: "/health" })).json();
+  assert.equal(h.capabilities.crossChannel, true);
+  assert.equal(h.capabilities.telegram, false);
+  ok("cross-channel: telegram webhook guarded off + health reports the layer");
 }
 
 // 15. /metrics reports counts + uptime
