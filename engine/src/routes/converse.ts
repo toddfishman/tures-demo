@@ -46,7 +46,7 @@ THE REAL RULES:
 - When you are genuinely unsure, ask one short question. Otherwise use common sense and keep things moving.
 - Do not open with the time of day; you may be reaching them in any timezone.
 
-HAND-OFF: the moment you have all the essentials, CALL the submit_brief tool — fill every required field plus a one-sentence brief — and tell them you are putting it together now. Do not keep asking once you have enough.`;
+HAND-OFF: the moment you have all the essentials, CALL the submit_brief tool — fill every required field plus a one-sentence brief — and tell them you are putting it together now. Do not keep asking once you have enough. CRITICAL: you MUST actually call the submit_brief tool in the SAME turn — never say you are "building it" or "putting it together" in words without calling the tool, or nothing happens and the traveler is left waiting.`;
 
 const TOOLS = [
   {
@@ -123,6 +123,29 @@ export async function converseRoutes(app: FastifyInstance) {
         } catch (err) {
           log.warn("sakana fugu failed — falling back to anthropic", { err: String((err as any)?.message ?? err) });
           via = "anthropic";
+        }
+      }
+
+      // Phantom hand-off guard: Fugu sometimes narrates "on it — building it" WITHOUT calling
+      // submit_brief, which would leave the traveler waiting on a trip that never builds. When it
+      // produced no brief but its reply clearly signals a hand-off, force exactly one structured
+      // retry with tool_choice pinned to submit_brief.
+      if (via === "fugu" && !slots && /\b(on it|buil(d|t|ding)|put(ting)?\b[^.]*together|here'?s your plan|let me put)/i.test(text)) {
+        try {
+          const forced = await fuguChat(
+            system,
+            [...msgs, { role: "assistant", content: text }, { role: "user", content: "Call submit_brief now with the essentials you have." }],
+            { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
+            320,
+            true,
+          );
+          if (forced.toolInput && Object.keys(forced.toolInput).length) {
+            slots = forced.toolInput;
+            if (forced.text) text = forced.text;
+            log.info("fugu phantom hand-off recovered via forced submit_brief");
+          }
+        } catch (e) {
+          log.warn("fugu forced hand-off retry failed", { err: String((e as any)?.message ?? e) });
         }
       }
 

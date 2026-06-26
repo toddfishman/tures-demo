@@ -45,12 +45,15 @@ function extractToolInput(msg: any, toolName: string): Record<string, any> | nul
   return null;
 }
 
-/** One non-streaming chat turn through Fugu with a single optional function tool. */
+/** One non-streaming chat turn through Fugu with a single optional function tool.
+ *  `forceTool` pins tool_choice to the function (used to recover a phantom hand-off — when the model
+ *  said it was building the trip but didn't actually call the tool). */
 export async function fuguChat(
   system: string,
   messages: { role: "user" | "assistant"; content: string }[],
   tool: ChatTool,
   maxTokens = 320,
+  forceTool = false,
 ): Promise<FuguResult> {
   const url = config.sakana.apiUrl.replace(/\/$/, "") + "/chat/completions";
   const res = await fetch(url, {
@@ -64,7 +67,7 @@ export async function fuguChat(
       max_tokens: maxTokens,
       messages: [{ role: "system", content: system }, ...messages],
       tools: [{ type: "function", function: { name: tool.name, description: tool.description, parameters: tool.parameters } }],
-      tool_choice: "auto",
+      tool_choice: forceTool ? { type: "function", function: { name: tool.name } } : "auto",
     }),
   });
 
