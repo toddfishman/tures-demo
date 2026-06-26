@@ -175,9 +175,14 @@
       if (!said) { setStatus('', 'Didn’t catch that'); micState('ready'); elHint.textContent = 'Didn’t catch that — tap to try again'; return; }
       bubble(said, 'me'); history.push({ role: 'user', content: said });
       setStatus('think', 'Tures is thinking');
-      function attempt(n) { return tures.converse(history.slice(-12)).catch(function (e) { if (n > 0) return new Promise(function (res, rej) { setTimeout(function () { attempt(n - 1).then(res, rej); }, 1800); }); throw e; }); }
+      // Share the same known profile + memory id the text chat uses, so voice is just as smart.
+      var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
+      var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
+      function attempt(n) { return tures.converse(history.slice(-12), undefined, ctx, uid).catch(function (e) { if (n > 0) return new Promise(function (res, rej) { setTimeout(function () { attempt(n - 1).then(res, rej); }, 1800); }); throw e; }); }
       return attempt(1).then(function (c) {
-        var reply = (c && c.reply || '').trim() || 'I’m here — tell me a trip and I’ll handle it.';
+        // If the reply is empty mid-conversation, re-prompt gently — do NOT greet fresh (that read
+        // as a "lobotomy", wiping the conversation right when it should have been booking).
+        var reply = (c && c.reply || '').trim() || (history.length > 1 ? 'Sorry — I lost that for a second. Say it once more?' : 'I’m here — tell me a trip and I’ll handle it.');
         if (c && c.ready && c.brief) {
           // Tures has enough — speak the wrap-up, then hand the brief to the planner.
           return sayTures(reply).then(function () { startPlanning(c.brief); });
@@ -197,9 +202,10 @@
       if (typeof window.autoGrow === 'function') window.autoGrow();
       setTimeout(function () { closeOv(); window.sendBrief(); }, 700);
     } else {
-      // not on the planning page — carry the brief there and let it plan on arrival
-      try { localStorage.setItem('tures.voiceBrief', brief); } catch (_) {}
-      location.href = '03-paste-trip.html';
+      // Not on the planning page — carry the FINISHED brief to Plan so it builds straight away
+      // (readyBrief, the no-re-ask path). v11's planner is plan.html (not the old 03-paste-trip).
+      try { localStorage.setItem('tures.readyBrief', brief); } catch (_) {}
+      location.href = 'plan.html';
     }
   }
 

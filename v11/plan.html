@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Have a conversation with Tures — bring every detail or just a vibe. It plans, books every leg, and hands back confirmation numbers, then keeps watching the trip for you.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#ff4929">
@@ -178,13 +179,32 @@
 
   @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
   @media (max-width:560px){.opt .oact .btn{flex:1}.xrow .xmeta{white-space:normal}}
+
+  /* ───────── APP MODE (mobile): the chat fills the screen like a native app ───────── */
+  @media (max-width:620px){
+    /* hide the marketing chrome so the page reads as an app, not a webpage */
+    #intro-sec, #asks-sec{display:none}
+    main{padding:0}
+    /* the console section becomes a full-height flex column under the nav */
+    #console-sec{padding:0;display:flex;flex-direction:column;height:calc(100dvh - 56px - env(safe-area-inset-top))}
+    #console-sec .wrap{padding:0;display:flex;flex-direction:column;flex:1;min-height:0}
+    .console-wrap{max-width:none;display:flex;flex-direction:column;flex:1;min-height:0}
+    .plan-bar{flex:0 0 auto;margin:0;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--surface)}
+    .browser{flex:1;min-height:0;display:flex;flex-direction:column;border-radius:0;border-left:0;border-right:0;border-bottom:0;box-shadow:none}
+    .browser .titlebar{display:none}
+    .browser .body{flex:1;min-height:0;display:flex}
+    .conv{flex:1;min-height:0;height:auto;display:flex;flex-direction:column}
+    .thread{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .composer{flex:0 0 auto;position:static;padding:11px 13px calc(11px + env(safe-area-inset-bottom))}
+    .composer .field{font-size:16px} /* ≥16px stops iOS Safari from zooming on focus */
+  }
 </style>
 </head>
 <body data-page="plan">
 <main>
 
   <!-- ── intro ── -->
-  <section class="section tight">
+  <section class="section tight" id="intro-sec">
     <div class="wrap center">
       <span class="eyebrow"><span class="dot"></span> Plan a trip</span>
       <h1 style="margin-top:22px">Just have a <em>conversation.</em></h1>
@@ -193,7 +213,7 @@
   </section>
 
   <!-- ── the console ── -->
-  <section class="section tight" style="padding-top:0">
+  <section class="section tight" id="console-sec" style="padding-top:0">
     <div class="wrap">
       <div class="console-wrap">
         <div class="plan-bar">
@@ -230,7 +250,7 @@
   </section>
 
   <!-- ── what Tures asks ── -->
-  <section class="section tight" style="padding-top:0">
+  <section class="section tight" id="asks-sec" style="padding-top:0">
     <div class="wrap">
       <div class="center" style="margin-bottom:26px">
         <span class="eyebrow"><span class="dot"></span> What Tures asks</span>
@@ -629,9 +649,25 @@
   // nav "plan a trip" input → seed the chat (same page) ; or arriving with ?q= / stored seed
   window.turesPlanSeed = function(t){ t=(t||'').trim(); if(!t || !live) return; demoRunning=false; send(t); };
 
-  greet();
+  // Skip the fresh greeting when we're continuing a conversation handed over from the concierge or
+  // voice (readyBrief) — greeting then would read as starting over.
+  var __ready=''; try{ __ready = localStorage.getItem('tures.readyBrief')||''; }catch(_){}
+  if(!(__ready && live)) greet();
 
   (function(){
+    // A READY brief handed over from the concierge bubble or the voice modal — the traveler already
+    // had the conversation there, so plan it DIRECTLY. Never restart the conversation (that was the
+    // "lobotomy": we used to re-converse from a seed and ask everything again).
+    var ready='';
+    try{ ready = localStorage.getItem('tures.readyBrief')||''; if(ready) localStorage.removeItem('tures.readyBrief'); }catch(_){}
+    if(ready && live){
+      setTimeout(function(){
+        bubble('Picking up right where we left off — building the trip you described. <span style="color:var(--muted)">No need to start over.</span>','t');
+        resolveBrief(ready);
+      }, 480);
+      return;
+    }
+    // A loose seed (nav "plan a trip" box, ?q=) — start the conversation from it.
     var seed='';
     try{ seed = new URLSearchParams(location.search).get('q') || ''; }catch(_){}
     if(!seed){ try{ seed = localStorage.getItem('tures.seed') || ''; if(seed) localStorage.removeItem('tures.seed'); }catch(_){} }

@@ -5,6 +5,17 @@
  * session token (stored), and every call rides Authorization: Bearer <token>, so a signed-in
  * visitor's cards/profile/trips are their own and persist server-side.
  */
+// Theme bootstrap — runs synchronously in <head> before the body paints, so dark mode never flashes.
+// Default follows the OS preference until the user picks one (persisted as tures.theme). site.js
+// renders the toggle that writes this key.
+(function () {
+  try {
+    var t = localStorage.getItem("tures.theme");
+    if (!t) t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    if (t === "dark") document.documentElement.classList.add("dark");
+  } catch (_) {}
+})();
+
 (function () {
   var KEY = "tures.engineUrl";
   var TOKEN = "tures.token";

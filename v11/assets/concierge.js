@@ -116,7 +116,11 @@
   modal.addEventListener("click", function(e){ if(e.target===modal) close(); });
   document.addEventListener("keydown", function(e){ if(e.key==="Escape" && modal.classList.contains("open")) close(); });
 
+  // Loose hand-off: carry a seed sentence and let Plan start the conversation from it.
   function handoff(seed){ try{ if(seed) localStorage.setItem("tures.seed", seed); }catch(e){} location.href="plan.html"; }
+  // READY hand-off: the conversation is DONE here — carry the finished brief so Plan builds it
+  // straight away instead of asking everything over again (that re-ask was the "lobotomy").
+  function handoffReady(brief){ try{ if(brief) localStorage.setItem("tures.readyBrief", brief); }catch(e){} location.href="plan.html"; }
 
   function send(text){
     if(busy || !text) return;
@@ -134,8 +138,8 @@
       typing(false); busy=false; sendBtn.disabled=false;
       var reply=(c && c.reply) || "Tell me a little more.";
       bubble(esc(reply), "ai"); history.push({role:"assistant",content:reply});
-      if(c && c.ready){ var brief = (typeof c.brief==="string") ? c.brief : text;
-        var b=document.createElement("button"); b.className="cz-cta"; b.textContent="✦ Book it in Plan →"; b.onclick=function(){handoff(brief);}; thread.appendChild(b); scroll(); }
+      if(c && c.ready){ var brief = (typeof c.brief==="string" && c.brief.trim()) ? c.brief : text;
+        var b=document.createElement("button"); b.className="cz-cta"; b.textContent="✦ Book it in Plan →"; b.onclick=function(){handoffReady(brief);}; thread.appendChild(b); scroll(); }
     }).catch(function(){ typing(false); busy=false; sendBtn.disabled=false;
       bubble("I couldn't reach the planner just now. Want to open the full Plan page.", "ai"); var b=document.createElement("button"); b.className="cz-cta"; b.textContent="Open Plan →"; b.onclick=function(){handoff(text);}; thread.appendChild(b); scroll(); });
   }

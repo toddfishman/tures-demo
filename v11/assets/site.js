@@ -50,6 +50,10 @@
       '</div>' +
       '<div class="v11-right">' +
         (cur === "plan" ? '' : '<a class="v11-cta" href="plan.html">Plan a trip</a>') +
+        '<button class="v11-theme" id="v11-theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">' +
+          '<svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>' +
+          '<svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>' +
+        '</button>' +
         '<div class="v11-acct-wrap">' +
           '<button class="v11-acct" id="v11-acct-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Account">' +
             '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>' +
@@ -73,6 +77,17 @@
   }
   wireDrop("v11-menu-btn", "v11-menu");
   wireDrop("v11-acct-btn", "v11-acct-menu");
+
+  /* ---- dark-mode toggle (engine.js already applied the saved/OS theme before paint) ---- */
+  (function () {
+    var btn = document.getElementById("v11-theme");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var dark = !document.documentElement.classList.contains("dark");
+      document.documentElement.classList.toggle("dark", dark);
+      try { localStorage.setItem("tures.theme", dark ? "dark" : "light"); } catch (_) {}
+    });
+  })();
   document.addEventListener("click", function (e) { if (!e.target.closest(".v11-menu-wrap") && !e.target.closest(".v11-acct-wrap")) closeAll(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 

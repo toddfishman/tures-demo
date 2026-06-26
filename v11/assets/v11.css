@@ -221,10 +221,79 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
   .section{padding:60px 0}
 }
 @media (max-width:620px){
-  .v11-nav .in{gap:10px}
+  .v11-nav{padding-top:env(safe-area-inset-top)} /* clear the iOS status bar in standalone/app mode */
+  .v11-nav .in{gap:10px;height:56px}
   .v11-nav .mark{font-size:20px}
   .v11-plan{max-width:none;padding-left:14px}
   .v11-acct{width:36px;height:36px}
+  .v11-right{gap:10px}
 }
 @media (max-width:560px){ .v11-foot .in{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+
+/* ============================================================
+   DARK MODE — obsidian + vermilion (the "app at night" register,
+   echoing the dark voice modal). Token overrides under html.dark
+   beat per-page :root blocks (html.dark = higher specificity than
+   :root), so the whole site flips from one switch. engine.js sets
+   html.dark before paint (no flash); site.js renders the toggle.
+   ============================================================ */
+html.dark{
+  --bg:#0e0e12;
+  --surface:#17171d;
+  --surface-2:#20202a;
+  --surface-3:#2a2a35;
+  --line:rgba(255,255,255,.10);
+  --line-2:rgba(255,255,255,.17);
+  --text:#f2f2f5;
+  --muted:#a2a2ae;
+  --faint:#6a6a76;
+  --acc:#ff5a3c;
+  --acc-2:#ff8268;
+  --acc-deep:#ff7a5c;       /* lighter than base so accent TEXT stays legible on dark */
+  --acc-dim:rgba(255,90,60,.16);
+  --acc-line:rgba(255,90,60,.34);
+  --good:#37b873;
+  --warn:#e0962a;
+  --rain:#5b8fd0;
+  --silver:#8a93a3;
+  --silver-2:rgba(255,255,255,.16);
+  --silver-deep:#b3bbc8;
+  --silver-sheen:linear-gradient(115deg,#2b2f38,#3c4352 40%,#30353f 70%,#3c4352);
+  --bubble-me:#20202a;
+  --bubble-ai:#17171d;
+  color-scheme:dark;
+}
+html.dark body{
+  background:
+    radial-gradient(1200px 760px at 84% -10%, rgba(255,90,60,.12), transparent 60%),
+    radial-gradient(900px 620px at 6% 8%, rgba(255,255,255,.035), transparent 55%),
+    var(--bg);
+}
+/* shared chrome + components that hardcode light values */
+html.dark .v11-nav{background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66))}
+html.dark .v11-menu,html.dark .v11-acct-menu,html.dark .card,html.dark .browser,html.dark .from-me .bubble{background:var(--surface)}
+html.dark .v11-cta,html.dark .btn{color:#fff}
+/* corner concierge widget (its injected CSS hardcodes #fff) */
+html.dark .cz-bub,html.dark .cz-card,html.dark .cz-m.me .cz-b,html.dark .cz-comp input{background:var(--surface);color:var(--text)}
+html.dark .cz-hero{background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+html.dark .cz-comp{background:var(--surface-2)}
+html.dark .cz-x,html.dark .cz-bub .x{background:rgba(255,255,255,.08);color:var(--muted)}
+html.dark .cz-av,html.dark .cz-bigav{border-color:var(--surface-2)}
+/* the cover's oversized cycling verbs hardcode ink — relight the INACTIVE ones for dark.
+   :not(.on) so the lit verb keeps its vermilion (var(--acc)). */
+html.dark .arc-hero .verb:not(.on){color:rgba(255,255,255,.16)}
+html.dark .arc-hero .verb:not(.on):hover{color:rgba(255,255,255,.34)}
+html.dark .arc-hero .phone{border-color:var(--surface-3)}
+html.dark .arc-hero .step:not(.on),html.dark .arc-hero .step:not(.on) .kick{color:#3a3a44}
+
+/* ---- theme toggle (in the nav, injected by site.js) ---- */
+.v11-theme{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;flex:0 0 auto;
+  border:1px solid var(--line-2);background:var(--bg);cursor:pointer;color:var(--muted);
+  transition:border-color .2s,color .2s,background .2s}
+.v11-theme:hover{border-color:var(--acc);color:var(--acc-deep)}
+.v11-theme svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.v11-theme .moon{display:none}
+html.dark .v11-theme .sun{display:none}
+html.dark .v11-theme .moon{display:block}
+@media(max-width:620px){.v11-theme{width:36px;height:36px}}
