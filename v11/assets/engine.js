@@ -16,6 +16,31 @@
   } catch (_) {}
 })();
 
+// PWA / app-shell bootstrap — make every page installable + standalone-capable without editing each
+// <head>. Injects the manifest link, Apple web-app meta, and viewport-fit=cover (for safe-area
+// insets) once, in <head>, at load. No-op if the page already declares them.
+(function () {
+  try {
+    var head = document.head || document.documentElement;
+    function addMeta(name, content) {
+      if (document.querySelector('meta[name="' + name + '"]')) return;
+      var m = document.createElement("meta"); m.name = name; m.content = content; head.appendChild(m);
+    }
+    function addLink(rel, href) {
+      if (document.querySelector('link[rel="' + rel + '"]')) return;
+      var l = document.createElement("link"); l.rel = rel; l.href = href; head.appendChild(l);
+    }
+    addLink("manifest", "manifest.webmanifest");
+    addLink("apple-touch-icon", "assets/img/app-icon.svg");
+    addMeta("apple-mobile-web-app-capable", "yes");
+    addMeta("mobile-web-app-capable", "yes");
+    addMeta("apple-mobile-web-app-status-bar-style", "black-translucent");
+    addMeta("apple-mobile-web-app-title", "Tures");
+    var vp = document.querySelector('meta[name="viewport"]');
+    if (vp && vp.content.indexOf("viewport-fit") < 0) vp.content = vp.content + ", viewport-fit=cover";
+  } catch (_) {}
+})();
+
 (function () {
   var KEY = "tures.engineUrl";
   var TOKEN = "tures.token";

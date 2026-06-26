@@ -297,3 +297,25 @@ html.dark .arc-hero .step:not(.on),html.dark .arc-hero .step:not(.on) .kick{colo
 html.dark .v11-theme .sun{display:none}
 html.dark .v11-theme .moon{display:block}
 @media(max-width:620px){.v11-theme{width:36px;height:36px}}
+
+/* ---- mobile bottom tab bar (app shell) ---- */
+.v11-tabbar{display:none}
+@media(max-width:620px){
+  .v11-tabbar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:85;
+    padding:7px 6px calc(7px + env(safe-area-inset-bottom));
+    background:linear-gradient(to top, rgba(255,255,255,.97), rgba(255,255,255,.86));
+    backdrop-filter:blur(16px) saturate(160%);border-top:1px solid var(--line);
+  }
+  .v11-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:5px 0;color:var(--muted);font:600 10.5px 'Inter',system-ui,sans-serif;letter-spacing:.01em}
+  .v11-tab svg{width:23px;height:23px}
+  .v11-tab.on{color:var(--acc-deep)}
+  .v11-tab.on svg{stroke:var(--acc)}
+  .v11-tab:active{transform:scale(.94)}
+  /* content clears the fixed bar */
+  body.has-tabbar{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
+  /* the bar replaces the floating launchers on mobile — declutter */
+  body.has-tabbar .cz-l,body.has-tabbar .tv-fab{display:none}
+}
+html.dark .v11-tabbar{background:linear-gradient(to top, rgba(16,16,20,.97), rgba(16,16,20,.82));border-top-color:var(--line)}
