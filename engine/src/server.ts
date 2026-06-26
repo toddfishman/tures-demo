@@ -30,6 +30,7 @@ import { converseRoutes } from "./routes/converse.ts";
 import { streamRoutes } from "./routes/stream.ts";
 import { discoverRoutes } from "./routes/discover.ts";
 import { signalRoutes } from "./routes/signals.ts";
+import { assistRoutes } from "./routes/assist.ts";
 import { startSignalWatcher } from "./signals/watcher.ts";
 
 export async function build() {
@@ -87,6 +88,7 @@ export async function build() {
   await app.register(streamRoutes);
   await app.register(discoverRoutes);
   await app.register(signalRoutes);
+  await app.register(assistRoutes);
 
   return app;
 }
