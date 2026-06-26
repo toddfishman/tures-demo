@@ -187,7 +187,10 @@
   /* ---- onboarding progress bar: surfaces funnel.js setupStatus for users who've started ---- */
   (function () {
     var F = window.turesFunnel; if (!F) return;
-    if (["cover", "legal", "signup"].indexOf(cur) > -1) return; // not on the pitch, legal, or the waitlist page itself
+    // Setup progress belongs in the account/app zone — NOT on the explainer/marketing pages.
+    // (Showing "2 of 6 · next: set your home airport" on "What is Tures", before the visitor has
+    // consciously done anything, reads as confusing and presumptuous.)
+    if (["trips", "vault", "taste"].indexOf(cur) < 0) return;
     var bar = document.createElement("div"); bar.className = "v11-onboard"; bar.id = "v11-onboard";
     nav.insertAdjacentElement("afterend", bar);
     var dismissed = false; try { dismissed = sessionStorage.getItem("tures.ob.x") === "1"; } catch (_) {}
