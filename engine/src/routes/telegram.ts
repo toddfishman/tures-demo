@@ -62,11 +62,11 @@ async function send(chatId: string, text: string) {
   }
 }
 
-function planSummary(plan: any): string {
+function planSummary(plan: any, tail: string): string {
   if (!plan) return "";
   const total = plan.totalUsd != null ? ` — about $${Number(plan.totalUsd).toLocaleString()} all in` : "";
   const why = plan.rationale ? `\n${plan.rationale}` : "";
-  return `Here's the shape${total}.${why}\n\nOpen the Tures app to confirm and book — nothing is held or charged yet.`;
+  return `Here's the shape${total}.${why}\n\n${tail}`;
 }
 
 export async function telegramRoutes(app: FastifyInstance) {
@@ -118,8 +118,8 @@ export async function telegramRoutes(app: FastifyInstance) {
         }
         const known = resolveAccount("telegram", chatId);
         await send(chatId, known
-          ? "Welcome back. What can I do?"
-          : "Hi — I'm Tures. To link this chat to your account, open Set up Tures in the app and tap Connect Telegram.");
+          ? "Welcome back. Tell me a trip, or ask me anything."
+          : "Hi — I'm Tures, your travel concierge. Tell me a trip or ask me anything and I'll take it from there. To save your trips across devices and let me book, link your account in the app under Set up Tures.");
         return { ok: true };
       }
       if (text === "/unlink") {
@@ -129,32 +129,37 @@ export async function telegramRoutes(app: FastifyInstance) {
         return { ok: true };
       }
 
-      // ── normal message — must be linked ──
+      // ── normal message ──
+      // Linked chat → the account's own Tures (shared mem0 memory + Vault, can book). Unlinked chat
+      // → a guest Tures: the SAME smart agent, with per-chat guest memory, so the bot is useful the
+      // moment someone messages it; linking in the app is the upgrade (saved trips + booking).
       const accountId = resolveAccount("telegram", chatId);
-      if (!accountId) {
-        await send(chatId, "This chat isn't linked yet. Open Set up Tures → Connect Telegram in the app to link it, then I'll pick up right where you left off.");
-        return { ok: true };
+      const userId = accountId || `tg-${chatId}`;
+      const headers: Record<string, string> = {};
+      if (accountId) {
+        const user = getUser(accountId);
+        headers.authorization = "Bearer " + signToken(accountId, user?.email ?? "");
       }
-
-      // Account-scoped internal calls (trusted server-side token), keyed by accountId for shared memory.
-      const user = getUser(accountId);
-      const headers = { authorization: "Bearer " + signToken(accountId, user?.email ?? "") };
       const hist = history(chatId);
 
-      const cr = await app.inject({ method: "POST", url: "/converse", headers, payload: { messages: hist.slice(-12), text, userId: accountId } });
+      const cr = await app.inject({ method: "POST", url: "/converse", headers, payload: { messages: hist.slice(-12), text, userId } });
       const data: any = cr.json();
       let reply = (data && data.reply) || "I'm here — tell me a trip or ask me anything.";
       hist.push({ role: "user", content: text });
       hist.push({ role: "assistant", content: reply });
 
-      // Brief is ready → plan it and summarize (booking continues in the app for now).
+      // Brief is ready → plan it and summarize.
       if (data && data.ready && data.brief) {
         try {
           const pr: any = (await app.inject({ method: "POST", url: "/parse", headers, payload: { text: data.brief } })).json();
           if (pr && pr.brief) {
-            const plan: any = (await app.inject({ method: "POST", url: "/plan", headers, payload: { ...pr.brief, userId: accountId } })).json();
-            reply += "\n\n" + planSummary(plan);
-            hist.push({ role: "assistant", content: planSummary(plan) });
+            const plan: any = (await app.inject({ method: "POST", url: "/plan", headers, payload: { ...pr.brief, userId } })).json();
+            const tail = accountId
+              ? "Open the Tures app to confirm and book — nothing is held or charged yet."
+              : "To hold and book this, link your Tures account in the app (Set up Tures → Connect Telegram) — then I can do it from right here.";
+            const sum = planSummary(plan, tail);
+            reply += "\n\n" + sum;
+            hist.push({ role: "assistant", content: sum });
           }
         } catch (e) {
           log.warn("telegram plan step failed", { err: String(e) });
