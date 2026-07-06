@@ -1,13 +1,16 @@
 /* Tures — voice conversation. Adds a "Talk to Tures" button that opens a spoken back-and-forth:
  * Tures greets you out loud, you tap to talk, it transcribes (Deepgram), thinks (Claude /converse),
- * and replies in its own voice (Deepgram Aura). Push-to-talk for reliability. Self-contained:
- * just include this script after engine.js on any page where window.tures is configured.
- * Styling: Greenhouse dark-botanical, accent follows the active scene (var(--gold)).
+ * and replies in its own voice (Deepgram Aura). Push-to-talk for reliability.
+ *
+ * On plan.html (window.turesVoiceBridge) voice runs IN the main chat thread — no separate modal.
  */
 (function () {
   if (window.__turesVoice) return;
   window.__turesVoice = true;
   if (!(window.tures && tures.configured)) return;
+
+  function bridge() { return window.turesVoiceBridge; }
+  function inline() { var b = bridge(); return !!(b && b.bubble); }
 
   var S = document.createElement('style');
   S.textContent = [
@@ -18,12 +21,16 @@
     '.tv-fab:hover{transform:translateY(-1px);border-color:var(--gold-bright,#86EFAC)}',
     '.tv-fab .d{width:7px;height:7px;border-radius:50%;background:var(--gold,#4ADE80)}',
     '.tv-trigger{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;cursor:pointer;white-space:nowrap;',
-    'border:1px solid var(--gold,#4ADE80);background:var(--gold,#4ADE80);color:#06120a;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.02em;',
-    'box-shadow:0 6px 18px -8px rgba(0,0,0,.5);transition:filter .15s ease, transform .14s ease}',
+    'border:1px solid var(--acc,var(--gold,#4ADE80));background:var(--acc,var(--gold,#4ADE80));color:#fff;font-family:Inter,sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.02em;',
+    'box-shadow:0 6px 18px -8px rgba(0,0,0,.5);transition:filter .15s ease, transform .14s ease, box-shadow .2s}',
     '.tv-trigger:hover{filter:brightness(1.07);transform:translateY(-1px)}',
     '.tv-trigger:active{transform:scale(.97)}',
-    '.tv-trigger .d{width:7px;height:7px;border-radius:50%;background:#06120a;animation:tvpulse 1.6s ease-in-out infinite}',
+    '.tv-trigger .d{width:7px;height:7px;border-radius:50%;background:#fff;animation:tvpulse 1.6s ease-in-out infinite}',
+    '.tv-trigger.rec{border-color:#7DD3FC;background:transparent;color:#7DD3FC;box-shadow:0 0 0 1px rgba(125,211,252,.35)}',
+    '.tv-trigger.rec .d{background:#7DD3FC;animation:tvr 1.4s infinite}',
+    '.tv-trigger.speak .d{background:var(--acc-2,#ff6b4a);animation:tvpulse 1s infinite}',
     '@keyframes tvpulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}',
+    '@keyframes tvr{0%{box-shadow:0 0 0 0 rgba(125,211,252,.45)}100%{box-shadow:0 0 0 14px rgba(125,211,252,0)}}',
     '.tv-trigger .ts{display:none}',
     '@media(max-width:430px){.tv-trigger .tl{display:none}.tv-trigger .ts{display:inline}}',
     '.tv-ov{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;',
@@ -55,13 +62,13 @@
     '.tv-mic:hover{box-shadow:0 0 22px -6px var(--gold,#4ADE80)}',
     '.tv-mic:disabled{opacity:.45;cursor:default}',
     '.tv-mic.rec{border-color:#7DD3FC;color:#7DD3FC;animation:tvr 1.4s infinite}',
-    '@keyframes tvr{0%{box-shadow:0 0 0 0 rgba(125,211,252,.45)}100%{box-shadow:0 0 0 18px rgba(125,211,252,0)}}',
     '.tv-hint{font-size:12px;color:#B8AD96;min-height:16px;text-align:center}'
   ].join('');
   document.head.appendChild(S);
 
   var fab = document.createElement('button');
   fab.setAttribute('aria-label', 'Talk to me');
+  fab.type = 'button';
   var mount = document.querySelector('[data-voice-mount]');
   if (mount) {
     fab.className = 'tv-trigger';
@@ -73,26 +80,36 @@
     document.body.appendChild(fab);
   }
 
-  var ov = document.createElement('div');
-  ov.className = 'tv-ov';
-  ov.innerHTML =
-    '<div class="tv-panel" role="dialog" aria-label="Talk to Tures">' +
-      '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><span style="display:flex;align-items:center;gap:10px"><button class="tv-x" id="tvMute" aria-label="Mute Tures" title="Mute">🔊</button><button class="tv-x" id="tvClose" aria-label="Close">×</button></span></div>' +
-      '<div class="tv-sub">Talk it through out loud — I’ll plan and book your trip as we go. Not the same as the dictation mic.</div>' +
-      '<div class="tv-status" id="tvStatus"><span class="pd"></span><span id="tvStatusT">Connecting…</span></div>' +
-      '<div class="tv-log" id="tvLog"></div>' +
-      '<div class="tv-foot"><button class="tv-mic" id="tvMic" disabled>🎤</button><div class="tv-hint" id="tvHint">…</div></div>' +
-    '</div>';
-  document.body.appendChild(ov);
+  var ov = null, elStatus, elStatusT, elLog, elMic, elHint, elMute;
 
-  var elStatus = ov.querySelector('#tvStatus'), elStatusT = ov.querySelector('#tvStatusT');
-  var elLog = ov.querySelector('#tvLog'), elMic = ov.querySelector('#tvMic'), elHint = ov.querySelector('#tvHint');
+  if (!inline()) {
+    ov = document.createElement('div');
+    ov.className = 'tv-ov';
+    ov.innerHTML =
+      '<div class="tv-panel" role="dialog" aria-label="Talk to Tures">' +
+        '<div class="tv-top"><span class="wm">t<b>✦</b>ures · voice</span><span style="display:flex;align-items:center;gap:10px"><button class="tv-x" id="tvMute" aria-label="Mute Tures" title="Mute">🔊</button><button class="tv-x" id="tvClose" aria-label="Close">×</button></span></div>' +
+        '<div class="tv-sub">Talk it through out loud — I’ll plan and book your trip as we go. Not the same as the dictation mic.</div>' +
+        '<div class="tv-status" id="tvStatus"><span class="pd"></span><span id="tvStatusT">Connecting…</span></div>' +
+        '<div class="tv-log" id="tvLog"></div>' +
+        '<div class="tv-foot"><button class="tv-mic" id="tvMic" disabled>🎤</button><div class="tv-hint" id="tvHint">…</div></div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    elStatus = ov.querySelector('#tvStatus');
+    elStatusT = ov.querySelector('#tvStatusT');
+    elLog = ov.querySelector('#tvLog');
+    elMic = ov.querySelector('#tvMic');
+    elHint = ov.querySelector('#tvHint');
+    elMute = ov.querySelector('#tvMute');
+    ov.querySelector('#tvClose').addEventListener('click', closeOv);
+    if (elMute) elMute.addEventListener('click', function () { setMuted(!muted); });
+    ov.addEventListener('click', function (e) { if (e.target === ov) closeOv(); });
+    elMic.addEventListener('click', function () { unlockAudio(); if (recording) stopRec(); else startRec(); });
+  }
 
-  var history = [], rec = null, chunks = [], recording = false, open = false, muted = false;
-  // ONE reused audio element, primed by the user's first tap so replies (which arrive after the
-  // async transcribe/think round-trip) aren't blocked by the browser's autoplay policy.
+  var history = [], rec = null, chunks = [], recording = false, open = false, muted = false, inlineStarted = false;
   var audioEl = new Audio(); audioEl.preload = 'auto';
   var primed = false;
+
   function unlockAudio() {
     if (primed) return; primed = true;
     try {
@@ -101,17 +118,37 @@
     } catch (_) {}
   }
 
-  var elMute = ov.querySelector('#tvMute');
-
-  function setStatus(mode, text) { elStatus.className = 'tv-status ' + (mode || ''); elStatusT.textContent = text; }
-  function bubble(text, who) {
-    var b = document.createElement('div'); b.className = 'tv-b ' + (who === 'me' ? 'me' : 't'); b.textContent = text;
-    elLog.appendChild(b); elLog.scrollTop = elLog.scrollHeight; return b;
+  function setStatus(mode, text) {
+    var b = bridge();
+    if (inline() && b.setStatus) b.setStatus(text || 'Tures · online');
+    if (elStatus) { elStatus.className = 'tv-status ' + (mode || ''); elStatusT.textContent = text; }
+    if (inline() && fab) {
+      fab.classList.toggle('rec', mode === 'listen');
+      fab.classList.toggle('speak', mode === 'speak');
+    }
   }
+
+  function bubble(text, who) {
+    var b = bridge();
+    if (inline() && b.bubble) return b.bubble(text, who === 'me' ? 'me' : 't');
+    if (!elLog) return null;
+    var el = document.createElement('div'); el.className = 'tv-b ' + (who === 'me' ? 'me' : 't'); el.textContent = text;
+    elLog.appendChild(el); elLog.scrollTop = elLog.scrollHeight; return el;
+  }
+
   function micState(s) {
-    if (s === 'rec') { elMic.disabled = false; elMic.classList.add('rec'); elMic.innerHTML = '⏹'; elHint.textContent = 'Listening… tap when you’re done'; }
-    else if (s === 'ready') { elMic.disabled = false; elMic.classList.remove('rec'); elMic.innerHTML = '🎤'; elHint.textContent = 'Tap to speak'; }
-    else { elMic.disabled = true; elMic.classList.remove('rec'); elMic.innerHTML = '🎤'; }
+    if (s === 'rec') {
+      if (elMic) { elMic.disabled = false; elMic.classList.add('rec'); elMic.innerHTML = '⏹'; }
+      if (elHint) elHint.textContent = 'Listening… tap when you’re done';
+      if (inline() && fab) fab.classList.add('rec');
+    } else if (s === 'ready') {
+      if (elMic) { elMic.disabled = false; elMic.classList.remove('rec'); elMic.innerHTML = '🎤'; }
+      if (elHint) elHint.textContent = 'Tap to speak';
+      if (inline() && fab) fab.classList.remove('rec');
+    } else {
+      if (elMic) { elMic.disabled = true; elMic.classList.remove('rec'); elMic.innerHTML = '🎤'; }
+      if (inline() && fab) fab.classList.remove('rec');
+    }
   }
 
   function pickMime() {
@@ -123,7 +160,6 @@
   }
 
   function speak(text) {
-    // Muted → pace as if Tures were reading it, so turn-taking still feels natural.
     if (muted) return new Promise(function (res) { setTimeout(res, Math.min(2800, 500 + text.length * 24)); });
     return tures.voice.speak(text).then(function (blob) {
       return new Promise(function (resolve) {
@@ -133,25 +169,30 @@
           var p = audioEl.play(); if (p && p.catch) p.catch(function () { resolve(); });
         } catch (_) { resolve(); }
       });
-    }).catch(function () { /* TTS failed — the text is already on screen */ });
+    }).catch(function () {});
   }
 
   function sayTures(text) {
     history.push({ role: 'assistant', content: text });
     bubble(text, 't');
+    var b = bridge();
+    if (inline() && b.pushHistory) b.pushHistory({ role: 'assistant', content: text });
     setStatus('speak', 'Tures is speaking');
     micState('off');
-    return speak(text).then(function () { setStatus('', 'Your turn'); micState('ready'); });
+    return speak(text).then(function () { setStatus('', 'Your turn — tap Talk'); micState('ready'); });
   }
 
   function greet() {
     setStatus('think', 'Waking up');
-    var hi = 'Hi — I’m Tures, a travel concierge that actually books your trips, not just suggests them. Ask me anything, or tell me a trip you’re dreaming up.';
+    var hi = inline()
+      ? 'Talk or type — same conversation. Tell me a trip and I will shape it, book it, and watch it.'
+      : 'Hi — I’m Tures, a travel concierge that actually books your trips, not just suggests them. Ask me anything, or tell me a trip you’re dreaming up.';
     sayTures(hi);
   }
 
   function startRec() {
     if (recording) return;
+    unlockAudio();
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
       var mime = pickMime();
       try { rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); } catch (_) { rec = new MediaRecorder(stream); }
@@ -163,8 +204,13 @@
         handleUtterance(blob);
       };
       rec.start(); recording = true; micState('rec'); setStatus('listen', 'Listening');
-    }).catch(function () { elHint.textContent = 'Allow the microphone, then tap to speak.'; });
+    }).catch(function () {
+      var msg = 'Allow the microphone, then tap Talk again.';
+      if (inline()) bubble(msg, 't');
+      else if (elHint) elHint.textContent = msg;
+    });
   }
+
   function stopRec() { if (rec && rec.state !== 'inactive') rec.stop(); recording = false; }
 
   function handleUtterance(blob) {
@@ -172,51 +218,62 @@
     setStatus('think', 'Hearing you'); micState('off');
     tures.voice.transcribe(blob).then(function (r) {
       var said = (r && r.transcript || '').trim();
-      if (!said) { setStatus('', 'Didn’t catch that'); micState('ready'); elHint.textContent = 'Didn’t catch that — tap to try again'; return; }
+      if (!said) { setStatus('', 'Didn’t catch that'); micState('ready'); return; }
       bubble(said, 'me'); history.push({ role: 'user', content: said });
+      var b = bridge();
+      if (inline() && b.pushHistory) b.pushHistory({ role: 'user', content: said });
       setStatus('think', 'Tures is thinking');
-      // Share the same known profile + memory id the text chat uses, so voice is just as smart.
       var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
       var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
       function attempt(n) { return tures.converse(history.slice(-12), undefined, ctx, uid).catch(function (e) { if (n > 0) return new Promise(function (res, rej) { setTimeout(function () { attempt(n - 1).then(res, rej); }, 1800); }); throw e; }); }
       return attempt(1).then(function (c) {
-        // If the reply is empty mid-conversation, re-prompt gently — do NOT greet fresh (that read
-        // as a "lobotomy", wiping the conversation right when it should have been booking).
         var reply = (c && c.reply || '').trim() || (history.length > 1 ? 'Sorry — I lost that for a second. Say it once more?' : 'I’m here — tell me a trip and I’ll handle it.');
         if (c && c.ready && c.brief) {
-          // Tures has enough — speak the wrap-up, then hand the brief to the planner.
           return sayTures(reply).then(function () { startPlanning(c.brief); });
         }
         return sayTures(reply);
       });
-    }).catch(function () { setStatus('', 'Hiccup'); micState('ready'); elHint.textContent = 'Something hiccuped — tap to try again'; });
+    }).catch(function () { setStatus('', 'Hiccup'); micState('ready'); });
   }
 
-  // Hand the gathered brief to the actual planning flow so the voice chat DOES something.
   function startPlanning(brief) {
     setStatus('think', 'Building your trip');
-    micState('off'); elHint.textContent = 'Putting your trip together…';
-    var comp = document.getElementById('composer');
+    micState('off');
+    var b = bridge();
+    if (inline() && b.onReady) {
+      b.onReady(brief, history);
+      setStatus('', 'Building your trip…');
+      return;
+    }
+    var comp = document.getElementById('composer-input') || document.getElementById('composer');
     if (comp && typeof window.sendBrief === 'function') {
+      if (typeof window.turesVoiceImport === 'function') window.turesVoiceImport(history);
       comp.value = brief;
       if (typeof window.autoGrow === 'function') window.autoGrow();
-      setTimeout(function () { closeOv(); window.sendBrief(); }, 700);
+      setTimeout(function () { closeOv(); window.sendBrief(brief); }, 700);
     } else {
-      // Not on the planning page — carry the FINISHED brief to Plan so it builds straight away
-      // (readyBrief, the no-re-ask path). v11's planner is plan.html (not the old 03-paste-trip).
       try { localStorage.setItem('tures.readyBrief', brief); } catch (_) {}
       location.href = 'plan.html';
     }
   }
 
   function openOv() {
-    if (open) return; open = true; ov.classList.add('on'); document.body.style.overflow = 'hidden';
-    unlockAudio();  // this click is a user gesture — prime audio so every reply can speak
-    history = []; elLog.innerHTML = '';
+    unlockAudio();
+    if (inline()) {
+      if (!inlineStarted) { inlineStarted = true; var b = bridge(); if (!b.hasMessages || !b.hasMessages()) greet(); }
+      if (recording) stopRec(); else startRec();
+      return;
+    }
+    if (open) return;
+    open = true; ov.classList.add('on'); document.body.style.overflow = 'hidden';
+    history = []; if (elLog) elLog.innerHTML = '';
     greet();
   }
+
   function closeOv() {
-    open = false; ov.classList.remove('on'); document.body.style.overflow = '';
+    open = false;
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
     try { audioEl.pause(); } catch (_) {}
     stopRec();
   }
@@ -228,9 +285,5 @@
   }
 
   fab.addEventListener('click', openOv);
-  ov.querySelector('#tvClose').addEventListener('click', closeOv);
-  if (elMute) elMute.addEventListener('click', function () { setMuted(!muted); });
-  ov.addEventListener('click', function (e) { if (e.target === ov) closeOv(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) closeOv(); });
-  elMic.addEventListener('click', function () { unlockAudio(); if (recording) stopRec(); else startRec(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open && !inline()) closeOv(); });
 })();

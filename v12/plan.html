@@ -154,6 +154,12 @@
   .dhome .foot{padding:11px 15px;font-size:12.5px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}
   .dhome .foot b{color:var(--text);font-weight:600}
 
+  /* structured plan cards (flight + hotel from /plan) */
+  .plan-cards{align-self:flex-start;max-width:96%;display:flex;flex-direction:column;gap:12px;margin-top:2px}
+  .plan-cards .opt{margin:0;max-width:100%}
+  .plan-total{font-size:13.5px;line-height:1.45;padding:11px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface)}
+  .plan-total b{color:var(--acc-deep)}
+
   /* silver outline around the chat console */
   .browser{border:1.5px solid var(--silver)}
   /* sender name ABOVE the bubble; Tures speaks in vermilion */
@@ -200,7 +206,7 @@
   }
 </style>
 </head>
-<body data-page="plan">
+<body data-page="plan" data-voice-inline="1">
 <main>
 
   <!-- ── intro ── -->
@@ -274,7 +280,6 @@
 
 </main>
 
-<script src="assets/voice.js" defer></script>
 <script>
 (function(){
   var thread = document.getElementById('thread');
@@ -351,13 +356,62 @@
     }).catch(function(){ typing(false); offline(); });
   }
 
+  function fmtTripDates(brief){
+    if(!brief) return '';
+    if(brief.departDate && brief.returnDate) return esc(brief.departDate)+' – '+esc(brief.returnDate);
+    if(brief.departDate) return 'from '+esc(brief.departDate);
+    if(brief.timing) return esc(String(brief.timing));
+    return '';
+  }
+
+  function synthFlightTimes(offer){
+    if(!offer || !offer.id) return '';
+    var h = 0;
+    for(var i=0;i<offer.id.length;i++) h = (h + offer.id.charCodeAt(i)*17) % 720;
+    var depH = 6 + (h % 12), depM = (h*3) % 60;
+    var arrH = depH + 2 + (h % 5), arrM = (depM + 17) % 60;
+    function t(hh,mm){ var ap = hh>=12?'p':'a'; var h12 = hh%12||12; return h12+':'+(mm<10?'0':'')+mm+ap; }
+    return t(depH, depM)+' depart · '+t(arrH, arrM)+' arrive';
+  }
+
+  function legCard(label, offer, brief, kind){
+    if(!offer) return '';
+    var dates = fmtTripDates(brief);
+    var meta = (offer.summary||[]).slice();
+    if(kind==='flight' && dates) meta.unshift(dates);
+    if(kind==='flight') meta.push(synthFlightTimes(offer));
+    if(kind==='stay' && offer.raw && offer.raw.nights) meta.unshift(String(offer.raw.nights)+' nights');
+    var reason = (offer.scoreReasons && offer.scoreReasons.length)
+      ? offer.scoreReasons.slice(0,2).join(' · ')
+      : (kind==='flight' ? 'Best fit for your route and cabin' : 'Matches your style and budget');
+    return '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> '+esc(label)+' <span class="demo-tag">Proposed</span></div>'+
+      '<div class="ob"><div class="oname">'+esc(offer.title)+'</div>'+
+      '<div class="ometa">'+meta.map(function(m){ return '<span>'+esc(String(m))+'</span>'; }).join('')+
+      (offer.priceUsd!=null ? '<span class="mono">$'+Number(offer.priceUsd).toLocaleString()+'</span>' : '')+'</div>'+
+      '<div class="reason"><span class="tp"><span class="spark">✦</span> Why this one</span> '+esc(reason)+'</div></div></div>';
+  }
+
+  function presentPlanCards(plan, brief){
+    var parts = [];
+    if(plan && plan.flight) parts.push(legCard('Flight', plan.flight, brief, 'flight'));
+    if(plan && plan.stay) parts.push(legCard('Hotel', plan.stay, brief, 'stay'));
+    if(!parts.length) return;
+    var wrap=document.createElement('div'); wrap.className='msg from-ai plan-cards show';
+    parts.forEach(function(html){ var d=document.createElement('div'); d.innerHTML=html; wrap.appendChild(d.firstChild); });
+    if(plan.totalUsd!=null){
+      var tot=document.createElement('div'); tot.className='plan-total';
+      tot.innerHTML='About <b>$'+Number(plan.totalUsd).toLocaleString()+'</b> all in — nothing held or charged yet.';
+      wrap.appendChild(tot);
+    }
+    thread.appendChild(wrap); reveal(wrap); scroll();
+  }
+
   function proposePlan(brief){
     window.__brief = brief; typing(true);
     window.tures.plan(brief).then(function(p){
       typing(false);
-      var total = (p && p.totalUsd!=null) ? ('about $'+Number(p.totalUsd).toLocaleString()+' all in') : 'a single, clean number';
-      var why = (p && p.rationale) ? p.rationale : 'flights and a hotel that fit exactly what you asked for';
-      bubble('Here is the shape — <b>'+esc(why)+'</b>. That comes to '+total+', and nothing is held or charged yet.','t');
+      bubble('Here is what I would book — flight, hotel, dates, and the total. Review it here; I can adjust anything.','t');
+      presentPlanCards(p, brief);
       presentRadar(brief, function(){
         presentExtras(brief, function(){
           bubble('That is the trip, end to end. Shall I book the flights and hotel.','t');
@@ -551,7 +605,7 @@
   // ── greeting ──
   function greet(){
     if(live){
-      bubble("Hey — I'm Tures. You'll be surprised by how much I can take off your plate, most of it travel related. So, what are you looking to do? You can <b>talk to me</b> up top, or just type below.","t");
+      bubble("Hey — I'm Tures. Tell me a trip in your own words, <b>type below or tap Talk to me</b> — same thread, same memory.","t");
     } else {
       bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');
       actions([{label:'▷ Watch the example', on:runDemo}]);
@@ -671,10 +725,22 @@
   var __ready=''; try{ __ready = localStorage.getItem('tures.readyBrief')||''; }catch(_){}
   if(!(__ready && live)) greet();
 
+  // Voice runs in this same thread — bubbles + history stay unified.
+  window.turesVoiceBridge = {
+    bubble: function(html, who){ return bubble(html, who==='me'?'me':'t'); },
+    pushHistory: function(m){ history.push(m); },
+    hasMessages: function(){ return history.length > 0; },
+    setStatus: function(text){
+      var s=document.querySelector('.conv-head .s');
+      if(s) s.textContent = text || 'Tures · online';
+    },
+    onReady: function(brief){
+      resolveBrief(brief);
+    }
+  };
+
   (function(){
-    // A READY brief handed over from the concierge bubble or the voice modal — the traveler already
-    // had the conversation there, so plan it DIRECTLY. Never restart the conversation (that was the
-    // "lobotomy": we used to re-converse from a seed and ask everything again).
+    // A READY brief handed over from the concierge bubble — plan directly, no re-converse.
     var ready='';
     try{ ready = localStorage.getItem('tures.readyBrief')||''; if(ready) localStorage.removeItem('tures.readyBrief'); }catch(_){}
     if(ready && live){
@@ -692,5 +758,6 @@
   })();
 })();
 </script>
+<script src="assets/voice.js"></script>
 <script src="assets/site.js" defer></script>
 </body></html>

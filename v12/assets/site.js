@@ -5,6 +5,14 @@
    A page declares itself with <body data-page="plan">.
    ============================================================ */
 (function () {
+  /* shared travel-bg scene fades (loaded once for pages with the backdrop video) */
+  if (!document.querySelector('script[src*="travel-bg.js"]')) {
+    var tbg = document.createElement("script");
+    tbg.src = "assets/travel-bg.js";
+    tbg.defer = true;
+    document.head.appendChild(tbg);
+  }
+
   // The funnel, grouped. n = stop number in the journey.
   var GROUPS = [
     { title: "Start here", items: [

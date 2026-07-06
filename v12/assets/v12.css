@@ -71,17 +71,21 @@ html.v11-travel-on .v11-travel-vid{
 }
 html.v11-travel-on .v11-travel-poster{
   background:url('travel-bg.jpg') center/cover no-repeat;
-  opacity:.5;
+  opacity:1;
   transform:scale(.72);
   transform-origin:center center;
+  transition:opacity .9s ease;
 }
 html.v11-travel-on .v11-travel-vid{
   object-fit:cover;
   object-position:center center;
-  opacity:.5;
+  opacity:0;
   transform:scale(.72);
   transform-origin:center center;
+  transition:opacity .9s ease;
 }
+html.v11-travel-on .v11-travel-bg.vid-ready .v11-travel-poster{opacity:0;visibility:hidden}
+html.v11-travel-on .v11-travel-bg.vid-ready .v11-travel-vid{opacity:.5}
 html.v11-travel-on .v11-travel-scrim{
   position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
@@ -441,8 +445,13 @@ html.px-cover .v11-foot{margin-top:0}
 .px-panel--hero{min-height:100dvh;display:flex;align-items:flex-end;padding:calc(var(--nav-h) + 24px) 24px 48px}
 .px-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
 .px-bg-inner{position:absolute;inset:-8%;width:116%;height:116%;will-change:transform}
-.px-bg-inner video,.px-bg-inner .px-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:.55}
-.px-bg-inner .px-poster{background:url('travel-bg.jpg') center/cover no-repeat}
+.px-bg-inner video,.px-bg-inner .px-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;transition:opacity .9s ease}
+.px-bg-inner .px-poster{background:url('travel-bg.jpg') center/cover no-repeat;opacity:1;z-index:0}
+.px-bg-inner video{opacity:0;z-index:0}
+.px-bg-inner.vid-ready .px-poster{opacity:0;visibility:hidden}
+.px-bg-inner.vid-ready video{opacity:.55}
+.travel-vfade{position:absolute;inset:0;z-index:2;pointer-events:none;background:#0a0c10;opacity:0;transition:opacity .36s ease}
+.travel-vfade.on{opacity:1}
 .px-scrim{position:absolute;inset:0;background:
   linear-gradient(to top, rgba(8,10,14,.82) 0%, rgba(8,10,14,.28) 42%, rgba(8,10,14,.52) 100%),
   radial-gradient(ellipse 80% 60% at 22% 78%, rgba(255,73,41,.14), transparent 70%)}
