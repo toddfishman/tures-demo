@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <defs>
+    <radialGradient id="g" cx="82%" cy="-8%" r="90%">
+      <stop offset="0%" stop-color="#ff4929" stop-opacity="0.10"/>
+      <stop offset="60%" stop-color="#ff4929" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <text x="90" y="250" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="600" fill="#1a1a1a">t<tspan fill="#ff4929">✦</tspan>ures</text>
+  <text x="94" y="340" font-family="Helvetica, Arial, sans-serif" font-size="42" font-weight="600" fill="#1a1a1a">Your end-to-end travel concierge.</text>
+  <text x="94" y="402" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#7a7a7a">It books, watches, and rebooks — confirmation numbers, not links.</text>
+  <text x="94" y="540" font-family="'Courier New', monospace" font-size="26" fill="#cf3b1f">Books · Protects · Proves</text>
+</svg>

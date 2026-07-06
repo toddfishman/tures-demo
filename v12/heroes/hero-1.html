@@ -1,0 +1,166 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t✦ures — Books. Protects. Proves.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--surface:#f6f6f6;--surface-2:#efefef;--line:rgba(26,26,26,.10);--line-2:rgba(26,26,26,.16);--text:#1a1a1a;--muted:#6f6f6f;--faint:#c4c4c4;--acc:#ff4929;--acc-2:#ff775f;--acc-deep:#cf3b1f;--acc-dim:rgba(255,73,41,.10);--acc-line:rgba(255,73,41,.28);--good:#2e9e5b;--warn:#c77a00;--rain:#3b6fb0;--radius:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+a{color:inherit;text-decoration:none}.serif{font-family:'Playfair Display',Georgia,serif}.mono{font-family:'Space Mono',monospace}.spark{color:var(--acc)}
+.nv{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:linear-gradient(to bottom,rgba(255,255,255,.92),rgba(255,255,255,.7));border-bottom:1px solid var(--line)}
+.nv .in{max-width:1180px;margin:0 auto;padding:0 22px;height:64px;display:flex;align-items:center;gap:16px}
+.nv .lg{display:inline-flex;align-items:center;gap:7px;font-family:'Playfair Display',serif;font-size:23px;font-weight:600;flex:0 0 auto}.nv .lg .cv{font-size:11px;color:var(--muted)}
+.nv .pl{flex:1;max-width:540px;margin:0 auto;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line-2);border-radius:999px;padding:5px 6px 5px 16px}
+.nv .pl input{flex:1;border:none;outline:none;background:none;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);min-width:0}.nv .pl input::placeholder{color:var(--muted)}
+.nv .pl button{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:none;background:var(--acc);cursor:pointer;display:grid;place-items:center}
+.nv .ac{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+@media(max-width:620px){.nv .pl{max-width:none}.nv .lg{font-size:20px}}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:14px;cursor:pointer;border:none;border-radius:999px;padding:12px 22px;background:var(--acc);color:#fff}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc-deep);border:1px solid var(--line-2);border-radius:999px;padding:6px 14px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-2);border-radius:5px;padding:3px 7px}
+
+/* ===== synchronized three-act hero ===== */
+.hw{max-width:1180px;margin:0 auto;padding:50px 24px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center}
+.steps{margin:22px 0 0;display:flex;flex-direction:column;gap:6px}
+.step{display:flex;align-items:center;gap:16px;cursor:pointer;padding:4px 0;border:none;background:none;text-align:left;font-family:'Playfair Display',serif;font-weight:500;line-height:1.0;font-size:clamp(34px,5vw,58px);color:var(--faint);transition:color .45s}
+.step .kick{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);width:62px;flex:0 0 auto;transition:color .45s;align-self:center}
+.step.on{color:var(--acc)}
+.step.on .kick{color:var(--acc-deep)}
+.step .beam{flex:1;height:2px;position:relative;opacity:0;transition:opacity .45s;min-width:24px}
+.step.on .beam{opacity:1;background:linear-gradient(to right,var(--acc),transparent)}
+.step.on .beam::after{content:"";position:absolute;top:50%;left:0;width:9px;height:9px;border-radius:50%;background:var(--acc);transform:translateY(-50%);animation:beam 1.5s linear infinite}
+@keyframes beam{0%{left:0;opacity:1}80%{opacity:1}100%{left:100%;opacity:0}}
+.sub{margin:24px 0 0;font-size:16px;color:var(--muted);max-width:42ch;min-height:48px;line-height:1.6;transition:opacity .3s}
+.sub b{color:var(--text);font-weight:500}
+.cta{margin-top:26px;display:flex;gap:13px;align-items:center;flex-wrap:wrap}
+.progress{display:flex;gap:6px;margin-top:22px}
+.progress i{width:26px;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden;position:relative}
+.progress i.on::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;animation:fillp var(--dwell,3800ms) linear forwards}
+.progress i.done{background:var(--acc-line)}
+@keyframes fillp{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.phone{width:372px;max-width:100%;margin:0 auto;background:var(--surface);border-radius:40px;padding:13px;border:2px solid var(--text);box-shadow:0 40px 80px -42px rgba(0,0,0,.45)}
+.screen{background:var(--bg);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;height:600px;border:1px solid var(--line)}
+.sct{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+.sct .nm{font-size:14px;font-weight:600}.sct .ss{font-size:11.5px;color:var(--acc-deep);display:flex;align-items:center;gap:6px}
+.sct .ss .pd{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.scenes{position:relative;flex:1}
+.scene{position:absolute;inset:0;padding:16px 14px;display:flex;flex-direction:column;gap:11px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;pointer-events:none}
+.scene.on{opacity:1;transform:none;pointer-events:auto}
+.m{max-width:88%}.m.me{align-self:flex-end}.m.ai{align-self:flex-start}
+.b{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.45}
+.ai .b{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+.me .b{background:#fff;border:1px solid var(--line-2);border-bottom-right-radius:4px}
+.work{align-self:flex-start;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:9px 13px}
+.work .sp{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.rc{align-self:flex-start;max-width:94%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 60%),var(--bg)}
+.rc .h{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+.rc .h .tag{margin-left:auto}
+.rc .r{display:flex;justify-content:space-between;gap:10px;padding:7px 13px;font-size:12.5px;border-bottom:1px solid var(--line)}.rc .r:last-child{border:none}.rc .r .mono{color:var(--acc-deep)}
+.wx{align-self:flex-start;max-width:94%;display:flex;gap:9px;background:rgba(59,111,176,.08);border:1px solid rgba(59,111,176,.22);border-radius:13px;padding:9px 12px;font-size:12.5px;line-height:1.45}.wx svg{stroke:var(--rain);flex:0 0 auto;margin-top:1px}
+.home{align-self:stretch;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg)}
+.home .hh{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--acc-dim)}
+.home .hh .t{font-family:'Playfair Display',serif;font-size:15px}.home .hh .tag{margin-top:5px}
+.home .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.home .cell{background:var(--bg);padding:10px 12px}.home .cell .n{font-family:'Space Mono',monospace;font-size:16px;color:var(--acc-deep)}.home .cell .l{font-size:10.5px;color:var(--muted)}
+.home .foot{padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}.home .foot b{color:var(--text);font-weight:600}
+@media(max-width:880px){.hw{grid-template-columns:1fr;gap:34px}.step{font-size:clamp(30px,9vw,46px)}.sub{min-height:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.scene{transition:none}}
+</style></head>
+<body>
+<header class="nv"><div class="in">
+  <span class="lg">t<span class="spark">✦</span>ures <span class="cv">▾</span></span>
+  <form class="pl" onsubmit="return false"><input placeholder="Where to? Describe your trip and Tures plans it…" aria-label="Plan a trip"><button aria-label="Plan it"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+  <button class="ac" aria-label="Account"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></button>
+</div></header>
+
+<section class="hw">
+  <div>
+    <span class="eyebrow"><span class="dot"></span> Your concierge, end to end</span>
+    <div class="steps" id="steps">
+      <button class="step" data-i="0"><span class="kick">Before</span><span class="word">Plans it.</span><span class="beam"></span></button>
+      <button class="step" data-i="1"><span class="kick">During</span><span class="word">Protects it.</span><span class="beam"></span></button>
+      <button class="step" data-i="2"><span class="kick">After</span><span class="word">Proves it.</span><span class="beam"></span></button>
+    </div>
+    <p class="sub" id="sub"></p>
+    <div class="progress" id="prog"><i></i><i></i><i></i></div>
+    <div class="cta">
+      <a class="btn" href="../plan.html">Plan a trip <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <span style="font-size:13px;color:var(--muted)">Other apps stop at <span style="color:var(--text)">Booked</span>.</span>
+    </div>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sct"><div class="av serif">T</div><div><div class="nm">Tures</div><div class="ss"><span class="pd"></span><span id="pstatus">Planning your trip</span></div></div></div>
+    <div class="scenes">
+      <!-- PLANS -->
+      <div class="scene on" data-s="0">
+        <div class="m me"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+        <div class="work"><span class="sp"></span> Comparing 38 fares · holding two oceanfront suites…</div>
+        <div class="rc"><div class="h"><span class="spark">✦</span> Trip held <span class="tag">Sample</span></div>
+          <div class="r"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+          <div class="r"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">oceanfront</span></div>
+          <div class="r"><span>Mama’s Fish House · anniversary</span><span class="mono">7:30p</span></div></div>
+      </div>
+      <!-- PROTECTS -->
+      <div class="scene" data-s="1">
+        <div class="m ai"><div class="b">Heads up — your flight home Thursday shifted two hours. I rebooked you on the 4:55, same cabin, no change fee.</div></div>
+        <div class="wx"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in for Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator. <span class="tag" style="margin-top:6px">Sample</span></div></div>
+        <div class="m ai"><div class="b">A better oceanfront table opened for your anniversary night — I took it. Nothing for you to do.</div></div>
+      </div>
+      <!-- PROVES -->
+      <div class="scene" data-s="2">
+        <div class="home">
+          <div class="hh"><div class="t serif">Welcome home, Andy — Maui, handled.</div><span class="tag">Sample</span></div>
+          <div class="grid">
+            <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
+            <div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>
+            <div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>
+            <div class="cell"><div class="n">1</div><div class="l">disaster dodged</div></div>
+          </div>
+          <div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama’s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<script>
+/* ===== EDIT THE THREE WORDS HERE — kicker + word + the line beneath =====
+   Alternates to audition: Books it/Watches it/Wraps it · Booked/Protected/Proven
+   · Plans it/Watches it/Proves it · Arranges/Guards/Reports                      */
+var ACTS=[
+  {kick:"Before", word:"Books.",    status:"Booking your trip",       sub:"One message books the whole trip — <b>flights, hotel, the table</b>. Confirmation numbers, not links."},
+  {kick:"During", word:"Protects.", status:"Watching your trip · 24/7", sub:"On the whole time. It catches the delay, the storm, the closure — and <b>fixes it before you notice</b>, good news too."},
+  {kick:"After",  word:"Proves.",   status:"Trip wrapped",            sub:"The receipts when you land — <b>what it saved, miles credited, hours back, expenses filed</b>, and a taste it learned."}
+];
+(function(){
+  var DWELL=3800;
+  var steps=[].slice.call(document.querySelectorAll('.step'));
+  var scenes=[].slice.call(document.querySelectorAll('.scene'));
+  var prog=[].slice.call(document.querySelectorAll('#prog i'));
+  var sub=document.getElementById('sub'), pstatus=document.getElementById('pstatus');
+  document.documentElement.style.setProperty('--dwell',DWELL+'ms');
+  // apply editable words
+  steps.forEach(function(s,i){ s.querySelector('.kick').textContent=ACTS[i].kick; s.querySelector('.word').textContent=ACTS[i].word; });
+  var i=0,timer=null;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function set(n){
+    i=n;
+    steps.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    scenes.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    prog.forEach(function(p,k){ p.classList.remove('on','done'); if(k<i)p.classList.add('done'); });
+    if(!reduce){ var bar=prog[i]; bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on'); }
+    sub.style.opacity=0; setTimeout(function(){ sub.innerHTML=ACTS[i].sub; sub.style.opacity=1; },150);
+    pstatus.textContent=ACTS[i].status;
+  }
+  function play(){ if(reduce) return; clearInterval(timer); timer=setInterval(function(){ set((i+1)%ACTS.length); }, DWELL); }
+  steps.forEach(function(s){ s.addEventListener('click',function(){ set(+s.dataset.i); play(); }); });
+  set(0); play();
+})();
+</script>
+</body></html>

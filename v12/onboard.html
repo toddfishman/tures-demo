@@ -1,0 +1,296 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Set up Tures — we only ask for what travel actually requires. Add the rest whenever you like; you can skip anything and finish later.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<title>t✦ures — Set up Tures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  .ob-wrap{max-width:680px;margin:0 auto;padding:0 22px}
+  .ob-hero{padding:60px 0 14px;text-align:center}
+  .ob-hero .lead{margin:16px auto 0}
+  .ob-skipall{display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-size:13.5px;color:var(--muted);border:1px solid var(--line-2);border-radius:999px;padding:8px 15px;cursor:pointer}
+  .ob-skipall:hover{border-color:var(--acc);color:var(--acc-deep)}
+
+  .ob-card{margin:16px 0;padding:0;overflow:hidden}
+  .ob-h{display:flex;align-items:flex-start;gap:14px;padding:20px 22px;cursor:pointer}
+  .ob-h .ob-meta{flex:1;min-width:0}
+  .ob-h h3{margin:8px 0 4px}
+  .ob-h .ob-sub{font-size:13.5px;color:var(--muted)}
+  .ob-h .tag.opt{color:var(--silver-deep);background:transparent;border-color:var(--silver-2)}
+  .ob-check{width:28px;height:28px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:var(--surface-2);color:var(--faint);font-size:14px;transition:background .2s,color .2s;margin-top:2px}
+  .ob-card.done .ob-check{background:var(--good);color:#fff}
+  .ob-h .chev{align-self:center;color:var(--faint);font-size:20px;transition:transform .2s;flex:0 0 auto}
+  .ob-card.open .ob-h .chev{transform:rotate(180deg)}
+
+  .ob-body{display:none;padding:2px 22px 8px;border-top:1px solid var(--line)}
+  .ob-card.open .ob-body{display:block;padding-top:18px}
+  .ob-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .ob-row .grp{flex:1;min-width:160px}
+  .ob-grp{margin-bottom:14px}
+  .ob-grp label,.ob-row .grp label{display:block;font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:6px}
+  .ob-note{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+  .ob-note svg{stroke:var(--silver-deep);flex:0 0 auto;margin-top:1px}
+  .ob-act{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0 18px}
+  .ob-skip{background:none;border:none;color:var(--muted);font:500 13.5px 'DM Sans',sans-serif;cursor:pointer;padding:10px 6px}
+  .ob-skip:hover{color:var(--acc-deep)}
+
+  /* loyalty repeatable rows */
+  .loy-row{display:flex;gap:10px;margin-bottom:10px;align-items:center}
+  .loy-row select.field{flex:0 0 130px}
+  .loy-row .rm{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;flex:0 0 auto;padding:4px 6px}
+  .loy-row .rm:hover{color:var(--acc-deep)}
+  .loy-add{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--acc-deep);background:none;border:1px dashed var(--acc-line);border-radius:10px;padding:9px 14px;cursor:pointer;margin-bottom:4px}
+  .loy-add:hover{background:var(--acc-dim)}
+
+  /* telegram card */
+  .tg-connect{display:inline-flex;align-items:center;gap:9px;background:#229ED9;color:#fff;border:none;border-radius:999px;padding:11px 18px;font:600 14px 'DM Sans',sans-serif;cursor:pointer}
+  .tg-connect:hover{filter:brightness(1.05)}
+  .tg-connect svg{fill:#fff}
+  .tg-soon{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+  /* sticky progress bar */
+  .ob-foot{position:sticky;bottom:0;z-index:30;background:linear-gradient(to top,var(--bg),var(--bg) 70%,rgba(255,255,255,0));
+    padding:14px 0 calc(16px + env(safe-area-inset-bottom));margin-top:14px}
+  .ob-foot .in{max-width:680px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:14px}
+  .ob-foot .pwrap{flex:1;min-width:0}
+  .ob-foot .ptext{font-size:12.5px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .ob-foot .ptext .ok{color:var(--good);font-weight:600;display:none;align-items:center;gap:5px}
+  .ob-foot.ready .ptext .ok{display:inline-flex}
+  .ob-foot .ptext .togo{display:inline}
+  .ob-foot.ready .ptext .togo{display:none}
+  .ob-foot .track{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .ob-foot .fill{height:100%;background:var(--acc);border-radius:999px;transition:width .4s}
+  .ob-foot .btn{flex:0 0 auto}
+  @media(max-width:560px){.ob-foot .in{flex-direction:column;align-items:stretch;gap:10px}.ob-foot .btn{width:100%}}
+  html.dark .ob-foot{background:linear-gradient(to top,var(--bg),var(--bg) 70%,rgba(14,14,18,0))}
+</style>
+</head>
+<body data-page="onboard">
+<main>
+  <section class="ob-hero ob-wrap">
+    <span class="eyebrow"><span class="dot"></span> Set up Tures</span>
+    <h1 style="margin-top:18px">A little setup, <em>then it does the rest.</em></h1>
+    <p class="lead center">We only ask for what travel actually requires. Everything else is optional — add it now or whenever you like. You can skip anything; nothing here is mandatory.</p>
+    <button class="ob-skipall" id="skip-all" type="button">I&rsquo;ll do this as I go &nbsp;→</button>
+  </section>
+
+  <div class="ob-wrap">
+
+    <!-- 1 · ESSENTIALS (required to book) -->
+    <section class="ob-card card open" id="c-essentials" data-key="essentials">
+      <div class="ob-h">
+        <div class="ob-meta"><span class="tag">Required to book</span><h3>The essentials</h3><p class="ob-sub">The minimum Tures needs to put a trip in your name.</p></div>
+        <span class="ob-check">✓</span><span class="chev">▾</span>
+      </div>
+      <div class="ob-body">
+        <div class="ob-row">
+          <div class="grp"><label for="e-name">Full legal name (as on ID)</label><input class="field" id="e-name" autocomplete="name" placeholder="Andrew J. Rockwell"></div>
+          <div class="grp" style="flex:0 0 160px"><label for="e-dob">Date of birth</label><input class="field" id="e-dob" type="date"></div>
+        </div>
+        <div class="ob-row">
+          <div class="grp" style="flex:0 0 150px"><label for="e-home">Home airport</label><input class="field" id="e-home" placeholder="SEA" maxlength="40" style="text-transform:uppercase"></div>
+          <div class="grp"><label for="e-email">Email</label><input class="field" id="e-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+          <div class="grp" style="flex:0 0 170px"><label for="e-phone">Mobile</label><input class="field" id="e-phone" type="tel" autocomplete="tel" placeholder="+1 555 010 1234"></div>
+        </div>
+        <div class="ob-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> A card lets Tures actually book, not just hold. It is tokenized — only the last four are ever stored here.</div>
+        <div class="ob-row">
+          <div class="grp"><label for="e-card">Card</label><input class="field" id="e-card" autocomplete="cc-number" inputmode="numeric" placeholder="Card number"></div>
+          <div class="grp" style="flex:0 0 110px"><label for="e-exp">Expiry</label><input class="field" id="e-exp" placeholder="08 / 29"></div>
+        </div>
+        <div class="ob-act"><button class="btn ob-save" type="button">Save essentials</button><button class="ob-skip" type="button">Do this later</button></div>
+      </div>
+    </section>
+
+    <!-- 2 · TRAVEL DOCUMENTS (optional) -->
+    <section class="ob-card card" id="c-docs" data-key="docs">
+      <div class="ob-h">
+        <div class="ob-meta"><span class="tag opt">Optional · for international</span><h3>Travel documents</h3><p class="ob-sub">Passport and Known Traveler — tokenized, added once, reused forever.</p></div>
+        <span class="ob-check">✓</span><span class="chev">▾</span>
+      </div>
+      <div class="ob-body">
+        <div class="ob-row">
+          <div class="grp"><label for="d-pass">Passport number</label><input class="field" id="d-pass" placeholder="X1234567"></div>
+          <div class="grp" style="flex:0 0 130px"><label for="d-country">Country</label><input class="field" id="d-country" placeholder="USA" maxlength="3" style="text-transform:uppercase"></div>
+          <div class="grp" style="flex:0 0 160px"><label for="d-exp">Expires</label><input class="field" id="d-exp" type="date"></div>
+        </div>
+        <div class="ob-grp"><label for="d-ktn">Known Traveler / Global Entry number</label><input class="field" id="d-ktn" placeholder="TT123456789"></div>
+        <div class="ob-act"><button class="btn ob-save" type="button">Save documents</button><button class="ob-skip" type="button">Do this later</button></div>
+      </div>
+    </section>
+
+    <!-- 3 · LOYALTY & ACCOUNTS (optional) -->
+    <section class="ob-card card" id="c-loyalty" data-key="loyalty">
+      <div class="ob-h">
+        <div class="ob-meta"><span class="tag opt">Optional</span><h3>Loyalty &amp; accounts</h3><p class="ob-sub">Airline, hotel, and rental-car programs — so your miles, points, and status apply automatically.</p></div>
+        <span class="ob-check">✓</span><span class="chev">▾</span>
+      </div>
+      <div class="ob-body">
+        <div id="loy-list"></div>
+        <button class="loy-add" id="loy-add" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add a program</button>
+        <div class="ob-act"><button class="btn ob-save" type="button">Save programs</button><button class="ob-skip" type="button">Do this later</button></div>
+      </div>
+    </section>
+
+    <!-- 4 · REACH YOU ON TELEGRAM (optional) -->
+    <section class="ob-card card" id="c-telegram" data-key="telegram">
+      <div class="ob-h">
+        <div class="ob-meta"><span class="tag opt">Optional · recommended</span><h3>Reach Tures on Telegram</h3><p class="ob-sub">Pick up the same conversation on any device — Tures messages you there, and remembers everything.</p></div>
+        <span class="ob-check">✓</span><span class="chev">▾</span>
+      </div>
+      <div class="ob-body">
+        <div class="ob-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg> Your Telegram links to your Tures account, so the agent that knows you on the web is the same one that texts you — your memory and trips follow you across every device.</div>
+        <button class="tg-connect" id="tg-connect" type="button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21.9 4.3 2.8 11.7c-1.1.4-1 1.5-.1 1.8l4.9 1.5 1.9 5.9c.2.5.4.7.8.7.4 0 .6-.2.9-.5l2.6-2.5 4.9 3.6c.9.5 1.5.2 1.7-.8L23.9 5.5c.3-1.2-.5-1.7-1-1.2z"/></svg> Connect Telegram</button>
+        <div class="tg-soon" id="tg-soon"></div>
+        <div class="ob-act" style="padding-top:14px"><button class="ob-skip" type="button">Maybe later</button></div>
+      </div>
+    </section>
+
+    <!-- 5 · TASTE (optional) -->
+    <section class="ob-card card" id="c-taste" data-key="taste">
+      <div class="ob-h">
+        <div class="ob-meta"><span class="tag opt">Optional</span><h3>Your Taste Print</h3><p class="ob-sub">A few quick this-or-thats so every pick sounds like you — not a generic search.</p></div>
+        <span class="ob-check">✓</span><span class="chev">▾</span>
+      </div>
+      <div class="ob-body">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:14px">It takes about a minute, and the planner reads it on every trip.</p>
+        <div class="ob-act"><a class="btn" href="taste.html">Build your Taste Print &nbsp;→</a><button class="ob-skip" type="button">Do this later</button></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- sticky progress -->
+  <div class="ob-foot" id="ob-foot">
+    <div class="in">
+      <div class="pwrap">
+        <div class="ptext">
+          <span class="togo"><b id="p-pct" style="color:var(--text)">0%</b> &middot; <span id="p-togo">add the essentials to start booking</span></span>
+          <span class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> Ready to book — the rest is optional</span>
+        </div>
+        <div class="track"><span class="fill" id="p-fill" style="width:0%"></span></div>
+      </div>
+      <a class="btn" id="ob-finish" href="plan.html">Start planning &nbsp;→</a>
+    </div>
+  </div>
+
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+(function(){
+  var F = window.turesFunnel, T = window.tures;
+  if(!F) return;
+  var tr = F.traveler() || {}, v = F.vault() || {};
+
+  // ── accordion: one section toggles open; clicking the header expands/collapses ──
+  var cards = [].slice.call(document.querySelectorAll('.ob-card'));
+  cards.forEach(function(c){
+    c.querySelector('.ob-h').addEventListener('click', function(e){
+      if(e.target.closest('a,button,input,select,.ob-body')) return;
+      c.classList.toggle('open');
+    });
+  });
+  function openNext(after){
+    var i = cards.indexOf(after);
+    after.classList.remove('open');
+    for(var j=i+1;j<cards.length;j++){ if(!cards[j].classList.contains('done')){ cards[j].classList.add('open'); cards[j].scrollIntoView({behavior:'smooth',block:'center'}); return; } }
+  }
+  function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+  function setDone(card, done){ card.classList.toggle('done', !!done); }
+
+  // ── prefill from existing state ──
+  if(tr.name) document.getElementById('e-name').value = tr.name;
+  if(tr.dob) document.getElementById('e-dob').value = tr.dob;
+  if(tr.homeAirport) document.getElementById('e-home').value = tr.homeAirport;
+  if(tr.email || (T&&T.account&&T.account.email)) document.getElementById('e-email').value = tr.email || T.account.email;
+  if(tr.phone) document.getElementById('e-phone').value = tr.phone;
+  if(v.payment && v.payment[0]) document.getElementById('e-card').value = v.payment[0].last4 ? ('•••• '+v.payment[0].last4) : '';
+  if(v.identity){ if(v.identity.passport){ document.getElementById('d-pass').value=v.identity.passport.number||''; document.getElementById('d-country').value=v.identity.passport.country||''; } if(v.identity.ktn) document.getElementById('d-ktn').value=v.identity.ktn; }
+
+  // ── loyalty repeatable rows ──
+  var loyList = document.getElementById('loy-list');
+  function loyRow(data){
+    data = data||{};
+    var row=document.createElement('div'); row.className='loy-row';
+    row.innerHTML =
+      '<select class="field loy-kind">'+['Airline','Hotel','Rental car','Other'].map(function(k){return '<option'+(data.kind===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'+
+      '<input class="field loy-prog" placeholder="Program (e.g. Alaska Mileage Plan)" value="'+(data.program||'').replace(/"/g,'&quot;')+'">'+
+      '<input class="field loy-num" placeholder="Member #" style="flex:0 0 130px" value="'+(data.number||'').replace(/"/g,'&quot;')+'">'+
+      '<button class="rm" type="button" aria-label="Remove">&times;</button>';
+    row.querySelector('.rm').onclick=function(){ row.remove(); };
+    loyList.appendChild(row);
+  }
+  (v.loyalty && v.loyalty.length ? v.loyalty : [{}]).forEach(loyRow);
+  document.getElementById('loy-add').onclick=function(){ loyRow({}); };
+
+  // ── saves ──
+  document.querySelector('#c-essentials .ob-save').onclick=function(){
+    var card = val('e-card'); var last4 = (card.match(/(\d{4})\s*$/)||[])[1] || (card.replace(/\D/g,'').slice(-4));
+    F.setTraveler({ name:val('e-name'), dob:val('e-dob'), homeAirport:val('e-home').toUpperCase(), email:val('e-email'), phone:val('e-phone') });
+    if(last4){ var vv=F.vault(); var pay=(vv.payment||[]).slice(); pay[0]={label:'Card', last4:last4}; F.setVault({payment:pay}); }
+    // best-effort engine sync when signed in
+    try{ if(T&&T.configured){ T.profile.set({fullName:val('e-name'), dob:val('e-dob'), email:val('e-email')}); if(last4) T.connections.connect({kind:'payment', label:'Card •••• '+last4, secret:{token:'tok_demo_'+last4, last4:last4}, meta:{cardKey:'visa_platinum', last4:last4}}); } }catch(_){}
+    setDone(document.getElementById('c-essentials'), true); refresh(); openNext(document.getElementById('c-essentials'));
+  };
+  document.querySelector('#c-docs .ob-save').onclick=function(){
+    var id = Object.assign({}, F.vault().identity||{});
+    if(val('d-pass')) id.passport={number:val('d-pass'), country:val('d-country').toUpperCase(), expiry:val('d-exp')};
+    if(val('d-ktn')) id.ktn=val('d-ktn');
+    F.setVault({identity:id});
+    try{ if(T&&T.configured){ T.profile.set({passport: val('d-pass')?{number:val('d-pass'),country:val('d-country')}:undefined, knownTravelerNumber: val('d-ktn')||undefined}); } }catch(_){}
+    setDone(document.getElementById('c-docs'), !!(val('d-pass')||val('d-ktn'))); refresh(); openNext(document.getElementById('c-docs'));
+  };
+  document.querySelector('#c-loyalty .ob-save').onclick=function(){
+    var rows=[].slice.call(loyList.querySelectorAll('.loy-row')).map(function(r){
+      return { kind:r.querySelector('.loy-kind').value, program:r.querySelector('.loy-prog').value.trim(), number:r.querySelector('.loy-num').value.trim() };
+    }).filter(function(x){ return x.program||x.number; });
+    F.setVault({loyalty:rows});
+    setDone(document.getElementById('c-loyalty'), rows.length>0); refresh(); openNext(document.getElementById('c-loyalty'));
+  };
+
+  // ── telegram: mint a one-time link code from the engine and open the deep link when the bot is
+  //    live; otherwise capture intent gracefully. The link binds this Telegram to the account so the
+  //    same Tures (memory + trips) follows you there.
+  document.getElementById('tg-connect').onclick=function(){
+    F.setTraveler({ telegram:'requested' });
+    setDone(document.getElementById('c-telegram'), true); refresh();
+    var soon=document.getElementById('tg-soon');
+    if(!(T && T.configured && T.channels)){ soon.textContent='Telegram is rolling out shortly — we will open your Tures chat there the moment it is live.'; return; }
+    soon.textContent='Starting the link…';
+    T.channels.linkCode().then(function(r){
+      if(r && r.telegramDeepLink){ window.open(r.telegramDeepLink, '_blank'); soon.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; }
+      else { soon.textContent='Your account is ready. Telegram is rolling out shortly — we will open your Tures chat there the moment the channel is live.'; }
+    }).catch(function(e){
+      soon.textContent = (e && e.status===401) ? 'Sign in first, then connect Telegram so it links to your account.' : 'Could not start the link just now — try again in a moment.';
+    });
+  };
+
+  // ── skip handlers ──
+  [].forEach.call(document.querySelectorAll('.ob-skip'), function(b){
+    b.onclick=function(){ var card=b.closest('.ob-card'); openNext(card); };
+  });
+  document.getElementById('skip-all').onclick=function(){ location.href='plan.html'; };
+
+  // ── progress (drives the sticky footer + "ready to book" state) ──
+  function minimumMet(){ var t=F.traveler(), vv=F.vault(); return !!(t.name && t.homeAirport && (t.email||t.phone) && vv.payment && vv.payment.length); }
+  function refresh(){
+    var st=F.setupStatus();
+    document.getElementById('p-pct').textContent = st.percent+'%';
+    document.getElementById('p-fill').style.width = st.percent+'%';
+    document.getElementById('ob-foot').classList.toggle('ready', minimumMet());
+    // reflect done state on cards from stored data (so reloads keep checks)
+    setDone(document.getElementById('c-essentials'), minimumMet());
+    setDone(document.getElementById('c-docs'), st.steps.docs);
+    setDone(document.getElementById('c-loyalty'), st.steps.loyalty);
+    setDone(document.getElementById('c-taste'), st.steps.taste);
+    var togo = st.steps.payment ? 'add documents, loyalty, and Telegram whenever you like' : 'add the essentials to start booking';
+    document.getElementById('p-togo').textContent = togo;
+  }
+  refresh();
+})();
+</script>
+</body></html>

@@ -1,0 +1,660 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tures watches your trip 24/7 and rebooks around delays, weather, and cancellations before they reach you. Watch it catch a live disruption.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="The Hiccup Handler — Tures">
+<meta property="og:description" content="Tures watches your trip 24/7 and rebooks around delays, weather, and cancellations before they reach you. Watch it catch a live disruption.">
+<meta property="og:url" content="https://tures.app/hiccup.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Hiccup Handler — Tures">
+<meta name="twitter:description" content="Tures watches your trip 24/7 and rebooks around delays, weather, and cancellations before they reach you. Watch it catch a live disruption.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — The Hiccup Handler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* ============ page-specific: the Hiccup Handler ============ */
+
+  /* ---- hero ---- */
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
+  .hero-cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
+
+  /* ---- command center (the watched-trip monitor) ---- */
+  .ops{position:relative;border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;
+    background:linear-gradient(180deg,var(--surface),var(--bg));box-shadow:0 40px 80px -50px rgba(0,0,0,.4)}
+  .ops .ops-grid{position:absolute;inset:0;opacity:.7;pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:38px 38px;mask-image:radial-gradient(120% 100% at 50% 42%,#000 52%,transparent)}
+  .ops .scan{position:absolute;top:0;bottom:0;width:150px;z-index:3;pointer-events:none;left:-150px;
+    background:linear-gradient(90deg,transparent,var(--acc-dim),transparent);animation:opsscan 6s linear infinite}
+  @keyframes opsscan{0%{left:-150px}100%{left:100%}}
+  .ops .hud{position:absolute;z-index:4;left:16px;top:14px;right:16px;display:flex;align-items:center;
+    justify-content:space-between;gap:10px;pointer-events:none}
+  .ops .hud .watch{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;
+    color:var(--text);background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid var(--line-2);
+    padding:6px 11px;border-radius:999px}
+  .ops .hud .watch .live{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .ops .hud .status{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+    color:var(--good);background:rgba(46,158,91,.10);border:1px solid rgba(46,158,91,.30);padding:6px 11px;border-radius:999px}
+  .ops svg.board{position:relative;z-index:2;display:block;width:100%;height:auto}
+  .ops .arc{fill:none;stroke:var(--acc-line);stroke-width:1.6;opacity:.9;stroke-dasharray:4 6;animation:opsdash 22s linear infinite}
+  @keyframes opsdash{to{stroke-dashoffset:-260}}
+  .ops .node{fill:var(--acc)}
+  .ops .halo{fill:none;stroke:var(--acc-line);transform-origin:center;transform-box:fill-box;animation:opspulse 2.4s ease-out infinite}
+  @keyframes opspulse{0%{transform:scale(.5);opacity:.7}100%{transform:scale(2.5);opacity:0}}
+  .ops .lbl{font-family:'Space Mono',monospace;font-size:11px;fill:var(--muted)}
+  .ops .legend{position:absolute;z-index:4;left:16px;bottom:13px;display:flex;gap:14px;font-size:9.5px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--faint);pointer-events:none}
+  .ops .legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:6px}
+
+  /* ---- stat strip ---- */
+  .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .stat-strip .cell{padding:22px 24px;border-right:1px solid var(--line)}
+  .stat-strip .cell:last-child{border-right:none}
+  .stat-strip .cell .n{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(24px,3vw,32px);color:var(--acc-deep)}
+  .stat-strip .cell .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .strip-note{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:12.5px;color:var(--faint)}
+  .strip-note .demo-tag{flex:0 0 auto}
+
+  /* ---- anatomy timeline ---- */
+  .save{border:1px solid var(--acc-line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .save .sh{padding:24px 26px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--acc-dim),transparent)}
+  .save .sh .sht{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .save .sh h3{font-size:clamp(19px,2.2vw,24px)}
+  .save .prob-row{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.06em;color:var(--muted);margin:18px 0 6px}
+  .save .prob-row .v{font-family:'Space Mono',monospace;color:var(--acc-deep);font-weight:700}
+  .save .prob-track{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .save .prob-fill{height:100%;width:18%;background:linear-gradient(90deg,var(--acc-2),var(--acc-deep));transition:width .6s ease}
+
+  .timeline{padding:24px 26px;position:relative}
+  .timeline .line{position:absolute;left:33px;top:34px;bottom:34px;width:2px;background:var(--acc-line)}
+  .tstep{position:relative;padding:0 0 18px 34px;opacity:.55;transition:opacity .4s ease}
+  .tstep:last-child{padding-bottom:0}
+  .tstep.lit{opacity:1}
+  .tstep .tnode{position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:50%;border:2px solid var(--acc);background:var(--bg);transition:all .4s ease}
+  .tstep.done .tnode{background:var(--acc);border-color:var(--acc-deep)}
+  .tstep.active .tnode{background:var(--warn);border-color:var(--warn);box-shadow:0 0 0 4px rgba(199,122,0,.18)}
+  .tstep .tmeta{display:flex;align-items:center;gap:10px}
+  .tstep .tmeta .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .tstep .tmeta .t{font-family:'Space Mono',monospace;font-size:11px;color:var(--faint)}
+  .tstep .th{font-family:'Inter',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+  .tstep p{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.5;max-width:54ch}
+  .held{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .held .he{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .held .hr{font-family:'Inter',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;margin-top:5px}
+  .held .hm{font-size:12px;color:var(--muted);margin-top:3px}
+  .outcome{margin-top:12px;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:12px;padding:14px 16px}
+  .outcome .oe{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .outcome .ov{font-family:'Space Mono',monospace;font-weight:700;font-size:22px;color:var(--acc-deep);margin-top:5px}
+  .outcome .on{font-size:12px;color:var(--muted);margin-top:3px}
+  .save .sf{padding:16px 26px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+
+  /* ---- phone mockups (saved before you noticed) ---- */
+  .phones{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .mini-phone{background:var(--surface);border-radius:32px;padding:11px;box-shadow:0 36px 70px -44px rgba(0,0,0,.4),0 0 0 1px var(--line-2)}
+  .mini-phone .mscreen{background:var(--bg);border-radius:24px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;min-height:430px}
+  .mini-phone .mhead{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .mini-phone .mname{font-weight:500;font-size:14px;line-height:1.2}
+  .mini-phone .msub{font-size:11px;color:var(--good);display:flex;align-items:center;gap:5px}
+  .mini-phone .msub::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 7px var(--good)}
+  .mthread{flex:1;padding:15px 13px;display:flex;flex-direction:column;gap:10px}
+  .mthread .mday{align-self:center;font-size:10px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+  .mthread .bub{max-width:90%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.45}
+  .mthread .bub.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:5px}
+  .mthread .bub.me{align-self:flex-end;background:var(--bg);border:1px solid var(--line-2);border-bottom-right-radius:5px}
+  .mchip{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--good);
+    background:rgba(46,158,91,.10);border:1px solid rgba(46,158,91,.28);border-radius:999px;padding:5px 11px;flex-wrap:wrap}
+  .mchip .dot{width:6px;height:6px;border-radius:50%;background:var(--good)}
+  .mchip .mono{color:var(--good)}
+  .mchip .demo-tag{color:var(--faint)}
+  .mfoot{padding:11px 13px;border-top:1px solid var(--line);display:flex;gap:9px;align-items:center;background:var(--surface)}
+  .mfoot .mf-field{flex:1;background:var(--bg);border:1px solid var(--line-2);border-radius:999px;padding:8px 13px;font-size:12px;color:var(--faint)}
+  .mfoot .mf-send{width:32px;height:32px;border-radius:50%;flex:0 0 auto;background:var(--acc);display:grid;place-items:center}
+  .mfoot .mf-send svg{stroke:#fff}
+
+  /* ---- what we watch ---- */
+  .watch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .watch-note{display:flex;align-items:flex-start;gap:10px;margin-top:22px;font-size:14px;color:var(--muted);max-width:62ch}
+  .watch-note b{color:var(--text);font-weight:600}
+  .watch-note svg{stroke:var(--acc-deep);flex:0 0 auto;margin-top:2px}
+
+  /* ---- 24/7 band ---- */
+  .band{border:1px solid var(--acc-line);border-radius:var(--radius);background:linear-gradient(180deg,var(--acc-dim),transparent);padding:clamp(36px,5vw,60px)}
+  .band .clock{display:inline-grid;place-items:center;width:54px;height:54px;border-radius:50%;border:1px solid var(--acc-line);background:var(--bg);margin-bottom:20px}
+  .band .clock svg{stroke:var(--acc-deep)}
+  .good-line{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:18px;font-size:14.5px;color:var(--muted)}
+  .good-line svg{stroke:var(--good);flex:0 0 auto}
+  .good-line b{color:var(--text);font-weight:600}
+
+  /* ---- live monitor (functional, wired to the engine) ---- */
+  .mon{border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;background:var(--bg);box-shadow:0 30px 70px -52px rgba(0,0,0,.4)}
+  .mon-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .mon-watch{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text)}
+  .mon-watch .live{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background .3s}
+  .mon.on .mon-watch .live{background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .mon-status{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--line-2);padding:6px 11px;border-radius:999px;transition:all .3s}
+  .mon-status.ok{color:var(--good);background:rgba(46,158,91,.10);border-color:rgba(46,158,91,.30)}
+  .mon-status.warn{color:var(--warn);background:rgba(199,122,0,.12);border-color:rgba(199,122,0,.34)}
+  .mon-status.act{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
+  .mon-feed{padding:4px 16px;min-height:188px;max-height:380px;overflow-y:auto}
+  .mon-empty{color:var(--faint);font-size:14px;padding:34px 6px;text-align:center;line-height:1.5}
+  .mon-row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);animation:monrise .32s ease both}
+  .mon-row:last-child{border-bottom:none}
+  @keyframes monrise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .mon-row .ic{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+  .mon-row.det .ic{background:var(--acc-dim);border-color:var(--acc-line);color:var(--acc-deep)}
+  .mon-row.good .ic{background:rgba(46,158,91,.12);border-color:rgba(46,158,91,.3);color:var(--good)}
+  .mon-row .ic .sp{width:14px;height:14px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:monspin .8s linear infinite}
+  @keyframes monspin{to{transform:rotate(360deg)}}
+  .mon-row .bd{flex:1;min-width:0}
+  .mon-row .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
+  .mon-row .k .t{font-family:'Space Mono',monospace;color:var(--faint);margin-left:auto;text-transform:none;letter-spacing:0}
+  .mon-row .tx{font-size:14px;margin-top:3px;line-height:1.45}
+  .mon-row .tx b{font-weight:600}
+  .mon-prop{margin-top:9px;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:10px;padding:9px 13px}
+  .mon-prop .pr{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:3px 0}
+  .mon-prop .pr .mono{font-family:'Space Mono',monospace;color:var(--acc-deep)}
+  .mon-act{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+  .mon-controls{padding:14px 16px;border-top:1px solid var(--line);background:var(--surface);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .mon-disrupt{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .mon-dl{font-size:12px;color:var(--muted)}
+  .btn.sm:disabled{opacity:.5;cursor:default}
+
+  @media (max-width:860px){
+    .hero-grid{grid-template-columns:1fr;gap:42px}
+    .ops-stage{order:-1}
+    .stat-strip{grid-template-columns:1fr}
+    .stat-strip .cell{border-right:none;border-bottom:1px solid var(--line)}
+    .stat-strip .cell:last-child{border-bottom:none}
+    .phones{grid-template-columns:1fr;max-width:380px;margin:0 auto}
+    .watch-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:420px){.wrap{padding:0 16px}}
+  @media (prefers-reduced-motion:reduce){.ops .scan{display:none}.ops .arc,.ops .halo{animation:none}}
+</style>
+</head>
+<body data-page="hiccup">
+<main>
+
+  <!-- ════════ HERO ════════ -->
+  <section class="section tight">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span> The Hiccup Handler</span>
+        <h1 style="margin-top:24px">It moves <em>first.</em></h1>
+        <p class="lead" style="margin-top:20px">Tures watches every leg of your trip, around the clock, with no days off. It catches the delay, the storm, the closure, the price drop — and the good news — then stages and runs the fix before you ever notice a problem.</p>
+        <div class="hero-cta">
+          <a class="btn" href="plan.html">Plan a trip
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn ghost" href="proactive.html">Meet your Concierge</a>
+        </div>
+      </div>
+
+      <!-- the watched-trip monitor -->
+      <div class="ops-stage">
+        <div class="ops" aria-label="Command center: a live monitor of a watched trip from Seattle to Maui and back">
+          <div class="ops-grid"></div>
+          <div class="scan"></div>
+          <div class="hud">
+            <span class="watch"><span class="live"></span> Watching · trip T-2087</span>
+            <span class="status" id="ops-status">All clear</span>
+          </div>
+          <svg class="board" viewBox="0 0 720 380" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Trip route SEA to OGG to SEA, all nodes monitored">
+            <path class="arc" d="M120,250 Q360,90 600,150"/>
+            <path class="arc" d="M600,150 Q420,260 120,250"/>
+            <g>
+              <circle class="halo" cx="120" cy="250" r="9"/>
+              <circle class="node" cx="120" cy="250" r="5"/>
+              <text class="lbl" x="104" y="278">SEA · Seattle</text>
+            </g>
+            <g>
+              <circle class="halo" cx="600" cy="150" r="9"/>
+              <circle class="node" cx="600" cy="150" r="5"/>
+              <text class="lbl" x="548" y="138">OGG · Maui</text>
+            </g>
+            <g>
+              <circle class="halo" cx="372" cy="178" r="8"/>
+              <circle class="node" cx="372" cy="178" r="4.5"/>
+              <text class="lbl" x="350" y="166">in air</text>
+            </g>
+          </svg>
+          <div class="legend">
+            <span><i style="background:var(--acc)"></i>Monitored</span>
+            <span><i style="background:var(--acc-line)"></i>Route</span>
+            <span><i style="background:var(--good)"></i>Scanning</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── stat strip ── -->
+  <section class="section tight" style="padding-top:0">
+    <div class="wrap">
+      <div class="stat-strip">
+        <div class="cell"><div class="n">14,208</div><div class="l">Signals watched per trip</div></div>
+        <div class="cell"><div class="n">3</div><div class="l">Pre-empted before you noticed</div></div>
+        <div class="cell"><div class="n">27h</div><div class="l">Average lead time on a fix</div></div>
+      </div>
+      <div class="strip-note">
+        <span class="demo-tag">Sample</span>
+        <span>Illustrative figures from a watched itinerary. The point is the posture: most of it never reaches you.</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="rule"></div>
+
+  <!-- ════════ LIVE MONITOR (functional, wired to the engine) ════════ -->
+  <section class="section" id="live">
+    <div class="wrap">
+      <div style="max-width:56ch;margin-bottom:30px">
+        <span class="eyebrow"><span class="dot"></span> Watch it live</span>
+        <h2 style="margin-top:18px">Throw a wrench at a real trip. <em>Watch Tures catch it.</em></h2>
+        <p class="lead" style="margin-top:16px">No video, no mockup — this runs against the live Tures engine on a held sample itinerary (mock supplier · $0). Trigger a disruption and watch it detect, assess, and propose the fix in real time.</p>
+      </div>
+
+      <div class="mon" id="mon">
+        <div class="mon-head">
+          <span class="mon-watch"><span class="live"></span> <span id="mon-trip">Not watching yet</span></span>
+          <span class="mon-status" id="mon-status">Idle</span>
+        </div>
+        <div class="mon-feed" id="mon-feed">
+          <div class="mon-empty" id="mon-empty">Start a watched trip and Tures will hold a sample itinerary, then keep an eye on every leg.</div>
+        </div>
+        <div class="mon-controls">
+          <button class="btn sm" id="mon-start" type="button">Start a watched trip</button>
+          <div class="mon-disrupt" id="mon-disrupt" hidden>
+            <span class="mon-dl">Throw a wrench:</span>
+            <button class="btn ghost sm" data-kind="schedule_change" type="button">Schedule change</button>
+            <button class="btn ghost sm" data-kind="delay" type="button">Delay</button>
+            <button class="btn ghost sm" data-kind="cancellation" type="button">Cancellation</button>
+          </div>
+        </div>
+      </div>
+      <div class="strip-note" style="margin-top:14px"><span class="demo-tag">Live</span><span>Real calls to the Tures engine (mock supplier, $0 — no real bookings). Standing authority is <b style="color:var(--text)">propose-only</b>: Tures finds the fix and waits for your OK.</span></div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="rule"></div>
+
+  <!-- ════════ ANATOMY OF A SAVE ════════ -->
+  <section class="section">
+    <div class="wrap">
+      <div style="max-width:50ch;margin-bottom:32px">
+        <span class="eyebrow"><span class="dot"></span> Anatomy of a save</span>
+        <h2 style="margin-top:18px">From a rumor to a rebooking — <em>31 hours early.</em></h2>
+      </div>
+
+      <div class="save">
+        <div class="sh">
+          <div class="sht">
+            <div>
+              <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600;margin-bottom:8px">Active watch</div>
+              <h3>A French controllers' strike threatens your CDG connection</h3>
+            </div>
+            <span class="tag" id="save-pill">Handled</span>
+          </div>
+          <div class="prob-row"><span>Disruption probability</span><span class="v" id="prob-v">1.00</span></div>
+          <div class="prob-track"><div class="prob-fill" id="prob-fill"></div></div>
+        </div>
+
+        <div class="timeline">
+          <div class="line"></div>
+
+          <div class="tstep done lit">
+            <span class="tnode"></span>
+            <div class="tmeta"><span class="k">Detected</span><span class="t">t-31h</span></div>
+            <div class="th">Union chatter surfaces on a wire feed</div>
+            <p>A French controllers' union signals action around the 12th. One post, low reach — logged for watch, nothing said.</p>
+          </div>
+
+          <div class="tstep done lit">
+            <span class="tnode"></span>
+            <div class="tmeta"><span class="k">Assessed</span><span class="t">t-26h</span></div>
+            <div class="th">The pattern matches prior strikes</div>
+            <p>Cross-referenced against two aviation reporters and an early NOTAM precursor. It matches the spring and summer actions. Probability rising.</p>
+          </div>
+
+          <div class="tstep done lit">
+            <span class="tnode"></span>
+            <div class="tmeta"><span class="k">Pre-staged</span><span class="t">t-18h</span></div>
+            <div class="th">A contingency is drafted and held</div>
+            <p>Aviation authorities order flight reductions at CDG. Tures drafts and holds a route that avoids CDG entirely — not booked, not charged, ready on one tap.</p>
+            <div class="held">
+              <div class="he">Held contingency</div>
+              <div class="hr serif">CPH → AMS → SEA</div>
+              <div class="hm">Same day · avoids CDG · seats held · $0 until triggered</div>
+            </div>
+          </div>
+
+          <div class="tstep active lit">
+            <span class="tnode"></span>
+            <div class="tmeta"><span class="k">Handled</span><span class="t">t-3h</span></div>
+            <div class="th">Rebooked before the airline's own email</div>
+            <p>The CPH→CDG leg cancels. The held contingency executes the instant it does — confirmed before the airline's cancellation notice ever arrived.</p>
+            <div class="outcome">
+              <div class="oe">Lead time over the airline</div>
+              <div class="ov">31h ahead</div>
+              <div class="on"><span class="demo-tag">Sample</span> &nbsp;Confirmed · KL · NX9R4D · $0 change fee</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sf">
+          <button id="replay" class="btn ghost sm" type="button">▷ Replay the watch</button>
+          <a class="btn sm" href="trips.html">See the updated itinerary
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="rule"></div>
+
+  <!-- ════════ SAVED BEFORE YOU NOTICED ════════ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="max-width:48ch;margin:0 auto 44px">
+        <span class="eyebrow"><span class="dot"></span> Saved before you noticed</span>
+        <h2 style="margin-top:18px">The day goes sideways. <em>You don't.</em></h2>
+        <p class="lead" style="margin:16px auto 0">A cancelled flight, a closed restaurant, a storm on the horizon — handled and confirmed while your phone was still in your pocket.</p>
+      </div>
+
+      <div class="phones">
+
+        <!-- 1 · flight cancelled → rebooked -->
+        <div class="mini-phone">
+          <div class="mscreen">
+            <div class="mhead">
+              <div class="avatar serif" style="width:34px;height:34px;font-size:16px;box-shadow:0 0 0 3px var(--acc-dim);position:relative">T<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+              <div><div class="mname">Tures</div><div class="msub">Watching your trip</div></div>
+            </div>
+            <div class="mthread">
+              <div class="mday">In the air to JFK</div>
+              <div class="bub ai">Your AY1342 to Helsinki just cancelled. I have you rebooked on AY1356 — two hours later, same business cabin.</div>
+              <div class="mchip"><span class="dot"></span> Rebooked · <span class="mono">TUR-8842</span> <span class="demo-tag">Sample</span></div>
+              <div class="bub ai">Your car has been moved to match, and the hotel is holding your room past check-in.</div>
+              <div class="bub me">You're a lifesaver.</div>
+            </div>
+            <div class="mfoot"><div class="mf-field">Message Tures…</div><div class="mf-send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+          </div>
+        </div>
+
+        <!-- 2 · restaurant closed → better table -->
+        <div class="mini-phone">
+          <div class="mscreen">
+            <div class="mhead">
+              <div class="avatar serif" style="width:34px;height:34px;font-size:16px;box-shadow:0 0 0 3px var(--acc-dim);position:relative">T<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+              <div><div class="mname">Tures</div><div class="msub">Watching your trip</div></div>
+            </div>
+            <div class="mthread">
+              <div class="mday">Paris · 6:10pm</div>
+              <div class="bub ai">Le Comptoir closed unexpectedly tonight. I have booked Septime instead — 8:30, your table of four.</div>
+              <div class="bub ai">They know it is your anniversary. A glass of champagne will be waiting.</div>
+              <div class="mchip"><span class="dot"></span> Confirmed · <span class="mono">TUR-9120</span> <span class="demo-tag">Sample</span></div>
+              <div class="bub me">Even better than the original.</div>
+            </div>
+            <div class="mfoot"><div class="mf-field">Message Tures…</div><div class="mf-send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+          </div>
+        </div>
+
+        <!-- 3 · storm → reshuffled to a clear day -->
+        <div class="mini-phone">
+          <div class="mscreen">
+            <div class="mhead">
+              <div class="avatar serif" style="width:34px;height:34px;font-size:16px;box-shadow:0 0 0 3px var(--acc-dim);position:relative">T<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+              <div><div class="mname">Tures</div><div class="msub">Watching your trip</div></div>
+            </div>
+            <div class="mthread">
+              <div class="mday">Maui · 7:30am</div>
+              <div class="bub ai">A storm is moving in Thursday. I have shifted your Molokini snorkeling to Wednesday morning — clear skies, same operator.</div>
+              <div class="bub ai">Your Haleakalā hike moved to Thursday's window. Nothing for you to do — it is all rebooked.</div>
+              <div class="mchip"><span class="dot"></span> Itinerary updated <span class="demo-tag">Sample</span></div>
+              <div class="bub me">Didn't even feel it.</div>
+            </div>
+            <div class="mfoot"><div class="mf-field">Message Tures…</div><div class="mf-send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><hr class="rule"></div>
+
+  <!-- ════════ WHAT WE WATCH ════════ -->
+  <section class="section">
+    <div class="wrap">
+      <div style="max-width:48ch;margin-bottom:32px">
+        <span class="eyebrow"><span class="dot"></span> What we watch</span>
+        <h2 style="margin-top:18px">A whole board of feeds, <em>scored against your trip.</em></h2>
+      </div>
+
+      <div class="watch-grid">
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div>
+          <h3>Wire services</h3>
+          <p>Reuters, AFP and breaking news — the first whisper of anything that moves a route.</p>
+        </div>
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.5.5 0 0 0-.5.8l3.9 4.9-1.8 1.8H4l1.4 2.7L8 19l1.4 1.4v-2.4l1.8-1.8 4.9 3.9a.5.5 0 0 0 .8-.5z"/></svg></div>
+          <h3>Aviation ops &amp; NOTAMs</h3>
+          <p>Airline schedule feeds, gate and equipment changes, and notices to airmen as they post.</p>
+        </div>
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div>
+          <h3>Weather models</h3>
+          <p>The major forecast runs, watched for the storm or the clear day before it reaches your window.</p>
+        </div>
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg></div>
+          <h3>Social signals</h3>
+          <p>Early chatter, scored — a rumor surfaces here hours before it reaches an official feed.</p>
+        </div>
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4l8 3 8-3v18M12 7v15"/></svg></div>
+          <h3>Transit &amp; labor</h3>
+          <p>Strike trackers, rail ops and ground transfers — the disruptions that never make the news.</p>
+        </div>
+        <div class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a3 3 0 0 1 0 6h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4zM6 1v3M10 1v3M14 1v3"/></svg></div>
+          <h3>Venue channels</h3>
+          <p>Restaurants, lodges and transfer operators — the closure or the held table, straight from the source.</p>
+        </div>
+      </div>
+
+      <div class="watch-note">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        <span>Every signal is scored against your specific itinerary. The <b>vast majority is filtered as noise</b> before it ever reaches you — you hear from Tures only when there is something worth handling.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ 24/7 BAND + CTA ════════ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="band center">
+        <span class="clock"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <h2>With you around the clock. <em>No days off.</em></h2>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px">
+          <a class="btn" href="pricing.html">See the Concierge plan
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn ghost" href="plan.html">Plan a trip</a>
+        </div>
+        <p style="margin-top:18px;font-size:13px;color:var(--faint)">The Concierge plan includes the always-on Hiccup Handler.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  /* ---- command-center status flicker (reduced-motion safe) ---- */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var statusEl = document.getElementById('ops-status');
+  if(statusEl && !reduce){
+    var phases = ['All clear','Watching','All clear'];
+    var pi = 0;
+    setInterval(function(){
+      pi = (pi + 1) % phases.length;
+      statusEl.textContent = phases[pi];
+    }, 4200);
+  }
+
+  /* ---- anatomy "replay the watch": walk probability + steps ---- */
+  var STAGES = [
+    {prob:'0.18', w:18,  pill:'Watching', steps:1},
+    {prob:'0.41', w:41,  pill:'Watching', steps:2},
+    {prob:'0.78', w:78,  pill:'Pre-staged', steps:3},
+    {prob:'1.00', w:100, pill:'Handled', steps:4}
+  ];
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.tstep'));
+  var fill = document.getElementById('prob-fill');
+  var probV = document.getElementById('prob-v');
+  var pill = document.getElementById('save-pill');
+  var timer = null;
+
+  function setStage(i){
+    var s = STAGES[i];
+    if(fill) fill.style.width = s.w + '%';
+    if(probV) probV.textContent = s.prob;
+    if(pill) pill.textContent = s.pill;
+    steps.forEach(function(st, k){
+      st.classList.remove('active','done','lit');
+      if(k < s.steps - 1){ st.classList.add('done','lit'); }
+      else if(k === s.steps - 1){ st.classList.add('active','lit'); }
+    });
+  }
+  function finalState(){
+    if(fill) fill.style.width = '100%';
+    if(probV) probV.textContent = '1.00';
+    if(pill) pill.textContent = 'Handled';
+    steps.forEach(function(st, k){
+      st.classList.remove('active','done');
+      st.classList.add('lit');
+      if(k < steps.length - 1) st.classList.add('done'); else st.classList.add('active');
+    });
+  }
+  function runScenario(){
+    if(reduce){ finalState(); return; }
+    if(timer) clearInterval(timer);
+    var i = 0; setStage(0);
+    timer = setInterval(function(){
+      i++;
+      if(i >= STAGES.length){ clearInterval(timer); return; }
+      setStage(i);
+    }, 1500);
+  }
+  var replay = document.getElementById('replay');
+  if(replay) replay.addEventListener('click', runScenario);
+  finalState(); /* page lands on the resolved story; replay re-tells it */
+})();
+
+/* ---- LIVE MONITOR: real engine — hold a sample trip, then detect→assess→propose a fix ---- */
+(function(){
+  var T = window.tures;
+  var mon = document.getElementById('mon');
+  var feed = document.getElementById('mon-feed');
+  var emptyEl = document.getElementById('mon-empty');
+  var tripEl = document.getElementById('mon-trip');
+  var statusEl = document.getElementById('mon-status');
+  var startBtn = document.getElementById('mon-start');
+  var disruptWrap = document.getElementById('mon-disrupt');
+  if(!mon || !startBtn) return;
+
+  var booking = null, busy = false;
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function now(){ try{ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }catch(_){ return ''; } }
+  function setStatus(txt, cls){ statusEl.textContent = txt; statusEl.className = 'mon-status' + (cls?(' '+cls):''); }
+  function row(opts){
+    if(emptyEl){ emptyEl.remove(); emptyEl=null; }
+    var r = document.createElement('div');
+    r.className = 'mon-row' + (opts.cls?(' '+opts.cls):'');
+    r.innerHTML =
+      '<div class="ic">'+(opts.icon||'')+'</div>'+
+      '<div class="bd"><div class="k"><span>'+esc(opts.kicker||'')+'</span><span class="t">'+now()+'</span></div>'+
+      '<div class="tx">'+(opts.html||esc(opts.text||''))+'</div>'+(opts.extra||'')+'</div>';
+    feed.appendChild(r); feed.scrollTop = feed.scrollHeight; return r;
+  }
+  function disableDisrupt(d){ Array.prototype.forEach.call(disruptWrap.querySelectorAll('button'), function(b){ b.disabled = d; }); }
+
+  var SPIN = '<span class="sp"></span>';
+  var DET = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.3a1 1 0 0 1 1.7 0l8.5 14.7a1 1 0 0 1-.9 1.5H2.6a1 1 0 0 1-.9-1.5z"/><path d="M11 9v4M11 16.5v.01"/></svg>';
+  var FIX = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="4"/></svg>';
+  var CHK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  var DETAILS = {
+    schedule_change: 'Outbound SEA→OGG moved 2h10m earlier — misconnect risk on the island leg',
+    delay: 'Inbound OGG→SEA showing a ~3h delay — tight connection at risk',
+    cancellation: 'Outbound SEA→OGG cancelled by the carrier'
+  };
+  var KINDLABEL = { schedule_change:'Schedule change', delay:'Delay', cancellation:'Cancellation' };
+
+  startBtn.addEventListener('click', function(){
+    if(busy) return;
+    if(!(T && T.configured)){ row({cls:'det', icon:DET, kicker:'Offline', text:'Cannot reach the Tures engine from here — the live monitor needs the engine online.'}); return; }
+    busy = true; startBtn.disabled = true; startBtn.textContent = 'Holding a trip…'; setStatus('Booking','act');
+    T.parse('From Seattle, 5 days on Maui in late June for 2 adults, oceanfront luxury, business class if reasonable, budget around $9,000 total.')
+      .then(function(pw){ return T.book({brief: pw.brief}); })
+      .then(function(bk){ return T.confirm(bk.id).then(function(cf){ return {bk:bk, cf:cf}; }); })
+      .then(function(o){
+        booking = { id:o.bk.id, tripId:o.cf.tripId||o.bk.tripId };
+        mon.classList.add('on');
+        tripEl.textContent = 'Watching · SEA⇄OGG · ' + String(booking.tripId).slice(0,16);
+        setStatus('All clear','ok');
+        row({cls:'good', icon:CHK, kicker:'Held & watching', html:'Sample Maui trip held and confirmed (mock $0). Every leg is now under watch — flights, hotel, the table. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+        startBtn.style.display='none'; disruptWrap.hidden = false; disableDisrupt(false); busy = false;
+      })
+      .catch(function(e){
+        setStatus('Error','warn');
+        row({cls:'det', icon:DET, kicker:'Could not start', text:'The engine returned an error ('+((e&&e.status)||'network')+'). Try again in a moment.'});
+        startBtn.disabled = false; startBtn.textContent = 'Start a watched trip'; busy = false;
+      });
+  });
+
+  disruptWrap.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-kind]'); if(!b || busy || !booking) return;
+    var kind = b.dataset.kind; busy = true; disableDisrupt(true);
+    row({cls:'det', icon:DET, kicker:'Detected · '+KINDLABEL[kind], text:DETAILS[kind]});
+    setStatus('Handling','act');
+    var assessing = row({icon:SPIN, kicker:'Assessing', text:'Scoring alternatives against your Brief…'});
+    T.disrupt(booking.id, kind, DETAILS[kind]).then(function(d){
+      var r = (d && d.resolution) || {};
+      if(assessing) assessing.remove();
+      var prop = '<div class="mon-prop">'+
+        '<div class="pr"><span>From</span><span class="mono">'+esc(r.from||'current leg')+'</span></div>'+
+        '<div class="pr"><span>To</span><span class="mono">'+esc(r.to||'alternative')+'</span></div>'+
+        (r.upchargeUsd!=null?'<div class="pr"><span>Upcharge</span><span class="mono">+$'+esc(r.upchargeUsd)+'</span></div>':'')+
+        '</div>'+
+        '<div class="mon-act"><button class="btn sm" data-approve="1" type="button">Approve the swap</button><button class="btn ghost sm" data-hold="1" type="button">Hold</button></div>';
+      var pr = row({cls:'det', icon:FIX, kicker:'Proposed fix', html:esc(r.reason||'Found a workable alternative.'), extra:prop});
+      setStatus('Awaiting your OK','act');
+      pr.querySelector('[data-approve]').addEventListener('click', function(){
+        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
+        row({cls:'good', icon:CHK, kicker:'Rebooked', html:'Switched to <b>'+esc(r.to||'the alternative')+'</b> — confirmed, same cabin. Hotel and ground held to match. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+        setStatus('Handled','ok'); disableDisrupt(false); busy=false;
+      });
+      pr.querySelector('[data-hold]').addEventListener('click', function(){
+        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
+        row({kicker:'Held', text:'Kept the original for now — still watching.'});
+        setStatus('All clear','ok'); disableDisrupt(false); busy=false;
+      });
+    }).catch(function(e){
+      if(assessing) assessing.remove();
+      row({cls:'det', icon:DET, kicker:'Engine error', text:'Could not process that disruption ('+((e&&e.status)||'network')+').'});
+      setStatus('All clear','ok'); disableDisrupt(false); busy=false;
+    });
+  });
+})();
+</script>
+<script src="assets/site.js" defer></script>
+</body></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="Tures books every leg of your trip, watches it 24/7, and hands you confirmation numbers — not links. A concierge that travels with you." />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0a0c10" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Books. Protects. Proves." />
+<meta property="og:description" content="A fully functioning AI agent that travels with you — books, watches, rebooks, proves." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v12/" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v12/assets/img/og.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+<title>t✦ures — Books. Protects. Proves.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Inter:wght@600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/v12.css" />
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+</head>
+<body data-page="cover" data-no-travel-bg="1">
+
+<main class="px-root">
+
+  <!-- ── Panel 1: full-bleed cinematic hero ── -->
+  <section class="px-panel px-panel--hero" id="top">
+    <div class="px-bg" aria-hidden="true">
+      <div class="px-bg-inner" data-speed="0.42">
+        <div class="px-poster"></div>
+        <video autoplay muted loop playsinline preload="auto" poster="assets/travel-bg.jpg">
+          <source src="assets/travel-bg.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="px-scrim"></div>
+    </div>
+    <div class="px-hero-in px-reveal in">
+      <p class="px-eyebrow"><span class="dot"></span> AI travel concierge</p>
+      <h1>A concierge that travels <em>with you.</em></h1>
+      <p class="px-lead">Not a travel agent — a fully functioning AI that books every leg, watches the trip around the clock, and hands you confirmation numbers.</p>
+      <p class="px-verbs"><b>Books</b><span class="dot">·</span><b>Protects</b><span class="dot">·</span><b>Proves</b></p>
+      <div class="px-cta">
+        <a class="btn" href="plan.html">Get started <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="#demo">See it work</a>
+        <a class="btn ghost" href="what-is.html">What is Tures</a>
+      </div>
+      <p class="px-note">Other apps stop at <b>Booked.</b></p>
+    </div>
+    <a class="px-scroll" href="#demo" aria-label="Scroll to demo">
+      <span>Scroll</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+    </a>
+  </section>
+
+  <!-- ── Panel 2: below-fold demo (compact phone) ── -->
+  <section class="px-panel px-panel--demo" id="demo">
+    <div class="wrap px-reveal">
+      <div class="px-head">
+        <span class="eyebrow"><span class="dot"></span> Watch it work</span>
+        <h2>One conversation → <em>confirmation numbers.</em></h2>
+        <p class="lead center" style="margin:14px auto 0">Books the trip, catches the disruption, wraps the receipts — all Sample-labeled, all honest.</p>
+      </div>
+      <div class="px-demo-wrap">
+        <div class="px-demo-tabs" id="demo-tabs" role="tablist">
+          <button type="button" class="on" data-i="0" role="tab" aria-selected="true">Books</button>
+          <button type="button" data-i="1" role="tab" aria-selected="false">Protects</button>
+          <button type="button" data-i="2" role="tab" aria-selected="false">Proves</button>
+        </div>
+        <div class="px-phone" id="demo-phone">
+          <div class="screen">
+            <div class="sct">
+              <div class="av serif">T<img src="assets/img/concierge.png" alt="" onerror="this.remove()"></div>
+              <div><div class="nm">Tures</div><div class="ss"><span class="pd"></span><span id="pstatus">Booking your trip</span></div></div>
+            </div>
+            <div class="scenes">
+              <div class="scene on" data-s="0">
+                <div class="m me"><div class="b">5 days on Maui in June — oceanfront, great food, business if it is reasonable, from Seattle.</div></div>
+                <div class="work"><span class="sp"></span> Comparing 38 fares · holding two oceanfront suites…</div>
+                <div class="rc"><div class="h"><span class="spark">✦</span> Trip held <span class="demo-tag">Sample</span></div>
+                  <div class="r"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>
+                  <div class="r"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">oceanfront</span></div>
+                  <div class="r"><span>Mama's Fish House · anniversary</span><span class="mono">7:30p</span></div></div>
+              </div>
+              <div class="scene" data-s="1">
+                <div class="m ai"><div class="b">Heads up — your flight home Thursday shifted two hours. I rebooked you on the 4:55, same cabin, no change fee.</div></div>
+                <div class="wx"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a4 4 0 0 0 0-8 6 6 0 0 0-11.6-2A3.5 3.5 0 0 0 6 18z"/></svg><div>Rain set in for Thursday, so I moved Molokini snorkeling to Wednesday — clear water, same operator. <span class="demo-tag">Sample</span></div></div>
+                <div class="m ai"><div class="b">A better oceanfront table opened for your anniversary night — I took it. Nothing for you to do.</div></div>
+              </div>
+              <div class="scene" data-s="2">
+                <div class="home">
+                  <div class="hh"><div class="t serif">Welcome home, Andy — Maui, handled.</div><span class="demo-tag">Sample</span></div>
+                  <div class="grid">
+                    <div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>
+                    <div class="cell"><div class="n">42k</div><div class="l">miles credited</div></div>
+                    <div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>
+                    <div class="cell"><div class="n">1</div><div class="l">disruption dodged</div></div>
+                  </div>
+                  <div class="foot"><b>Expense report ready.</b> And you loved the table at Mama's Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <a class="px-demo-link" href="demo.html">Full replay → demo.html</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Panel 3: trust strip ── -->
+  <section class="px-panel px-panel--trust">
+    <div class="wrap px-reveal">
+      <div class="px-trust-grid">
+        <div class="cell"><div class="k serif">One conversation</div><div class="v">from your words to a held itinerary</div></div>
+        <div class="cell"><div class="k serif">24/7</div><div class="v">watching every leg you book</div></div>
+        <div class="cell"><div class="k serif">Two-source</div><div class="v">every booking verified before it says booked</div></div>
+        <div class="cell"><div class="k serif">Zero</div><div class="v">tabs, forms, or hold music</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Panel 4: how it works ── -->
+  <section class="px-panel px-panel--how">
+    <div class="wrap px-reveal">
+      <div class="px-head">
+        <span class="eyebrow"><span class="dot"></span> How it works</span>
+        <h2>Describe the trip. <em>Tures executes.</em></h2>
+      </div>
+      <div class="px-how-grid">
+        <article class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg></div>
+          <h3>Have a conversation</h3>
+          <p>Bring every detail or just a vibe — origin, dates, style, budget. Tures asks only what it truly needs.</p>
+        </article>
+        <article class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Seal your Vault once</h3>
+          <p>Card, passport, loyalty — tokenized. Tures books as your agent, never by logging into your airline.</p>
+        </article>
+        <article class="card hover">
+          <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h3>Get confirmation numbers</h3>
+          <p>Flights, hotel, the table — each leg verified twice. Then Tures keeps watching until you are home.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Panel 5: final CTA ── -->
+  <section class="px-panel px-panel--cta">
+    <div class="wrap px-reveal px-cta-band">
+      <h2 class="serif center">Hand off the <em>logistics.</em></h2>
+      <p class="lead center">Start a conversation about the next trip — or explore pricing and the Taste Engine first.</p>
+      <div class="px-cta" style="justify-content:center;margin-top:0">
+        <a class="btn" href="plan.html">Plan a trip</a>
+        <a class="btn ghost" href="pricing.html">Pricing</a>
+        <a class="btn ghost" href="taste.html">Taste Engine</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/parallax.js" defer></script>
+<script>
+(function () {
+  var ACTS = [
+    { status: "Booking your trip" },
+    { status: "Watching your trip · 24/7" },
+    { status: "Trip wrapped" }
+  ];
+  var scenes = [].slice.call(document.querySelectorAll(".px-phone .scene"));
+  var tabs = [].slice.call(document.querySelectorAll("#demo-tabs button"));
+  var pstatus = document.getElementById("pstatus");
+  if (!scenes.length) return;
+  var i = 0, timer = null;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function set(n) {
+    i = n;
+    scenes.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+    tabs.forEach(function (t, k) {
+      t.classList.toggle("on", k === i);
+      t.setAttribute("aria-selected", k === i ? "true" : "false");
+    });
+    if (pstatus) pstatus.textContent = ACTS[i].status;
+  }
+  function play() {
+    if (reduce) return;
+    clearInterval(timer);
+    timer = setInterval(function () { set((i + 1) % ACTS.length); }, 5200);
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { set(parseInt(t.getAttribute("data-i"), 10)); play(); });
+  });
+  set(0);
+  play();
+})();
+</script>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

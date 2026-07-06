@@ -1,0 +1,696 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Build your Taste Print so every Tures pick — hotels, tables, flights — sounds like you. It learns from every trip you take.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="The Taste Engine — Tures">
+<meta property="og:description" content="Build your Taste Print so every Tures pick — hotels, tables, flights — sounds like you. It learns from every trip you take.">
+<meta property="og:url" content="https://tures.app/taste.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Taste Engine — Tures">
+<meta name="twitter:description" content="Build your Taste Print so every Tures pick — hotels, tables, flights — sounds like you. It learns from every trip you take.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — The Taste Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* ── taste — page-specific only; everything else reuses v12.css ── */
+  .ts-hero{padding-top:74px}
+  .ts-hero h1{margin-top:20px;max-width:12ch}
+  .ts-hero .lead{margin:18px auto 0}
+
+  /* ── two-profile panel: standing print + per-trip lens ── */
+  .tprofile{margin-top:38px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);
+    overflow:hidden;box-shadow:0 40px 90px -60px rgba(0,0,0,.3)}
+  .tp-head{display:flex;align-items:center;gap:13px;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .tp-head .avatar{width:42px;height:42px;font-size:19px}
+  .tp-head .who{flex:1}
+  .tp-head .nm{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em}
+  .tp-head .sub{font-size:12.5px;color:var(--muted)}
+  .tp-head .edit{font-size:12.5px;color:var(--acc-deep);border:1px solid var(--acc-line);border-radius:999px;padding:6px 13px;background:var(--acc-dim)}
+
+  .lens-row{padding:20px 22px 8px}
+  .lens-row .ll{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:13px}
+
+  /* slick symmetrical selector — replaces pill buttons */
+  .choiceset{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:9px}
+  .choice{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;padding:16px 10px 13px;
+    border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;color:var(--text);
+    transition:transform .16s,border-color .16s,background .16s,box-shadow .16s,color .16s}
+  .choice:hover{transform:translateY(-2px);border-color:var(--acc-line);box-shadow:0 14px 30px -24px rgba(0,0,0,.4)}
+  .choice:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  .choice .ci{color:var(--silver-deep);line-height:0;transition:color .16s}
+  .choice .ci svg{stroke:currentColor}
+  .choice .cl{font-size:12.5px;font-weight:500;letter-spacing:-.01em}
+  .choice[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff;
+    box-shadow:0 16px 32px -20px rgba(255,73,41,.66)}
+  .choice[aria-pressed="true"] .ci{color:#fff}
+
+  .tp-legend{display:flex;align-items:center;flex-wrap:wrap;gap:7px 18px;padding:18px 22px 2px;font-size:12px;color:var(--muted)}
+  .tp-legend .lg{display:flex;align-items:center;gap:6px}
+  .tp-legend i.usu{width:2px;height:13px;border-radius:2px;background:var(--silver-deep)}
+  .tp-legend i.trp{width:15px;height:9px;border-radius:3px;background:linear-gradient(90deg,var(--acc-2),var(--acc))}
+  .tp-sig{flex:1;min-width:100%;color:var(--text);font-size:13.5px;line-height:1.55;margin-top:4px}
+  .tp-sig b{color:var(--acc-deep);font-weight:600}
+
+  .tp-dims{padding:14px 22px 10px}
+  .tdim{margin-bottom:15px}
+  .tdim:last-child{margin-bottom:4px}
+  .tdim .tnrow{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+  .tdim .tn{font-size:12.5px;font-weight:500;color:var(--text)}
+  .tdim .tdelta{font-size:11px;font-family:'Space Mono',monospace}
+  .tdim .tdelta.up{color:var(--acc-deep)}
+  .tdim .tdelta.down{color:var(--silver-deep)}
+  .tdim .ttrack{position:relative;height:8px;border-radius:999px;background:var(--surface-2)}
+  .tdim .tfill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--acc-2),var(--acc));transition:width .6s cubic-bezier(.5,0,.2,1)}
+  .tdim .tmark{position:absolute;top:-4px;bottom:-4px;width:2px;border-radius:2px;background:var(--silver-deep);
+    transition:left .6s cubic-bezier(.5,0,.2,1)}
+  .tdim .tpoles{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--faint);letter-spacing:.02em}
+
+  .tp-foot{padding:13px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;align-items:center;gap:8px}
+  .tp-foot .demo-tag{margin-left:auto}
+
+  /* attribute chips (read-only tags) */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--line-2);border-radius:7px;padding:5px 11px}
+  .chip.av{color:var(--muted);background:var(--bg);border-style:dashed}
+  .chip.lv{color:var(--acc-deep);background:var(--acc-dim);border-color:var(--acc-line)}
+
+  /* Because you loved */
+  .byl{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .byl .past,.byl .next{padding:26px 28px}
+  .byl .past{background:var(--surface)}
+  .byl .next{border-left:1px solid var(--line);position:relative}
+  .byl .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .byl .next .lbl{color:var(--acc-deep)}
+  .byl h3{margin-bottom:6px}
+  .byl p{color:var(--muted);font-size:14px;max-width:34ch}
+  .byl .meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin-top:14px}
+  .byl .arrow{position:absolute;left:-17px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
+    background:var(--bg);border:1px solid var(--line-2);display:grid;place-items:center;color:var(--acc-deep);z-index:2}
+  .byl .arrow svg{stroke:var(--acc-deep)}
+  .byl .next .demo-tag{position:absolute;top:18px;right:20px}
+
+  /* how it learns */
+  .learn .ico svg{stroke:var(--acc-deep)}
+
+  /* privacy band */
+  .privacy{display:flex;align-items:center;gap:20px;border:1px solid var(--acc-line);background:var(--acc-dim);border-radius:var(--radius);padding:26px 30px}
+  .privacy .ic{width:48px;height:48px;border-radius:13px;flex:0 0 auto;display:grid;place-items:center;background:var(--bg);border:1px solid var(--acc-line);color:var(--acc-deep)}
+  .privacy .ic svg{stroke:var(--acc-deep)}
+  .privacy h3{margin-bottom:4px}
+  .privacy p{color:var(--muted);font-size:14.5px;max-width:62ch}
+  .privacy a{color:var(--acc-deep);font-weight:500;white-space:nowrap}
+  .privacy a:hover{text-decoration:underline}
+
+  .ts-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+  /* ── quiz: Build your Taste Print ── */
+  .tq{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:24px;
+    background:rgba(26,26,26,.42);backdrop-filter:blur(4px)}
+  .tq.open{display:flex}
+  .tq-panel{position:relative;width:100%;max-width:620px;max-height:calc(100dvh - 48px);overflow:auto;
+    background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 60px 120px -50px rgba(0,0,0,.5);padding:28px 30px 30px;
+    animation:tq-rise .42s cubic-bezier(.2,.8,.2,1)}
+  @keyframes tq-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .tq-x{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);
+    background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer;line-height:0}
+  .tq-x:hover{color:var(--acc-deep);border-color:var(--acc-line)}
+  .tq-top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+  .tq-prog{flex:1;height:5px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .tq-prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc-2));
+    border-radius:999px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .tq-count{font-family:'Space Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:.06em;white-space:nowrap}
+  .tq-q .eyebrow{margin-bottom:14px}
+  .tq-q h3{font-size:clamp(21px,2.6vw,27px);margin-bottom:6px;line-height:1.2}
+  .tq-q .sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+  .tq-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tq-opt{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 16px;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;color:var(--text)}
+  .tq-opt:hover{border-color:var(--acc-line);transform:translateY(-2px);box-shadow:0 16px 36px -28px rgba(0,0,0,.32)}
+  .tq-opt:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  .tq-opt .oi{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--acc-dim);
+    color:var(--acc-deep);margin-bottom:11px}
+  .tq-opt .oi svg{stroke:var(--acc-deep)}
+  .tq-opt .ot{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.02em;margin-bottom:3px}
+  .tq-opt .od{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .tq-live{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+  .tq-live .ll{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+  .dimbar{display:grid;grid-template-columns:78px 1fr;align-items:center;gap:10px;margin-bottom:7px}
+  .dimbar .dl{font-size:11px;color:var(--muted);text-align:right}
+  .dimbar .dt{position:relative;height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .dimbar .dt>i{position:absolute;inset:0 auto 0 0;border-radius:999px;
+    background:linear-gradient(90deg,var(--acc-2),var(--acc-deep));transition:width .55s cubic-bezier(.2,.8,.2,1)}
+
+  /* result card */
+  .tq-result .sig{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:clamp(20px,2.6vw,26px);line-height:1.32;letter-spacing:-.02em;color:var(--text)}
+  .tq-result .sig em{font-style:italic;color:var(--acc-deep)}
+  .tq-result .rtags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+  .tq-result .rcta{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+
+  /* saved-print live block in the page */
+  .tp-live{margin-top:26px}
+  .tp-live .sig{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:clamp(18px,2.2vw,23px);line-height:1.35;letter-spacing:-.02em;color:var(--text);max-width:52ch;margin:0 auto}
+  .tp-live .sig em{font-style:italic;color:var(--acc-deep)}
+  .tp-live .rtags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:16px}
+  .ts-build{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+  @media (prefers-reduced-motion:reduce){
+    .tq-panel,.tq-prog>i,.dimbar .dt>i{animation:none!important;transition:none!important}
+    .tq-opt{transition:none}
+  }
+
+  @media (max-width:480px){
+    .tq-opts{grid-template-columns:1fr}
+    .tq-panel{padding:24px 20px 26px}
+  }
+
+  @media (max-width:760px){
+    .print .pb{grid-template-columns:1fr}
+    .byl{grid-template-columns:1fr}
+    .byl .next{border-left:none;border-top:1px solid var(--line)}
+    .byl .arrow{left:50%;top:-17px;transform:translateX(-50%) rotate(90deg)}
+    .privacy{flex-direction:column;align-items:flex-start;gap:14px}
+  }
+</style>
+</head>
+<body data-page="taste">
+<main>
+
+  <!-- HERO -->
+  <section class="section ts-hero">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> The Taste Engine</span>
+      <h1 style="margin-left:auto;margin-right:auto">It gets to know <em>you.</em></h1>
+      <p class="lead center">You have a usual taste &mdash; and every trip bends it a little. Tures keeps both: who you are <em>in general</em>, and what <em>this</em> trip is really for &mdash; then books in that vein. The more you travel, the sharper both get.</p>
+
+      <!-- saved Taste Print surfaces here on load -->
+      <div id="tpLive" class="tp-live" hidden>
+        <p class="sig" id="tpLiveSig"></p>
+        <div class="rtags" id="tpLiveTags"></div>
+      </div>
+
+      <div class="ts-build">
+        <button class="btn" id="tpBuild" type="button">Build your Taste Print &nbsp;&#10022;</button>
+        <a class="btn ghost" href="plan.html" id="tpPlan" hidden>Plan a trip &nbsp;&rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO PROFILES: standing print + per-trip lens -->
+  <section class="section tight">
+    <div class="wrap">
+      <div class="center">
+        <span class="eyebrow"><span class="dot"></span> Two profiles, one of you</span>
+        <h2 style="margin-top:18px">Your usual taste &mdash; and how each trip <em>bends it.</em></h2>
+        <p class="lead center" style="margin:14px auto 0;max-width:60ch">Pick what a trip is for. Watch your standing Taste Print flex to fit it &mdash; the outliers move, the rest stays you.</p>
+      </div>
+
+      <div class="tprofile">
+        <div class="tp-head">
+          <span class="avatar" id="tpAv">A</span>
+          <div class="who">
+            <div class="nm" id="tpName">Andy Rockwell</div>
+            <div class="sub" id="tpSub">Standing Taste Print &middot; learned across 11 trips</div>
+          </div>
+          <a class="edit" href="vault.html">Edit</a>
+        </div>
+
+        <div class="lens-row">
+          <div class="ll">What&rsquo;s this trip for?</div>
+          <div class="choiceset" id="lensSet" role="group" aria-label="Trip purpose"></div>
+        </div>
+
+        <div class="tp-legend">
+          <span class="lg"><i class="usu"></i> Your usual</span>
+          <span class="lg"><i class="trp"></i> This trip</span>
+          <p class="tp-sig" id="lensSig"></p>
+        </div>
+
+        <div class="tp-dims" id="tpDims"></div>
+
+        <div class="tp-foot">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--faint)"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Both profiles are yours &mdash; editable any time. Tures books inside them, asks outside them.</span>
+          <span class="demo-tag" id="tpTag">Sample</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- BECAUSE YOU LOVED -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:36px">
+        <span class="eyebrow"><span class="dot"></span> How it shows up</span>
+        <h2 style="margin-top:18px">Every pick traces back to <em>something you loved.</em></h2>
+      </div>
+
+      <div class="byl">
+        <div class="past">
+          <div class="lbl">Because you loved</div>
+          <h3 class="serif">The Real Christine, Paris</h3>
+          <p>You spent two extra nights in the design rooms, asked to keep the same one on the way back, and rated the courtyard breakfast your favourite of the trip.</p>
+          <div class="meta">Dec 2025 &middot; 5 nights &middot; design suite</div>
+        </div>
+        <div class="next">
+          <span class="arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="demo-tag">Sample</span>
+          <div class="lbl">On Maui we would hold</div>
+          <h3 class="serif">Montage Kapalua Bay</h3>
+          <p>Same design-led, low-key feel &mdash; an ocean-view residence over a big resort tower, with the unhurried mornings you keep coming back for.</p>
+          <div class="meta">Jun 12&ndash;19 &middot; ocean-view residence &middot; held to confirm</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- HOW IT LEARNS -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:40px">
+        <span class="eyebrow"><span class="dot"></span> How it learns</span>
+        <h2 style="margin-top:18px">It learns the way a good concierge would. <em>By paying attention.</em></h2>
+      </div>
+      <div class="grid-3 learn">
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <h3>From your trips</h3>
+          <p>Where you've been, what you went back to, the room you asked to keep. Every place you've stayed teaches Tures what "your kind of place" actually means.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6a4 4 0 0 0 4 4h11M21 17v-6a4 4 0 0 0-4-4H6M8 4 5 7l3 3M16 20l3-3-3-3"/></svg></span>
+          <h3>From your corrections</h3>
+          <p>Every swap is a signal. Trade the resort for a boutique, push the flight an hour later &mdash; Tures remembers the reason, not just the change, and stops offering the thing you moved away from.</p>
+        </div>
+        <div class="card hover">
+          <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/><path d="M3 18.5V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-1.5"/></svg></span>
+          <h3>From your bookings</h3>
+          <p>What you actually confirm tells the truest story. The picks you say yes to &mdash; and how fast &mdash; sharpen the next slate so the right option is already at the top.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="section tight">
+    <div class="wrap">
+      <div class="privacy">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <div>
+          <h3 class="serif">It is your data, working for you</h3>
+          <p>Your Taste Print is yours &mdash; editable and revocable any time, never traded or sold. Held quietly in the Vault, tokenized through VGS, and used only to book the way you would. Turn any of it off and Tures simply asks more.</p>
+        </div>
+        <a href="vault.html">Open the Vault &nbsp;→</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <!-- CLOSING CTA -->
+  <section class="section tight">
+    <div class="wrap center">
+      <h2>Let it learn your taste. <em>Starting with one trip.</em></h2>
+      <p class="lead center" style="margin:16px auto 28px">Describe where you're headed. Tures books it the way you would &mdash; and gets sharper every time.</p>
+      <div class="ts-cta">
+        <a class="btn" href="plan.html">Plan a trip &nbsp;→</a>
+        <a class="btn ghost" href="vault.html">The Vault</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── QUIZ MODAL ── -->
+<div class="tq" id="tq" role="dialog" aria-modal="true" aria-labelledby="tqTitle" aria-hidden="true">
+  <div class="tq-panel">
+    <button class="tq-x" id="tqClose" type="button" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="tq-top">
+      <div class="tq-prog"><i id="tqBar"></i></div>
+      <span class="tq-count" id="tqCount">1 / 10</span>
+    </div>
+    <div id="tqBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   The Taste Engine — Build your Taste Print (functional)
+   ============================================================ */
+(function () {
+  var F = window.turesFunnel, T = window.tures;
+  if (!F) return;
+
+  var SVG = {
+    leaf:'<path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+    bolt:'<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+    cup:'<path d="M18 8h1a3 3 0 0 1 0 6h-1M3 8h15v6a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z"/><path d="M6 2v2M10 2v2M14 2v2"/>',
+    moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/>',
+    gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21 8.5 9 12 3l3.5 6z"/>',
+    compass:'<circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.9 6.4-6.4 2.9 2.9-6.4z"/>',
+    map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+    grid:'<path d="M3 9h18M9 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/>',
+    spark:'<path d="M12 3v6M12 15v6M3 12h6M15 12h6"/><path d="m6 6 3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/>',
+    feather:'<path d="M20 4 8.5 15.5a5 5 0 0 0-1.5 3.5V21h2a5 5 0 0 0 3.5-1.5L20 8z"/><path d="M16 8 4 20M14 10H8"/>',
+    briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+    heart:'<path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/>'
+  };
+  function ico(p){return '<span class="oi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg></span>';}
+
+  // Each card nudges one dimension toward low (←) or high (→), and may add a tag.
+  // dim ends: pace languid↔packed · register hiddengem↔grand · energy solitude↔social
+  //           palate comfort↔adventurous · planning spontaneous↔scripted · aesthetic heritage↔modern
+  var Q = [
+    { dim:'pace', q:'A free afternoon abroad. What sounds right?',
+      a:{ic:'moon',t:'One slow thing',d:'A long lunch, a wander, nowhere to be.',tag:'unhurried'},
+      b:{ic:'bolt',t:'Pack it in',d:'Three neighbourhoods before dark.',tag:'full days'} },
+    { dim:'register', q:'The hotel you keep coming back to is&hellip;',
+      a:{ic:'gem',t:'A hidden gem',d:'Twelve rooms, a name only locals know.',tag:'boutique'},
+      b:{ic:'cup',t:'A grand address',d:'The landmark, the doorman, the bar.',tag:'grand'} },
+    { dim:'energy', q:'The evening you remember most is&hellip;',
+      a:{ic:'moon',t:'Quiet and few',d:'A small table, the two of you.',tag:'low-key'},
+      b:{ic:'users',t:'Alive and full',d:'A room buzzing, people you just met.',tag:'social'} },
+    { dim:'palate', q:'Dinner on the first night.',
+      a:{ic:'cup',t:'The reliable great',d:'Done beautifully, exactly as expected.',tag:'comfort food'},
+      b:{ic:'spark',t:'The thing you can&rsquo;t pronounce',d:'Whatever the chef is excited about.',tag:'adventurous palate'} },
+    { dim:'planning', q:'Your ideal day has&hellip;',
+      a:{ic:'compass',t:'Room to drift',d:'A loose idea, the rest invented as you go.',tag:'spontaneous'},
+      b:{ic:'map',t:'A real plan',d:'Reservations held, the day already shaped.',tag:'planned'} },
+    { dim:'aesthetic', q:'A room you walk into and love.',
+      a:{ic:'leaf',t:'Heritage &amp; patina',d:'Old stone, worn wood, a long story.',tag:'heritage'},
+      b:{ic:'grid',t:'Clean &amp; modern',d:'Line, light, nothing extra.',tag:'design-forward'} },
+    // a few reinforcing this-or-thats across dims (8–12 total)
+    { dim:'register', q:'The view that wins is&hellip;',
+      a:{ic:'gem',t:'A back lane',d:'A door you&rsquo;d miss, a courtyard you wouldn&rsquo;t.',tag:'off the map'},
+      b:{ic:'cup',t:'The famous one',d:'The square everyone photographs &mdash; earned.',tag:'icons'} },
+    { dim:'palate', q:'The market stall vs. the white tablecloth.',
+      a:{ic:'cup',t:'White tablecloth',d:'Service, stemware, a long menu you trust.',tag:'fine dining'},
+      b:{ic:'spark',t:'The market stall',d:'Plastic stool, best thing you ate all trip.',tag:'street food'} },
+    { dim:'energy', q:'Mornings, ideally.',
+      a:{ic:'moon',t:'Slow and yours',d:'Coffee, a book, no one expecting you.',tag:'solitude'},
+      b:{ic:'users',t:'Out among it',d:'A market, a class, the day&rsquo;s first faces.',tag:'people'} },
+    { dim:'pace', q:'A perfect week is&hellip;',
+      a:{ic:'moon',t:'One place, deeply',d:'Stay put, learn the corner café by name.',tag:'one base'},
+      b:{ic:'bolt',t:'Three places, fast',d:'Keep moving, see more, sleep on trains.',tag:'multi-stop'} }
+  ];
+
+  var DIM_KEYS = ['pace','register','energy','palate','planning','aesthetic'];
+  var DIM_LABEL = {pace:'Pace',register:'Register',energy:'Energy',palate:'Palate',planning:'Planning',aesthetic:'Aesthetic'};
+
+  var modal = document.getElementById('tq');
+  var body  = document.getElementById('tqBody');
+  var bar   = document.getElementById('tqBar');
+  var count = document.getElementById('tqCount');
+  var closeBtn = document.getElementById('tqClose');
+  var lastFocus = null;
+
+  var state, idx;
+
+  function start(){
+    idx = 0;
+    state = { pace:50, register:50, energy:50, palate:50, planning:50, aesthetic:50 };
+    state._tags = [];
+    state._counts = {pace:0,register:0,energy:0,palate:0,planning:0,aesthetic:0};
+    open();
+    renderQ();
+  }
+
+  function open(){
+    lastFocus = document.activeElement;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+  }
+  function close(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', onKey);
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function onKey(e){
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') trap(e);
+  }
+  function trap(e){
+    var f = modal.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length-1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+
+  function liveBars(){
+    var h = '<div class="tq-live"><div class="ll">Your taste, taking shape</div>';
+    DIM_KEYS.forEach(function(k){
+      h += '<div class="dimbar"><span class="dl">'+DIM_LABEL[k]+'</span><span class="dt"><i style="width:'+state[k]+'%"></i></span></div>';
+    });
+    return h + '</div>';
+  }
+
+  function renderQ(){
+    var item = Q[idx];
+    var pct = Math.round((idx) / Q.length * 100);
+    bar.style.width = pct + '%';
+    count.textContent = (idx+1) + ' / ' + Q.length;
+    body.innerHTML =
+      '<div class="tq-q">'+
+        '<span class="eyebrow" id="tqTitle"><span class="dot"></span> '+DIM_LABEL[item.dim]+'</span>'+
+        '<h3>'+item.q+'</h3>'+
+        '<div class="tq-opts">'+
+          optBtn(item.a, 0)+
+          optBtn(item.b, 1)+
+        '</div>'+
+      '</div>'+
+      liveBars();
+    var btns = body.querySelectorAll('.tq-opt');
+    btns[0].addEventListener('click', function(){ choose(item, 'a'); });
+    btns[1].addEventListener('click', function(){ choose(item, 'b'); });
+    btns[0].focus();
+  }
+  function optBtn(o, i){
+    return '<button class="tq-opt" type="button">'+ico(SVG[o.ic])+
+      '<div class="ot">'+o.t+'</div><div class="od">'+o.d+'</div></button>';
+  }
+
+  function choose(item, side){
+    var o = item[side];
+    var dir = side === 'a' ? -1 : 1;        // a → low end, b → high end
+    var c = ++state._counts[item.dim];
+    // nudge toward the chosen pole; step shrinks as a dim gets reinforced
+    var step = 26 - Math.min(c-1,2)*6;
+    state[item.dim] = clamp(state[item.dim] + dir*step);
+    if (o.tag && state._tags.indexOf(o.tag) === -1) state._tags.push(o.tag);
+    idx++;
+    if (idx >= Q.length) finish();
+    else renderQ();
+  }
+  function clamp(n){ return Math.max(4, Math.min(96, Math.round(n))); }
+
+  function placeTypes(d){
+    var pt = [];
+    if (d.register >= 62) pt.push('grand-hotel');
+    if (d.register <= 38) pt.push('boutique');
+    if (d.aesthetic >= 62) pt.push('design-hotel');
+    if (d.aesthetic <= 38) pt.push('heritage-hotel');
+    if (d.palate >= 62) pt.push("chef's-table");
+    if (d.energy <= 40) pt.push('quiet-table');
+    if (d.pace <= 40) pt.push('long-stay');
+    if (!pt.length) pt.push('boutique');
+    return pt.filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,5);
+  }
+
+  function signature(d, tags){
+    var pace = d.pace <= 45 ? 'unhurried' : d.pace >= 60 ? 'full, moving' : 'easy';
+    var reg  = d.register <= 45 ? 'small, under-the-radar places' : d.register >= 60 ? 'grand, landmark addresses' : 'a quiet kind of grand';
+    var aes  = d.aesthetic <= 45 ? 'heritage rooms with patina' : d.aesthetic >= 60 ? 'clean, design-led rooms' : 'rooms with character';
+    var pal  = d.palate >= 60 ? 'a table the chef is excited about' : d.palate <= 40 ? 'the reliable great over the experiment' : 'good food, no fuss';
+    var eng  = d.energy <= 45 ? 'kept quiet and few' : d.energy >= 60 ? 'with the room alive around you' : 'sociable but unforced';
+    var plan = d.planning <= 45 ? 'room to drift' : d.planning >= 60 ? 'the day already shaped' : 'a loose plan';
+    return 'You travel at '+pace+' pace &mdash; '+reg+', '+aes+', '+pal+', '+
+           'evenings '+eng+', with '+plan+'.';
+  }
+
+  function finish(){
+    bar.style.width = '100%';
+    var dims = {}; DIM_KEYS.forEach(function(k){ dims[k] = state[k]; });
+    var tags = state._tags.slice(0, 8);
+    var sig = signature(dims, tags);
+    var tp = { dims:dims, placeTypes:placeTypes(dims), tags:tags, signature:stripHtml(sig) };
+
+    // PERSIST — funnel (localStorage + nav chip) then server-side if signed in
+    F.setTaste(tp);
+    if (T && T.signedIn) { try { T.prefs.set({ tastePrint: tp }); } catch(_){} }
+
+    renderResult(tp, sig);
+    surface(tp);
+    renderProfile();
+  }
+
+  function stripHtml(s){ var d=document.createElement('div'); d.innerHTML=s; return d.textContent; }
+
+  function renderResult(tp, sigHtml){
+    count.textContent = 'Done';
+    body.innerHTML =
+      '<div class="tq-result">'+
+        '<span class="eyebrow"><span class="dot"></span> Your Taste Print</span>'+
+        '<p class="sig" style="margin-top:14px">'+enliven(sigHtml)+'</p>'+
+        liveReadout(tp.dims)+
+        '<div class="rtags">'+ tp.tags.map(function(t){return '<span class="chip lv">'+t+'</span>';}).join('') +'</div>'+
+        '<div class="rcta">'+
+          '<a class="btn" href="plan.html">Plan a trip &nbsp;&rarr;</a>'+
+          '<button class="btn ghost" type="button" id="tqRefine">Refine</button>'+
+        '</div>'+
+      '</div>';
+    document.getElementById('tqRefine').addEventListener('click', start);
+    var pa = body.querySelector('.btn'); if (pa) pa.focus();
+  }
+  // wrap the leading clause in <em> for a vermilion accent
+  function enliven(s){ return s.replace('&mdash;', '&mdash; <em>').replace(/\.$/, '</em>.'); }
+
+  function liveReadout(d){
+    var h = '<div class="tq-live" style="margin-top:20px"><div class="ll">The six dimensions</div>';
+    DIM_KEYS.forEach(function(k){
+      h += '<div class="dimbar"><span class="dl">'+DIM_LABEL[k]+'</span><span class="dt"><i style="width:'+d[k]+'%"></i></span></div>';
+    });
+    return h + '</div>';
+  }
+
+  /* ---- page surface (hero block + CTA label) ---- */
+  var elLive = document.getElementById('tpLive');
+  var elSig  = document.getElementById('tpLiveSig');
+  var elTags = document.getElementById('tpLiveTags');
+  var elBuild = document.getElementById('tpBuild');
+  var elPlan = document.getElementById('tpPlan');
+
+  function surface(tp){
+    if (!tp) return;
+    elSig.innerHTML = enliven(tp.signature.replace(' — ', ' &mdash; '));
+    elTags.innerHTML = (tp.tags||[]).slice(0,6).map(function(t){return '<span class="chip lv">'+t+'</span>';}).join('');
+    elLive.hidden = false;
+    elPlan.hidden = false;
+    elBuild.innerHTML = 'Refine your Taste Print &nbsp;&#10022;';
+  }
+
+  /* ===========================================================
+     Two-profile lens panel — standing Taste Print, bent per trip
+     The lens maps to brief.tripSentiment {purpose, pace, avoid}.
+     =========================================================== */
+  var POLES = {
+    pace:['Slow','Packed'], register:['Casual','Refined'], energy:['Mellow','High'],
+    palate:['Familiar','Adventurous'], planning:['Spontaneous','Mapped'], aesthetic:['Rustic','Designed']
+  };
+  // verbs shown when a lens nudges a dimension down (0) / up (1)
+  var POLE_VERB = {
+    pace:['easier','fuller'], register:['looser','sharper'], energy:['calmer','livelier'],
+    palate:['safer','bolder'], planning:['looser','tighter'], aesthetic:['warmer','cleaner']
+  };
+  var SAMPLE_DIMS = {pace:32,register:36,energy:34,palate:74,planning:50,aesthetic:82};
+
+  var LENSES = [
+    {id:'usual', label:'My usual', ic:'feather', d:{},
+      sig:'This is <b>you, in general</b> — what Tures reaches for when nothing about the trip says otherwise.'},
+    {id:'celebrate', label:'Celebrate', ic:'spark', d:{register:24,energy:30,palate:12,aesthetic:6},
+      sig:'A celebration <b>trades up</b> — louder energy, sharper rooms, bolder plates than your everyday. The rest stays you.'},
+    {id:'unwind', label:'Unwind', ic:'moon', d:{pace:-26,energy:-22,planning:-18,palate:-8},
+      sig:'To decompress, Tures <b>drops the pace hard</b> — slow mornings, low energy, nothing over-planned.'},
+    {id:'adventure', label:'Adventure', ic:'compass', d:{energy:30,pace:22,palate:16,planning:-16,aesthetic:-8},
+      sig:'On an adventure it <b>pushes out</b> — full days, high energy, food you&rsquo;ve never tried, loosely mapped.'},
+    {id:'work', label:'Work', ic:'briefcase', d:{planning:28,pace:22,register:16,energy:-10},
+      sig:'A work trip <b>tightens up</b> — mapped, efficient, a notch more polished — energy dialed down.'},
+    {id:'romance', label:'Romance', ic:'heart', d:{register:22,aesthetic:14,energy:-16,pace:-12},
+      sig:'Romance goes <b>quieter and finer</b> — refined, beautiful rooms, unhurried and low-key.'},
+    {id:'family', label:'Family', ic:'users', d:{pace:-20,palate:-22,energy:8,planning:12},
+      sig:'With family it <b>simplifies</b> — gentler pace, crowd-pleasing food, a little more structure.'}
+  ];
+
+  var lensSet = document.getElementById('lensSet');
+  var lensSig = document.getElementById('lensSig');
+  var tpDims  = document.getElementById('tpDims');
+  var tpName  = document.getElementById('tpName');
+  var tpSub   = document.getElementById('tpSub');
+  var tpAv    = document.getElementById('tpAv');
+  var tpTag   = document.getElementById('tpTag');
+  var curLens = LENSES[0];
+
+  function baseline(){
+    var saved = F.taste && F.taste();
+    if (saved && saved.dims){
+      var acc = (T && T.account) ? T.account() : null;
+      var nm = (acc && acc.name) || 'You';
+      return { dims:saved.dims, name:nm, sub:'Your standing Taste Print', sample:false };
+    }
+    return { dims:SAMPLE_DIMS, name:'Andy Rockwell', sub:'Standing Taste Print · learned across 11 trips', sample:true };
+  }
+  function clampD(n){ return Math.max(6, Math.min(96, Math.round(n))); }
+  function bend(dims, lens){
+    var o = {}; DIM_KEYS.forEach(function(k){ o[k] = clampD(dims[k] + (lens.d[k]||0)); }); return o;
+  }
+  function renderDims(usual, trip){
+    var h = '';
+    DIM_KEYS.forEach(function(k){
+      var u = usual[k], t = trip[k], dlt = t - u, p = POLES[k];
+      var ann = '';
+      if (dlt >= 8)      ann = '<span class="tdelta up">&uarr; '+POLE_VERB[k][1]+'</span>';
+      else if (dlt <= -8) ann = '<span class="tdelta down">&darr; '+POLE_VERB[k][0]+'</span>';
+      h += '<div class="tdim"><div class="tnrow"><span class="tn">'+DIM_LABEL[k]+'</span>'+ann+'</div>'+
+           '<div class="ttrack"><i class="tfill" style="width:'+t+'%"></i><i class="tmark" style="left:'+u+'%"></i></div>'+
+           '<div class="tpoles"><span>'+p[0]+'</span><span>'+p[1]+'</span></div></div>';
+    });
+    tpDims.innerHTML = h;
+  }
+  function selectLens(lens){
+    curLens = lens;
+    [].forEach.call(lensSet.children, function(b){ b.setAttribute('aria-pressed', b.dataset.id === lens.id ? 'true' : 'false'); });
+    var base = baseline();
+    renderDims(base.dims, bend(base.dims, lens));
+    lensSig.innerHTML = lens.sig;
+  }
+  function renderProfile(){
+    var base = baseline();
+    tpName.textContent = base.name;
+    tpSub.textContent  = base.sub;
+    tpAv.textContent   = (base.name || 'Y').trim().charAt(0).toUpperCase();
+    tpTag.hidden = !base.sample;
+    if (!lensSet.children.length){
+      LENSES.forEach(function(l){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'choice'; b.dataset.id = l.id; b.setAttribute('aria-pressed','false');
+        b.innerHTML = '<span class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+SVG[l.ic]+'</svg></span><span class="cl">'+l.label+'</span>';
+        b.addEventListener('click', function(){ selectLens(l); });
+        lensSet.appendChild(b);
+      });
+    }
+    selectLens(curLens);
+  }
+
+  elBuild.addEventListener('click', start);
+  closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', function(e){ if (e.target === modal) close(); });
+
+  // on load: surface any saved Taste Print + render the two-profile panel
+  var existing = F.taste();
+  if (existing && existing.signature) surface(existing);
+  renderProfile();
+})();
+</script>
+
+<script src="assets/site.js" defer></script>
+</body></html>
