@@ -32,6 +32,25 @@
   function on(p) { return p === cur ? " on" : ""; }
   var MARK = 't<span class="spark">✦</span>ures';
 
+  /* ---- travel backdrop (assets/travel-bg.mp4 — portrait-cut, cover on desktop) ---- */
+  (function () {
+    if (document.body.getAttribute("data-no-travel-bg") === "1") return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var asset = "assets/";
+    var bg = document.createElement("div");
+    bg.className = "v11-travel-bg";
+    bg.setAttribute("aria-hidden", "true");
+    bg.innerHTML = '<div class="v11-travel-poster"></div>' +
+      (reduce ? "" : '<video class="v11-travel-vid" autoplay muted loop playsinline preload="auto" poster="' + asset + 'travel-bg.jpg">' +
+        '<source src="' + asset + 'travel-bg.mp4" type="video/mp4"></video>');
+    var scrim = document.createElement("div");
+    scrim.className = "v11-travel-scrim";
+    scrim.setAttribute("aria-hidden", "true");
+    document.documentElement.classList.add("v11-travel-on");
+    document.body.insertBefore(bg, document.body.firstChild);
+    document.body.insertBefore(scrim, bg.nextSibling);
+  })();
+
   /* ---- top nav: 3 zones — logo+menu · plan input · account ---- */
   var menuHtml = GROUPS.map(function (g) {
     return '<div class="grp">' + g.title + '</div>' +
