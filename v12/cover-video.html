@@ -24,9 +24,9 @@
   a{color:inherit;text-decoration:none}
 
   /* ── full-bleed video ── */
-  .bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#0a0c10}
-  .bg video,.bg .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .bg .poster{background-size:cover;background-position:center;background-image:url('assets/travel-bg.jpg')}
+  .bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#0a0c10;isolation:isolate}
+  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .85s ease}
+  .bg.vid-ready video{opacity:1}
   /* legibility scrim — keeps type crisp without hiding the footage */
   .scrim{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:
@@ -119,8 +119,7 @@
 <body>
 
 <div class="bg">
-  <div class="poster"></div>
-  <video autoplay muted loop playsinline preload="auto" poster="assets/travel-bg.jpg">
+  <video autoplay muted loop playsinline preload="auto">
     <source src="assets/travel-bg.mp4" type="video/mp4">
   </video>
 </div>
@@ -169,4 +168,5 @@
   </div>
 </main>
 
+<script src="assets/travel-bg.js"></script>
 </body></html>

@@ -51,9 +51,10 @@
     var bg = document.createElement("div");
     bg.className = "v11-travel-bg";
     bg.setAttribute("aria-hidden", "true");
-    bg.innerHTML = '<div class="v11-travel-poster"></div>' +
-      (reduce ? "" : '<video class="v11-travel-vid" autoplay muted loop playsinline preload="auto" poster="' + asset + 'travel-bg.jpg">' +
-        '<source src="' + asset + 'travel-bg.mp4" type="video/mp4"></video>');
+    bg.innerHTML = reduce
+      ? '<div class="v11-travel-vid" style="background:url(\'' + asset + 'travel-bg.jpg\') center/cover no-repeat"></div>'
+      : '<video class="v11-travel-vid" autoplay muted loop playsinline preload="auto">' +
+        '<source src="' + asset + 'travel-bg.mp4" type="video/mp4"></video>';
     var scrim = document.createElement("div");
     scrim.className = "v11-travel-scrim";
     scrim.setAttribute("aria-hidden", "true");
