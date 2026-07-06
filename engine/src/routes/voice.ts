@@ -47,7 +47,7 @@ export async function voiceRoutes(app: FastifyInstance) {
     const text = (((req.body as any) || {}).text || "").toString().trim().slice(0, 1800);
     if (!text) return reply.status(400).send({ error: "no_text" });
     try {
-      const res = await fetch("https://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mp3", {
+      const res = await fetch(`https://api.deepgram.com/v1/speak?model=${encodeURIComponent(config.deepgramTtsModel)}&encoding=mp3`, {
         method: "POST",
         headers: { Authorization: `Token ${config.deepgramKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({ text }),

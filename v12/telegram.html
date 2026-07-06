@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Connect Tures on Telegram — same agent, same memory, any device.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<title>t✦ures — Connect Telegram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  .tg-wrap{max-width:640px;margin:0 auto;padding:0 22px 100px}
+  .tg-hero{padding:58px 0 24px;text-align:center}
+  .tg-steps{display:flex;flex-direction:column;gap:14px;margin-top:28px}
+  .tg-step{border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  .tg-step .sh{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;cursor:pointer}
+  .tg-step .num{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--acc-deep);background:var(--acc-dim);border-radius:999px;padding:5px 10px;flex:0 0 auto;margin-top:2px}
+  .tg-step.done .num{background:var(--good);color:#fff}
+  .tg-step .st{flex:1}
+  .tg-step .st h3{font-size:16px;margin-bottom:4px}
+  .tg-step .st p{font-size:13.5px;color:var(--muted);line-height:1.45}
+  .tg-step .chev{color:var(--faint);font-size:18px;align-self:center}
+  .tg-step.open .chev{transform:rotate(180deg)}
+  .tg-body{display:none;padding:0 20px 18px;border-top:1px solid var(--line)}
+  .tg-step.open .tg-body{display:block;padding-top:16px}
+  .tg-body ul{margin:0 0 14px 18px;color:var(--muted);font-size:14px;line-height:1.55}
+  .tg-body li{margin-bottom:6px}
+  .tg-connect{display:inline-flex;align-items:center;gap:9px;background:#229ED9;color:#fff;border:none;border-radius:999px;padding:11px 18px;font:600 14px 'DM Sans',sans-serif;cursor:pointer;margin-top:4px}
+  .tg-connect svg{fill:#fff}
+  .tg-note{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.45}
+  .tg-foot{text-align:center;margin-top:32px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+</style>
+</head>
+<body data-page="telegram" data-no-travel-bg="1">
+<main>
+  <section class="tg-hero tg-wrap">
+    <span class="eyebrow"><span class="dot"></span> Text Tures</span>
+    <h1 style="margin-top:18px">Same concierge, <em>on Telegram.</em></h1>
+    <p class="lead center">One account, one memory — whether you brief a trip in the browser or move a dinner from your phone. This takes about a minute.</p>
+  </section>
+
+  <div class="tg-wrap">
+    <div class="tg-steps" id="tg-steps">
+      <article class="tg-step open" data-n="1">
+        <div class="sh"><span class="num">1</span><div class="st"><h3>Why Telegram</h3><p>Tures plans, books, and watches your trip. Telegram is where it reaches you when something shifts — same agent, not a bot pretending to be one.</p></div><span class="chev">▾</span></div>
+        <div class="tg-body"><ul><li>Pick up the same conversation you started on the web</li><li>Get calm updates when a flight moves or a table opens</li><li>Your Vault and Taste Print follow you — no re-explaining</li></ul></div>
+      </article>
+      <article class="tg-step" data-n="2">
+        <div class="sh"><span class="num">2</span><div class="st"><h3>Set up your Tures account</h3><p>Telegram links to your account — not a guest thread. Sign in or finish the essentials first.</p></div><span class="chev">▾</span></div>
+        <div class="tg-body"><p class="tg-note">Need the form path? <a href="setup.html" style="color:var(--acc-deep);font-weight:600">Set up with text →</a> Or jump to <a href="onboard.html" style="color:var(--acc-deep);font-weight:600">Set up Tures</a> for the full accordion.</p><a class="btn sm" href="signup.html">Join the waitlist</a></div>
+      </article>
+      <article class="tg-step" data-n="3">
+        <div class="sh"><span class="num">3</span><div class="st"><h3>Open Telegram and tap Connect</h3><p>We mint a one-time link — it opens the Tures bot with your code prefilled.</p></div><span class="chev">▾</span></div>
+        <div class="tg-body">
+          <button class="tg-connect" id="tg-connect" type="button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21.9 4.3 2.8 11.7c-1.1.4-1 1.5-.1 1.8l4.9 1.5 1.9 5.9c.2.5.4.7.8.7.4 0 .6-.2.9-.5l2.6-2.5 4.9 3.6c.9.5 1.5.2 1.7-.8L23.9 5.5c.3-1.2-.5-1.7-1-1.2z"/></svg> Connect Telegram</button>
+          <p class="tg-note" id="tg-status">When the bot is live, this opens Telegram — tap <b>Start</b> to link the chat to your account.</p>
+        </div>
+      </article>
+      <article class="tg-step" data-n="4">
+        <div class="sh"><span class="num">4</span><div class="st"><h3>Text like you would a fixer</h3><p>Brief a trip, confirm a hold, or nudge a reservation — Tures executes, you get confirmation numbers.</p></div><span class="chev">▾</span></div>
+        <div class="tg-body"><ul><li>Planning still works best in the app for long trips</li><li>Mid-trip changes and alerts are perfect on Telegram</li><li>Booking confirmations may ask you to seal the Vault once in the browser</li></ul></div>
+      </article>
+    </div>
+    <div class="tg-foot">
+      <a class="btn" href="plan.html">Plan a trip →</a>
+      <a class="btn ghost" href="demo.html">Watch the full demo</a>
+    </div>
+  </div>
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+(function(){
+  var steps=[].slice.call(document.querySelectorAll('.tg-step'));
+  steps.forEach(function(s){
+    s.querySelector('.sh').addEventListener('click',function(){
+      steps.forEach(function(x){ x.classList.remove('open'); });
+      s.classList.add('open');
+    });
+  });
+  var T=window.tures,F=window.turesFunnel,btn=document.getElementById('tg-connect'),st=document.getElementById('tg-status');
+  btn.onclick=function(){
+    if(F) F.setTraveler({telegram:'requested'});
+    steps[2].classList.add('done');
+    if(!(T&&T.configured&&T.channels)){ st.textContent='Telegram is rolling out shortly — we will open your Tures chat there the moment it is live.'; return; }
+    st.textContent='Starting the link…';
+    T.channels.linkCode().then(function(r){
+      if(r&&r.telegramDeepLink){ window.open(r.telegramDeepLink,'_blank'); st.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; steps[3].classList.add('done'); }
+      else st.textContent='Your account is ready. Telegram is rolling out shortly.';
+    }).catch(function(e){
+      st.textContent=(e&&e.status===401)?'Sign in first, then connect Telegram so it links to your account.':'Could not start the link just now — try again in a moment.';
+    });
+  };
+})();
+</script>
+</body></html>

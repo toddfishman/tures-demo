@@ -73,7 +73,7 @@
   .tg{position:relative;width:42px;height:24px;flex:0 0 auto;border-radius:999px;border:1px solid var(--line-2);
     background:var(--surface-2);cursor:pointer;transition:background .2s,border-color .2s;padding:0}
   .tg::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
-    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+    background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
   .tg[aria-pressed="true"]{background:var(--acc);border-color:var(--acc)}
   .tg[aria-pressed="true"]::after{transform:translateX(18px)}
 
@@ -365,7 +365,7 @@
         <span class="gi">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-5.4A8 8 0 1 1 21 11.5z"/></svg>
         </span>
-        <span class="gm"><span class="gt">Messaging</span><span class="gd">Reach you on WhatsApp or text when something needs you.</span></span>
+        <span class="gm"><span class="gt">Messaging</span><span class="gd">Reach you on Telegram when something needs you.</span></span>
         <button class="tg" type="button" aria-pressed="false" aria-label="Grant messaging access"></button>
       </div>
     </div>

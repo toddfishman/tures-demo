@@ -45,6 +45,8 @@ const Env = z.object({
   VGS_PASSWORD: z.string().optional(),
   // Deepgram speech-to-text (voice input on the brief chat). Unset → /voice/transcribe is off.
   DEEPGRAM_API_KEY: z.string().optional(),
+  // Deepgram Aura TTS voice for /voice/speak. Default: Orion (masculine, calm, professional).
+  DEEPGRAM_TTS_MODEL: z.string().default("aura-2-orion-en"),
   // mem0 — managed memory layer for personalization (taste, learned preferences, trip-history
   // notes), keyed by user_id. Unset → memory is a no-op and the engine runs identically.
   MEM0_API_KEY: z.string().optional(),
@@ -98,6 +100,7 @@ export const config = {
   },
   anthropicKey: parsed.ANTHROPIC_API_KEY,
   deepgramKey: parsed.DEEPGRAM_API_KEY,
+  deepgramTtsModel: parsed.DEEPGRAM_TTS_MODEL,
   mem0Key: parsed.MEM0_API_KEY,
   googleMapsKey: parsed.GOOGLE_MAPS_API_KEY,
   perTripFeeUsd: parsed.PER_TRIP_FEE_USD,

@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Set up Tures step by step — account, essentials, optional docs, Telegram. No chat required.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<title>t✦ures — Set up step by step</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  .su-wrap{max-width:560px;margin:0 auto;padding:0 22px calc(120px + env(safe-area-inset-bottom))}
+  .su-hero{padding:54px 0 10px;text-align:center}
+  .su-track{display:flex;gap:6px;margin:28px 0 22px}
+  .su-track i{flex:1;height:4px;border-radius:3px;background:var(--surface-2);position:relative;overflow:hidden}
+  .su-track i.on::after{content:"";position:absolute;inset:0;background:var(--acc)}
+  .su-track i.done{background:var(--acc)}
+  .su-panel{display:none}
+  .su-panel.on{display:block;animation:suin .35s ease}
+  @keyframes suin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .su-panel h2{font-size:clamp(22px,4vw,28px);margin-bottom:8px}
+  .su-panel .sub{color:var(--muted);font-size:15px;line-height:1.5;margin-bottom:22px}
+  .su-panel .grp{margin-bottom:16px}
+  .su-panel label{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+  .su-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+  .su-choice a,.su-choice button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid var(--line-2);border-radius:14px;background:var(--bg);text-align:left;cursor:pointer;font:inherit;color:inherit}
+  .su-choice a:hover,.su-choice button:hover{border-color:var(--acc)}
+  .su-choice .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .su-foot{position:fixed;left:0;right:0;bottom:0;z-index:40;background:linear-gradient(to top,var(--bg),var(--bg) 72%,transparent);padding:14px 22px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+  .su-foot .in{max-width:560px;margin:0 auto;display:flex;gap:10px}
+  .su-foot .btn{flex:1}
+  .su-foot .ghost{flex:0 0 auto;background:transparent;box-shadow:inset 0 0 0 1px var(--line-2)}
+  html.dark .su-foot{background:linear-gradient(to top,var(--bg),var(--bg) 72%,rgba(14,14,18,0))}
+</style>
+</head>
+<body data-page="setup" data-no-travel-bg="1">
+<main class="su-wrap">
+  <section class="su-hero">
+    <span class="eyebrow"><span class="dot"></span> Set up Tures</span>
+    <h1 style="margin-top:16px">Text path, <em>start to finish.</em></h1>
+    <p class="lead center" style="margin-top:14px">Prefer forms over conversation? Same outcome — account, Vault, optional Telegram — in a few calm steps.</p>
+  </section>
+
+  <div class="su-track" id="su-track"><i></i><i></i><i></i><i></i><i></i></div>
+
+  <section class="su-panel on" data-step="0">
+    <h2>How do you want to start?</h2>
+    <p class="sub">Most people talk it through with Tures. If you would rather type into fields, this wizard is for you.</p>
+    <div class="su-choice">
+      <a href="plan.html"><span class="k">Recommended</span><strong>Talk to Tures</strong><span style="font-size:13px;color:var(--muted)">Guided chat — voice or text</span></a>
+      <button type="button" id="su-forms"><span class="k">You are here</span><strong>Use these forms</strong><span style="font-size:13px;color:var(--muted)">Step by step, skip anything</span></button>
+    </div>
+  </section>
+
+  <section class="su-panel" data-step="1">
+    <h2>Your account</h2>
+    <p class="sub">So your trips, Vault, and Telegram link belong to you — not a guest session.</p>
+    <div class="grp"><label for="su-email">Email</label><input class="field" id="su-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="grp"><label for="su-pass">Password</label><input class="field" id="su-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+    <p style="font-size:12.5px;color:var(--muted)">Rolling out by invitation — this creates a local preview profile. Live auth connects when your seat opens.</p>
+  </section>
+
+  <section class="su-panel" data-step="2">
+    <h2>The essentials</h2>
+    <p class="sub">Minimum to book in your name — tokenized, not stored raw.</p>
+    <div class="grp"><label for="su-name">Full legal name</label><input class="field" id="su-name" autocomplete="name" placeholder="Andrew J. Rockwell"></div>
+    <div class="grp"><label for="su-home">Home airport</label><input class="field" id="su-home" placeholder="SEA" maxlength="40" style="text-transform:uppercase"></div>
+    <div class="grp"><label for="su-phone">Mobile</label><input class="field" id="su-phone" type="tel" autocomplete="tel" placeholder="+1 555 010 1234"></div>
+    <div class="grp"><label for="su-card">Card</label><input class="field" id="su-card" inputmode="numeric" placeholder="Card number" autocomplete="cc-number"></div>
+  </section>
+
+  <section class="su-panel" data-step="3">
+    <h2>Telegram <span style="font-size:14px;color:var(--muted);font-weight:400">· optional</span></h2>
+    <p class="sub">Same Tures on your phone — brief a change, get a calm update, pick up where you left off.</p>
+    <a class="btn" href="telegram.html">Open the Telegram guide →</a>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">You can connect later from the Vault or onboarding page.</p>
+  </section>
+
+  <section class="su-panel" data-step="4">
+    <h2>You are set.</h2>
+    <p class="sub">Vault sealed for booking. Taste Print and travel docs are optional — add them whenever you like.</p>
+    <a class="btn" href="plan.html" style="width:100%;justify-content:center;margin-top:8px">Plan your first trip →</a>
+    <a class="btn ghost" href="taste.html" style="width:100%;justify-content:center;margin-top:10px">Build your Taste Print</a>
+  </section>
+</main>
+
+<div class="su-foot" id="su-foot" hidden>
+  <div class="in">
+    <button class="btn ghost" type="button" id="su-back">Back</button>
+    <button class="btn" type="button" id="su-next">Continue</button>
+  </div>
+</div>
+
+<script src="assets/site.js" defer></script>
+<script>
+(function(){
+  var F=window.turesFunnel,T=window.tures;
+  if(!F) return;
+  var step=0, panels=[].slice.call(document.querySelectorAll('.su-panel')), track=[].slice.call(document.querySelectorAll('.su-track i'));
+  var foot=document.getElementById('su-foot'), back=document.getElementById('su-back'), next=document.getElementById('su-next');
+  function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+  function render(){
+    panels.forEach(function(p,i){ p.classList.toggle('on', i===step); });
+    track.forEach(function(t,i){ t.classList.toggle('done', i<step); t.classList.toggle('on', i===step); });
+    foot.hidden = step===0 || step===4;
+    back.disabled = step<=1;
+    next.textContent = step===3 ? 'Finish' : 'Continue';
+  }
+  document.getElementById('su-forms').onclick=function(){ step=1; render(); };
+  back.onclick=function(){ if(step>1){ step--; render(); } };
+  next.onclick=function(){
+    if(step===1){
+      if(!val('su-email')) return;
+      F.setTraveler({ email:val('su-email') });
+      try{ if(T&&T.configured&&T.signUp) T.signUp({email:val('su-email'),password:val('su-pass')||'preview-demo'}).catch(function(){}); }catch(_){}
+      step=2; render(); return;
+    }
+    if(step===2){
+      var card=val('su-card'), last4=(card.match(/(\d{4})\s*$/)||[])[1]||card.replace(/\D/g,'').slice(-4);
+      F.setTraveler({ name:val('su-name'), homeAirport:val('su-home').toUpperCase(), phone:val('su-phone'), email:val('su-email')||F.traveler().email });
+      if(last4){ var v=F.vault(), pay=(v.payment||[]).slice(); pay[0]={label:'Card',last4:last4}; F.setVault({payment:pay}); }
+      step=3; render(); return;
+    }
+    if(step===3){ step=4; render(); }
+  };
+  var tr=F.traveler();
+  if(tr.email) document.getElementById('su-email').value=tr.email;
+  if(tr.name) document.getElementById('su-name').value=tr.name;
+  if(tr.homeAirport) document.getElementById('su-home').value=tr.homeAirport;
+  if(tr.phone) document.getElementById('su-phone').value=tr.phone;
+  render();
+})();
+</script>
+</body></html>

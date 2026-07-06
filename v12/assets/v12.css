@@ -33,8 +33,10 @@
   --radius:18px;
   --maxw:1180px;
   --nav-h:66px;
-  --bubble-me:#ffffff;
-  --bubble-ai:var(--surface);
+  --bubble-ai:#1a1a1a;
+  --bubble-ai-text:#f2f2f5;
+  --bubble-me:var(--acc);
+  --bubble-me-text:#ffffff;
   /* aliases so ported v10 assets (voice.js etc.) inherit the vermilion accent */
   --gold:var(--acc);
   --gold-bright:var(--acc-2);
@@ -172,9 +174,9 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
 .msg{max-width:84%}
 .from-ai{align-self:flex-start}
 .from-me{align-self:flex-end}
-.bubble{padding:11px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;color:var(--text)}
-.from-ai .bubble{background:var(--bubble-ai);border:1px solid var(--line);border-bottom-left-radius:5px}
-.from-me .bubble{background:var(--bubble-me);border:1px solid var(--line-2);border-bottom-right-radius:5px}
+.bubble{padding:11px 14px;border-radius:16px;font-size:14.5px;line-height:1.5}
+.from-ai .bubble{background:var(--bubble-ai);border:1px solid rgba(0,0,0,.18);border-bottom-left-radius:5px;color:var(--bubble-ai-text)}
+.from-me .bubble{background:var(--bubble-me);border:1px solid var(--acc-deep);border-bottom-right-radius:5px;color:var(--bubble-me-text)}
 .tstamp{font-size:10.5px;color:var(--faint);margin:4px 4px 0}
 .from-me .tstamp{text-align:right}
 .avatar{
@@ -307,8 +309,10 @@ html.dark{
   --silver-2:rgba(255,255,255,.16);
   --silver-deep:#b3bbc8;
   --silver-sheen:linear-gradient(115deg,#2b2f38,#3c4352 40%,#30353f 70%,#3c4352);
-  --bubble-me:#20202a;
-  --bubble-ai:#17171d;
+  --bubble-me:var(--acc);
+  --bubble-me-text:#ffffff;
+  --bubble-ai:#0e0e12;
+  --bubble-ai-text:#f2f2f5;
   color-scheme:dark;
 }
 html.dark body{
@@ -330,12 +334,12 @@ html.dark.v11-travel-on .v11-foot{background:rgba(22,22,28,.9)}
 html.dark .v11-nav{background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66))}
 html.dark .v11-menu,html.dark .v11-acct-menu,html.dark .card,html.dark .browser{background:var(--surface)}
 /* chat bubbles — dark surface + light text everywhere (covers index arc-hero + plan + demos) */
-html.dark .from-me .bubble{background:var(--bubble-me);border-color:var(--line-2);color:var(--text)}
-html.dark .from-ai .bubble{background:var(--bubble-ai);border-color:var(--line);color:var(--text)}
-html.dark .arc-hero .me .b{background:var(--bubble-me);border-color:var(--line-2);color:var(--text)}
-html.dark .arc-hero .ai .b{background:var(--bubble-ai);border-color:var(--line);color:var(--text)}
-html.dark .cz-m.ai .cz-b{background:var(--bubble-ai);border-color:var(--line);color:var(--text)}
-html.dark .cz-m.me .cz-b{background:var(--bubble-me);border-color:var(--line-2);color:var(--text)}
+html.dark .from-me .bubble{background:var(--bubble-me);border-color:var(--acc-deep);color:var(--bubble-me-text)}
+html.dark .from-ai .bubble{background:var(--bubble-ai);border-color:rgba(255,255,255,.12);color:var(--bubble-ai-text)}
+html.dark .arc-hero .me .b{background:var(--bubble-me);border-color:var(--acc-deep);color:var(--bubble-me-text)}
+html.dark .arc-hero .ai .b{background:var(--bubble-ai);border-color:rgba(255,255,255,.12);color:var(--bubble-ai-text)}
+html.dark .cz-m.ai .cz-b{background:var(--bubble-ai);border-color:rgba(255,255,255,.12);color:var(--bubble-ai-text)}
+html.dark .cz-m.me .cz-b{background:var(--bubble-me);border-color:var(--acc-deep);color:var(--bubble-me-text)}
 html.dark .v11-cta,html.dark .btn{color:#fff}
 /* corner concierge widget (its injected CSS hardcodes #fff) */
 html.dark .cz-bub,html.dark .cz-card,html.dark .cz-comp input{background:var(--surface);color:var(--text)}
@@ -382,6 +386,25 @@ html.dark .v11-theme .moon{display:block}
   body.has-tabbar .cz-l,body.has-tabbar .tv-fab{display:none}
 }
 html.dark .v11-tabbar{background:linear-gradient(to top, rgba(16,16,20,.97), rgba(16,16,20,.82));border-top-color:var(--line)}
+
+/* ---- dark mode — page-specific surfaces that inline styles hardcode light ---- */
+html.dark body.demo-page .ai .b{color:var(--bubble-ai-text)}
+html.dark body.demo-page .outro{background:rgba(14,14,18,.88)}
+html.dark body.demo-page .phone{
+  border:none;
+  background:linear-gradient(155deg,#4a4a52 0%,#1c1c22 38%,#2a2a32 62%,#15151a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.35),
+    0 0 0 1.5px #0a0a0e,
+    0 28px 60px -18px rgba(0,0,0,.55);
+}
+html.dark body[data-page="app"] nav,
+html.dark body[data-page="concierge"] nav{
+  background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66));
+}
+html.dark body[data-page="hiccup"] .ops .hud .watch{background:rgba(22,22,28,.82)}
+html.dark .tg::after{background:var(--surface-2);box-shadow:0 1px 3px rgba(0,0,0,.45)}
 
 /* ============================================================
    v12 PARALLAX COVER — full-bleed cinematic hero + scroll panels
@@ -462,21 +485,65 @@ html.dark .px-scrim{background:
 .px-demo-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .px-demo-tabs button{font:600 12px 'DM Sans',sans-serif;letter-spacing:.06em;border:1px solid var(--line-2);background:var(--bg);color:var(--muted);border-radius:999px;padding:8px 14px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
 .px-demo-tabs button.on{border-color:var(--acc);color:var(--acc-deep);background:var(--acc-dim)}
-.px-phone{width:min(300px,78vw);background:var(--surface);border-radius:36px;padding:10px;border:2px solid var(--text);box-shadow:0 32px 70px -36px rgba(0,0,0,.45)}
-.px-phone .screen{background:var(--bg);border-radius:26px;overflow:hidden;display:flex;flex-direction:column;height:min(440px,52vh);border:1px solid var(--line)}
-.px-phone .sct{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+/* compact demo phone (below fold) — realistic device frame */
+.px-phone{
+  position:relative;width:min(318px,84vw);padding:11px;border-radius:48px;flex:0 0 auto;
+  background:linear-gradient(155deg,#4a4a52 0%,#1c1c22 38%,#2a2a32 62%,#15151a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.35),
+    0 0 0 1.5px #0a0a0e,
+    0 2px 0 rgba(255,255,255,.04),
+    0 28px 60px -18px rgba(0,0,0,.55),
+    0 12px 28px -12px rgba(0,0,0,.35);
+}
+.px-phone-side{position:absolute;width:3px;border-radius:2px;background:linear-gradient(180deg,#5c5c66,#2a2a32);z-index:0}
+.px-phone-side--l{left:-2px;top:108px;height:56px;box-shadow:inset -1px 0 0 rgba(255,255,255,.08)}
+.px-phone-side--l::after{content:"";position:absolute;left:0;top:68px;width:3px;height:36px;border-radius:2px;background:inherit;box-shadow:inherit}
+.px-phone-side--r{right:-2px;top:128px;height:72px;box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
+.px-phone-bezel{border-radius:38px;overflow:hidden;background:#000;position:relative;z-index:1}
+.px-phone .screen{
+  background:var(--bg);border-radius:38px;overflow:hidden;display:flex;flex-direction:column;
+  height:min(520px,58vh);border:none;position:relative;
+}
+.px-phone .px-status{
+  position:absolute;top:0;left:0;right:0;z-index:8;height:44px;padding:13px 22px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--text);pointer-events:none;
+}
+html.dark .px-phone .px-status{color:#f2f2f5}
+.px-phone .px-icons{display:flex;align-items:center;opacity:.85}
+.px-phone .px-notch{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:9;
+  width:92px;height:27px;border-radius:18px;background:#000;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06);
+}
+.px-phone .px-notch::after{
+  content:"";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#2a3040,#0a0c12);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.px-phone .px-homebar{
+  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:9;
+  width:118px;height:5px;border-radius:999px;background:rgba(26,26,26,.28);pointer-events:none;
+}
+html.dark .px-phone .px-homebar{background:rgba(255,255,255,.28)}
+.px-phone .sct{
+  display:flex;align-items:center;gap:10px;padding:46px 14px 12px;border-bottom:1px solid var(--line);
+  background:var(--surface);flex:0 0 auto;position:relative;z-index:2;
+}
 .px-phone .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:15px;overflow:hidden;position:relative}
 .px-phone .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .px-phone .nm{font-size:13.5px;font-weight:600}
 .px-phone .ss{font-size:11px;color:var(--acc-deep);display:flex;align-items:center;gap:5px}
 .px-phone .ss .pd{width:6px;height:6px;border-radius:50%;background:var(--good)}
-.px-phone .scenes{position:relative;flex:1}
-.px-phone .scene{position:absolute;inset:0;padding:14px 12px;display:flex;flex-direction:column;gap:9px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;pointer-events:none}
+.px-phone .scenes{position:relative;flex:1;min-height:0}
+.px-phone .scene{position:absolute;inset:0;padding:14px 12px 28px;display:flex;flex-direction:column;gap:9px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;pointer-events:none;overflow-y:auto}
 .px-phone .scene.on{opacity:1;transform:none;pointer-events:auto}
 .px-phone .m{max-width:90%}.px-phone .m.me{align-self:flex-end}.px-phone .m.ai{align-self:flex-start}
 .px-phone .b{padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.45;color:var(--text)}
-.px-phone .ai .b{background:var(--bubble-ai);border:1px solid var(--line);border-bottom-left-radius:4px}
-.px-phone .me .b{background:var(--bubble-me);border:1px solid var(--line-2);border-bottom-right-radius:4px}
+.px-phone .ai .b{background:var(--bubble-ai);border:1px solid rgba(0,0,0,.18);border-bottom-left-radius:4px;color:var(--bubble-ai-text)}
+.px-phone .me .b{background:var(--bubble-me);border:1px solid var(--acc-deep);border-bottom-right-radius:4px;color:var(--bubble-me-text)}
 .px-phone .work{align-self:flex-start;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 11px}
 .px-phone .work .sp{width:13px;height:13px;border:2px solid var(--acc-line);border-top-color:var(--acc);border-radius:50%;animation:aospin .8s linear infinite}
 @keyframes aospin{to{transform:rotate(360deg)}}

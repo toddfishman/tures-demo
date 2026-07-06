@@ -9,7 +9,9 @@
   var GROUPS = [
     { title: "Start here", items: [
       { href: "what-is.html",   label: "What is Tures",    page: "what-is" },
-      { href: "demo.html",      label: "Watch the demo",   page: "demo" },
+      { href: "journey.html",   label: "Watch the demo",   page: "demo" },
+      { href: "setup.html",     label: "Set up step by step", page: "setup" },
+      { href: "telegram.html",  label: "Connect Telegram", page: "telegram" },
       { href: "plan.html",      label: "Plan a trip",      page: "plan" },
       { href: "onboard.html",   label: "Set up Tures",     page: "onboard" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
