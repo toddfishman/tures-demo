@@ -162,6 +162,7 @@
       },
       revokeGrant: function (id) { return api("/actions/grants/" + id + "/revoke", { method: "POST" }); },
       run: function (body) { return api("/actions/run", { method: "POST", body: JSON.stringify(body || {}) }); },
+      listRuns: function () { return api("/actions/runs"); },
       getRun: function (id) { return api("/actions/runs/" + id); },
       getHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token)); },
       continueHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token) + "/continue", { method: "POST" }); },

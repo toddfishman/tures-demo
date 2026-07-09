@@ -99,7 +99,7 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 - [x] Telegram notify on handoff (when bot + channel linked)
 - [x] Vault credential injection into browser sessions (site_login + loyalty w/ username/password)
 - [x] **Assist UI** — grant + run from proposed actions in concierge chat
-- [ ] Session replay in My Trips audit trail
+- [x] Session replay in My Trips audit trail
 
 ---
 

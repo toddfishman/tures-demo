@@ -25,6 +25,61 @@
     if (st === "confirmation_required") return "watch";
     return "info";
   }
+  function actionStatusLabel(st) {
+    if (st === "completed") return "Done";
+    if (st === "needs_human") return "Needs you";
+    if (st === "running") return "Running";
+    if (st === "failed") return "Failed";
+    if (st === "aborted") return "Aborted";
+    return st || "Action";
+  }
+  function actionDotClass(st) {
+    if (st === "completed") return "";
+    if (st === "needs_human" || st === "failed") return " warn";
+    return "";
+  }
+  function replayUrl(run) {
+    if (!run) return "";
+    if (run.result && run.result.sessionUrl) return run.result.sessionUrl;
+    if (run.liveViewUrl) return run.liveViewUrl;
+    if (run.browserSessionId) return "https://www.browserbase.com/sessions/" + run.browserSessionId;
+    return "";
+  }
+  function fmtWhen(iso) {
+    if (!iso) return "";
+    try {
+      var d = new Date(iso);
+      return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    } catch (_) { return iso; }
+  }
+  function actionAuditHtml(runs, tripId) {
+    var list = (runs || []).filter(function (r) {
+      if (tripId) return r.tripId === tripId;
+      return !r.tripId;
+    });
+    if (!list.length) return "";
+    var rows = list.map(function (run) {
+      var replay = replayUrl(run);
+      var audit = (run.audit || []).slice(-4).map(function (a) {
+        return '<div class="it2" style="margin-top:4px">' + esc(fmtWhen(a.ts)) + " · " + esc(a.action) +
+          (a.detail ? " — " + esc(a.detail) : "") + "</div>";
+      }).join("");
+      var links = "";
+      if (replay) links += '<a class="swap" href="' + esc(replay) + '" target="_blank" rel="noopener">Watch session →</a>';
+      if (run.handoffToken && run.status === "needs_human") {
+        links += (links ? " · " : "") + '<a class="swap" href="handoff.html?id=' + esc(run.handoffToken) + '">Open handoff →</a>';
+      }
+      var sum = run.result && run.result.summary ? '<div class="it2">' + esc(run.result.summary) + "</div>" : "";
+      return '<div class="item"><span class="idot' + actionDotClass(run.status) + '"></span><div class="ibody">' +
+        '<div class="it1">' + esc(run.title) + (run.result && run.result.simulated ? ' <span class="demo-tag">Sample</span>' : "") + "</div>" +
+        sum +
+        (audit || "") +
+        (links ? '<div class="iconf">' + links + "</div>" : "") +
+        "</div><div class=\"side\">" + esc(actionStatusLabel(run.status)) + "<br>" + esc(fmtWhen(run.updatedAt || run.createdAt)) + "</div></div>";
+    }).join("");
+    return '<div class="cat" id="' + (tripId ? "trip-" + tripId + "-actions" : "account-actions") + '">' +
+      '<div class="cat-h"><span class="cn">Actions Tures took</span><span class="demo-tag">Audit</span></div>' + rows + "</div>";
+  }
   function fmtDates(brief) {
     if (!brief) return "";
     if (brief.departDate && brief.returnDate) return brief.departDate + " – " + brief.returnDate;
@@ -48,7 +103,7 @@
       "</div><div class="side">" + esc(c.status || "") + "</div></div>";
   }
 
-  function renderDetail(bk) {
+  function renderDetail(bk, actionRuns) {
     var brief = bk.brief || {};
     var dest = brief.destination || "Trip";
     var sim = (bk.components || []).some(function (c) { return c.simulated; });
@@ -89,6 +144,7 @@
         '<div class="ts-feed"><div class="ts-empty">Connected — waiting for signals from the engine watcher.</div></div></div>' +
         '<div class="watch-meter" id="watch-' + esc(bk.id) + '" data-booking-id="' + esc(bk.id) + '"></div>';
     }
+    html += actionAuditHtml(actionRuns, bk.id);
     html += "</div></section><hr class=\"rule\">";
     return { id: id, html: html };
   }
@@ -160,7 +216,14 @@
     wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted)">Loading your trips…</p>';
 
     var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
-    sync.then(function () { return T.bookings(); }).then(function (r) {
+    sync.then(function () {
+      var jobs = [T.bookings()];
+      if (T.actions && T.actions.listRuns) jobs.push(T.actions.listRuns().catch(function () { return { runs: [] }; }));
+      else jobs.push(Promise.resolve({ runs: [] }));
+      return Promise.all(jobs);
+    }).then(function (res) {
+      var r = res[0];
+      var actionRuns = (res[1] && res[1].runs) || [];
       var list = (r && r.bookings) || [];
       if (!list.length) {
         wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted);margin-bottom:20px">No held or booked trips yet — plan one and Tures will list it here. <a href="plan.html" style="color:var(--acc-deep);font-weight:600">Plan a trip →</a></p>';
@@ -170,7 +233,8 @@
       wrap.innerHTML = '<span class="eyebrow" style="margin-bottom:14px;display:block"><span class="dot"></span> Your trips</span>' +
         '<div class="grid-3">' + list.map(renderCard).join("") + "</div>";
       if (details) {
-        details.innerHTML = list.map(function (bk) { return renderDetail(bk).html; }).join("");
+        details.innerHTML = list.map(function (bk) { return renderDetail(bk, actionRuns).html; }).join("") +
+          actionAuditHtml(actionRuns, null);
       }
       if (window.turesTripStream) {
         var bar = document.getElementById("trip-live-bar");
