@@ -1,7 +1,7 @@
 # Tures v12 — product checklist
 
 **Engine:** `https://tures-engine.onrender.com` · **Front-end:** `v12/`  
-**Last updated:** 2026-07-08
+**Last updated:** 2026-07-09
 
 Use this for **feature slices**. For **launch readiness** (agent, memory, integrations, P0 blockers), see **[`LAUNCH.md`](LAUNCH.md)**.
 
@@ -57,11 +57,12 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 
 - [x] **mem0** in plan cards — hotel “Why this one” from `plan.memories` *(launch slice)*
 - [x] **mem0** in discover slates (“like you loved at…”)
-- [ ] Google Places key on Render; empty discover UX
-- [ ] `proactive.html` → real thread or redirect to plan
+- [ ] **Google Places key** on Render (`GOOGLE_MAPS_API_KEY`) — discover empty-state UX done; needs key for real spots
+- [x] `proactive.html` → redirect to `plan.html?from=proactive` (theater at `?theater=1`)
+- [x] **Guest → signed-in mem0 merge** on login/signup (`/mem0/merge`)
 - [ ] Stripe billing when `billingLive`
 - [x] CORS: add `tures.app` to engine (`render.yaml`)
-- [ ] Nav orphans / compile Tailwind / update `CLAUDE.md` → v12
+- [ ] Custom domain `tures.app` → v12 · update root `CLAUDE.md` → v12
 
 ---
 

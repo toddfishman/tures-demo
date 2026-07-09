@@ -10,18 +10,18 @@ Todd is **not very technical**. With him: **short, plain English** — what it m
 
 ## First actions on entry
 1. **`git pull --rebase origin main`** — this repo goes stale; a parallel session also pushes here. Always rebase before you push.
-2. Current front-end version is **v8** — work in `v8/`. (`v7/` is the pre-nav-fix snapshot; `v2/`–`v6/` are older.)
-3. Don't re-scan the whole tree to "understand the project" — it's described below.
+2. **Current front-end = `v12/`** — https://toddfishman.github.io/tures-demo/v12 (target: `tures.app`). Older `v2`–`v11` are archives.
+3. **Launch docs:** [`v12/LAUNCH.md`](v12/LAUNCH.md) · [`v12/CHECKLIST.md`](v12/CHECKLIST.md).
+4. Don't re-scan the whole tree — historical notes below; v12 is current.
 
 ## Where the code is
 - **This repo** = `github.com/toddfishman/tures-demo` (the front-end demo + the engine under `engine/`).
-- **Front-end**: versioned static demos `v2/`–`v8/`, served on GitHub Pages. **Current = v8: https://toddfishman.github.io/tures-demo/v8** . `v8/index.html` is the live "Bound Edition" cover (a small leather book floating over a rotating full-bleed world — Tulum/Paris/Tokyo/Lapland/NYC; tap to open → two-door chooser "What is Tures?" / "Plan a trip").
-- **Funnel order (v8)**: `index.html` (cover) → `01-landing.html` → `02-taste-engine.html` → `03-paste-trip.html` (the conversational brief — the heart) → `04-connections` → `05-execution` → `07-itinerary` → `08-concierge`; plus `pricing.html`, `signup.html`, `welcome.html`, `checkout.html`, `auth/`, `legal/`, `account.html`, `admin.html`.
-- **Back-end**: `engine/` (Node + TypeScript + Fastify, "tures-engine"), **deployed live at https://tures-engine-tf.fly.dev**. The front-end calls it (default engine URL baked into `v7/assets/engine.js`); SSE streams.
+- **Front-end (current):** `v12/` — cover `index.html`, core `plan.html`, `vault.html`, `trips.html`, `onboard.html`, `login.html`, corner concierge on every page. GitHub Pages: https://toddfishman.github.io/tures-demo/v12
+- **Back-end:** `engine/` deployed at **https://tures-engine.onrender.com** (default in `v12/assets/engine.js`).
 - **Strategy docs live OUTSIDE this repo** (in Todd's local project root, not cloned by a dispatch): BRIEF, ARCHITECTURE, DEMO-FLOW, DESIGN-DIRECTION, OPEN-QUESTIONS, POST-MVP. If you need them, ask Todd to paste them — a dispatch won't have them.
 
-## Live engine state (verified 2026-06-13, HEAD 7092aa4)
-`/health` reports: supplier=**mock** (no Duffel token → confirmations are simulated, **no real bookings**), agentLoop=**true** (ANTHROPIC_API_KEY set & valid — parse returns `via: agent`), voice=**true** (DEEPGRAM_API_KEY set & valid — Aura TTS verified), liveBooking=**false** (hard safety off), durable=true, Stripe **test** mode, auth off. Enabling real bookings would require a live Duffel token + `STRIPE_CHARGE_CARDS=true` + `ALLOW_LIVE_BOOKING=true` — **all intentionally off; leave them off unless Todd explicitly says otherwise.** Engine milestones 0–6 done (mock+Duffel adapters, Claude agent loop, booking state machine + confirm gate, AES-256-GCM vault, wallet+profile, Hiccup Handler, hardening).
+## Live engine state (verified 2026-07-09)
+`/health` at https://tures-engine.onrender.com/health : `durable:true`, `auth:true`, `agentLoop:true`, `voice:true`, `tripWatch:true`, `stagehand:true`, `chatBrain:sakana-fugu`, `bookingSimulated:true`, `realInventorySearch:true`. Confirmations are **Sample** until P6 (`ALLOW_LIVE_BOOKING`, `STRIPE_CHARGE_CARDS`) — leave off unless Todd says otherwise.
 
 ## What's built (v7 + engine)
 - **Budget posture**: `priceSensitivity` thrifty/balanced/premium/no_limit + optional `budgetUsd` cap; parsed from prose, scored into a value-vs-taste blend, tunable in the brief (re-plans).

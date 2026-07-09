@@ -8,6 +8,7 @@ import { geocode } from "../geo/index.ts";
 import { searchHotels, searchDining, searchActivities } from "../discovery/places.ts";
 import { estimateTransport } from "../discovery/transport.ts";
 import { recall } from "../mem0.ts";
+import { config } from "../config.ts";
 
 let discoverCounter = 0;
 
@@ -39,7 +40,8 @@ export async function discoverRoutes(app: FastifyInstance) {
     return {
       tripId: `disc_${Date.now().toString(36)}_${discoverCounter++}`,
       destination: { label: destGeo.label, location: { lat: destGeo.lat, lng: destGeo.lng } },
-      source: "google-places",
+      source: config.googleMapsKey ? "google-places" : "unconfigured",
+      googlePlaces: !!config.googleMapsKey,
       memories,
       stays,
       dining,

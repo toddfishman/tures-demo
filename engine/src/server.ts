@@ -37,6 +37,7 @@ import { telegramRoutes, registerTelegramWebhook } from "./routes/telegram.ts";
 import { startSignalWatcher } from "./signals/watcher.ts";
 import { startTripWatchScheduler } from "./watch/scheduler.ts";
 import { watchRoutes } from "./routes/watch.ts";
+import { mem0Routes } from "./routes/mem0.ts";
 
 export async function build() {
   const app = Fastify({ logger: false });
@@ -94,6 +95,7 @@ export async function build() {
   await app.register(discoverRoutes);
   await app.register(signalRoutes);
   await app.register(watchRoutes);
+  await app.register(mem0Routes);
   await app.register(assistRoutes);
   await app.register(actionsRoutes);
   await app.register(channelRoutes);

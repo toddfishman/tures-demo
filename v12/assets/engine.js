@@ -63,6 +63,15 @@
   // shares the traveler's mem0 memory. Undefined when the funnel isn't loaded.
   function memId() { try { return (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : undefined; } catch (_) { return undefined; } }
   function setSession(t, u) { token = t || ""; account = u || null; if (token) localStorage.setItem(TOKEN, token); else localStorage.removeItem(TOKEN); if (account) localStorage.setItem(ACCT, JSON.stringify(account)); else localStorage.removeItem(ACCT); }
+  function maybeMergeGuestMem(accountId) {
+    try {
+      var g = localStorage.getItem("tures.uid");
+      if (!g || g.indexOf("guest-") !== 0 || g === accountId || !token) return Promise.resolve();
+      return api("/mem0/merge", { method: "POST", body: JSON.stringify({ fromUserId: g }) }).then(function () {
+        localStorage.removeItem("tures.uid");
+      }).catch(function () {});
+    } catch (_) { return Promise.resolve(); }
+  }
 
   function retriableStatus(s) { return s === 502 || s === 503 || s === 504; }
   /** Retry cold-start / gateway blips — Render wakes on first request. */
@@ -111,11 +120,11 @@
     /* ----- real auth ----- */
     signUp: function (name, email, password) {
       return api("/auth/signup", { method: "POST", body: JSON.stringify({ name: name, email: email, password: password }) })
-        .then(function (r) { setSession(r.token, r.user); return r.user; });
+        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(function () { return r.user; }); });
     },
     login: function (email, password) {
       return api("/auth/login", { method: "POST", body: JSON.stringify({ email: email, password: password }) })
-        .then(function (r) { setSession(r.token, r.user); return r.user; });
+        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(function () { return r.user; }); });
     },
     me: function () { return api("/auth/me").then(function (r) { account = r.user; localStorage.setItem(ACCT, JSON.stringify(account)); return r.user; }); },
     signOut: function () { setSession("", null); },

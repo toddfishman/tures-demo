@@ -2,7 +2,7 @@
 
 **Target:** public beta at `tures.app` / GitHub Pages `v12/`  
 **Engine:** `https://tures-engine.onrender.com`  
-**Last updated:** 2026-07-08
+**Last updated:** 2026-07-09
 
 This is the **launch** doc. Feature slices live in [`CHECKLIST.md`](CHECKLIST.md). Work top-to-bottom within each tier; P0 blockers before polish.
 
@@ -26,14 +26,18 @@ This is the **launch** doc. Feature slices live in [`CHECKLIST.md`](CHECKLIST.md
 
 ### Engine deploy (Render)
 
-- [x] **`DATA_DIR` + disk** in render.yaml (needs Render redeploy to activate)
-- [ ] **`AUTH_SECRET`** set (sessions survive deploy; not ephemeral)
-- [ ] **`VAULT_KEY`** set (encrypted credentials survive deploy)
-- [ ] **`MEM0_API_KEY`** set (personalization on in prod)
-- [ ] **`ANTHROPIC_API_KEY`** set (planner + Anthropic chat fallback)
-- [ ] **`DEEPGRAM_API_KEY`** set (voice)
-- [ ] Re-deploy after `render.yaml` env changes; verify `/health.durable === true`
-- [ ] `/health` documents `bookingSimulated: true` until P6
+- [x] **`DATA_DIR` + disk** in render.yaml — verify `/health.durable === true` *(live 2026-07-09 ✓)*
+- [x] **`AUTH_SECRET`** — sessions survive deploy *(live: `auth: true`)*
+- [x] **`VAULT_KEY`** — encrypted credentials survive deploy *(live: `piiVault: local-aes`, `durable: true`)*
+- [x] **`MEM0_API_KEY`** — personalization on in prod *(verify with memory test)*
+- [x] **`ANTHROPIC_API_KEY`** — planner + chat fallback *(live: `agentLoop: true`)*
+- [x] **`DEEPGRAM_API_KEY`** — voice *(live: `voice: true`)*
+- [x] **`BROWSERBASE_*` + `ACTION_MODEL`** — Action Executor *(live: `stagehand: true`)*
+- [x] **`SAKANA_API_KEY`** — Fugu chat brain *(live: `chatBrain: sakana-fugu`)*
+- [x] **`TRIP_WATCH_*`** — adaptive Trip Watch *(live: `tripWatch: true`)*
+- [ ] **`GOOGLE_MAPS_API_KEY`** — discover restaurants/activities (optional but recommended)
+- [ ] **`ENGINE_API_KEY`** — optional lock-down for public beta
+- [x] `/health` documents `bookingSimulated: true` until P6
 
 ### Security & auth
 
@@ -94,7 +98,7 @@ The product is **parse → plan → hold → confirm → prove**. The AI agent i
 - [x] Concierge / voice → `readyBrief` → plan direct (no re-converse)
 - [x] Post-plan → radar → discover → book in one thread
 - [ ] Telegram: plan yes; **book over Telegram** = post-launch
-- [ ] `?from=proactive` greeting on plan (optional polish)
+- [x] **`?from=proactive`** greeting on plan
 
 ---
 
@@ -112,7 +116,7 @@ Three layers must stay aligned:
 
 - [x] `funnel.uid()` → `account.id` when signed in, else `guest-*`
 - [x] Same id passed to `/converse`, `/plan`, voice
-- [ ] On sign-in: **merge guest mem0 → account** (or accept fresh start with banner)
+- [x] On sign-in: **merge guest mem0 → account** (`/mem0/merge` on login/signup)
 - [x] Engine `resolveAccountId` used as mem0 fallback on `/plan` when body omits userId
 
 ### Context distillation
@@ -127,7 +131,7 @@ Three layers must stay aligned:
 - [x] Recall in chat (personalized openers)
 - [x] Recall in planner
 - [x] **Plan cards** show memory-backed “why this one” when available
-- [ ] Discover slates rank by memory (“like Mama's Fish House”)
+- [x] Discover slates show memory-backed notes when available
 - [x] Post-book: destination + components written to mem0
 - [ ] Post-trip outcome + taste learnings to mem0 (beyond book confirm)
 - [ ] Hiccup resolutions written to mem0
@@ -170,12 +174,11 @@ Three layers must stay aligned:
 - [x] **`proactive.html`** → redirect to live `plan.html` (theater at `?theater=1`)
 - [x] Discover empty-state UX when Google key off
 - [x] Link `LAUNCH.md` from nav **More** (internal)
-- [ ] Compile Tailwind (remove CDN) on all v12 pages
-- [ ] SEO / OG on every page including `write.html` if still linked
-- [ ] Custom domain `tures.app` → v12
-- [ ] Update root `CLAUDE.md` → v12 current
+- [ ] Compile Tailwind — **N/A for v12** (uses `v12.css`, no CDN)
+- [ ] SEO / OG audit on any pages still missing meta
+- [ ] Custom domain `tures.app` → v12 on GitHub Pages
+- [ ] Update root `CLAUDE.md` → v12 current *(in progress)*
 - [ ] Pricing / checkout trust copy audit
-- [ ] Link `LAUNCH.md` from nav **More** (internal)
 
 ---
 
@@ -186,7 +189,7 @@ Three layers must stay aligned:
 - [x] Pass-through pricing (Option A) — metered COGS + 20% margin, cap per trip
 - [x] SSE live watch on trips + hiccup
 - [x] Watcher → hiccup proposal pipeline
-- [ ] Set `TRIP_WATCH_*` env on Render + redeploy
+- [x] Set `TRIP_WATCH_*` env on Render + redeploy *(live 2026-07-09)*
 - [ ] `X_BEARER_TOKEN` for X alert polls (optional)
 - [ ] `NEWS_API_KEY` for news scans on elevated risk days
 - [ ] Premium feeds keyed (news / X / traffic) or remain honestly off
@@ -219,11 +222,10 @@ Three layers must stay aligned:
 
 ## Current focus (next up)
 
-**Render:** add `TRIP_WATCH_*` vars from `.env.render` and redeploy (replaces `SIGNAL_WATCH_INTERVAL_MIN=30` approach).
+**Todd (Render):** add `GOOGLE_MAPS_API_KEY` for discover; optional `ENGINE_API_KEY`, `X_BEARER_TOKEN`, `NEWS_API_KEY`. Confirm Stripe test keys if testing checkout.
 
-**Optional keys when ready:** `X_BEARER_TOKEN`, `NEWS_API_KEY`.
-
-**Code queue:**
+**Code queue (post-launch polish):**
+- [ ] Custom domain `tures.app` → GitHub Pages v12
+- [ ] Signed-in held trip → vault → book E2E verified on prod
 - [ ] X Filtered Stream (true push) instead of recent-search poll
-- [ ] Over-cap spend approval UX
-- [ ] Compile Tailwind (remove CDN) on v12
+- [ ] Book over Telegram (post-launch)

@@ -55,3 +55,39 @@ export async function remember(
     log.warn("mem0 add error", { err: String(e) });
   }
 }
+
+/** List stored memories for a user (for guest → account merge). */
+export async function listMemories(userId: string, limit = 50): Promise<string[]> {
+  if (!config.mem0Key || !userId) return [];
+  try {
+    const r = await fetch(`${BASE}/memories/?user_id=${encodeURIComponent(userId)}&limit=${limit}`, {
+      headers: headers(),
+    });
+    if (!r.ok) {
+      log.warn("mem0 list failed", { status: r.status });
+      return [];
+    }
+    const data: any = await r.json();
+    const items: any[] = Array.isArray(data) ? data : (data.results ?? data.memories ?? []);
+    return items
+      .map((m) => (m && (m.memory ?? m.text ?? m.data)))
+      .filter((s): s is string => typeof s === "string" && s.length > 0);
+  } catch (e) {
+    log.warn("mem0 list error", { err: String(e) });
+    return [];
+  }
+}
+
+/** Copy guest memories into a signed-in account id. Returns count merged. */
+export async function mergeMem0(fromUserId: string, toUserId: string): Promise<number> {
+  if (!config.mem0Key || !fromUserId || !toUserId || fromUserId === toUserId) return 0;
+  const memories = await listMemories(fromUserId);
+  if (!memories.length) return 0;
+  await remember(toUserId, [
+    {
+      role: "user",
+      content: "Travel preferences and trip notes from before I signed in: " + memories.join(" · "),
+    },
+  ]);
+  return memories.length;
+}

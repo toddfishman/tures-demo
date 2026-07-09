@@ -558,6 +558,14 @@ let bookingId = "";
   ok("vault: site login credentials match by URL");
 }
 
+// 38. mem0 guest merge route
+{
+  const { mergeMem0 } = await import("../src/mem0.ts");
+  const merged = await mergeMem0("guest-smoke-a", "guest-smoke-b");
+  assert.equal(typeof merged, "number", "merge returns count");
+  ok("mem0: merge guest memories (guarded when unkeyed)");
+}
+
 // 16. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });

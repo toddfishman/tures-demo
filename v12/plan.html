@@ -562,7 +562,10 @@
         groups.forEach(function(g){ wrap.appendChild(g); });
         thread.appendChild(wrap); reveal(wrap); scroll();
       } else {
-        bubble('Discover is not wired on this engine yet — I can still book the core trip.','t');
+        var msg = (d && d.googlePlaces === false)
+          ? 'Restaurant and activity picks need Google Places on the engine — your core flight and hotel are still ready to book.'
+          : 'No local picks came back just now — the core trip is still ready to book.';
+        bubble(msg,'t');
       }
       done();
     }).catch(function(){ typing(false); bubble('Could not load local picks just now — the core trip is still ready to book.','t'); done(); });
@@ -665,8 +668,13 @@
 
   // ── greeting ──
   function greet(){
+    var fromProactive = /[?&]from=proactive\b/.test(location.search);
     if(live){
-      bubble("Hey — I'm Tures. Tell me a trip in your own words, <b>type below or tap Talk to me</b> — same thread, same memory.","t");
+      if(fromProactive){
+        bubble("You're in the right place — I watch every leg while you're away, and I book the trip before you go. Tell me what you're planning, or tap <b>Talk to me</b>.","t");
+      } else {
+        bubble("Hey — I'm Tures. Tell me a trip in your own words, <b>type below or tap Talk to me</b> — same thread, same memory.","t");
+      }
     } else {
       bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');
       actions([{label:'▷ Watch the example', on:runDemo}]);
