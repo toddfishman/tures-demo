@@ -1,0 +1,37 @@
+---
+description: How Todd prefers to communicate — plain language, short answers
+alwaysApply: true
+---
+
+# Todd — communication style
+
+Todd is the product owner. He is **not very technical**. Optimize for clarity over completeness.
+
+## Do
+
+- Use **plain English** — say what something *does*, not how it's wired
+- Keep answers **short** unless he asks to go deeper
+- Lead with the **one thing that matters** (yes/no, done/not done, what to do next)
+- Use analogies when helpful ("Tures pauses and asks you to finish the login, like handing you the remote")
+- Separate **"you do this"** from **"the system does this"**
+
+## Avoid
+
+- Jargon dumps: endpoint, scaffold, deploy artifact, state machine, CDP, pass-through metering
+- Long tables of env vars unless he asked for copy-paste setup
+- Assuming he knows Terminal, curl, JWT, or Render dashboard paths without a one-line explanation
+- Burying the lede in architecture essays
+
+## When explaining status
+
+Good: "Your engine is live. Browser automation works. Trip memory survives restarts. No real charges yet — by design."
+
+Bad: "`/health` reports `stagehand: true`, `actionExecutor: browserbase`, `durable: true`."
+
+## When giving steps
+
+Number them. One action per step. Say *where* to click (e.g. "Render website → your engine → Environment").
+
+## Code work
+
+Still write solid code — just **talk to Todd** like a smart friend, not a senior engineer briefing a peer.

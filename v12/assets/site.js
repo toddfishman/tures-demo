@@ -298,5 +298,6 @@
      wordmark/avatars too.) */
 
   /* ---- corner concierge (loads on every page; suppresses itself on Plan) ---- */
-  var cz = document.createElement("script"); cz.src = "assets/concierge.js"; cz.defer = true; document.body.appendChild(cz);
+  var cz = document.createElement("script"); cz.src = "assets/assist-ui.js"; cz.defer = true; document.body.appendChild(cz);
+  var cz2 = document.createElement("script"); cz2.src = "assets/concierge.js"; cz2.defer = true; document.body.appendChild(cz2);
 })();

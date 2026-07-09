@@ -4,6 +4,10 @@
 
 Tures is Todd's AI travel-concierge product: an **executor**, not a research tool — describe a trip in plain English, Tures books every leg and ends with **confirmation numbers, not links**. Persona: "Andy Rockwell" (frequent luxury traveler, $300K+ HHI, names hotels, friction-allergic). Core principles: LLM parses, deterministic executor books; the Brief is the authorization boundary; pause-and-ask on uncertainty; **no fake success states** (two-source verification); every action audit-logged.
 
+## Talking to Todd
+
+Todd is **not very technical**. With him: **short, plain English** — what it means and what to do next. Skip jargon (endpoints, env vars, state machines) unless he asks. See `.cursor/rules/todd-communication.mdc`.
+
 ## First actions on entry
 1. **`git pull --rebase origin main`** — this repo goes stale; a parallel session also pushes here. Always rebase before you push.
 2. Current front-end version is **v8** — work in `v8/`. (`v7/` is the pre-nav-fix snapshot; `v2/`–`v6/` are older.)

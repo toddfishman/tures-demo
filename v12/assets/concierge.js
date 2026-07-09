@@ -127,14 +127,36 @@
     bubble(esc(text), "me"); history.push({role:"user",content:text}); input.value=""; busy=true; sendBtn.disabled=true; typing(true);
     if(!(T && T.configured)){ typing(false); busy=false; sendBtn.disabled=false; bubble("Let me open this in the full planner.", "ai"); var b=document.createElement("button"); b.className="cz-cta"; b.textContent="Continue in Plan →"; b.onclick=function(){handoff(text);}; thread.appendChild(b); scroll(); return; }
     var ctx = F ? F.context() : undefined, uid = F ? F.uid() : undefined;
-    // Retry once on failure — the engine machine can cold-start, so the first call may stall.
-    function attempt(n){
+    var useAssist = window.turesAssistUi && window.turesAssistUi.isTripPlanning && !window.turesAssistUi.isTripPlanning(text);
+
+    function attemptConverse(n){
       return T.converse(history.slice(-12), undefined, ctx, uid).catch(function(e){
-        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attempt(n-1).then(res,rej); }, 1800); });
+        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attemptConverse(n-1).then(res,rej); }, 1800); });
         throw e;
       });
     }
-    attempt(1).then(function(c){
+    function attemptAssist(n){
+      return T.assist(history.slice(-10), text, ctx, uid).catch(function(e){
+        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attemptAssist(n-1).then(res,rej); }, 1800); });
+        throw e;
+      });
+    }
+    function finishAssist(r){
+      typing(false); busy=false; sendBtn.disabled=false;
+      var answer = (r && r.answer) || "Here's what I found.";
+      bubble(esc(answer), "ai"); history.push({role:"assistant",content:answer});
+      if(r && r.actions && r.actions.length && window.turesAssistUi){
+        window.turesAssistUi.renderActions(thread, r.actions, { scroll: scroll });
+      }
+    }
+    if(useAssist && T.assist){
+      attemptAssist(1).then(finishAssist).catch(function(){
+        typing(false); busy=false; sendBtn.disabled=false;
+        bubble("I couldn't look that up just now. Try again, or open Plan for a trip.", "ai");
+      });
+      return;
+    }
+    attemptConverse(1).then(function(c){
       typing(false); busy=false; sendBtn.disabled=false;
       var reply=(c && c.reply) || "Tell me a little more.";
       bubble(esc(reply), "ai"); history.push({role:"assistant",content:reply});

@@ -98,7 +98,7 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 - [x] Human handoff page `v12/handoff.html` (+ `?demo=1` preview)
 - [x] Telegram notify on handoff (when bot + channel linked)
 - [ ] Vault credential injection into browser sessions
-- [ ] Assist UI: grant + run from proposed actions in chat
+- [x] **Assist UI** — grant + run from proposed actions in concierge chat
 - [ ] Session replay in My Trips audit trail
 
 ---

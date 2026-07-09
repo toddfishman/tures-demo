@@ -190,6 +190,11 @@
       return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context, userId: userId }) });
     },
 
+    /* "Handle anything" — researches the web, proposes permissioned actions Tures can take. */
+    assist: function (history, text, context, userId) {
+      return api("/assist", { method: "POST", body: JSON.stringify({ history: history || [], text: text, context: context, userId: userId }) });
+    },
+
     /* Voice: transcribe a recorded Blob (Deepgram STT) and speak text (Deepgram Aura TTS → mp3 Blob). */
     voice: {
       transcribe: function (blob) {
