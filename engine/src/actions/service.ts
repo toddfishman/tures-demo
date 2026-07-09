@@ -6,9 +6,11 @@ import {
   endStagehand,
   gotoTarget,
   runStagehandAgent,
+  tryVaultLogin,
   sessionMeta,
   stagehandReady,
 } from "./stagehand.ts";
+import { credentialsForSite } from "./vault-creds.ts";
 import { notifyHandoff } from "./notify.ts";
 import {
   actionGrants,
@@ -85,14 +87,8 @@ export interface RunInput {
   targetUrl?: string;
   tripId?: string;
   grantId?: string;
-  /** Force a human step before automation (login always does this). */
+  /** Force a human step before automation. */
   expectHuman?: boolean;
-}
-
-/** Login permission always pauses for the traveler — Vault auto-fill comes later. */
-function loginFirst(permission: ActionPermission, expectHuman?: boolean): boolean {
-  if (permission === "act:browser_login") return true;
-  return expectHuman === true;
 }
 
 async function attachSession(run: ActionRun, session: { sessionId: string; liveViewUrl: string; simulated?: boolean }) {
@@ -162,7 +158,38 @@ export async function runAction(accountId: string, input: RunInput): Promise<Act
 
       await gotoTarget(stagehand, input.targetUrl);
 
-      if (loginFirst(input.permission, input.expectHuman)) {
+      // Sign-in: use Vault credentials when saved; otherwise ask the traveler.
+      if (input.permission === "act:browser_login" && input.expectHuman !== false) {
+        const creds = await credentialsForSite(accountId, input.targetUrl);
+        if (!creds) {
+          await pauseStagehand(stagehand);
+          return openHandoffForRun(run, input, "login", accountId);
+        }
+        audit(run, "vault_login", creds.label);
+        const login = await tryVaultLogin(stagehand, creds);
+        audit(run, login.ok ? "vault_login_ok" : "vault_login_try", login.message.slice(0, 120));
+        const verify = await runStagehandAgent(stagehand, {
+          title: "Check whether sign-in succeeded. If you see CAPTCHA, OTP, or email verification, stop.",
+          permission: input.permission,
+          maxSteps: 6,
+        });
+        if (!login.ok || verify.needsHuman) {
+          await pauseStagehand(stagehand);
+          return openHandoffForRun(run, input, verify.reason ?? "captcha", accountId);
+        }
+        run.status = "completed";
+        run.result = {
+          summary: "Signed in using your saved Vault login.",
+          simulated: false,
+          agentMessage: verify.message,
+        };
+        audit(run, "completed", "vault login");
+        await endStagehand(stagehand);
+        actionRuns.put(run);
+        return run;
+      }
+
+      if (input.expectHuman === true) {
         await pauseStagehand(stagehand);
         return openHandoffForRun(run, input, "login", accountId);
       }
@@ -205,7 +232,7 @@ export async function runAction(accountId: string, input: RunInput): Promise<Act
   if (!session) session = simulatedSession(input.targetUrl);
   await attachSession(run, session);
 
-  if (loginFirst(input.permission, input.expectHuman) || input.expectHuman !== false) {
+  if (input.permission === "act:browser_login" || input.expectHuman === true) {
     return openHandoffForRun(run, input, "login", accountId);
   }
 

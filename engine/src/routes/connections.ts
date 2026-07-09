@@ -5,7 +5,7 @@ import { resolveAccountId, actsFor } from "../auth/index.ts";
 
 const ConnectBody = z.object({
   accountId: z.string().optional(),
-  kind: z.enum(["payment", "email", "calendar", "loyalty"]),
+  kind: z.enum(["payment", "email", "calendar", "loyalty", "site_login"]),
   label: z.string().min(1),
   // NOTE: `scopes` is intentionally NOT accepted from the client. Scopes are the authorization
   // boundary (hasScope gates payment:charge), so they are derived server-side from `kind`

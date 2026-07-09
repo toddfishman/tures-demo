@@ -3,6 +3,7 @@ import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { browserConfigured } from "./browser.ts";
 import type { ActionPermission } from "./types.ts";
+import type { SiteCredentials } from "./vault-creds.ts";
 
 export function stagehandReady(): boolean {
   return browserConfigured() && !!config.anthropicKey;
@@ -123,6 +124,24 @@ export async function gotoTarget(stagehand: Stagehand, targetUrl?: string): Prom
   if (!targetUrl) return;
   const page = stagehand.context.pages()[0] ?? (await stagehand.context.newPage());
   await page.goto(targetUrl);
+}
+
+/** Try filling a login form from Vault credentials — passwords stay in variables, not the prompt. */
+export async function tryVaultLogin(stagehand: Stagehand, creds: SiteCredentials): Promise<{ ok: boolean; message: string }> {
+  try {
+    const fill = await stagehand.act(
+      "On this page, find the sign-in or login form. Put %username% in the username or email field. Put %password% in the password field. Stop before any CAPTCHA or verification step.",
+      { variables: { username: creds.username, password: creds.password } },
+    );
+    if (!fill.success) return { ok: false, message: fill.message || "Could not find a login form." };
+    const submit = await stagehand.act(
+      "If the login form is filled and there is no CAPTCHA visible, click the sign-in or submit button once.",
+    );
+    return { ok: submit.success, message: submit.message || fill.message || "Login submitted." };
+  } catch (e) {
+    log.warn("vault login fill", { err: String((e as Error)?.message ?? e), label: creds.label });
+    return { ok: false, message: "Could not fill the login form automatically." };
+  }
 }
 
 /** Run the Stagehand agent for a permissioned browser task. */

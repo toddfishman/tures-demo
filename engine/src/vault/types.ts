@@ -2,7 +2,7 @@
 // toggles (04-connections.html): a payment method, travel-only inbox access, calendar, loyalty.
 // Each grant is scoped, encrypted, and revocable — "permissions are a gradient, not a switch."
 
-export type ConnectionKind = "payment" | "email" | "calendar" | "loyalty" | "traveler_profile" | "traveler";
+export type ConnectionKind = "payment" | "email" | "calendar" | "loyalty" | "site_login" | "traveler_profile" | "traveler";
 
 /** Default scopes granted when a service of each kind is connected. */
 export const DEFAULT_SCOPES: Record<ConnectionKind, string[]> = {
@@ -10,6 +10,7 @@ export const DEFAULT_SCOPES: Record<ConnectionKind, string[]> = {
   email: ["email:read:travel"], // travel senders only — never marketing/personal mail
   calendar: ["calendar:read", "calendar:write"],
   loyalty: ["loyalty:read"],
+  site_login: ["browser:login"], // encrypted username/password for airline/hotel sites
   traveler_profile: ["profile:read"], // the account holder's own passport/KTN/memberships
   traveler: ["profile:read"], // an additional traveler (spouse/child/companion) on the account
 };

@@ -2,25 +2,32 @@
 // dining + activities come from Google Places (New); transport is a modeled estimate from the real
 // airport→destination distance. Read-only; "booking" an extra is the simulated /reserve below.
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { BriefSchema, type OfferKind } from "../types.ts";
 import { geocode } from "../geo/index.ts";
 import { searchHotels, searchDining, searchActivities } from "../discovery/places.ts";
 import { estimateTransport } from "../discovery/transport.ts";
+import { recall } from "../mem0.ts";
 
 let discoverCounter = 0;
+
+const DiscoverSchema = BriefSchema.extend({ userId: z.string().optional() });
 
 export async function discoverRoutes(app: FastifyInstance) {
   // POST /discover — a brief in, real trip-extras out. Finds; books nothing.
   app.post("/discover", async (req, reply) => {
-    const parsed = BriefSchema.safeParse(req.body);
+    const parsed = DiscoverSchema.safeParse(req.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: "invalid_brief", issues: parsed.error.issues });
     }
-    const brief = parsed.data;
+    const { userId, ...brief } = parsed.data;
     const destGeo = await geocode(brief.destination);
     if (!destGeo) {
       return reply.status(422).send({ error: "could_not_locate_destination", destination: brief.destination });
     }
+
+    const memQuery = `${destGeo.label} restaurants activities things to do`;
+    const memories = userId ? await recall(userId, memQuery, 4) : [];
 
     const [stays, dining, activities] = await Promise.all([
       searchHotels(destGeo, brief),
@@ -33,6 +40,7 @@ export async function discoverRoutes(app: FastifyInstance) {
       tripId: `disc_${Date.now().toString(36)}_${discoverCounter++}`,
       destination: { label: destGeo.label, location: { lat: destGeo.lat, lng: destGeo.lng } },
       source: "google-places",
+      memories,
       stays,
       dining,
       activities,

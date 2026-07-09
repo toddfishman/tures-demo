@@ -64,16 +64,36 @@
   function memId() { try { return (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : undefined; } catch (_) { return undefined; } }
   function setSession(t, u) { token = t || ""; account = u || null; if (token) localStorage.setItem(TOKEN, token); else localStorage.removeItem(TOKEN); if (account) localStorage.setItem(ACCT, JSON.stringify(account)); else localStorage.removeItem(ACCT); }
 
+  function retriableStatus(s) { return s === 502 || s === 503 || s === 504; }
+  /** Retry cold-start / gateway blips — Render wakes on first request. */
+  function withRetry(fn, retries) {
+    retries = retries == null ? 1 : retries;
+    return fn().catch(function (err) {
+      var st = err && err.status;
+      if (retries > 0 && (!st || retriableStatus(st))) {
+        return new Promise(function (res, rej) {
+          setTimeout(function () { withRetry(fn, retries - 1).then(res, rej); }, 1800);
+        });
+      }
+      throw err;
+    });
+  }
+
   function api(path, opts) {
     opts = opts || {};
     var h = Object.assign({}, opts.headers || {});
     if (opts.body && !h["Content-Type"]) h["Content-Type"] = "application/json";
     if (token && !h["Authorization"]) h["Authorization"] = "Bearer " + token;
     opts.headers = h;
-    return fetch(url + path, opts).then(function (r) {
-      return r.json().then(function (body) {
-        if (!r.ok) throw Object.assign(new Error(body.error || r.status), { status: r.status, body: body });
-        return body;
+    return withRetry(function () {
+      return fetch(url + path, opts).then(function (r) {
+        return r.json().then(function (body) {
+          if (!r.ok) throw Object.assign(new Error(body.error || r.status), { status: r.status, body: body });
+          return body;
+        }, function () {
+          if (!r.ok) throw Object.assign(new Error(String(r.status)), { status: r.status });
+          throw new Error("invalid_json");
+        });
       });
     });
   }
@@ -108,7 +128,7 @@
     parse: function (text) { return api("/parse", { method: "POST", body: JSON.stringify({ text: text }) }); },
     plan: function (brief) { var body = Object.assign({}, brief || {}); var u = memId(); if (u) body.userId = u; return api("/plan", { method: "POST", body: JSON.stringify(body) }); },
     /* Real trip extras: hotels + restaurants + things-to-do (Google Places) + transport estimate. */
-    discover: function (brief) { return api("/discover", { method: "POST", body: JSON.stringify(brief) }); },
+    discover: function (brief) { var body = Object.assign({}, brief || {}); var u = memId(); if (u) body.userId = u; return api("/discover", { method: "POST", body: JSON.stringify(body) }); },
     /* Situational awareness — weather/air/events/advisories/transit for this trip. deep=true adds the
        live web scout (slower). The "Trip Radar": this is the always-on watch, made visible. */
     signals: function (brief, deep) { var b = brief || {}; return api("/signals", { method: "POST", body: JSON.stringify({ destination: b.destination, origin: b.origin, departDate: b.departDate, returnDate: b.returnDate, deep: !!deep }) }); },
@@ -200,16 +220,20 @@
       transcribe: function (blob) {
         var h = { "Content-Type": blob.type || "audio/webm" };
         if (token) h["Authorization"] = "Bearer " + token;
-        return fetch(url + "/voice/transcribe", { method: "POST", headers: h, body: blob }).then(function (r) {
-          return r.json().then(function (b) { if (!r.ok) throw Object.assign(new Error(b.error || r.status), { status: r.status, body: b }); return b; });
+        return withRetry(function () {
+          return fetch(url + "/voice/transcribe", { method: "POST", headers: h, body: blob }).then(function (r) {
+            return r.json().then(function (b) { if (!r.ok) throw Object.assign(new Error(b.error || r.status), { status: r.status, body: b }); return b; });
+          });
         });
       },
       speak: function (text) {
         var h = { "Content-Type": "application/json" };
         if (token) h["Authorization"] = "Bearer " + token;
-        return fetch(url + "/voice/speak", { method: "POST", headers: h, body: JSON.stringify({ text: text }) }).then(function (r) {
-          if (!r.ok) throw Object.assign(new Error("tts " + r.status), { status: r.status });
-          return r.blob();
+        return withRetry(function () {
+          return fetch(url + "/voice/speak", { method: "POST", headers: h, body: JSON.stringify({ text: text }) }).then(function (r) {
+            if (!r.ok) throw Object.assign(new Error("tts " + r.status), { status: r.status });
+            return r.blob();
+          });
         });
       },
     },

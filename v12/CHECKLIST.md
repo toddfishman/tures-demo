@@ -56,7 +56,7 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 ## Slice 4 — Personalization & polish
 
 - [x] **mem0** in plan cards — hotel “Why this one” from `plan.memories` *(launch slice)*
-- [ ] **mem0** in discover slates (“like you loved at…”)
+- [x] **mem0** in discover slates (“like you loved at…”)
 - [ ] Google Places key on Render; empty discover UX
 - [ ] `proactive.html` → real thread or redirect to plan
 - [ ] Stripe billing when `billingLive`
@@ -97,7 +97,7 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 - [x] **Stagehand v3 agent** — `engine/src/actions/stagehand.ts` (resume after handoff)
 - [x] Human handoff page `v12/handoff.html` (+ `?demo=1` preview)
 - [x] Telegram notify on handoff (when bot + channel linked)
-- [ ] Vault credential injection into browser sessions
+- [x] Vault credential injection into browser sessions (site_login + loyalty w/ username/password)
 - [x] **Assist UI** — grant + run from proposed actions in concierge chat
 - [ ] Session replay in My Trips audit trail
 

@@ -259,6 +259,7 @@
 
   function openOv() {
     unlockAudio();
+    try { if (window.tures && window.tures.health) window.tures.health(); } catch (_) {}
     if (inline()) {
       if (!inlineStarted) { inlineStarted = true; var b = bridge(); if (!b.hasMessages || !b.hasMessages()) greet(); }
       if (recording) stopRec(); else startRec();

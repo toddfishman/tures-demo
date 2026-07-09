@@ -210,11 +210,16 @@
   function loyRow(data){
     data = data||{};
     var row=document.createElement('div'); row.className='loy-row';
+    row.style.flexWrap='wrap';
     row.innerHTML =
-      '<select class="field loy-kind">'+['Airline','Hotel','Rental car','Other'].map(function(k){return '<option'+(data.kind===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'+
-      '<input class="field loy-prog" placeholder="Program (e.g. Alaska Mileage Plan)" value="'+(data.program||'').replace(/"/g,'&quot;')+'">'+
-      '<input class="field loy-num" placeholder="Member #" style="flex:0 0 130px" value="'+(data.number||'').replace(/"/g,'&quot;')+'">'+
-      '<button class="rm" type="button" aria-label="Remove">&times;</button>';
+      '<select class="field loy-kind" style="flex:0 0 130px">'+['Airline','Hotel','Rental car','Other'].map(function(k){return '<option'+(data.kind===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'+
+      '<input class="field loy-prog" placeholder="Program (e.g. Marriott Bonvoy)" value="'+(data.program||'').replace(/"/g,'&quot;')+'" style="flex:1;min-width:140px">'+
+      '<input class="field loy-num" placeholder="Member #" style="flex:0 0 120px" value="'+(data.number||'').replace(/"/g,'&quot;')+'">'+
+      '<button class="rm" type="button" aria-label="Remove">&times;</button>'+
+      '<div class="loy-site" style="width:100%;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;padding-top:8px;border-top:1px dashed var(--line)">'+
+      '<input class="field loy-user" placeholder="Website login email (optional, encrypted)" style="flex:1;min-width:160px" value="'+(data.username||'').replace(/"/g,'&quot;')+'">'+
+      '<input class="field loy-pass" type="password" placeholder="Site password (optional)" style="flex:1;min-width:140px" autocomplete="new-password">'+
+      '</div>';
     row.querySelector('.rm').onclick=function(){ row.remove(); };
     loyList.appendChild(row);
   }
@@ -274,9 +279,28 @@
   };
   document.querySelector('#c-loyalty .ob-save').onclick=function(){
     var rows=[].slice.call(loyList.querySelectorAll('.loy-row')).map(function(r){
-      return { kind:r.querySelector('.loy-kind').value, program:r.querySelector('.loy-prog').value.trim(), number:r.querySelector('.loy-num').value.trim() };
+      return {
+        kind:r.querySelector('.loy-kind').value,
+        program:r.querySelector('.loy-prog').value.trim(),
+        number:r.querySelector('.loy-num').value.trim(),
+        username:r.querySelector('.loy-user').value.trim(),
+        password:r.querySelector('.loy-pass').value
+      };
     }).filter(function(x){ return x.program||x.number; });
     F.setVault({loyalty:rows});
+    try{
+      if(T&&T.configured&&T.signedIn){
+        rows.forEach(function(x){
+          var hasLogin = x.username && x.password;
+          T.connections.connect({
+            kind: hasLogin ? 'site_login' : 'loyalty',
+            label: x.program,
+            secret: { program: x.program, number: x.number, username: x.username, password: x.password },
+            meta: { numberMasked: x.number ? ('••••'+x.number.slice(-4)) : undefined, hasSiteLogin: !!hasLogin }
+          });
+        });
+      }
+    }catch(_){}
     setDone(document.getElementById('c-loyalty'), rows.length>0); refresh(); openNext(document.getElementById('c-loyalty'));
   };
 

@@ -517,10 +517,12 @@
     if(kind==='activity') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
     return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>';
   }
-  function xRow(item, kind){
+  function xRow(item, kind, memoryNote){
     var row=document.createElement('div'); row.className='xrow';
     var meta=(item.summary||[]).join(' · ');
-    row.innerHTML='<div class="xinfo"><div class="xname">'+esc(item.title)+'</div><div class="xmeta">'+esc(meta)+'</div></div>';
+    if(memoryNote) meta = memoryNote + (meta ? ' · ' + meta : '');
+    var memTag = memoryNote ? ' <span class="demo-tag">From memory</span>' : '';
+    row.innerHTML='<div class="xinfo"><div class="xname">'+esc(item.title)+memTag+'</div><div class="xmeta">'+esc(meta)+'</div></div>';
     var btn=document.createElement('button'); btn.type='button'; btn.className='xbtn';
     btn.textContent = kind==='transport' ? 'Arrange' : (kind==='dining' ? 'Reserve' : 'Add');
     btn.onclick=function(){
@@ -533,13 +535,13 @@
     };
     row.appendChild(btn); return row;
   }
-  function xGroup(title, kind, items){
+  function xGroup(title, kind, items, memoryNote){
     if(!items || !items.length) return null;
     var g=document.createElement('div'); g.className='xgroup';
     var h=document.createElement('div'); h.className='xh';
     h.innerHTML=xIcon(kind)+'<span>'+esc(title)+'</span><span class="demo-tag">Sample</span>';
     g.appendChild(h);
-    items.slice(0,4).forEach(function(it){ g.appendChild(xRow(it,kind)); });
+    items.slice(0,4).forEach(function(it, i){ g.appendChild(xRow(it, kind, i === 0 && memoryNote ? memoryNote : null)); });
     return g;
   }
   function presentExtras(brief, done){
@@ -549,9 +551,10 @@
     typing(true);
     window.tures.discover(brief).then(function(d){
       typing(false);
+      var mems = (d && d.memories) || [];
       var groups=[
-        xGroup('Where to eat','dining',d&&d.dining),
-        xGroup('Things to do','activity',d&&d.activities),
+        xGroup('Where to eat','dining',d&&d.dining, mems[0]),
+        xGroup('Things to do','activity',d&&d.activities, mems[1] || mems[0]),
         xGroup('Getting around','transport',d&&d.transport)
       ].filter(Boolean);
       if(groups.length){

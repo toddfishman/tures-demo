@@ -542,6 +542,22 @@ let bookingId = "";
   ok("action executor: grant → run → handoff → continue");
 }
 
+// 37. Vault site-login matching for browser actions
+{
+  const { connect } = await import("../src/vault/index.ts");
+  const { credentialsForSite } = await import("../src/actions/vault-creds.ts");
+  await connect({
+    accountId: "demo",
+    kind: "site_login",
+    label: "Marriott Bonvoy",
+    secret: { program: "Marriott Bonvoy", username: "traveler@example.com", password: "vault-test", domain: "marriott.com" },
+  });
+  const c = await credentialsForSite("demo", "https://www.marriott.com/sign-in");
+  assert.ok(c && c.username === "traveler@example.com", "matches marriott URL to saved login");
+  assert.equal(await credentialsForSite("demo", "https://example.com"), null, "no match for unrelated site");
+  ok("vault: site login credentials match by URL");
+}
+
 // 16. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });

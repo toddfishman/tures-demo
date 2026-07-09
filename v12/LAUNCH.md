@@ -67,7 +67,7 @@ The product is **parse → plan → hold → confirm → prove**. The AI agent i
 - [x] Voice uses same `/converse` path
 - [x] **History compaction** before each turn (`agent/history.ts`)
 - [x] Context string capped + structured (not unbounded prose) — `capContext` 1400 chars
-- [ ] Error UX: cold start / 502 retry (plan has retry; verify voice + concierge)
+- [x] Error UX: cold start / 502 retry (central retry in engine.js — api + voice transcribe/TTS)
 - [ ] Eval set: 10 vague openers → all eventually `ready:true` without re-asking known slots
 
 ### Planner (`/plan`)
