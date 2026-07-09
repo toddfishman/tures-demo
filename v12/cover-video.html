@@ -14,6 +14,12 @@
     --glass-2:rgba(16,18,24,.5);
     --hair:rgba(226,230,238,.32);
     --hair-strong:rgba(226,230,238,.5);
+    --phone-ar: 9 / 19.5;
+    --phone-h-cap: min(620px, 72vh);
+    --phone-w: min(286px, calc(var(--phone-h-cap) * 9 / 19.5), 78vw);
+    --phone-pad: 10px;
+    --phone-r-outer: 44px;
+    --phone-r-screen: 36px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -25,7 +31,7 @@
 
   /* ── full-bleed video ── */
   .bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#0a0c10;isolation:isolate}
-  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .85s ease}
+  .bg video{opacity:0;transition:opacity .85s ease}
   .bg.vid-ready video{opacity:1}
   /* legibility scrim — keeps type crisp without hiding the footage */
   .scrim{position:fixed;inset:0;z-index:-1;pointer-events:none;
@@ -73,9 +79,10 @@
   .verbs .dot{color:var(--silver-deep)}
 
   /* ── glass demo (phone) ── */
-  .demo{justify-self:end;position:relative;width:clamp(280px,32vw,360px)}
-  .phone{border-radius:42px;padding:12px;position:relative;z-index:2}
-  .screen{border-radius:32px;overflow:hidden;background:rgba(10,12,16,.42);border:1px solid var(--hair)}
+  .demo{justify-self:end;position:relative;width:var(--phone-w);max-width:100%}
+  .phone{border-radius:var(--phone-r-outer);padding:var(--phone-pad);position:relative;z-index:2;width:100%}
+  .screen{width:100%;aspect-ratio:var(--phone-ar);max-height:var(--phone-h-cap);height:auto;
+    border-radius:var(--phone-r-screen);overflow:hidden;background:rgba(10,12,16,.42);border:1px solid var(--hair)}
   .sc-top{display:flex;align-items:center;gap:11px;padding:16px 16px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
   .av{width:34px;height:34px;border-radius:50%;flex:0 0 auto;background:var(--silver-sheen);display:grid;place-items:center;color:#12151b;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
   .sc-top .nm{font-weight:600;font-size:14.5px}

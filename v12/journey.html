@@ -45,10 +45,14 @@
   .actlabel b{color:var(--acc-deep)}
 
   /* ---- phone ---- */
-  .phone{position:relative;width:min(338px,84vw);background:var(--surface);border-radius:46px;padding:11px;border:2px solid var(--text);box-shadow:0 50px 90px -42px rgba(0,0,0,.45)}
-  .phone .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:78px;height:19px;border-radius:14px;background:#1a1a1a;z-index:6}
-  .phone .homebar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:116px;height:5px;border-radius:5px;background:rgba(26,26,26,.3);z-index:6}
-  .screen{background:var(--bg);border-radius:35px;overflow:hidden;display:flex;flex-direction:column;height:min(612px,66vh);border:1px solid var(--line);position:relative}
+  .phone{position:relative;width:var(--phone-w);max-width:100%;flex:0 0 auto;
+    background:var(--surface);border-radius:var(--phone-r-outer);padding:var(--phone-pad);
+    border:2px solid var(--text);box-shadow:0 50px 90px -42px rgba(0,0,0,.45)}
+  .phone .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:min(88px,30%);height:22px;border-radius:14px;background:#1a1a1a;z-index:6}
+  .phone .homebar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:min(112px,32%);height:5px;border-radius:5px;background:rgba(26,26,26,.3);z-index:6}
+  .screen{width:100%;aspect-ratio:var(--phone-ar);max-height:var(--phone-h-cap);height:auto;
+    background:var(--bg);border-radius:var(--phone-r-screen);overflow:hidden;display:flex;flex-direction:column;
+    border:1px solid var(--line);position:relative}
   .sct{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto;z-index:2}
   .sct .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,var(--acc-2),var(--acc) 55%,var(--acc-deep));color:#fff;font-weight:700;font-size:14px}
   .sct .nm{font-size:13.5px;font-weight:600}
@@ -161,8 +165,8 @@
   @media (max-width:600px){
     .stage{padding:60px 12px 20px;gap:13px}
     .lead h1{font-size:20px}
-    .phone{width:min(300px,90vw);padding:10px;border-radius:34px}
-    .screen{height:min(440px,52vh);border-radius:26px}
+    .phone{width:var(--phone-w);padding:var(--phone-pad);border-radius:var(--phone-r-outer)}
+    .screen{border-radius:calc(var(--phone-r-screen) - 4px)}
     .caption{font-size:14px;min-height:40px}
     .outro .ot{font-size:26px}
   }
@@ -176,7 +180,7 @@
   .home-beat{position:fixed;inset:0;z-index:4;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .55s ease,transform .55s ease;transform:scale(1.02)}
   .home-beat.on{opacity:1;transform:none;pointer-events:auto}
   .hb-bg{position:absolute;inset:0;overflow:hidden;background:#0a0c10;isolation:isolate}
-  .hb-bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0;transition:opacity .85s ease}
+  .hb-bg video{opacity:0;z-index:0;transition:opacity .85s ease}
   .hb-bg.vid-ready video{opacity:1}
   .hb-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,10,14,.55) 0%,rgba(8,10,14,.2) 40%,rgba(8,10,14,.65) 100%)}
   .hb-in{position:relative;z-index:2;width:100%;max-width:520px;margin:0 auto;padding:calc(var(--nav-h) + 20px) 24px 72px;color:#fff}
@@ -195,7 +199,7 @@
   .stage.home-mode .lead h1{opacity:0}
 </style>
 </head>
-<body class="demo-page" data-page="journey" data-no-travel-bg="1">
+<body class="demo-page" data-page="demo" data-no-travel-bg="1">
 
 <div class="home-beat" id="home-beat" aria-hidden="true">
   <div class="hb-bg"><video autoplay muted loop playsinline preload="auto"><source src="assets/travel-bg.mp4" type="video/mp4"></video></div>

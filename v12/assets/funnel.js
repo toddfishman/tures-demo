@@ -72,11 +72,16 @@
 
   // Context string for /converse so the agent skips what it already knows.
   function context() {
-    var bits = [], tp = taste(), tr = traveler();
+    var bits = [], tp = taste(), tr = traveler(), v = vault();
     if (tp && tp.signature) bits.push("Taste Print: " + tp.signature);
     else if (tp && tp.tags && tp.tags.length) bits.push("Taste: " + tp.tags.slice(0, 5).join(", "));
     if (tr.homeAirport) bits.push("Home airport: " + tr.homeAirport);
     if (tr.name) bits.push("Name: " + tr.name);
+    if (v && v.payment && v.payment.length) bits.push("Card on file: yes");
+    if (v && v.loyalty && v.loyalty.length) {
+      bits.push("Loyalty: " + v.loyalty.slice(0, 3).map(function (l) { return l.program; }).filter(Boolean).join(", "));
+    }
+    if (v && v.identity && (v.identity.passport || v.identity.ktn)) bits.push("Travel docs on file: yes");
     var a = account();
     if (a && a.email) bits.push("Signed-in account: " + a.email);
     return bits.length ? bits.join(" · ") : undefined;

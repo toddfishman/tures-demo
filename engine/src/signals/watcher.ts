@@ -15,6 +15,7 @@ import { config } from "../config.ts";
 import { bookings } from "../booking/store.ts";
 import { gatherSignals } from "./service.ts";
 import { emitEvent } from "../events/bus.ts";
+import { handleDisruption } from "../hiccup/handler.ts";
 import { log } from "../logger.ts";
 
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -52,6 +53,12 @@ async function sweep(): Promise<void> {
           detail: s.detail,
           data: { bookingId: b.id, signalId: s.id, category: s.category, severity: s.severity, travelImpacting: !!s.travelImpacting, source: s.source, url: s.url },
         });
+        if (s.travelImpacting && (s.severity === "critical" || s.severity === "warning")) {
+          const disruptKind = s.category === "weather" ? "delay" as const : "schedule_change" as const;
+          void handleDisruption(b.id, { kind: disruptKind, detail: s.detail }).catch((e) =>
+            log.warn("watcher hiccup escalation failed", { bookingId: b.id, err: String(e) }),
+          );
+        }
       }
       surfaced.set(b.id, set);
     } catch (e) {

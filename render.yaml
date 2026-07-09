@@ -54,6 +54,16 @@ services:
       - key: TELEGRAM_BOT_USERNAME     # public @handle (no @), for t.me deep links
         value: Tures_Travel_Bot
       - key: CORS_ORIGINS
-        value: https://toddfishman.github.io,http://localhost:8123
-      # Optional later (persistence + security hardening): DATA_DIR (+ a Render disk),
-      # VAULT_KEY, AUTH_SECRET, STRIPE_* . Unset is fine for the demo (in-memory, ephemeral key).
+        value: https://toddfishman.github.io,https://tures.app,http://localhost:8123,http://localhost:8765
+      # Durable store — accounts, vault connections, bookings survive deploys/restarts.
+      # Requires the disk below. Without DATA_DIR the engine stays in-memory (fine for demos).
+      - key: DATA_DIR
+        value: /data
+      # Background trip watcher — sweeps booked trips for weather/air/web signals (0 = off).
+      - key: SIGNAL_WATCH_INTERVAL_MIN
+        value: "0"
+    disk:
+      name: tures-data
+      mountPath: /data
+      sizeGB: 1
+      # Optional later (security hardening): VAULT_KEY, AUTH_SECRET, STRIPE_* .

@@ -434,7 +434,115 @@ let bookingId = "";
   ok("cross-channel: telegram webhook guarded off + health reports the layer");
 }
 
-// 15. /metrics reports counts + uptime
+// 15. conversation history compaction
+{
+  const { compactConversation, capContext } = await import("../src/agent/history.ts");
+  const long = "x".repeat(2000);
+  const out = compactConversation([
+    { role: "user", content: long },
+    { role: "assistant", content: "ok" },
+    { role: "user", content: "next" },
+  ]);
+  assert.ok(out.length <= 12, "caps turn count");
+  assert.ok(out[0]!.content.endsWith("…"), "truncates long messages");
+  assert.equal(capContext("a".repeat(2000))!.length, 1401, "capContext adds ellipsis at 1400");
+  ok("history: compactConversation + capContext stay within budget");
+}
+
+// 15.5 adaptive trip watch — risk + pass-through metering
+{
+  const { assessRisk } = await import("../src/watch/risk.ts");
+  const { recordUsage, pricing } = await import("../src/watch/meter.ts");
+  const { emptyMeter } = await import("../src/watch/meter.ts");
+  const low = assessRisk([], "2099-01-01");
+  assert.equal(low.level, "clear");
+  assert.equal(low.scansBudget, 0);
+  const high = assessRisk(
+    [{ id: "w:1", category: "weather", severity: "critical", title: "Storm", source: "test", travelImpacting: true }],
+    "2026-07-10",
+  );
+  assert.ok(high.score >= 50, "critical weather + near depart elevates risk");
+  const w = {
+    bookingId: "bk_test",
+    tripId: "t1",
+    accountId: "demo",
+    enabled: true,
+    capUsd: 10,
+    marginPercent: 20,
+    alertsOn: true,
+    riskScore: 0,
+    riskLevel: "clear" as const,
+    scansToday: 0,
+    scansBudgetToday: 0,
+    deepScansToday: 0,
+    meter: emptyMeter(),
+    keywords: [],
+    surfacedSignalIds: [],
+    createdAt: "",
+    updatedAt: "",
+  };
+  recordUsage(w, "deep_scout", 1);
+  const p = pricing(w);
+  assert.ok(p.billableUsd >= p.cogsUsd);
+  w.meter.cogsUsd = 50;
+  w.meter.billableUsd = 0;
+  const { recalcBillable } = await import("../src/watch/meter.ts");
+  recalcBillable(w);
+  assert.ok(w.meter.billableUsd <= w.capUsd);
+  ok("trip watch: risk scoring + pass-through metering");
+}
+
+// 36. Action executor — permissions, grants, run → handoff
+{
+  const caps = await app.inject({ method: "GET", url: "/actions/capabilities" });
+  assert.equal(caps.statusCode, 200);
+  assert.ok(caps.json().permissions["act:browser_login"], "browser_login in catalog");
+
+  const grant = await app.inject({
+    method: "POST",
+    url: "/actions/grants",
+    payload: { permission: "act:browser_login", label: "Sign in to airline site" },
+  });
+  assert.equal(grant.statusCode, 200);
+  const grantId = grant.json().grant.id;
+
+  const denied = await app.inject({
+    method: "POST",
+    url: "/actions/run",
+    payload: { permission: "act:fill_forms", title: "Submit form", targetUrl: "https://example.com/form" },
+  });
+  assert.equal(denied.statusCode, 403, "run without grant blocked");
+
+  const run = await app.inject({
+    method: "POST",
+    url: "/actions/run",
+    payload: {
+      permission: "act:browser_login",
+      title: "Sign in to Example Air",
+      targetUrl: "https://example.com/login",
+      grantId,
+    },
+  });
+  assert.equal(run.statusCode, 200);
+  const body = run.json();
+  assert.equal(body.run.status, "needs_human");
+  assert.ok(body.run.handoffToken);
+  const token = body.run.handoffToken;
+
+  const ho = await app.inject({ method: "GET", url: `/actions/handoff/${token}` });
+  assert.equal(ho.statusCode, 200);
+  assert.equal(ho.json().handoff.status, "open");
+
+  const cont = await app.inject({ method: "POST", url: `/actions/handoff/${token}/continue` });
+  assert.equal(cont.statusCode, 200);
+  assert.equal(cont.json().run.status, "completed");
+
+  const health = await app.inject({ method: "GET", url: "/health" });
+  assert.ok(health.json().capabilities.actionExecutor);
+  ok("action executor: grant → run → handoff → continue");
+}
+
+// 16. /metrics reports counts + uptime
 {
   const res = await app.inject({ method: "GET", url: "/metrics" });
   assert.equal(res.statusCode, 200);
@@ -446,7 +554,7 @@ let bookingId = "";
 
 await app.close();
 
-// 16. API-key auth: blocks without key, allows with, /health stays open
+// 17. API-key auth: blocks without key, allows with, /health stays open
 {
   process.env.ENGINE_API_KEY = "secret-test-key";
   const secured = await build();

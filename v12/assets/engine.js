@@ -127,6 +127,27 @@
     book: function (body) { body = body || {}; if (!body.accountId) body.accountId = acctId(); return api("/book", { method: "POST", body: JSON.stringify(body) }); },
     confirm: function (id) { return api("/book/" + id + "/confirm", { method: "POST" }); },
     bookings: function () { return api("/bookings?accountId=" + acctId()); },
+    watchCapabilities: function () { return api("/watch/capabilities"); },
+    getWatch: function (bookingId) { return api("/watch/" + bookingId); },
+    enableWatch: function (bookingId, capUsd) { return api("/watch/" + bookingId + "/enable", { method: "POST", body: JSON.stringify({ capUsd: capUsd }) }); },
+    approveWatchCap: function (bookingId, additionalUsd) { return api("/watch/" + bookingId + "/approve-cap", { method: "POST", body: JSON.stringify({ additionalUsd: additionalUsd || 5 }) }); },
+
+    /* Action Executor — permissioned browser actions + human handoff for CAPTCHA/login. */
+    actions: {
+      capabilities: function () { return api("/actions/capabilities"); },
+      permissions: function () { return api("/actions/permissions"); },
+      grants: function () { return api("/actions/grants"); },
+      grant: function (permission, label, scope) {
+        return api("/actions/grants", { method: "POST", body: JSON.stringify({ permission: permission, label: label, scope: scope }) });
+      },
+      revokeGrant: function (id) { return api("/actions/grants/" + id + "/revoke", { method: "POST" }); },
+      run: function (body) { return api("/actions/run", { method: "POST", body: JSON.stringify(body || {}) }); },
+      getRun: function (id) { return api("/actions/runs/" + id); },
+      getHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token)); },
+      continueHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token) + "/continue", { method: "POST" }); },
+      abortHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token) + "/abort", { method: "POST" }); },
+    },
+
     disrupt: function (bookingId, kind, detail) { return api("/disruptions", { method: "POST", body: JSON.stringify({ bookingId: bookingId, kind: kind, detail: detail }) }); },
 
     connections: {

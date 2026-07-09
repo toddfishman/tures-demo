@@ -19,6 +19,8 @@
 <link rel="stylesheet" href="assets/v12.css">
 <script src="assets/engine.js"></script>
 <script src="assets/funnel.js"></script>
+<script src="assets/account-sync.js"></script>
+<script src="assets/channels-ui.js"></script>
 <style>
   /* page-specific only — reuses v12.css tokens + classes */
   .vault-hero{padding:84px 0 36px;text-align:center}
@@ -368,6 +370,14 @@
         <span class="gm"><span class="gt">Messaging</span><span class="gd">Reach you on Telegram when something needs you.</span></span>
         <button class="tg" type="button" aria-pressed="false" aria-label="Grant messaging access"></button>
       </div>
+
+      <div class="grant-row" id="tg-vault-row">
+        <span class="gi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-5.4A8 8 0 1 1 21 11.5z"/></svg>
+        </span>
+        <span class="gm"><span class="gt">Telegram</span><span class="gd" id="tg-vault-sub">Text Tures on your phone — same memory as here.</span></span>
+        <button class="btn ghost" type="button" id="tg-vault-btn" style="flex-shrink:0;font-size:12px;padding:8px 14px">Connect</button>
+      </div>
     </div>
   </section>
 
@@ -547,7 +557,23 @@ window.turesBestCard = function(category, amount, cards){
       return '<div class="row"><span class="pill-card">'+esc(pill)+'</span><span class="rl"><span class="rk">'+esc(c.name||'Your card')+'</span><span class="rv">'+esc(c.label||'')+'</span>'+perk+'</span><span class="rtail"><span class="tag">VGS-tokenized</span></span></div>';
     }).join('');
   }
-  renderCards();
+  function bootVault(){
+    renderCards();
+    renderHeld();
+    if(location.hash==='#payment'){ addForm.style.display='flex'; document.getElementById('add-card-btn').scrollIntoView({block:'center'}); }
+  }
+  var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
+  sync.then(bootVault).catch(bootVault);
+  if (window.turesWireTelegramUi) {
+    turesWireTelegramUi({
+      button: document.getElementById("tg-vault-btn"),
+      subtitle: document.getElementById("tg-vault-sub"),
+      onLinked: function () {
+        var msg = document.querySelector('#access-grants .grant-row:nth-child(3) .tg');
+        if (msg) msg.setAttribute("aria-pressed", "true");
+      }
+    });
+  }
   var addBtn=document.getElementById('add-card-btn'), addForm=document.getElementById('add-card-form');
   addBtn.addEventListener('click', function(){ addForm.style.display = (addForm.style.display==='flex'?'none':'flex'); });
   document.getElementById('c-save').addEventListener('click', function(){
@@ -595,7 +621,9 @@ window.turesBestCard = function(category, amount, cards){
     T.book({brief:pt.brief}).then(function(bk){ return T.confirm(bk.id||bk.tripId); }).then(function(bk){
       var comps=(bk.components||[]);
       var rows=comps.map(function(c){ return '<div class="row"><span class="rl"><span class="rv">'+esc(c.title||c.label||'Booked')+'</span></span><span class="rtail"><span class="tag">'+esc(c.confirmation||c.pnr||c.status||'')+'</span></span></div>'; }).join('');
-      res.innerHTML='<div class="tok" style="margin:6px 0 8px">Confirmed — verified twice · <span class="demo-tag">Sample</span></div>'+rows;
+      var tid = bk.id || bk.tripId || '';
+      res.innerHTML='<div class="tok" style="margin:6px 0 8px">Confirmed — verified twice · <span class="demo-tag">Sample</span></div>'+rows+
+        (tid ? '<div style="margin-top:12px"><a class="btn ghost" href="trips.html#trip-'+esc(tid)+'">View in My Trips →</a></div>' : '');
       F.pendingTrip.clear();
       flash('Booked — no card was charged (safe simulation)');
     }).catch(function(e){
@@ -603,10 +631,6 @@ window.turesBestCard = function(category, amount, cards){
       else { res.innerHTML='<span class="vsub">Could not book just now — nothing was charged.</span>'; }
     });
   }
-  renderHeld();
-
-  // deep-link: open add-card if arriving at #payment, scroll to #basics
-  if(location.hash==='#payment'){ addForm.style.display='flex'; document.getElementById('add-card-btn').scrollIntoView({block:'center'}); }
 })();
 </script>
 <script>

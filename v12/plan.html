@@ -160,6 +160,17 @@
   .plan-total{font-size:13.5px;line-height:1.45;padding:11px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface)}
   .plan-total b{color:var(--acc-deep)}
 
+  /* Trip Watch opt-in — pass-through monitoring add-on */
+  .watch-opt{align-self:flex-start;max-width:96%;margin-top:2px;border:1px solid var(--acc-line);border-radius:14px;background:var(--bg);padding:14px 16px}
+  .watch-opt .wh{display:flex;align-items:flex-start;gap:10px}
+  .watch-opt .wh input{margin-top:4px;accent-color:var(--acc-deep)}
+  .watch-opt .wt{font-size:14px;font-weight:600;line-height:1.35}
+  .watch-opt .ws{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .watch-opt .wc{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .watch-opt select{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface)}
+  .watch-status{font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .watch-status b{color:var(--text)}
+
   /* silver outline around the chat console */
   .browser{border:1.5px solid var(--silver)}
   /* sender name ABOVE the bubble; Tures speaks in vermilion */
@@ -224,7 +235,7 @@
       <div class="console-wrap">
         <div class="plan-bar">
           <span data-voice-mount></span>
-          <a class="chip-link" id="text-tures" href="sms:&body=Hi%20Tures%2C%20I%27d%20like%20to%20plan%20a%20trip" title="Text Tures (SMS channel — preview)">
+          <a class="chip-link" id="text-tures" href="#" title="Text Tures on Telegram — same account">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg> Text Tures</a>
           <span class="spacer"></span>
           <button id="btn-demo" class="btn ghost sm" type="button">▷ Watch the example</button>
@@ -290,6 +301,18 @@
   var live   = !!(window.tures && window.tures.configured);
   var history = [];
   var busy = false;
+  var watchCap = 10;
+  var watchOn = true;
+  var watchMeta = { marginPercent: 20, defaultCapUsd: 10 };
+
+  if (live && window.tures.watchCapabilities) {
+    window.tures.watchCapabilities().then(function(c){
+      if (c) {
+        watchMeta = c;
+        watchCap = c.defaultCapUsd || 10;
+      }
+    }).catch(function(){});
+  }
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function short(s){ s=String(s||''); return s.length>16 ? s.slice(0,15)+'…' : s; }
@@ -303,7 +326,7 @@
     w.innerHTML='<div class="who">'+(me?'You':'Tures')+'</div><div class="bubble">'+html+'</div>';
     thread.appendChild(w); reveal(w); scroll(); return w;
   }
-  var typingEl=null;
+  window.bubble = bubble;
   function typing(on){
     if(on){ if(typingEl) return; typingEl=document.createElement('div'); typingEl.className='msg typing from-ai';
       typingEl.innerHTML='<div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div>';
@@ -374,27 +397,33 @@
     return t(depH, depM)+' depart · '+t(arrH, arrM)+' arrive';
   }
 
-  function legCard(label, offer, brief, kind){
+  function legCard(label, offer, brief, kind, plan){
     if(!offer) return '';
     var dates = fmtTripDates(brief);
     var meta = (offer.summary||[]).slice();
     if(kind==='flight' && dates) meta.unshift(dates);
     if(kind==='flight') meta.push(synthFlightTimes(offer));
     if(kind==='stay' && offer.raw && offer.raw.nights) meta.unshift(String(offer.raw.nights)+' nights');
-    var reason = (offer.scoreReasons && offer.scoreReasons.length)
-      ? offer.scoreReasons.slice(0,2).join(' · ')
-      : (kind==='flight' ? 'Best fit for your route and cabin' : 'Matches your style and budget');
+    var reason;
+    if(kind==='stay' && plan && plan.memories && plan.memories.length){
+      reason = plan.memories[0];
+    } else if(offer.scoreReasons && offer.scoreReasons.length){
+      reason = offer.scoreReasons.slice(0,2).join(' · ');
+    } else {
+      reason = (kind==='flight' ? 'Best fit for your route and cabin' : 'Matches your style and budget');
+    }
+    var memTag = (kind==='stay' && plan && plan.memories && plan.memories.length) ? ' <span class="demo-tag">From memory</span>' : '';
     return '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> '+esc(label)+' <span class="demo-tag">Proposed</span></div>'+
       '<div class="ob"><div class="oname">'+esc(offer.title)+'</div>'+
       '<div class="ometa">'+meta.map(function(m){ return '<span>'+esc(String(m))+'</span>'; }).join('')+
       (offer.priceUsd!=null ? '<span class="mono">$'+Number(offer.priceUsd).toLocaleString()+'</span>' : '')+'</div>'+
-      '<div class="reason"><span class="tp"><span class="spark">✦</span> Why this one</span> '+esc(reason)+'</div></div></div>';
+      '<div class="reason"><span class="tp"><span class="spark">✦</span> Why this one'+memTag+'</span> '+esc(reason)+'</div></div></div>';
   }
 
   function presentPlanCards(plan, brief){
     var parts = [];
-    if(plan && plan.flight) parts.push(legCard('Flight', plan.flight, brief, 'flight'));
-    if(plan && plan.stay) parts.push(legCard('Hotel', plan.stay, brief, 'stay'));
+    if(plan && plan.flight) parts.push(legCard('Flight', plan.flight, brief, 'flight', plan));
+    if(plan && plan.stay) parts.push(legCard('Hotel', plan.stay, brief, 'stay', plan));
     if(!parts.length) return;
     var wrap=document.createElement('div'); wrap.className='msg from-ai plan-cards show';
     parts.forEach(function(html){ var d=document.createElement('div'); d.innerHTML=html; wrap.appendChild(d.firstChild); });
@@ -424,16 +453,33 @@
     });
   }
   function offerBook(brief){
+    var wrap=document.createElement('div'); wrap.className='msg from-ai watch-opt show';
+    wrap.innerHTML=
+      '<label class="wh"><input type="checkbox" id="watch-on" checked aria-label="Enable Trip Watch">'+
+      '<span><div class="wt">Trip Watch — always-on alerts + smart daily scans</div>'+
+      '<div class="ws">Alerts stay on for weather and disruptions. Scans adapt to risk — usually $0–3 per trip. Pass-through API cost + '+watchMeta.marginPercent+'% · capped.</div></span></label>'+
+      '<div class="wc"><span>Spend cap</span><select id="watch-cap" aria-label="Watch spend cap">'+
+      [5,10,15,25].map(function(n){ return '<option value="'+n+'"'+(n===watchCap?' selected':'')+'>'+n+' USD</option>'; }).join('')+
+      '</select><span>without asking</span></div>';
+    thread.appendChild(wrap); reveal(wrap); scroll();
+    var chk=wrap.querySelector('#watch-on');
+    var capSel=wrap.querySelector('#watch-cap');
+    if(chk) chk.onchange=function(){ watchOn=chk.checked; };
+    if(capSel) capSel.onchange=function(){ watchCap=Number(capSel.value)||10; };
     actions([
-      {label:'✦ Book it', on:function(){ executeBooking(brief); }},
-      {label:'Adjust', cls:'ghost', on:function(){ bubble('Of course — tell me what to change (dates, budget, a different hotel) and I will re-shape it.','t'); input.focus(); }}
+      {label:'✦ Book with Trip Watch', on:function(){ executeBooking(brief, false, watchOn, watchCap); }},
+      {label:'Book without watch', cls:'ghost', on:function(){ executeBooking(brief, false, false, 0); }},
+      {label:'Adjust trip', cls:'ghost', on:function(){ bubble('Of course — tell me what to change (dates, budget, a different hotel) and I will re-shape it.','t'); input.focus(); }}
     ]);
   }
 
-  function executeBooking(brief, fromSetup){
+  function executeBooking(brief, fromSetup, tripWatchEnabled, capUsd){
     typing(true);
-    window.tures.book({brief:brief}).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId); })
-    .then(function(bk){
+    var body={brief:brief};
+    if(tripWatchEnabled) body.tripWatch={enabled:true, capUsd:capUsd||watchCap};
+    window.tures.book(body).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId).then(function(conf){ return {bk:bk, conf:conf}; }); })
+    .then(function(r){
+      var bk=r.conf||r.bk;
       typing(false);
       var comps=(bk && bk.components)||[];
       var rows = comps.map(function(c){
@@ -444,14 +490,24 @@
       card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+rows;
       thread.appendChild(card); reveal(card);
       bubble('Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>','t');
+      if(tripWatchEnabled && bk.id && window.tures.getWatch){
+        window.tures.getWatch(bk.id).then(function(w){
+          if(!w||!w.enabled) return;
+          var st=document.createElement('div'); st.className='watch-status';
+          var pr=w.pricing||{};
+          st.innerHTML='Trip Watch on · risk <b>'+esc(w.riskLevel||'clear')+'</b> · cap <b>$'+esc(String(pr.capUsd||capUsd))+'</b> · alerts always on';
+          card.appendChild(st);
+          scroll();
+        }).catch(function(){});
+      }
       maybeNudge(); scroll();
     }).catch(function(e){
       typing(false);
       if(e && e.status===409){
-        if(fromSetup){ bubble('Hm — that did not go through. Your trip is still held; want me to try the booking once more.','t'); actions([{label:'Try booking again', on:function(){ executeBooking(brief, true); }}]); }
+        if(fromSetup){ bubble('Hm — that did not go through. Your trip is still held; want me to try the booking once more.','t'); actions([{label:'Try booking again', on:function(){ executeBooking(brief, true, tripWatchEnabled, capUsd); }}]); }
         else { vaultSetup(brief); }
       }
-      else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief); }}]); }
+      else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief, false, tripWatchEnabled, capUsd); }}]); }
     });
   }
 
@@ -502,9 +558,11 @@
         var wrap=document.createElement('div'); wrap.className='msg from-ai xwrap';
         groups.forEach(function(g){ wrap.appendChild(g); });
         thread.appendChild(wrap); reveal(wrap); scroll();
+      } else {
+        bubble('Discover is not wired on this engine yet — I can still book the core trip.','t');
       }
       done();
-    }).catch(function(){ typing(false); done(); });
+    }).catch(function(){ typing(false); bubble('Could not load local picks just now — the core trip is still ready to book.','t'); done(); });
   }
 
   // ── trip radar: situational awareness (the always-on watch, made visible) ──
@@ -584,7 +642,7 @@
       Promise.all(jobs).then(function(){
         c.remove();
         bubble('Sealed in your Vault — and that is the last time I will ask. Booking now.','t');
-        executeBooking(brief, true);
+        executeBooking(brief, true, watchOn, watchCap);
       });
     };
   }
@@ -693,22 +751,8 @@
   form.addEventListener('submit', function(ev){ ev.preventDefault(); demoRunning=false; send(input.value.trim()); });
   document.getElementById('btn-demo').addEventListener('click', runDemo);
 
-  // "Text Tures" → open the SAME Tures on Telegram (cross-channel). Mints a one-time link code and
-  // opens the deep link when the bot is live; otherwise leaves the default sms: preview behavior.
-  (function(){
-    var tt=document.getElementById('text-tures'); if(!tt) return;
-    tt.addEventListener('click', function(ev){
-      if(!(window.tures && tures.configured && tures.channels)) return; // fall back to the sms href
-      ev.preventDefault();
-      tures.channels.linkCode().then(function(r){
-        if(r && r.telegramDeepLink){ window.open(r.telegramDeepLink, '_blank'); }
-        else { bubble('Telegram is rolling out shortly — soon this button opens your Tures chat there, picking up right where we are now.','t'); }
-      }).catch(function(e){
-        if(e && e.status===401){ bubble('Sign in first and I can text you on Telegram — same conversation, any device.','t'); }
-        else { bubble('Could not open Telegram just now — try again in a moment.','t'); }
-      });
-    });
-  })();
+  // "Text Tures" → Telegram deep link (signed-in) or login prompt.
+  if (window.turesWirePlanTextTures) turesWirePlanTextTures();
   // voice.js sets #composer.value = brief then calls sendBrief() with no arg
   window.sendBrief = function(b){
     if(b==null){ try{ b = form.value; }catch(_){} }
@@ -759,5 +803,6 @@
 })();
 </script>
 <script src="assets/voice.js"></script>
+<script src="assets/channels-ui.js"></script>
 <script src="assets/site.js" defer></script>
 </body></html>

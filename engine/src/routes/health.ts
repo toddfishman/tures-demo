@@ -1,6 +1,9 @@
 import type { FastifyInstance } from "fastify";
 import { config } from "../config.ts";
 import { providerStatus } from "../signals/registry.ts";
+import { actionExecutorStatus } from "../actions/service.ts";
+import { browserConfigured } from "../actions/browser.ts";
+import { stagehandReady } from "../actions/stagehand.ts";
 
 export async function healthRoutes(app: FastifyInstance) {
   app.get("/health", async () => ({
@@ -26,7 +29,11 @@ export async function healthRoutes(app: FastifyInstance) {
       travelerProfile: true, // Chunk 4.5 — passport/KTN/memberships
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
       situationalAwareness: true, // Signals layer — weather/air/events/advisories radar + watcher
+      tripWatch: config.watch.enabled, // Adaptive Trip Watch — pass-through + risk-scored scans
       assist: !!config.anthropicKey, // "handle anything" concierge — web research + permissioned actions
+      actionExecutor: actionExecutorStatus(), // browserbase | simulated
+      browserAutomation: browserConfigured(),
+      stagehand: stagehandReady(), // true when Browserbase + Anthropic keyed
       crossChannel: true, // channel-link identity (web/voice/Telegram resolve to one account + memory)
       telegram: config.telegram.enabled, // the same Tures, reachable on Telegram (off until a bot token is set)
       accounts: true, // email+password logins with sessions
@@ -36,9 +43,17 @@ export async function healthRoutes(app: FastifyInstance) {
       billingLive: !!config.stripeKey && !!config.stripePriceSubscription, // real Stripe subscriptions
     },
     signals: {
-      watcherOn: config.signals.watchIntervalMin > 0, // background trip monitoring
+      watcherOn: config.signals.watchIntervalMin > 0 && !config.watch.enabled,
       watchIntervalMin: config.signals.watchIntervalMin,
-      providers: providerStatus(), // which situational feeds are wired + configured
+      tripWatch: config.watch.enabled,
+      tripWatchTickMin: config.watch.tickMin,
+      providers: providerStatus(),
+    },
+    tripWatch: {
+      enabled: config.watch.enabled,
+      pricingModel: "pass_through",
+      marginPercent: config.watch.marginPercent,
+      defaultCapUsd: config.watch.defaultCapUsd,
     },
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts
     piiVault: config.vgs.enabled ? "vgs" : "local-aes", // where passport/KTN/etc. are stored

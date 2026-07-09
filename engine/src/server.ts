@@ -31,9 +31,12 @@ import { streamRoutes } from "./routes/stream.ts";
 import { discoverRoutes } from "./routes/discover.ts";
 import { signalRoutes } from "./routes/signals.ts";
 import { assistRoutes } from "./routes/assist.ts";
+import { actionsRoutes } from "./routes/actions.ts";
 import { channelRoutes } from "./routes/channels.ts";
 import { telegramRoutes, registerTelegramWebhook } from "./routes/telegram.ts";
 import { startSignalWatcher } from "./signals/watcher.ts";
+import { startTripWatchScheduler } from "./watch/scheduler.ts";
+import { watchRoutes } from "./routes/watch.ts";
 
 export async function build() {
   const app = Fastify({ logger: false });
@@ -90,7 +93,9 @@ export async function build() {
   await app.register(streamRoutes);
   await app.register(discoverRoutes);
   await app.register(signalRoutes);
+  await app.register(watchRoutes);
   await app.register(assistRoutes);
+  await app.register(actionsRoutes);
   await app.register(channelRoutes);
   await app.register(telegramRoutes);
 
@@ -111,8 +116,10 @@ if (isMain) {
         live: config.supplier === "duffel" ? config.duffel.isLive : false,
         authProtected: !!config.apiKey,
       });
-      // Start the situational-awareness watcher (no-op unless SIGNAL_WATCH_INTERVAL_MIN>0).
-      startSignalWatcher();
+      // Start adaptive Trip Watch (pass-through + risk-scored scans). Legacy deep watcher stays
+      // off unless SIGNAL_WATCH_INTERVAL_MIN>0 AND trip watch is disabled.
+      startTripWatchScheduler();
+      if (!config.watch.enabled) startSignalWatcher();
       // Point Telegram at this engine's webhook (no-op unless a bot token is set).
       void registerTelegramWebhook();
     })

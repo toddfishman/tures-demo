@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tures needs you for a moment — pass a check or sign in, then hand back to your concierge.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>t✦ures — Your turn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .ho-page{min-height:100dvh;display:flex;flex-direction:column;padding:calc(var(--nav-h) + 24px) 0 calc(24px + env(safe-area-inset-bottom))}
+  .ho-wrap{max-width:520px;margin:0 auto;padding:0 22px;width:100%;flex:1;display:flex;flex-direction:column}
+  .ho-pulse{width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 0 rgba(255,73,41,.45);animation:hoPulse 2s ease infinite}
+  @keyframes hoPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,73,41,.45)}50%{box-shadow:0 0 0 10px rgba(255,73,41,0)}}
+  .ho-hero{text-align:center;padding:8px 0 28px}
+  .ho-hero h1{margin:18px 0 10px;font-size:clamp(1.65rem,5vw,2.1rem);line-height:1.15}
+  .ho-hero .lead{margin:0 auto;max-width:38ch;color:var(--muted);font-size:15.5px;line-height:1.55}
+  .ho-card{background:var(--bg);border:1px solid var(--line-2);border-radius:var(--radius);padding:22px;margin-bottom:16px;box-shadow:0 18px 50px rgba(26,26,26,.06)}
+  .ho-card h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:500;margin:0 0 8px}
+  .ho-card p{font-size:14.5px;color:var(--muted);line-height:1.55;margin:0}
+  .ho-steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  .ho-steps li{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+  .ho-steps .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font:600 12px 'Space Mono',monospace;color:var(--silver-deep)}
+  .ho-live{margin-top:18px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);background:var(--surface);aspect-ratio:16/10;display:grid;place-items:center;position:relative}
+  .ho-live iframe{width:100%;height:100%;border:0;background:#111}
+  .ho-live .ho-ph{padding:24px;text-align:center;color:var(--muted);font-size:13.5px}
+  .ho-live .ho-ph svg{display:block;margin:0 auto 10px;opacity:.55}
+  .ho-tag{display:inline-flex;align-items:center;gap:6px;font:500 11.5px 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--silver-deep);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+  .ho-tag.live{color:var(--acc-deep);border-color:var(--acc-line);background:var(--acc-dim)}
+  .ho-foot{margin-top:auto;padding-top:20px;display:flex;flex-direction:column;gap:10px}
+  .ho-foot .btn{width:100%;justify-content:center;padding:14px 20px;font-size:15px}
+  .ho-foot .ghost{background:transparent;border:1px solid var(--line-2);color:var(--muted)}
+  .ho-foot .ghost:hover{border-color:var(--line-2);color:var(--text)}
+  .ho-done{text-align:center;padding:40px 0 20px}
+  .ho-done .mark{width:56px;height:56px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;margin:0 auto 16px;font-size:24px}
+  .ho-err{text-align:center;padding:40px 22px;color:var(--muted)}
+  .ho-sim{font-size:12px;color:var(--warn);margin-top:10px}
+  html.dark .ho-card{box-shadow:0 18px 50px rgba(0,0,0,.25)}
+</style>
+</head>
+<body data-page="handoff">
+<main class="ho-page">
+  <div class="ho-wrap" id="ho-root">
+    <div class="ho-hero">
+      <span class="eyebrow"><span class="ho-pulse"></span> Tures paused</span>
+      <h1>Your turn for <em>30 seconds.</em></h1>
+      <p class="lead" id="ho-lead">Loading…</p>
+    </div>
+  </div>
+</main>
+<script src="assets/handoff.js"></script>
+</body></html>

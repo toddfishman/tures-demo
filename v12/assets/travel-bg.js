@@ -36,6 +36,8 @@
   };
 
   function boot() {
+    if (window.turesApplyTravelVideoPref) window.turesApplyTravelVideoPref();
+    if (document.documentElement.classList.contains("travel-video-off")) return;
     window.turesWireTravelBg();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

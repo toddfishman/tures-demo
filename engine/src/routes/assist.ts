@@ -17,6 +17,8 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
+import { ACTION_PERMISSIONS } from "../actions/catalog.ts";
+import { actionExecutorStatus } from "../actions/service.ts";
 
 const Body = z.object({
   text: z.string().min(2),
@@ -25,15 +27,10 @@ const Body = z.object({
   userId: z.string().optional(),
 });
 
-// The permission catalog — what Tures may be granted, in plain language. `readonly` actions (just
-// looking things up) can run without an explicit grant; everything else must be allowed first.
-export const PERMISSIONS: Record<string, { label: string; readonly: boolean }> = {
-  "act:research": { label: "Look things up for you on the web", readonly: true },
-  "act:contact": { label: "Contact someone on your behalf (email, message, or call)", readonly: false },
-  "act:fill_forms": { label: "Fill out and submit paperwork for you", readonly: false },
-  "act:reserve": { label: "Make a reservation or appointment for you", readonly: false },
-  "act:purchase": { label: "Spend money to resolve it", readonly: false },
-};
+/** Back-compat export — same catalog as /actions/permissions. */
+export const PERMISSIONS: Record<string, { label: string; readonly: boolean }> = Object.fromEntries(
+  Object.entries(ACTION_PERMISSIONS).map(([k, v]) => [k, { label: v.label, readonly: v.readonly }]),
+);
 
 const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_uses: 5 } as const;
 
@@ -119,7 +116,12 @@ export async function assistRoutes(app: FastifyInstance) {
         };
       });
 
-      return { answer: String(plan.answer ?? text ?? ""), actions, executor: "not_wired" };
+      return {
+        answer: String(plan.answer ?? text ?? ""),
+        actions,
+        executor: actionExecutorStatus(),
+        runHint: "Grant a permission via POST /actions/grants, then POST /actions/run to execute.",
+      };
     } catch (e: any) {
       log.error("assist failed", { message: String(e?.message ?? e), status: e?.status });
       return reply.status(502).send({ error: "assist_failed" });

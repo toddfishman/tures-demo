@@ -3,6 +3,7 @@ import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { recall, remember } from "../mem0.ts";
+import { compactConversation, capContext } from "../agent/history.ts";
 import { fuguChat } from "../agent/fugu.ts";
 
 // Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
@@ -84,13 +85,15 @@ export async function converseRoutes(app: FastifyInstance) {
     if (!config.anthropicKey && !config.sakana.enabled) {
       return reply.status(501).send({ error: "agent_not_configured", reply: "My brain isn't connected yet — no chat model is set." });
     }
-    const msgs = p.data.messages.slice(-12);
+    const msgs = compactConversation(p.data.messages);
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
     if (!msgs.length) msgs.push({ role: "user", content: "Hello — what are you?" });
+    const compacted = compactConversation(msgs);
 
-    const latestUser = [...msgs].reverse().find((m) => m.role === "user")?.content ?? "";
+    const latestUser = [...compacted].reverse().find((m) => m.role === "user")?.content ?? "";
     let system = SYSTEM;
-    if (p.data.context) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${p.data.context}`;
+    const ctx = capContext(p.data.context);
+    if (ctx) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${ctx}`;
 
     try {
       // Personalize from mem0: what we remember about this traveler (taste, past trips). No-op without a key.
@@ -112,7 +115,7 @@ export async function converseRoutes(app: FastifyInstance) {
         try {
           const f = await fuguChat(
             system,
-            msgs,
+            compacted,
             { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
             320,
           );
@@ -134,7 +137,7 @@ export async function converseRoutes(app: FastifyInstance) {
         try {
           const forced = await fuguChat(
             system,
-            [...msgs, { role: "assistant", content: text }, { role: "user", content: "Call submit_brief now with the essentials you have." }],
+            [...compacted, { role: "assistant", content: text }, { role: "user", content: "Call submit_brief now with the essentials you have." }],
             { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
             320,
             true,
@@ -168,7 +171,7 @@ export async function converseRoutes(app: FastifyInstance) {
               max_tokens: 320,
               system,
               tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
-              messages: msgs,
+              messages: compacted,
             }).finalMessage();
           } catch (err) {
             const m = String((err && (err as any).message) || err);

@@ -95,6 +95,16 @@
   .ao-band .ao-link:hover{color:var(--acc)}
   .ao-band .ao-link:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
   @media (max-width:680px){.ao-band .ao-pts{grid-template-columns:1fr}}
+
+  /* Trip Watch pass-through band */
+  .tw-band{margin:32px auto 0;max-width:880px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:26px}
+  .tw-band h3{margin:0 0 8px}
+  .tw-band .tw-sub{color:var(--muted);font-size:14.5px;line-height:1.55;max-width:62ch}
+  .tw-band .tw-grid{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .tw-band .tw-cell{font-size:13.5px;color:var(--muted);line-height:1.45}
+  .tw-band .tw-cell b{color:var(--text);font-weight:600;display:block;margin-bottom:2px}
+  .tw-band .tw-note{margin-top:16px;font-size:12.5px;color:var(--faint)}
+  @media (max-width:680px){.tw-band .tw-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-page="pricing">
@@ -104,7 +114,7 @@
   <section class="wrap price-hero">
     <span class="eyebrow"><span class="dot"></span> Pricing</span>
     <h1 class="serif">Two ways <em>in.</em></h1>
-    <p class="lead center">Pay per trip when you book, or keep Tures on around the clock with Concierge — the always-on watch that rebooks around trouble before it reaches you.</p>
+    <p class="lead center">Pay per trip when you book, or keep Tures on around the clock with Concierge — always-on Trip Watch and the Hiccup Handler that rebooks before trouble reaches you.</p>
   </section>
 
   <!-- TIERS -->
@@ -121,6 +131,7 @@
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>The <b>best card chosen per charge</b> for points and protection.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>A <b>thorough taste profile</b> so every pick sounds like you.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>Your <b>AI text assistant</b>, ready whenever a trip comes up.</span></li>
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>Optional <b>Trip Watch</b> at booking — alerts always on; smart scans billed pass-through (you set the cap).</span></li>
         </ul>
         <a class="btn ghost" href="plan.html" style="margin-top:auto">Start with a trip</a>
       </article>
@@ -137,6 +148,7 @@
         <p class="terms" id="cc-terms">Always on. No per-booking fee — book as much as you travel.</p>
         <div class="adds">Everything in Per trip, plus</div>
         <ul class="feats">
+          <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Trip Watch included</b> — always-on alerts + adaptive scans ($25 API cap, pass-through).</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>Always-on <b>Hiccup Handler</b> — catches delays and weather, and rebooks before you notice.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>A <b>real person in triage</b> when a moment truly calls for one.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Where you've been</b> — your travel history, kept and searchable.</span></li>
@@ -148,7 +160,18 @@
 
     </div>
 
-    <p class="same-line"><b>Per trip is pay-as-you-go; Concierge keeps the watch on.</b> The always-on Hiccup Handler is what the monthly buys — and it pays for itself the first time it saves a trip.</p>
+    <p class="same-line"><b>Per trip is pay-as-you-go; Concierge keeps the watch on.</b> Trip Watch uses real API sources — we pass through the cost plus 20%, capped so you never get surprised.</p>
+
+    <div class="tw-band" aria-labelledby="tw-band-title">
+      <h3 id="tw-band-title" class="serif">Trip Watch — <em>how billing works</em></h3>
+      <p class="tw-sub">An optional add-on at booking (included with Concierge). <b>Alerts stay on</b> for weather and disruptions. <b>Smart scans</b> run only when risk warrants it — a morning brief scores the trip, then schedules zero to three scans that day.</p>
+      <div class="tw-grid">
+        <div class="tw-cell"><b>Always on</b> Weather thresholds + disruption alerts. Free sources where possible.</div>
+        <div class="tw-cell"><b>Adaptive scans</b> More checks on high-risk days; quiet days stay quiet.</div>
+        <div class="tw-cell"><b>Pass-through + 20%</b> You pick a cap ($5–25). Typical trip: $0–3. We never exceed your cap without approval.</div>
+      </div>
+      <p class="tw-note">Deep live-source scans (when needed) use our research layer — not browser automation. You see itemized spend on each trip.</p>
+    </div>
 
     <div class="ao-band" aria-labelledby="ao-band-title">
       <div class="ao-top">
@@ -190,6 +213,10 @@
       <details>
         <summary><span class="q">When am I charged</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
         <div class="a">On Per trip, only when a trip actually books — confirmation numbers in hand. On Concierge, it is $129 a month — or $97 a month billed yearly, saving 25% — with no per-booking fee. Either way, nothing is charged for a trip that does not complete.</div>
+      </details>
+      <details>
+        <summary><span class="q">What is Trip Watch</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Trip Watch monitors your booked trip — weather, air quality, and disruption signals — with alerts always on. Smart scans adapt to risk: clear days get fewer checks; elevated days get more. API costs are passed through to you with a 20% margin, hard-capped at the limit you set at booking (usually $10; Concierge includes a $25 cap). Alerts keep running even if scan spend hits the cap.</div>
       </details>
       <details>
         <summary><span class="q">What is the Hiccup Handler</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>

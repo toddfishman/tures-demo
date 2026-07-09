@@ -58,7 +58,7 @@
     <p class="sub">So your trips, Vault, and Telegram link belong to you — not a guest session.</p>
     <div class="grp"><label for="su-email">Email</label><input class="field" id="su-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
     <div class="grp"><label for="su-pass">Password</label><input class="field" id="su-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
-    <p style="font-size:12.5px;color:var(--muted)">Rolling out by invitation — this creates a local preview profile. Live auth connects when your seat opens.</p>
+    <p style="font-size:12.5px;color:var(--muted)">Creates a real account on the engine — same one Vault and Telegram use. <a href="login.html" style="color:var(--acc-deep);font-weight:600">Sign in</a> if you already have one.</p>
   </section>
 
   <section class="su-panel" data-step="2">
@@ -112,9 +112,18 @@
   next.onclick=function(){
     if(step===1){
       if(!val('su-email')) return;
-      F.setTraveler({ email:val('su-email') });
-      try{ if(T&&T.configured&&T.signUp) T.signUp({email:val('su-email'),password:val('su-pass')||'preview-demo'}).catch(function(){}); }catch(_){}
-      step=2; render(); return;
+      var suName=val('su-name')||'Traveler';
+      F.setTraveler({ email:val('su-email'), name:suName });
+      var btn=next; btn.disabled=true; btn.textContent='Creating…';
+      var p=T&&T.configured&&T.signUp
+        ? T.signUp(suName, val('su-email'), val('su-pass')||'preview-demo8')
+        : Promise.resolve();
+      p.then(function(){
+        step=2; render();
+      }).catch(function(){
+        alert('Could not create account — try login.html or continue as guest.');
+      }).finally(function(){ btn.disabled=false; btn.textContent= step===3?'Finish':'Continue'; });
+      return;
     }
     if(step===2){
       var card=val('su-card'), last4=(card.match(/(\d{4})\s*$/)||[])[1]||card.replace(/\D/g,'').slice(-4);

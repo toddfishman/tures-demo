@@ -67,4 +67,6 @@ export interface Booking {
   idempotencyKey?: string;
   createdAt: string;
   updatedAt: string;
+  /** Trip Watch opt-in from booking — enabled after successful confirm. */
+  watch?: { requested: boolean; capUsd?: number };
 }

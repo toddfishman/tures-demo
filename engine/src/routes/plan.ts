@@ -16,8 +16,10 @@ export async function planRoutes(app: FastifyInstance) {
     const tripId = `trip_${Date.now().toString(36)}_p${planCounter++}`;
     // Optional stable memory id (same one the conversational agent uses) so the planner shares the
     // traveler's mem0 memory. Read alongside the brief; BriefSchema ignores it.
-    const memoryKey = typeof (req.body as any)?.userId === "string" ? (req.body as any).userId : undefined;
-    const plan = await proposePlan(tripId, parsed.data, resolveAccountId(req), memoryKey);
+    const accountId = resolveAccountId(req);
+    const body = req.body as { userId?: string };
+    const memoryKey = body.userId || (accountId !== "demo" ? accountId : undefined);
+    const plan = await proposePlan(tripId, parsed.data, accountId, memoryKey);
     return plan;
   });
 }

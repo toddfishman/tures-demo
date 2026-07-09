@@ -11,6 +11,9 @@ import { getSupplier } from "../suppliers/index.ts";
 import { runSearch } from "../search/service.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
+import { remember } from "../mem0.ts";
+import { enableTripWatch } from "../watch/service.ts";
+import { getUser } from "../auth/index.ts";
 import { chooseCard, categoryForKind } from "../wallet/cards.ts";
 import { passengerSummary, loyaltyCrediter } from "../profile/index.ts";
 
@@ -29,6 +32,8 @@ export interface CreateBookingInput {
   idempotencyKey?: string;
   /** Tures concierge fee to collect with this booking (per-trip pricing; 0 for subscribers). */
   feeUsd?: number;
+  /** Adaptive Trip Watch — pass-through metered monitoring (opt-in). */
+  tripWatch?: { enabled: boolean; capUsd?: number };
 }
 
 export async function createBooking(tripId: string, input: CreateBookingInput): Promise<Booking> {
@@ -68,6 +73,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     violations,
     audit: [],
     idempotencyKey: input.idempotencyKey,
+    watch: input.tripWatch?.enabled ? { requested: true, capUsd: input.tripWatch.capUsd } : undefined,
     createdAt: now,
     updatedAt: now,
   };
@@ -175,6 +181,23 @@ async function execute(booking: Booking): Promise<Booking> {
     const anySim = booking.components.some((c) => c.simulated);
     audit(booking, "system", "booked", anySim ? "all components confirmed (simulated)" : "all components confirmed");
     emitEvent(booking.tripId, "notify", anySim ? "Trip booked (simulated)" : "Trip booked", { detail: `${booking.components.length} components · $${booking.totalUsd.toLocaleString()}${anySim ? " · sample confirmations, no money moved" : ""}`, data: { bookingId: booking.id, simulated: anySim } });
+    if (booking.accountId && booking.accountId !== "demo") {
+      const dest = booking.brief.destination || "trip";
+      const legs = booking.components.map((c) => c.title).filter(Boolean).slice(0, 4).join(", ");
+      void remember(booking.accountId, [
+        { role: "user", content: `Booked ${dest}` },
+        { role: "assistant", content: `Confirmed ${legs || "trip components"}. Total $${booking.totalUsd.toLocaleString()}${anySim ? " (sample booking)" : ""}.` },
+      ]);
+    }
+    if (booking.watch?.requested) {
+      void enableTripWatch(booking.id, { capUsd: booking.watch.capUsd }).catch((e) =>
+        log.warn("trip watch enable failed", { bookingId: booking.id, err: String(e) }),
+      );
+    } else if (getUser(booking.accountId)?.plan === "subscribe") {
+      void enableTripWatch(booking.id, {}).catch((e) =>
+        log.warn("trip watch enable failed (concierge)", { bookingId: booking.id, err: String(e) }),
+      );
+    }
   } catch (e) {
     booking.status = "failed";
     booking.violations.push(String(e));

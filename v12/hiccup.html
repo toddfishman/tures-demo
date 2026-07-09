@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="assets/v12.css">
 <script src="assets/engine.js"></script>
 <script src="assets/funnel.js"></script>
+<script src="assets/trip-stream.js"></script>
 <style>
   /* ============ page-specific: the Hiccup Handler ============ */
 
@@ -97,9 +98,7 @@
   .save .sf{padding:16px 26px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
 
   /* ---- phone mockups (saved before you noticed) ---- */
-  .phones{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .mini-phone{background:var(--surface);border-radius:32px;padding:11px;box-shadow:0 36px 70px -44px rgba(0,0,0,.4),0 0 0 1px var(--line-2)}
-  .mini-phone .mscreen{background:var(--bg);border-radius:24px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;min-height:430px}
+  .phones{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:start}
   .mini-phone .mhead{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
   .mini-phone .mname{font-weight:500;font-size:14px;line-height:1.2}
   .mini-phone .msub{font-size:11px;color:var(--good);display:flex;align-items:center;gap:5px}
@@ -613,6 +612,50 @@
         setStatus('All clear','ok');
         row({cls:'good', icon:CHK, kicker:'Held & watching', html:'Sample Maui trip held and confirmed (mock $0). Every leg is now under watch — flights, hotel, the table. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
         startBtn.style.display='none'; disruptWrap.hidden = false; disableDisrupt(false); busy = false;
+        if (window.turesTripStream && booking.tripId) {
+          if (window.__hiccupStream) window.__hiccupStream.close();
+          window.__hiccupStream = turesTripStream.watch(booking.tripId, {
+            onEvent: function (ev) {
+              if (ev.kind === "search" || ev.kind === "score" || ev.kind === "propose" || ev.kind === "status") return;
+              if (ev.label === "Rebooking needs your OK") {
+                var pr = row({ cls: "det", icon: FIX, kicker: "Proposed fix", html: esc(ev.detail || "Found a workable alternative.") });
+                var act = document.createElement("div");
+                act.className = "mon-act";
+                act.innerHTML = '<button class="btn sm" data-approve="1" type="button">Approve the swap</button><button class="btn ghost sm" data-hold="1" type="button">Hold</button>';
+                pr.querySelector(".bd").appendChild(act);
+                setStatus("Awaiting your OK", "act");
+                act.querySelector("[data-approve]").addEventListener("click", function () {
+                  Array.prototype.forEach.call(act.querySelectorAll("button"), function (x) { x.disabled = true; });
+                  row({ cls: "good", icon: CHK, kicker: "Rebooked", html: "Swap approved — confirmed on the alternative. Hotel and ground held to match. <span class=\"demo-tag\" style=\"margin-left:4px\">Sample</span>" });
+                  setStatus("Handled", "ok");
+                });
+                act.querySelector("[data-hold]").addEventListener("click", function () {
+                  Array.prototype.forEach.call(act.querySelectorAll("button"), function (x) { x.disabled = true; });
+                  row({ kicker: "Held", text: "Kept the original for now — still watching." });
+                  setStatus("All clear", "ok");
+                });
+                return;
+              }
+              if (ev.kind === "hiccup") {
+                row({ cls: "det", icon: FIX, kicker: (ev.data && ev.data.signalId) ? "Radar · live" : "Hiccup", text: ev.detail || ev.label });
+                if (ev.data && ev.data.travelImpacting) setStatus("Handling", "act");
+                return;
+              }
+              if (ev.kind === "notify") {
+                row({ cls: "good", icon: CHK, kicker: ev.label, text: ev.detail || "" });
+                setStatus("Handled", "ok");
+                return;
+              }
+              if (ev.kind === "error") {
+                row({ cls: "det", icon: DET, kicker: ev.label, text: ev.detail || "" });
+                return;
+              }
+              if (ev.kind === "book" || ev.kind === "confirm") {
+                row({ cls: "good", icon: CHK, kicker: ev.label, text: ev.detail || "" });
+              }
+            },
+          });
+        }
       })
       .catch(function(e){
         setStatus('Error','warn');

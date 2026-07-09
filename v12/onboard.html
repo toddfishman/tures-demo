@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="assets/v12.css">
 <script src="assets/engine.js"></script>
 <script src="assets/funnel.js"></script>
+<script src="assets/account-sync.js"></script>
+<script src="assets/channels-ui.js"></script>
 <style>
   .ob-wrap{max-width:680px;margin:0 auto;padding:0 22px}
   .ob-hero{padding:60px 0 14px;text-align:center}
@@ -203,15 +205,6 @@
   function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
   function setDone(card, done){ card.classList.toggle('done', !!done); }
 
-  // ── prefill from existing state ──
-  if(tr.name) document.getElementById('e-name').value = tr.name;
-  if(tr.dob) document.getElementById('e-dob').value = tr.dob;
-  if(tr.homeAirport) document.getElementById('e-home').value = tr.homeAirport;
-  if(tr.email || (T&&T.account&&T.account.email)) document.getElementById('e-email').value = tr.email || T.account.email;
-  if(tr.phone) document.getElementById('e-phone').value = tr.phone;
-  if(v.payment && v.payment[0]) document.getElementById('e-card').value = v.payment[0].last4 ? ('•••• '+v.payment[0].last4) : '';
-  if(v.identity){ if(v.identity.passport){ document.getElementById('d-pass').value=v.identity.passport.number||''; document.getElementById('d-country').value=v.identity.passport.country||''; } if(v.identity.ktn) document.getElementById('d-ktn').value=v.identity.ktn; }
-
   // ── loyalty repeatable rows ──
   var loyList = document.getElementById('loy-list');
   function loyRow(data){
@@ -225,7 +218,41 @@
     row.querySelector('.rm').onclick=function(){ row.remove(); };
     loyList.appendChild(row);
   }
-  (v.loyalty && v.loyalty.length ? v.loyalty : [{}]).forEach(loyRow);
+  function rebuildLoyalty(){
+    var vv = F.vault() || {};
+    loyList.innerHTML = '';
+    (vv.loyalty && vv.loyalty.length ? vv.loyalty : [{}]).forEach(loyRow);
+  }
+  rebuildLoyalty();
+
+  // ── prefill from local + engine state ──
+  function applyState(){
+    tr = F.traveler() || {}; v = F.vault() || {};
+    if(tr.name) document.getElementById('e-name').value = tr.name;
+    if(tr.dob) document.getElementById('e-dob').value = tr.dob;
+    if(tr.homeAirport) document.getElementById('e-home').value = tr.homeAirport;
+    if(tr.email || (T&&T.account&&T.account.email)) document.getElementById('e-email').value = tr.email || (T&&T.account&&T.account.email) || '';
+    if(tr.phone) document.getElementById('e-phone').value = tr.phone;
+    if(v.payment && v.payment[0]){
+      var p0=v.payment[0];
+      var last4=(p0.last4||String(p0.label||'').replace(/\D/g,'').slice(-4));
+      if(last4) document.getElementById('e-card').value='•••• '+last4;
+    }
+    if(v.identity){
+      if(v.identity.passport){
+        var pass = typeof v.identity.passport==='string' ? v.identity.passport : (v.identity.passport.number||'');
+        if(pass) document.getElementById('d-pass').value=pass;
+        if(v.identity.passport.country) document.getElementById('d-country').value=v.identity.passport.country;
+      }
+      if(v.identity.ktn) document.getElementById('d-ktn').value=v.identity.ktn;
+    }
+    rebuildLoyalty();
+    refresh();
+  }
+  applyState();
+  var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
+  sync.then(applyState);
+
   document.getElementById('loy-add').onclick=function(){ loyRow({}); };
 
   // ── saves ──
@@ -253,23 +280,6 @@
     setDone(document.getElementById('c-loyalty'), rows.length>0); refresh(); openNext(document.getElementById('c-loyalty'));
   };
 
-  // ── telegram: mint a one-time link code from the engine and open the deep link when the bot is
-  //    live; otherwise capture intent gracefully. The link binds this Telegram to the account so the
-  //    same Tures (memory + trips) follows you there.
-  document.getElementById('tg-connect').onclick=function(){
-    F.setTraveler({ telegram:'requested' });
-    setDone(document.getElementById('c-telegram'), true); refresh();
-    var soon=document.getElementById('tg-soon');
-    if(!(T && T.configured && T.channels)){ soon.textContent='Telegram is rolling out shortly — we will open your Tures chat there the moment it is live.'; return; }
-    soon.textContent='Starting the link…';
-    T.channels.linkCode().then(function(r){
-      if(r && r.telegramDeepLink){ window.open(r.telegramDeepLink, '_blank'); soon.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; }
-      else { soon.textContent='Your account is ready. Telegram is rolling out shortly — we will open your Tures chat there the moment the channel is live.'; }
-    }).catch(function(e){
-      soon.textContent = (e && e.status===401) ? 'Sign in first, then connect Telegram so it links to your account.' : 'Could not start the link just now — try again in a moment.';
-    });
-  };
-
   // ── skip handlers ──
   [].forEach.call(document.querySelectorAll('.ob-skip'), function(b){
     b.onclick=function(){ var card=b.closest('.ob-card'); openNext(card); };
@@ -292,6 +302,15 @@
     document.getElementById('p-togo').textContent = togo;
   }
   refresh();
+  if (window.turesWireTelegramUi) {
+    turesWireTelegramUi({
+      button: document.getElementById("tg-connect"),
+      subtitle: document.getElementById("tg-soon"),
+      subtitleDefault: "Link Telegram so Tures can reach you on the go.",
+      buttonLabel: "Connect Telegram",
+      onLinked: function () { F.setTraveler({ telegram: "linked" }); setDone(document.getElementById("c-telegram"), true); refresh(); }
+    });
+  }
 })();
 </script>
 </body></html>

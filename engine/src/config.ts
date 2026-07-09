@@ -85,6 +85,19 @@ const Env = z.object({
   NEWS_API_KEY: z.string().optional(),
   X_BEARER_TOKEN: z.string().optional(),
   TRAFFIC_API_KEY: z.string().optional(),
+  // ── Adaptive Trip Watch (pass-through metering + risk-scored scans) ───────────────
+  TRIP_WATCH_ENABLED: z.enum(["true", "false"]).default("true"),
+  TRIP_WATCH_TICK_MIN: z.coerce.number().int().positive().default(60),
+  TRIP_WATCH_ALERTS_INTERVAL_MIN: z.coerce.number().int().positive().default(120),
+  TRIP_WATCH_BRIEF_HOUR_UTC: z.coerce.number().int().min(0).max(23).default(7),
+  TRIP_WATCH_DEFAULT_CAP_USD: z.coerce.number().positive().default(10),
+  TRIP_WATCH_SUBSCRIBER_CAP_USD: z.coerce.number().positive().default(25),
+  TRIP_WATCH_MARGIN_PERCENT: z.coerce.number().int().min(0).max(100).default(20),
+  // ── Action Executor — Browserbase + Stagehand ───────────────────────────────────────
+  BROWSERBASE_API_KEY: z.string().optional(),
+  BROWSERBASE_PROJECT_ID: z.string().optional(),
+  /** Stagehand agent model — provider/model, e.g. anthropic/claude-sonnet-4-6 */
+  ACTION_MODEL: z.string().default("anthropic/claude-sonnet-4-6"),
 });
 
 const parsed = Env.parse(process.env);
@@ -109,6 +122,15 @@ export const config = {
     newsApiKey: parsed.NEWS_API_KEY,
     xBearerToken: parsed.X_BEARER_TOKEN,
     trafficApiKey: parsed.TRAFFIC_API_KEY,
+  },
+  watch: {
+    enabled: parsed.TRIP_WATCH_ENABLED === "true",
+    tickMin: parsed.TRIP_WATCH_TICK_MIN,
+    alertsIntervalMin: parsed.TRIP_WATCH_ALERTS_INTERVAL_MIN,
+    briefHourUtc: parsed.TRIP_WATCH_BRIEF_HOUR_UTC,
+    defaultCapUsd: parsed.TRIP_WATCH_DEFAULT_CAP_USD,
+    subscriberCapUsd: parsed.TRIP_WATCH_SUBSCRIBER_CAP_USD,
+    marginPercent: parsed.TRIP_WATCH_MARGIN_PERCENT,
   },
   stripeKey: parsed.STRIPE_SECRET_KEY,
   vaultKey: parsed.VAULT_KEY,
@@ -160,4 +182,14 @@ export const config = {
   get supplier(): "duffel" | "mock" {
     return parsed.DUFFEL_API_TOKEN ? "duffel" : "mock";
   },
+  /** Browserbase — cloud browsers for permissioned actions (login, forms, purchases on sites). */
+  browserbase: {
+    apiKey: parsed.BROWSERBASE_API_KEY,
+    projectId: parsed.BROWSERBASE_PROJECT_ID,
+    get enabled(): boolean {
+      return !!(parsed.BROWSERBASE_API_KEY && parsed.BROWSERBASE_PROJECT_ID);
+    },
+  },
+  /** Stagehand agent model for browser actions (uses ANTHROPIC_API_KEY by default). */
+  actionModel: parsed.ACTION_MODEL,
 } as const;

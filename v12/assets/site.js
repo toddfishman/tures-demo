@@ -23,7 +23,8 @@
       { href: "plan.html",      label: "Plan a trip",      page: "plan" },
       { href: "onboard.html",   label: "Set up Tures",     page: "onboard" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
-      { href: "signup.html",    label: "Join the waitlist", page: "signup" }
+      { href: "signup.html",    label: "Join the waitlist", page: "signup" },
+      { href: "login.html",     label: "Sign in",           page: "login" }
     ]},
     { title: "Features", items: [
       { href: "taste.html",     label: "The Taste Engine",  page: "taste" },
@@ -33,6 +34,8 @@
       { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup" }
     ]},
     { title: "More", items: [
+      { href: "LAUNCH.md",      label: "Launch checklist",  page: "launch" },
+      { href: "CHECKLIST.md",   label: "Product checklist", page: "checklist" },
       { href: "about.html",     label: "About",            page: "about" },
       { href: "legal.html",     label: "Privacy & Terms",  page: "legal" }
     ]}
@@ -44,9 +47,27 @@
   var MARK = 't<span class="spark">✦</span>ures';
 
   /* ---- travel backdrop (assets/travel-bg.mp4 — portrait-cut, cover on desktop) ---- */
+  var VID_KEY = "tures.travelVideo";
+  function travelVideoOn() {
+    try {
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+      return localStorage.getItem(VID_KEY) !== "off";
+    } catch (_) { return true; }
+  }
+  function applyTravelVideoPref() {
+    var on = travelVideoOn();
+    document.documentElement.classList.toggle("travel-video-off", !on);
+    if (!on) {
+      [].slice.call(document.querySelectorAll("video.v11-travel-vid, .v11-travel-bg video, .px-bg-inner video, .hb-bg video, .bg video")).forEach(function (v) {
+        try { v.pause(); } catch (_) {}
+      });
+    }
+  }
+  window.turesApplyTravelVideoPref = applyTravelVideoPref;
+
   (function () {
     if (document.body.getAttribute("data-no-travel-bg") === "1") return;
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = !travelVideoOn();
     var asset = "assets/";
     var bg = document.createElement("div");
     bg.className = "v11-travel-bg";
@@ -59,8 +80,34 @@
     scrim.className = "v11-travel-scrim";
     scrim.setAttribute("aria-hidden", "true");
     document.documentElement.classList.add("v11-travel-on");
+    if (reduce) document.documentElement.classList.add("travel-video-off");
     document.body.insertBefore(bg, document.body.firstChild);
     document.body.insertBefore(scrim, bg.nextSibling);
+  })();
+
+  /* inconspicuous bg-video off toggle (fixed, bottom-left) */
+  (function () {
+    var page = document.body.getAttribute("data-page") || "";
+    var hasVid = document.body.getAttribute("data-no-travel-bg") !== "1" || page === "cover" || page === "demo";
+    if (!hasVid) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "v11-vid-toggle";
+    btn.setAttribute("aria-pressed", travelVideoOn() ? "true" : "false");
+    btn.setAttribute("aria-label", travelVideoOn() ? "Turn background video off" : "Turn background video on");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8v8l4-3V5L4 8zm11-1.2a1 1 0 0 1 1.53.85v8.7a1 1 0 0 1-1.53.85L11 14H9v5a1 1 0 0 1-1.7.7L3.8 15.5A1.6 1.6 0 0 1 3.2 14V10c0-.6.2-1.1.6-1.5L7.3 4.3A1 1 0 0 1 9 5v5h2l4-3.2z"/></svg>';
+    btn.addEventListener("click", function () {
+      var on = !travelVideoOn();
+      try { localStorage.setItem(VID_KEY, on ? "on" : "off"); } catch (_) {}
+      applyTravelVideoPref();
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.setAttribute("aria-label", on ? "Turn background video off" : "Turn background video on");
+      btn.classList.toggle("off", !on);
+      if (on && window.turesWireTravelBg) window.turesWireTravelBg();
+    });
+    if (!travelVideoOn()) btn.classList.add("off");
+    document.body.appendChild(btn);
+    applyTravelVideoPref();
   })();
 
   /* ---- top nav: 3 zones — logo+menu · plan input · account ---- */
@@ -183,7 +230,7 @@
     var setupRow = st ? '<a class="setup" href="' + ((nx && nx.href) || "trips.html") + '"><span>Your setup</span><span class="pct">' + st.percent + '%</span></a>' : '';
     var auth = signed
       ? '<button class="signout" id="v11-signout" type="button">Sign out</button>'
-      : '<a href="signup.html">Sign in</a><a class="req" href="signup.html">Join the waitlist</a>';
+      : '<a href="login.html">Sign in</a><a class="req" href="signup.html">Join the waitlist</a>';
     menu.innerHTML = head + '<div class="sec">' + member + '</div>' + (setupRow ? '<div class="sec">' + setupRow + '</div>' : '') + '<div class="sec">' + auth + '</div>';
     var so = document.getElementById("v11-signout");
     if (so) so.addEventListener("click", function () { try { window.tures.signOut(); } catch (_) {} location.reload(); });

@@ -29,6 +29,13 @@
   --silver:#a7afbb;
   --silver-2:#cdd3dc;
   --silver-deep:#79828f;
+  /* phone mockup — iPhone-class 9:19.5 */
+  --phone-ar: 9 / 19.5;
+  --phone-h-cap: min(620px, 72vh);
+  --phone-w: min(286px, calc(var(--phone-h-cap) * 9 / 19.5), 78vw);
+  --phone-pad: 10px;
+  --phone-r-outer: 44px;
+  --phone-r-screen: 36px;
   --silver-sheen:linear-gradient(115deg,#eef1f5,#c0c8d2 40%,#f1f3f6 70%,#cdd3dc);
   --radius:18px;
   --maxw:1180px;
@@ -65,14 +72,21 @@ html.v11-travel-on body{background:transparent !important}
 html.v11-travel-on .v11-travel-bg{
   position:fixed;inset:0;z-index:-2;overflow:hidden;background:#0c0e12;
 }
-html.v11-travel-on .v11-travel-vid{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;
-  object-position:center center;
-  opacity:0;
-  transition:opacity .25s ease;
+html.v11-travel-on .v11-travel-vid,
+html.v11-travel-on video.v11-travel-vid{
+  position:absolute;top:50%;left:50%;
+  min-width:100%;min-height:100%;
+  width:auto;height:auto;max-width:none;
+  transform:translate(-50%,-50%);
+  object-fit:cover;object-position:center center;
+  opacity:0;transition:opacity .25s ease;
 }
 html.v11-travel-on .v11-travel-bg.vid-ready .v11-travel-vid{opacity:1}
+html.travel-video-off.v11-travel-on .v11-travel-vid,
+html.travel-video-off.v11-travel-on video.v11-travel-vid{display:none}
+html.travel-video-off.v11-travel-on .v11-travel-bg{
+  background:url('assets/travel-bg.jpg') center/cover no-repeat #0c0e12;
+}
 html.v11-travel-on .v11-travel-scrim{
   position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
@@ -177,10 +191,18 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
   box-shadow:0 0 0 3px var(--acc-dim);
 }
 
-/* ---- frames ---- */
-.phone{width:360px;max-width:100%;background:var(--surface);border-radius:40px;padding:14px;border:2px solid var(--text);
-  box-shadow:0 40px 80px -40px rgba(0,0,0,.4)}
-.phone .screen{background:var(--bg);border-radius:28px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column}
+/* ---- phone device frame (shared proportions) ---- */
+.phone{
+  position:relative;width:var(--phone-w);max-width:100%;flex:0 0 auto;
+  padding:var(--phone-pad);border-radius:var(--phone-r-outer);
+  background:var(--surface);border:2px solid var(--text);
+  box-shadow:0 40px 80px -40px rgba(0,0,0,.4);
+}
+.phone .screen{
+  width:100%;aspect-ratio:var(--phone-ar);max-height:var(--phone-h-cap);height:auto;
+  background:var(--bg);border-radius:var(--phone-r-screen);overflow:hidden;
+  border:1px solid var(--line);display:flex;flex-direction:column;position:relative;
+}
 .browser{background:var(--bg);border:1px solid var(--line-2);border-radius:16px;overflow:hidden;
   box-shadow:0 50px 100px -50px rgba(0,0,0,.32)}
 .browser .titlebar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
@@ -356,6 +378,20 @@ html.dark .v11-theme .sun{display:none}
 html.dark .v11-theme .moon{display:block}
 @media(max-width:620px){.v11-theme{width:36px;height:36px}}
 
+/* bg video off — inconspicuous fixed toggle */
+.v11-vid-toggle{
+  position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:max(12px,env(safe-area-inset-left));z-index:70;
+  width:34px;height:34px;border-radius:50%;padding:0;cursor:pointer;
+  border:1px solid var(--line-2);background:rgba(255,255,255,.78);backdrop-filter:blur(8px);
+  color:var(--muted);opacity:.42;transition:opacity .2s,border-color .2s,background .2s;
+}
+.v11-vid-toggle:hover{opacity:.88;border-color:var(--acc-line)}
+.v11-vid-toggle svg{width:15px;height:15px;fill:currentColor;stroke:none;display:block;margin:0 auto}
+.v11-vid-toggle.off{opacity:.62}
+html.dark .v11-vid-toggle{background:rgba(22,22,28,.82);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.55)}
+html.px-cover .v11-vid-toggle{background:rgba(8,10,14,.45);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.65)}
+@media(max-width:620px){.v11-vid-toggle{width:32px;height:32px;opacity:.38}}
+
 /* ---- mobile bottom tab bar (app shell) ---- */
 .v11-tabbar{display:none}
 @media(max-width:620px){
@@ -432,8 +468,27 @@ html.px-cover .v11-foot{margin-top:0}
 .px-panel--hero{min-height:100dvh;display:flex;align-items:flex-end;padding:calc(var(--nav-h) + 24px) 24px 48px}
 .px-bg{position:absolute;inset:0;overflow:hidden;z-index:0;background:#0a0c10}
 .px-bg-inner{position:absolute;inset:-8%;width:116%;height:116%;will-change:transform;background:#0a0c10;isolation:isolate}
-.px-bg-inner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;z-index:0;transition:opacity .25s ease}
-.px-bg-inner.vid-ready video{opacity:1}
+.px-bg-inner video,
+.hb-bg video,
+.bg video{
+  position:absolute;top:50%;left:50%;
+  min-width:100%;min-height:100%;
+  width:auto;height:auto;max-width:none;
+  transform:translate(-50%,-50%);
+  object-fit:cover;object-position:center center;
+  opacity:0;z-index:0;transition:opacity .25s ease;
+}
+.px-bg-inner.vid-ready video,
+.hb-bg.vid-ready video,
+.bg.vid-ready video{opacity:1}
+html.travel-video-off .px-bg-inner video,
+html.travel-video-off .hb-bg video,
+html.travel-video-off .bg video{display:none}
+html.travel-video-off .px-bg-inner,
+html.travel-video-off .hb-bg,
+html.travel-video-off .bg{
+  background:url('assets/travel-bg.jpg') center/cover no-repeat #0a0c10;
+}
 .px-scrim{position:absolute;inset:0;background:
   linear-gradient(to top, rgba(8,10,14,.82) 0%, rgba(8,10,14,.28) 42%, rgba(8,10,14,.52) 100%),
   radial-gradient(ellipse 80% 60% at 22% 78%, rgba(255,73,41,.14), transparent 70%)}
@@ -478,7 +533,7 @@ html.dark .px-scrim{background:
 .px-demo-tabs button.on{border-color:var(--acc);color:var(--acc-deep);background:var(--acc-dim)}
 /* compact demo phone (below fold) — realistic device frame */
 .px-phone{
-  position:relative;width:min(318px,84vw);padding:11px;border-radius:48px;flex:0 0 auto;
+  position:relative;width:var(--phone-w);padding:var(--phone-pad);border-radius:calc(var(--phone-r-outer) + 4px);flex:0 0 auto;
   background:linear-gradient(155deg,#4a4a52 0%,#1c1c22 38%,#2a2a32 62%,#15151a 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.14),
@@ -489,13 +544,14 @@ html.dark .px-scrim{background:
     0 12px 28px -12px rgba(0,0,0,.35);
 }
 .px-phone-side{position:absolute;width:3px;border-radius:2px;background:linear-gradient(180deg,#5c5c66,#2a2a32);z-index:0}
-.px-phone-side--l{left:-2px;top:108px;height:56px;box-shadow:inset -1px 0 0 rgba(255,255,255,.08)}
-.px-phone-side--l::after{content:"";position:absolute;left:0;top:68px;width:3px;height:36px;border-radius:2px;background:inherit;box-shadow:inherit}
-.px-phone-side--r{right:-2px;top:128px;height:72px;box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
-.px-phone-bezel{border-radius:38px;overflow:hidden;background:#000;position:relative;z-index:1}
+.px-phone-side--l{left:-2px;top:20%;height:12%;box-shadow:inset -1px 0 0 rgba(255,255,255,.08)}
+.px-phone-side--l::after{content:"";position:absolute;left:0;top:115%;width:3px;height:8%;border-radius:2px;background:inherit;box-shadow:inherit}
+.px-phone-side--r{right:-2px;top:24%;height:15%;box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
+.px-phone-bezel{border-radius:var(--phone-r-screen);overflow:hidden;background:#000;position:relative;z-index:1}
 .px-phone .screen{
-  background:var(--bg);border-radius:38px;overflow:hidden;display:flex;flex-direction:column;
-  height:min(520px,58vh);border:none;position:relative;
+  width:100%;aspect-ratio:var(--phone-ar);max-height:var(--phone-h-cap);height:auto;
+  background:var(--bg);border-radius:var(--phone-r-screen);overflow:hidden;display:flex;flex-direction:column;
+  border:none;position:relative;
 }
 .px-phone .px-status{
   position:absolute;top:0;left:0;right:0;z-index:8;height:44px;padding:13px 22px 0;
@@ -505,8 +561,8 @@ html.dark .px-scrim{background:
 html.dark .px-phone .px-status{color:#f2f2f5}
 .px-phone .px-icons{display:flex;align-items:center;opacity:.85}
 .px-phone .px-notch{
-  position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:9;
-  width:92px;height:27px;border-radius:18px;background:#000;
+  position:absolute;top:11px;left:50%;transform:translateX(-50%);z-index:9;
+  width:min(96px,32%);height:26px;border-radius:18px;background:#000;
   box-shadow:0 0 0 1px rgba(255,255,255,.06);
 }
 .px-phone .px-notch::after{
@@ -515,8 +571,8 @@ html.dark .px-phone .px-status{color:#f2f2f5}
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
 }
 .px-phone .px-homebar{
-  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:9;
-  width:118px;height:5px;border-radius:999px;background:rgba(26,26,26,.28);pointer-events:none;
+  position:absolute;left:50%;bottom:7px;transform:translateX(-50%);z-index:9;
+  width:min(118px,34%);height:5px;border-radius:999px;background:rgba(26,26,26,.28);pointer-events:none;
 }
 html.dark .px-phone .px-homebar{background:rgba(255,255,255,.28)}
 .px-phone .sct{
@@ -554,6 +610,18 @@ html.dark .px-phone .px-homebar{background:rgba(255,255,255,.28)}
 .px-phone .home .foot{padding:9px 11px;font-size:11.5px;color:var(--muted);line-height:1.4;border-top:1px solid var(--line)}
 .px-demo-link{margin-top:8px;font-size:14px;font-weight:600;color:var(--acc-deep)}
 .px-demo-link:hover{text-decoration:underline}
+
+/* compact mini phones (hiccup page, etc.) */
+.mini-phone{
+  width:var(--phone-w);max-width:100%;margin:0 auto;
+  background:var(--surface);border-radius:var(--phone-r-outer);padding:var(--phone-pad);
+  box-shadow:0 36px 70px -44px rgba(0,0,0,.4),0 0 0 1px var(--line-2);
+}
+.mini-phone .mscreen{
+  width:100%;aspect-ratio:var(--phone-ar);max-height:var(--phone-h-cap);height:auto;
+  background:var(--bg);border-radius:var(--phone-r-screen);overflow:hidden;
+  border:1px solid var(--line);display:flex;flex-direction:column;
+}
 
 .px-trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
 .px-trust-grid .cell{text-align:center;padding:8px 12px}

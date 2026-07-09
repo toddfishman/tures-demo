@@ -12,6 +12,7 @@ const BookBody = z.object({
   flightId: z.string().optional(),
   stayId: z.string().optional(),
   idempotencyKey: z.string().min(8).optional(),
+  tripWatch: z.object({ enabled: z.boolean(), capUsd: z.number().positive().max(100).optional() }).optional(),
   // NOTE: feeUsd is intentionally NOT accepted from the client — the per-trip concierge fee is
   // derived server-side from the account's plan (see perTripFee). A request can't set its own fee.
 });
@@ -36,7 +37,12 @@ export async function bookRoutes(app: FastifyInstance) {
     }
     const tripId = `trip_${Date.now().toString(36)}_b${tripCounter++}`;
     const accountId = resolveAccountId(req, parsed.data.accountId);
-    const booking = await createBooking(tripId, { ...parsed.data, accountId, feeUsd: perTripFee(accountId) });
+    const booking = await createBooking(tripId, {
+      ...parsed.data,
+      accountId,
+      feeUsd: perTripFee(accountId),
+      tripWatch: parsed.data.tripWatch,
+    });
     if (booking.status === "failed" && booking.components.every((c) => c.status === "pending")) {
       // Blocked at the policy gate before any money moved.
       return reply.status(409).send(booking);

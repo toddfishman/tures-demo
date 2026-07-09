@@ -23,6 +23,8 @@ export interface ProposedPlan {
   rationale: string;
   /** Which planner produced this — "agent" (Claude loop) or "deterministic". */
   planner?: "agent" | "deterministic";
+  /** mem0 snippets surfaced to the client for card copy (when memory is configured). */
+  memories?: string[];
 }
 
 /** Entry point. Uses the Claude tool-use agent loop when ANTHROPIC_API_KEY is set; otherwise
@@ -38,11 +40,12 @@ export async function proposePlan(tripId: string, brief: Brief, accountId = "dem
   // shared memoryKey when present, else the account id. Folded into the SAME context prose both the
   // scorer and the agent read — so the planner is personalized, not just the chat. No-op without a key.
   const memId = memoryKey || (accountId !== "demo" ? accountId : undefined);
+  let memories: string[] = [];
   if (memId) {
     try {
-      const mems = await recall(memId, `${brief.destination} ${(brief.placeTypes ?? []).join(" ")} ${context.tasteTags.join(" ")}`.trim());
-      if (mems.length) {
-        context.prose = `${context.prose} Remembered: ${mems.slice(0, 4).join("; ")}.`.trim();
+      memories = await recall(memId, `${brief.destination} ${(brief.placeTypes ?? []).join(" ")} ${context.tasteTags.join(" ")}`.trim());
+      if (memories.length) {
+        context.prose = `${context.prose} Remembered: ${memories.slice(0, 4).join("; ")}.`.trim();
       }
     } catch { /* memory is best-effort — never block a plan on it */ }
   }
@@ -52,9 +55,10 @@ export async function proposePlan(tripId: string, brief: Brief, accountId = "dem
   if (config.anthropicKey) {
     const { runAgentLoop } = await import("./llm.ts");
     const plan = await runAgentLoop(tripId, effBrief, accountId, context);
-    return { ...plan, planner: "agent" };
+    return { ...plan, planner: "agent", memories: memories.slice(0, 4) };
   }
-  return proposePlanDeterministic(tripId, effBrief, accountId, context);
+  const det = await proposePlanDeterministic(tripId, effBrief, accountId, context);
+  return { ...det, memories: memories.slice(0, 4) };
 }
 
 /** Pre-LLM planner: top scored flight + top stay that still fits the budget when combined.
