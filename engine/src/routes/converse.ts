@@ -85,7 +85,7 @@ export async function converseRoutes(app: FastifyInstance) {
     if (!config.anthropicKey && !config.sakana.enabled) {
       return reply.status(501).send({ error: "agent_not_configured", reply: "My brain isn't connected yet — no chat model is set." });
     }
-    const msgs = compactConversation(p.data.messages);
+    let msgs = [...p.data.messages];
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
     if (!msgs.length) msgs.push({ role: "user", content: "Hello — what are you?" });
     const compacted = compactConversation(msgs);
