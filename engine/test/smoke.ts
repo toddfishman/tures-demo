@@ -591,6 +591,8 @@ await app.close();
   assert.equal(health.json().auth, true, "health reports auth on");
   const tgHook = await secured.inject({ method: "POST", url: "/telegram/webhook", payload: {} });
   assert.notEqual(tgHook.statusCode, 401, "telegram webhook not blocked by ENGINE_API_KEY");
+  const convo = await secured.inject({ method: "POST", url: "/converse", payload: { messages: [], text: "hi" } });
+  assert.notEqual(convo.statusCode, 401, "converse not blocked by ENGINE_API_KEY");
   await secured.close();
   delete process.env.ENGINE_API_KEY;
   ok("API-key auth blocks without key, allows with, /health stays open");

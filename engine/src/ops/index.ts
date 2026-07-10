@@ -21,12 +21,34 @@ export function registerOps(app: FastifyInstance) {
     const session = verifyToken(bearer) ?? verifyToken(queryToken);
     if (session) (req as any).accountId = session.sub;
 
-    // Optional shared API-key gate (ops). Public + auth endpoints stay open.
+    // Optional shared API-key gate (ops). Public product + auth endpoints stay open.
     const key = config.apiKey;
     if (!key) return;
     if (req.method === "OPTIONS") return; // never block CORS preflight
-    const open = ["/health", "/waitlist", "/auth", "/billing/webhook", "/telegram/webhook"];
-    if (open.some((p) => req.url === p || req.url.startsWith(p))) return;
+    const path = req.url.split("?")[0];
+    const open = [
+      "/health",
+      "/waitlist",
+      "/auth",
+      "/billing/webhook",
+      "/telegram/webhook",
+      // Static site — no embedded API key; anonymous visitors plan via these routes.
+      "/converse",
+      "/parse",
+      "/plan",
+      "/discover",
+      "/signals",
+      "/assist",
+      "/reserve",
+      "/voice/",
+      "/book",
+      "/stream/",
+      "/watch/capabilities",
+      "/actions/capabilities",
+      "/actions/permissions",
+      "/actions/handoff/",
+    ];
+    if (open.some((p) => path === p || path.startsWith(p))) return;
     if (session) return; // a signed-in user is authorized
     const headerKey = (req.headers["x-api-key"] as string | undefined) ?? bearer;
     if (headerKey !== key && queryToken !== key) {
