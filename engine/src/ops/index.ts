@@ -25,7 +25,7 @@ export function registerOps(app: FastifyInstance) {
     const key = config.apiKey;
     if (!key) return;
     if (req.method === "OPTIONS") return; // never block CORS preflight
-    const open = ["/health", "/waitlist", "/auth", "/billing/webhook"];
+    const open = ["/health", "/waitlist", "/auth", "/billing/webhook", "/telegram/webhook"];
     if (open.some((p) => req.url === p || req.url.startsWith(p))) return;
     if (session) return; // a signed-in user is authorized
     const headerKey = (req.headers["x-api-key"] as string | undefined) ?? bearer;
