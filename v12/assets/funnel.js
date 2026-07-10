@@ -70,6 +70,18 @@
     return null;
   }
 
+  /** Where "The Vault" should land — essentials first, then manage. */
+  function vaultHref() {
+    if (!signedIn()) return "vault.html";
+    var tr = traveler(), v = vault(), a = account();
+    var hasEssentials = !!(tr.homeAirport && (tr.email || (a && a.email)) && v.payment && v.payment.length);
+    if (!hasEssentials) {
+      var nx = nextStep();
+      return (nx && nx.href) || "onboard.html#c-essentials";
+    }
+    return "vault.html";
+  }
+
   // Context string for /converse so the agent skips what it already knows.
   function context() {
     var bits = [], tp = taste(), tr = traveler(), v = vault();
@@ -101,6 +113,7 @@
     vault: vault,
     setupStatus: setupStatus,
     nextStep: nextStep,
+    vaultHref: vaultHref,
     context: context,
     steps: STEPS,
     // setters (each persists + emits)

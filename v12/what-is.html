@@ -36,13 +36,14 @@
 
   /* hero demo phone */
   .wi-demo{justify-self:end;width:var(--phone-w);max-width:100%}
-  .wi-demo .screen{padding:18px 16px 20px}
-  .wi-demo .scr-top{display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+  .wi-demo .screen{padding:0;display:flex;flex-direction:column;position:relative}
+  .wi-demo .scr-top{display:flex;align-items:center;gap:10px;padding:46px 16px 14px;margin-bottom:0;border-bottom:1px solid var(--line);position:relative;z-index:2}
   .wi-demo .scr-top .av{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
     background:radial-gradient(circle at 32% 28%, var(--acc-2), var(--acc) 55%, var(--acc-deep));color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:15px}
   .wi-demo .scr-top .nm{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:-.02em}
   .wi-demo .scr-top .st{font-size:11px;color:var(--good);display:flex;align-items:center;gap:5px}
-  .wi-demo .scr-top .st i{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block}
+  .wi-demo .thread{padding:14px 16px 10px;flex:1;overflow:auto}
+  .wi-demo .rescard{margin:0 16px 16px}
   .rescard{margin-top:6px;border:1px solid var(--line-2);border-radius:14px;padding:14px;background:var(--bg)}
   .rescard .rh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .rescard .rh .demo-tag{margin-left:auto}
@@ -114,8 +115,13 @@
       </div>
 
       <!-- HERO DEMO — one request → a Sample-tagged held result -->
-      <div class="phone wi-demo">
+      <div class="phone px-phone wi-demo">
+        <span class="px-phone-side px-phone-side--l" aria-hidden="true"></span>
+        <span class="px-phone-side px-phone-side--r" aria-hidden="true"></span>
+        <div class="px-phone-bezel">
         <div class="screen">
+          <div class="px-status" aria-hidden="true"><span class="px-time">9:41</span><span class="px-icons"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx=".8"/><rect x="4.5" y="4.5" width="3" height="6.5" rx=".8"/><rect x="9" y="2" width="3" height="9" rx=".8"/><rect x="13" y="0" width="3" height="11" rx=".8"/></svg></span></div>
+          <div class="px-notch" aria-hidden="true"></div>
           <div class="scr-top">
             <span class="av" style="position:relative">t<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></span>
             <div>
@@ -160,7 +166,8 @@
               </div>
             </div>
           </div>
-        </div>
+          <div class="px-homebar" aria-hidden="true"></div>
+        </div></div>
       </div>
     </div>
   </section>

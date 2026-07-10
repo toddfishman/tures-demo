@@ -191,6 +191,8 @@
     // Hidden on the Plan chat (full-immersion; would fight the composer) and the cover (the brand
     // front door, not an app section). Shown on the app-section pages.
     if (cur === "plan" || cur === "cover") return;
+    var f = window.turesFunnel;
+    var vaultLink = f && f.vaultHref ? f.vaultHref() : "vault.html";
     var TABS = [
       { href: "plan.html", page: "plan", label: "Plan",
         icon: '<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/>' },
@@ -198,7 +200,7 @@
         icon: '<rect x="4" y="8" width="16" height="11" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>' },
       { href: "proactive.html", page: "concierge", label: "Concierge",
         icon: '<circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/>' },
-      { href: "vault.html", page: "vault", label: "Vault",
+      { href: vaultLink, page: "vault", label: "Vault",
         icon: '<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>' }
     ];
     var bar = document.createElement("nav");
@@ -223,9 +225,10 @@
     var nx = f ? f.nextStep() : null;
     var menu = document.getElementById("v11-acct-menu");
     var head = '<div class="ah">' + (signed && acct ? (acct.name || acct.email) : "Your account") + '</div>';
+    var vaultLink = f && f.vaultHref ? f.vaultHref() : "vault.html";
     var member =
       '<a class="' + on("trips").trim() + '" href="trips.html">My Trips</a>' +
-      '<a class="' + on("vault").trim() + '" href="vault.html">The Vault</a>' +
+      '<a class="' + on("vault").trim() + '" href="' + vaultLink + '">The Vault</a>' +
       '<a class="' + on("taste").trim() + '" href="taste.html">The Taste Engine</a>';
     var setupRow = st ? '<a class="setup" href="' + ((nx && nx.href) || "trips.html") + '"><span>Your setup</span><span class="pct">' + st.percent + '%</span></a>' : '';
     var auth = signed

@@ -92,6 +92,7 @@
   </div>
 </div>
 
+<script src="assets/account-sync.js"></script>
 <script src="assets/site.js" defer></script>
 <script>
 (function(){
@@ -99,18 +100,32 @@
   if(!F) return;
   var step=0, panels=[].slice.call(document.querySelectorAll('.su-panel')), track=[].slice.call(document.querySelectorAll('.su-track i'));
   var foot=document.getElementById('su-foot'), back=document.getElementById('su-back'), next=document.getElementById('su-next');
+  var panelAcct=document.querySelector('[data-step="1"]');
+  function signedIn(){ return F.signedIn(); }
   function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
   function render(){
     panels.forEach(function(p,i){ p.classList.toggle('on', i===step); });
     track.forEach(function(t,i){ t.classList.toggle('done', i<step); t.classList.toggle('on', i===step); });
     foot.hidden = step===0 || step===4;
-    back.disabled = step<=1;
+    back.disabled = signedIn() ? step<=2 : step<=1;
     next.textContent = step===3 ? 'Finish' : 'Continue';
   }
-  document.getElementById('su-forms').onclick=function(){ step=1; render(); };
-  back.onclick=function(){ if(step>1){ step--; render(); } };
+  function showSignedInAcct(){
+    if(!panelAcct) return;
+    var acct=T&&T.account;
+    panelAcct.querySelector('h2').textContent='You\u2019re signed in';
+    panelAcct.querySelector('.sub').textContent='Your account is already connected — continue to add the essentials for booking.';
+    var emailEl=document.getElementById('su-email'), passEl=document.getElementById('su-pass');
+    if(emailEl){ emailEl.value=(acct&&acct.email)||F.traveler().email||''; emailEl.readOnly=true; }
+    if(passEl){ passEl.closest('.grp').style.display='none'; }
+    var note=panelAcct.querySelector('p[style]');
+    if(note) note.innerHTML='Signed in as <b>'+((acct&&acct.email)||'your account')+'</b>. Essentials are next.';
+  }
+  document.getElementById('su-forms').onclick=function(){ step=signedIn()?2:1; if(signedIn()) showSignedInAcct(); render(); };
+  back.onclick=function(){ if(signedIn()&&step===2){ step=0; render(); return; } if(step>1){ step--; render(); } };
   next.onclick=function(){
     if(step===1){
+      if(signedIn()){ step=2; render(); return; }
       if(!val('su-email')) return;
       var suName=val('su-name')||'Traveler';
       F.setTraveler({ email:val('su-email'), name:suName });
@@ -133,12 +148,18 @@
     }
     if(step===3){ step=4; render(); }
   };
-  var tr=F.traveler();
-  if(tr.email) document.getElementById('su-email').value=tr.email;
-  if(tr.name) document.getElementById('su-name').value=tr.name;
-  if(tr.homeAirport) document.getElementById('su-home').value=tr.homeAirport;
-  if(tr.phone) document.getElementById('su-phone').value=tr.phone;
-  render();
+  function prefill(){
+    var tr=F.traveler(), acct=T&&T.account;
+    if(acct&&acct.email) document.getElementById('su-email').value=acct.email;
+    else if(tr.email) document.getElementById('su-email').value=tr.email;
+    if(tr.name) document.getElementById('su-name').value=tr.name;
+    if(tr.homeAirport) document.getElementById('su-home').value=tr.homeAirport;
+    if(tr.phone) document.getElementById('su-phone').value=tr.phone;
+    if(signedIn()) showSignedInAcct();
+  }
+  var boot=function(){ prefill(); render(); };
+  if(window.turesAccountSync) window.turesAccountSync().then(boot).catch(boot);
+  else boot();
 })();
 </script>
 </body></html>
