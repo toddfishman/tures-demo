@@ -42,19 +42,19 @@
 
   <div class="tg-wrap">
     <div class="tg-steps" id="tg-steps">
-      <article class="tg-step open" data-n="1">
+      <article class="tg-step" data-n="1">
         <div class="sh"><span class="num">1</span><div class="st"><h3>Why Telegram</h3><p>Tures plans, books, and watches your trip. Telegram is where it reaches you when something shifts — same agent, not a bot pretending to be one.</p></div><span class="chev">▾</span></div>
         <div class="tg-body"><ul><li>Pick up the same conversation you started on the web</li><li>Get calm updates when a flight moves or a table opens</li><li>Your Vault and Taste Print follow you — no re-explaining</li></ul></div>
       </article>
       <article class="tg-step" data-n="2">
         <div class="sh"><span class="num">2</span><div class="st"><h3>Set up your Tures account</h3><p>Telegram links to your account — not a guest thread. Sign in or finish the essentials first.</p></div><span class="chev">▾</span></div>
-        <div class="tg-body"><p class="tg-note">Need the form path? <a href="setup.html" style="color:var(--acc-deep);font-weight:600">Set up with text →</a> Or jump to <a href="onboard.html" style="color:var(--acc-deep);font-weight:600">Set up Tures</a> for the full accordion.</p><a class="btn sm" href="signup.html">Join the waitlist</a></div>
+        <div class="tg-body"><p class="tg-note">Need the form path? <a href="setup.html" style="color:var(--acc-deep);font-weight:600">Set up with text →</a> Or jump to <a href="onboard.html" style="color:var(--acc-deep);font-weight:600">Set up Tures</a> for the full accordion.</p><a class="btn sm" href="login.html">Sign in</a> <a class="btn sm ghost" href="signup.html" style="margin-left:8px">Create account</a></div>
       </article>
-      <article class="tg-step" data-n="3">
+      <article class="tg-step open" data-n="3">
         <div class="sh"><span class="num">3</span><div class="st"><h3>Open Telegram and tap Connect</h3><p>We mint a one-time link — it opens the Tures bot with your code prefilled.</p></div><span class="chev">▾</span></div>
         <div class="tg-body">
           <button class="tg-connect" id="tg-connect" type="button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21.9 4.3 2.8 11.7c-1.1.4-1 1.5-.1 1.8l4.9 1.5 1.9 5.9c.2.5.4.7.8.7.4 0 .6-.2.9-.5l2.6-2.5 4.9 3.6c.9.5 1.5.2 1.7-.8L23.9 5.5c.3-1.2-.5-1.7-1-1.2z"/></svg> Connect Telegram</button>
-          <p class="tg-note" id="tg-status">When the bot is live, this opens Telegram — tap <b>Start</b> to link the chat to your account.</p>
+          <p class="tg-note" id="tg-status">Sign in first — then tap Connect to open Telegram. Tap <b>Start</b> in the bot to link this chat to your account.</p>
         </div>
       </article>
       <article class="tg-step" data-n="4">
@@ -69,6 +69,7 @@
   </div>
 </main>
 <script src="assets/site.js" defer></script>
+<script src="assets/channels-ui.js" defer></script>
 <script>
 (function(){
   var steps=[].slice.call(document.querySelectorAll('.tg-step'));
@@ -79,13 +80,26 @@
     });
   });
   var T=window.tures,F=window.turesFunnel,btn=document.getElementById('tg-connect'),st=document.getElementById('tg-status');
+  function paintLinked(linked){
+    if(!btn||!st) return;
+    if(linked){
+      btn.textContent='Linked ✓';
+      btn.disabled=true;
+      st.textContent='Telegram is linked to your account — text your bot anytime.';
+      steps[2].classList.add('done');
+      steps[3].classList.add('done');
+    }
+  }
+  if(window.turesChannelStatus){
+    window.turesChannelStatus().then(function(s){ paintLinked(s.telegram); });
+  }
   btn.onclick=function(){
     if(F) F.setTraveler({telegram:'requested'});
-    steps[2].classList.add('done');
     if(!(T&&T.configured&&T.channels)){ st.textContent='Telegram is rolling out shortly — we will open your Tures chat there the moment it is live.'; return; }
+    if(!T.signedIn){ st.textContent='Sign in first — then tap Connect again so Telegram links to your account.'; return; }
     st.textContent='Starting the link…';
     T.channels.linkCode().then(function(r){
-      if(r&&r.telegramDeepLink){ window.open(r.telegramDeepLink,'_blank'); st.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; steps[3].classList.add('done'); }
+      if(r&&r.telegramDeepLink){ window.open(r.telegramDeepLink,'_blank'); st.textContent='Opening Telegram — tap Start to link this chat to your Tures account.'; steps[2].classList.add('done'); }
       else st.textContent='Your account is ready. Telegram is rolling out shortly.';
     }).catch(function(e){
       st.textContent=(e&&e.status===401)?'Sign in first, then connect Telegram so it links to your account.':'Could not start the link just now — try again in a moment.';
