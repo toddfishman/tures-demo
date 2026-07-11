@@ -62,6 +62,14 @@
   // Stable memory id — the same one the conversational agent uses (turesFunnel.uid), so the planner
   // shares the traveler's mem0 memory. Undefined when the funnel isn't loaded.
   function memId() { try { return (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : undefined; } catch (_) { return undefined; } }
+  function chatSessionId() {
+    try {
+      var k = "tures.sessionId";
+      var s = sessionStorage.getItem(k);
+      if (!s) { s = "sess-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); sessionStorage.setItem(k, s); }
+      return s;
+    } catch (_) { return "sess-" + Date.now().toString(36); }
+  }
   function setSession(t, u) { token = t || ""; account = u || null; if (token) localStorage.setItem(TOKEN, token); else localStorage.removeItem(TOKEN); if (account) localStorage.setItem(ACCT, JSON.stringify(account)); else localStorage.removeItem(ACCT); }
   function maybeMergeGuestMem(accountId) {
     try {
@@ -113,6 +121,7 @@
     get account() { return account; },
     get signedIn() { return !!(token && account); },
     get accountId() { return acctId(); },
+    sessionId: chatSessionId,
 
     use: function (u) { url = (u || "").replace(/\/$/, ""); localStorage.setItem(KEY, url); return url; },
     forget: function () { url = ""; setSession("", null); localStorage.removeItem(KEY); },
@@ -216,8 +225,8 @@
 
     /* Conversational Tures. messages: prior turns; text: new user turn; context: known profile/
        Taste Print so the agent skips what it already knows. → { reply, ready?, brief?, slots? } */
-    converse: function (messages, text, context, userId) {
-      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context, userId: userId }) });
+    converse: function (messages, text, context, userId, sessionId) {
+      return api("/converse", { method: "POST", body: JSON.stringify({ messages: messages || [], text: text, context: context, userId: userId, sessionId: sessionId || chatSessionId() }) });
     },
 
     /* "Handle anything" — researches the web, proposes permissioned actions Tures can take. */

@@ -576,6 +576,51 @@ let bookingId = "";
   ok("/metrics reports request counts + uptime");
 }
 
+// 39. PDX → Cannon Beach transport uses real distance, not a 12-mile city hop
+{
+  const { geocode } = await import("../src/geo/index.ts");
+  const { estimateTransport } = await import("../src/discovery/transport.ts");
+  const { BriefSchema } = await import("../src/types.ts");
+  const pdx = await geocode("PDX");
+  const cb = await geocode("Cannon Beach, OR");
+  assert.ok(pdx && cb, "geocodes PDX and Cannon Beach");
+  const offers = estimateTransport(pdx, cb, BriefSchema.parse({ origin: "SEA", destination: "PDX", departDate: "2026-08-01" }));
+  assert.ok(offers.length, "transport options returned");
+  const miles = offers[0]!.raw?.roadMiles as number;
+  assert.ok(miles >= 60 && miles <= 110, `PDX→CB ~90min drive, got ${miles} mi`);
+  ok("transport: airport→lodging distance (PDX → Cannon Beach)");
+}
+
+// 40. discover honors flights_transport scope — no dining/activities
+{
+  const { BriefSchema } = await import("../src/types.ts");
+  const brief = BriefSchema.parse({
+    origin: "SEA",
+    destination: "PDX",
+    departDate: "2026-08-01",
+    lodgingArea: "Cannon Beach, OR",
+    tripScope: "flights_transport",
+  });
+  const res = await app.inject({ method: "POST", url: "/discover", payload: brief });
+  assert.equal(res.statusCode, 200);
+  const d = res.json();
+  assert.equal(d.dining.length, 0, "no dining when transport-only");
+  assert.equal(d.activities.length, 0, "no activities when transport-only");
+  assert.ok(d.transport.length > 0, "transport still returned");
+  ok("discover: flights_transport skips dining and activities");
+}
+
+// 41. conversation audit log — verbatim turns retrievable by session
+{
+  const { logTurn, listSessionTranscript } = await import("../src/conversation-log.ts");
+  logTurn({ userId: "guest-smoke", sessionId: "sess-smoke-1", role: "user", content: "Fly into Portland, get to Cannon Beach" });
+  logTurn({ userId: "guest-smoke", sessionId: "sess-smoke-1", role: "assistant", content: "Got it — PDX then a drive to Cannon Beach.", via: "anthropic" });
+  const rows = listSessionTranscript("sess-smoke-1");
+  assert.equal(rows.length, 2, "two verbatim turns stored");
+  assert.ok(rows[0]!.content.includes("Portland"), "user turn exact");
+  ok("conversation log: verbatim session transcript");
+}
+
 await app.close();
 
 // 17. API-key auth: blocks without key, allows with, /health stays open

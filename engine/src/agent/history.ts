@@ -26,6 +26,14 @@ export function compactConversation(msgs: ChatTurn[]): ChatTurn[] {
   return out;
 }
 
+/** Build a mem0 search query from recent user turns — a single short correction often misses
+ *  the destination/context that earlier messages established. */
+export function recallQueryFromMessages(msgs: ChatTurn[], fallback = ""): string {
+  const users = msgs.filter((m) => m.role === "user").slice(-3).map((m) => m.content.trim()).filter(Boolean);
+  if (!users.length) return fallback;
+  return users.join(" · ");
+}
+
 /** Cap optional context prose injected into the system prompt. */
 export function capContext(prose?: string, max = 1400): string | undefined {
   if (!prose) return undefined;

@@ -20,6 +20,7 @@ const CITY_IATA: Record<string, string> = {
   helsinki: "HEL", ivalo: "IVL", rome: "FCO", barcelona: "BCN", amsterdam: "AMS",
   berlin: "BER", reykjavik: "KEF", oslo: "OSL", stockholm: "ARN", lima: "LIM",
   "big island": "KOA", kona: "KOA", hawaii: "KOA", honolulu: "HNL", maui: "OGG",
+  portland: "PDX",
 };
 
 function isoDaysFromNow(days: number): string {
@@ -88,10 +89,31 @@ function heuristicParse(text: string): ParseResult {
 
   if (priceSensitivity !== "balanced") assumptions.push(`read budget posture: ${priceSensitivity.replace("_", " ")}`);
 
+  let lodgingArea: string | undefined;
+  if (/cannon beach|\bcb\b/i.test(text)) lodgingArea = "Cannon Beach, OR";
+  else {
+    const stayMatch = text.match(/(?:stay(?:ing)? (?:in|at)|lodging (?:in|at)|drive to|transport to)\s+([^,.;\n]+)/i);
+    if (stayMatch?.[1]) lodgingArea = stayMatch[1].trim();
+  }
+  if (lodgingArea) assumptions.push(`lodging area: ${lodgingArea}`);
+
+  let tripScope: "full" | "flights_stay" | "flights_transport" | "flights_only" = "full";
+  if (/flight(s)?\s*(?:and|\+|plus)\s*(?:car|ground|transfer|car service|ride)/i.test(t) || /just\s+(?:the\s+)?flight/i.test(t) && /car|transfer|ground/i.test(t)) {
+    tripScope = "flights_transport";
+    assumptions.push("scope: flight + ground transport only");
+  } else if (/just\s+(?:the\s+)?flights?|flights?\s*only/i.test(t)) {
+    tripScope = "flights_only";
+    assumptions.push("scope: flights only");
+  } else if (/no\s+(?:activities|restaurants|dining|extras)/i.test(t)) {
+    tripScope = "flights_stay";
+    assumptions.push("scope: flight + stay, no extras");
+  }
+
   const brief = BriefSchema.parse({
     origin, destination, departDate, returnDate, adults, children, cabin,
     priceSensitivity, budgetUsd,
     placeTypes: [...new Set(placeTypes)], bookingMode: "confirm_each",
+    lodgingArea, tripScope,
   });
   return { brief, assumptions, via: "heuristic" };
 }
@@ -115,9 +137,13 @@ export async function parseBrief(text: string): Promise<ParseResult> {
         "into priceSensitivity: phrases like 'budget-friendly'/'cheap'/'save money' → thrifty; " +
         "'splurge'/'to the nines'/'money is no object'/'not price sensitive' → no_limit; 'nice but " +
         "reasonable'/'treat ourselves' → premium; otherwise balanced. If a hard dollar cap is stated " +
-        "('under $5k'), set budgetUsd too. The prose may arrive as an initial brief followed by " +
-        "'[Update]' corrections — treat later updates as overrides and merge them into one coherent " +
-        "brief. If something isn't stated, choose a sensible default and note it in assumptions. Call emit_brief.",
+        "('under $5k'), set budgetUsd too. When they fly into one city but stay elsewhere " +
+        "(e.g. PDX then Cannon Beach), set destination to the arrival airport IATA and lodgingArea " +
+        "to the actual town. Read tripScope: 'flight + car/transfer only' → flights_transport; " +
+        "'flights only' → flights_only; 'no activities/restaurants' → flights_stay; else full. " +
+        "The prose may arrive as an initial brief followed by corrections — treat later updates as " +
+        "overrides and merge them into one coherent brief. If something isn't stated, choose a " +
+        "sensible default and note it in assumptions. Call emit_brief.",
       tools: [
         {
           name: "emit_brief",
@@ -133,6 +159,8 @@ export async function parseBrief(text: string): Promise<ParseResult> {
               budgetUsd: { type: "number" },
               cabin: { type: "string", enum: ["economy", "premium_economy", "business", "first"] },
               placeTypes: { type: "array", items: { type: "string" } },
+              lodgingArea: { type: "string" },
+              tripScope: { type: "string", enum: ["full", "flights_stay", "flights_transport", "flights_only"] },
               assumptions: { type: "array", items: { type: "string" } },
             },
             required: ["origin", "destination", "departDate"],

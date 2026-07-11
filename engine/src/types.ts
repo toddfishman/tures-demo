@@ -29,6 +29,13 @@ export const BriefSchema = z.object({
   /** Free-form "right kinds of places" signals — drives stay scoring. */
   placeTypes: z.array(z.string()).default([]),
   cabin: z.enum(["economy", "premium_economy", "business", "first"]).default("economy"),
+  /** Where the traveler actually stays or spends time when it differs from the arrival airport
+   *  (e.g. fly into PDX, stay at Cannon Beach). Free-form place name for geocoding + discovery. */
+  lodgingArea: z.string().optional(),
+  /** What to plan beyond the flight — honors explicit narrowing like "flight + car only". */
+  tripScope: z
+    .enum(["full", "flights_stay", "flights_transport", "flights_only"])
+    .default("full"),
   /** Governs how far the agent may go on its own. */
   bookingMode: z.enum(["propose_only", "confirm_each", "auto_within_brief"]).default("confirm_each"),
   /** Standing authority for the Hiccup Handler: may it auto-rebook on a disruption, and up to

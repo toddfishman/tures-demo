@@ -25,7 +25,7 @@ export function registerOps(app: FastifyInstance) {
     const key = config.apiKey;
     if (!key) return;
     if (req.method === "OPTIONS") return; // never block CORS preflight
-    const path = req.url.split("?")[0];
+    const path = req.url.split("?")[0] ?? "";
     const open = [
       "/health",
       "/waitlist",

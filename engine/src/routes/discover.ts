@@ -14,6 +14,10 @@ let discoverCounter = 0;
 
 const DiscoverSchema = BriefSchema.extend({ userId: z.string().optional() });
 
+function extrasOnly(scope: string | undefined): boolean {
+  return scope === "flights_transport" || scope === "flights_only";
+}
+
 export async function discoverRoutes(app: FastifyInstance) {
   // POST /discover — a brief in, real trip-extras out. Finds; books nothing.
   app.post("/discover", async (req, reply) => {
@@ -22,24 +26,44 @@ export async function discoverRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "invalid_brief", issues: parsed.error.issues });
     }
     const { userId, ...brief } = parsed.data;
-    const destGeo = await geocode(brief.destination);
-    if (!destGeo) {
-      return reply.status(422).send({ error: "could_not_locate_destination", destination: brief.destination });
+    const airportGeo = await geocode(brief.destination);
+    const lodgingGeo = brief.lodgingArea ? await geocode(brief.lodgingArea) : airportGeo;
+    const searchGeo = lodgingGeo || airportGeo;
+    if (!searchGeo) {
+      return reply.status(422).send({
+        error: "could_not_locate_destination",
+        destination: brief.destination,
+        lodgingArea: brief.lodgingArea,
+      });
     }
 
-    const memQuery = `${destGeo.label} restaurants activities things to do`;
+    const scope = brief.tripScope || "full";
+    const transportOnly = extrasOnly(scope);
+
+    const memQuery = transportOnly
+      ? `${searchGeo.label} airport ground transfer`
+      : `${searchGeo.label} restaurants activities things to do`;
     const memories = userId ? await recall(userId, memQuery, 4) : [];
 
-    const [stays, dining, activities] = await Promise.all([
-      searchHotels(destGeo, brief),
-      searchDining(destGeo, brief),
-      searchActivities(destGeo, brief),
-    ]);
-    const transport = estimateTransport(destGeo, brief);
+    let stays: Awaited<ReturnType<typeof searchHotels>> = [];
+    let dining: Awaited<ReturnType<typeof searchDining>> = [];
+    let activities: Awaited<ReturnType<typeof searchActivities>> = [];
+
+    if (!transportOnly && scope !== "flights_only") {
+      [stays, dining, activities] = await Promise.all([
+        scope === "flights_stay" || scope === "full" ? searchHotels(searchGeo, brief) : Promise.resolve([]),
+        scope === "full" ? searchDining(searchGeo, brief) : Promise.resolve([]),
+        scope === "full" ? searchActivities(searchGeo, brief) : Promise.resolve([]),
+      ]);
+    }
+
+    const transport = estimateTransport(airportGeo, lodgingGeo || airportGeo, brief);
 
     return {
       tripId: `disc_${Date.now().toString(36)}_${discoverCounter++}`,
-      destination: { label: destGeo.label, location: { lat: destGeo.lat, lng: destGeo.lng } },
+      destination: { label: searchGeo.label, location: { lat: searchGeo.lat, lng: searchGeo.lng } },
+      arrival: airportGeo ? { label: airportGeo.label, location: { lat: airportGeo.lat, lng: airportGeo.lng } } : undefined,
+      tripScope: scope,
       source: config.googleMapsKey ? "google-places" : "unconfigured",
       googlePlaces: !!config.googleMapsKey,
       memories,

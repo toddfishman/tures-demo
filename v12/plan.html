@@ -322,6 +322,9 @@
   var form   = document.getElementById('composer');
   var live   = !!(window.tures && window.tures.configured);
   var history = [];
+  var sessionCtx = '';
+  var sessionId = window.tures && window.tures.sessionId ? window.tures.sessionId() : ('sess-' + Date.now().toString(36));
+  var planShown = false;
   var busy = false;
   var typingEl = null;
   var watchCap = 10;
@@ -349,6 +352,44 @@
     w.innerHTML='<div class="who">'+(me?'You':'Tures')+'</div><div class="bubble">'+html+'</div>';
     thread.appendChild(w); reveal(w); scroll(); return w;
   }
+  function assistantSay(text){
+    bubble(esc(text),'t');
+    history.push({role:'assistant',content:String(text||'').replace(/<[^>]+>/g,'')});
+  }
+  function convoContext(){
+    var base = window.turesFunnel ? window.turesFunnel.context() : undefined;
+    if(!sessionCtx) return base;
+    return base ? base+' · '+sessionCtx : sessionCtx;
+  }
+  function noteSession(slots){
+    if(!slots) return;
+    sessionCtx = [
+      slots.origin && ('Origin: '+slots.origin),
+      slots.destination && ('Fly into: '+slots.destination),
+      slots.lodgingArea && ('Final destination: '+slots.lodgingArea),
+      slots.scope && ('Scope: '+slots.scope),
+      slots.brief && ('Trip: '+slots.brief)
+    ].filter(Boolean).join(' · ');
+  }
+  function enrichBriefText(brief, slots){
+    var parts = [String(brief||'')];
+    if(!slots) return parts[0];
+    if(slots.lodgingArea) parts.push('Lodging area / final destination: '+slots.lodgingArea);
+    if(slots.destination) parts.push('Arrival airport or city: '+slots.destination);
+    if(slots.scope) parts.push('Trip scope: '+slots.scope);
+    if(slots.mustHaves) parts.push('Must haves: '+slots.mustHaves);
+    if(slots.origin) parts.push('Origin: '+slots.origin);
+    if(slots.timing) parts.push('Timing: '+slots.timing);
+    if(slots.travelers) parts.push('Travelers: '+slots.travelers);
+    if(slots.style) parts.push('Style: '+slots.style);
+    if(slots.budget) parts.push('Budget: '+slots.budget);
+    return parts.join('. ');
+  }
+  function scopeOf(brief){ return (brief && brief.tripScope) || 'full'; }
+  function transportOnly(brief){
+    var s = scopeOf(brief);
+    return s === 'flights_transport' || s === 'flights_only';
+  }
   window.bubble = bubble;
   function typing(on){
     if(on){ if(typingEl) return; typingEl=document.createElement('div'); typingEl.className='msg typing from-ai';
@@ -370,10 +411,10 @@
     if(busy || !text) return;
     bubble(esc(text),'me'); history.push({role:'user',content:text});
     input.value=''; busy=true; sendBtn.disabled=true; typing(true);
-    var ctx = window.turesFunnel ? window.turesFunnel.context() : undefined;
+    var ctx = convoContext();
     var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
     function attempt(n){
-      return window.tures.converse(history.slice(-12), undefined, ctx, uid).catch(function(e){
+      return window.tures.converse(history, undefined, ctx, uid, sessionId).catch(function(e){
         if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attempt(n-1).then(res,rej); }, 1800); });
         throw e;
       });
@@ -381,23 +422,34 @@
     attempt(1).then(function(c){
       typing(false); busy=false; sendBtn.disabled=false;
       if(c && c.slots && c.slots.origin && c.slots.destination) setRoute(c.slots.origin, c.slots.destination);
+      if(c && c.slots) noteSession(c.slots);
       if(c && c.ready && c.brief){
-        if(c.reply) bubble(esc(c.reply),'t');
-        resolveBrief(c.brief);
+        if(c.reply) assistantSay(c.reply);
+        resolveBrief(c.brief, c.slots);
       } else {
         var reply=(c && c.reply) || 'Tell me a little more.';
-        bubble(esc(reply),'t'); history.push({role:'assistant',content:reply});
+        assistantSay(reply);
       }
     }).catch(function(e){ typing(false); busy=false; sendBtn.disabled=false; offline(e); });
   }
 
   // converse returns the brief as a sentence; /plan and /book need a structured brief → parse it first.
-  function resolveBrief(b){
+  function resolveBrief(b, slots){
     if(b && typeof b==='object' && b.destination){ window.__brief=b; proposePlan(b); return; }
+    var prose = enrichBriefText(b, slots);
     typing(true);
-    window.tures.parse(String(b||'')).then(function(pr){
+    window.tures.parse(prose).then(function(pr){
       typing(false);
-      if(pr && pr.brief){ window.__brief=pr.brief; proposePlan(pr.brief); }
+      if(pr && pr.brief){
+        if(slots && slots.scope && !pr.brief.tripScope){
+          var scopeMap = { full:'full', 'flights_stay':'flights_stay', 'flights_transport':'flights_transport', 'flights_only':'flights_only' };
+          var sk = String(slots.scope).toLowerCase().replace(/\s+/g,'_');
+          if(scopeMap[sk]) pr.brief.tripScope = scopeMap[sk];
+          else if(/transport|car|transfer|ground/i.test(String(slots.scope))) pr.brief.tripScope = 'flights_transport';
+        }
+        if(slots && slots.lodgingArea && !pr.brief.lodgingArea) pr.brief.lodgingArea = slots.lodgingArea;
+        window.__brief=pr.brief; proposePlan(pr.brief);
+      }
       else offline();
     }).catch(function(){ typing(false); offline(); });
   }
@@ -446,11 +498,12 @@
   function presentPlanCards(plan, brief){
     var parts = [];
     if(plan && plan.flight) parts.push(legCard('Flight', plan.flight, brief, 'flight', plan));
-    if(plan && plan.stay) parts.push(legCard('Hotel', plan.stay, brief, 'stay', plan));
+    if(plan && plan.stay && !transportOnly(brief)) parts.push(legCard('Hotel', plan.stay, brief, 'stay', plan));
     if(!parts.length) return;
+    planShown = true;
     var wrap=document.createElement('div'); wrap.className='msg from-ai plan-cards show';
     parts.forEach(function(html){ var d=document.createElement('div'); d.innerHTML=html; wrap.appendChild(d.firstChild); });
-    if(plan.totalUsd!=null){
+    if(plan.totalUsd!=null && !transportOnly(brief)){
       var tot=document.createElement('div'); tot.className='plan-total';
       tot.innerHTML='About <b>$'+Number(plan.totalUsd).toLocaleString()+'</b> all in — nothing held or charged yet.';
       wrap.appendChild(tot);
@@ -459,20 +512,27 @@
   }
 
   function proposePlan(brief){
-    window.__brief = brief; typing(true);
+    window.__brief = brief; planShown = false; typing(true);
     window.tures.plan(brief).then(function(p){
       typing(false);
-      bubble('Here is what I would book — flight, hotel, dates, and the total. Review it here; I can adjust anything.','t');
+      var msg = transportOnly(brief)
+        ? 'Here is the flight plus ground transfer — review it here; I can adjust anything.'
+        : 'Here is what I would book — flight, hotel, dates, and the total. Review it here; I can adjust anything.';
+      assistantSay(msg);
       presentPlanCards(p, brief);
       presentRadar(brief, function(){
         presentExtras(brief, function(){
-          bubble('That is the trip, end to end. Shall I book the flights and hotel.','t');
+          var bookMsg = transportOnly(brief)
+            ? 'That covers the flight and car service. Shall I book it.'
+            : 'That is the trip, end to end. Shall I book the flights and hotel.';
+          assistantSay(bookMsg);
           offerBook(brief);
         });
       });
     }).catch(function(){
       typing(false);
-      bubble('That is everything I need. Shall I hold it and book.','t'); offerBook(brief);
+      assistantSay('That is everything I need. Shall I hold it and book.');
+      offerBook(brief);
     });
   }
   function offerBook(brief){
@@ -570,7 +630,22 @@
   function presentExtras(brief, done){
     done = done || function(){};
     if(!live || !brief){ done(); return; }
-    bubble('And while you are there — here is where I would eat, what I would do, and how to get around. Real spots; tap and I will handle the reservation.','t');
+    if(transportOnly(brief)){
+      assistantSay('Ground transfer from the airport — private car or rideshare, priced for the actual drive.');
+      typing(true);
+      window.tures.discover(brief).then(function(d){
+        typing(false);
+        var groups=[ xGroup('Getting there from the airport','transport',d&&d.transport) ].filter(Boolean);
+        if(groups.length){
+          var wrap=document.createElement('div'); wrap.className='msg from-ai xwrap';
+          groups.forEach(function(g){ wrap.appendChild(g); });
+          thread.appendChild(wrap); reveal(wrap); scroll();
+        } else bubble('Could not load transfer estimates just now — the flight is still ready to book.','t');
+        done();
+      }).catch(function(){ typing(false); bubble('Could not load transfer estimates just now — the flight is still ready to book.','t'); done(); });
+      return;
+    }
+    assistantSay('And while you are there — here is where I would eat, what I would do, and how to get around. Real spots; tap and I will handle the reservation.');
     typing(true);
     window.tures.discover(brief).then(function(d){
       typing(false);
@@ -694,9 +769,9 @@
     var fromProactive = /[?&]from=proactive\b/.test(location.search);
     if(live){
       if(fromProactive){
-        bubble("You're in the right place — I watch every leg while you're away, and I book the trip before you go. Tell me what you're planning, or tap <b>Talk to me</b>.","t");
+        assistantSay("You're in the right place — I watch every leg while you're away, and I book the trip before you go. Tell me what you're planning, or tap Talk to me.");
       } else {
-        bubble("Hey — I'm Tures. Tell me a trip in your own words, <b>type below or tap Talk to me</b> — same thread, same memory.","t");
+        assistantSay("Hey — I'm Tures. Tell me a trip in your own words, type below or tap Talk to me — same thread, same memory.");
       }
     } else {
       bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');

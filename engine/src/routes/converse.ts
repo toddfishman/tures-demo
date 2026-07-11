@@ -2,8 +2,9 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
-import { recall, remember } from "../mem0.ts";
-import { compactConversation, capContext } from "../agent/history.ts";
+import { recall, rememberTranscript } from "../mem0.ts";
+import { logTurn } from "../conversation-log.ts";
+import { compactConversation, capContext, recallQueryFromMessages } from "../agent/history.ts";
 import { fuguChat } from "../agent/fugu.ts";
 
 // Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
@@ -17,6 +18,8 @@ const Body = z.object({
   context: z.string().optional(),
   // Stable id for this traveler — keys their mem0 memory (personalization across sessions).
   userId: z.string().optional(),
+  // Client session id — keys verbatim transcript (mem0 run_id + engine audit log).
+  sessionId: z.string().optional(),
   // Diagnostics: when true, the response includes the raw Fugu assistant message so we can see how
   // (or whether) it emitted the submit_brief tool. Safe — it's the model's own message, no secrets.
   debug: z.boolean().optional(),
@@ -36,6 +39,10 @@ THIS CONVERSATION: a natural back-and-forth, spoken or typed. Your job here is t
 
 WHAT YOU NEED before you can plan (gather it conversationally, one natural question at a time, skipping anything already known): where they're leaving from, where they're going (a vibe like "somewhere warm, you pick" is fine), when and for how long, who's coming, how they like to fly and stay, and how freely they want to spend. Origin is required — if you do not know their home airport, ask; never guess it. Accept vague answers and refine later. The moment you have enough for a strong first plan, stop asking, recap it in one line, and offer to build it.
 
+AIRPORT + GROUND TRANSFER: when someone flies into one city but their real destination is elsewhere (e.g. fly into Portland, drive 90 minutes to Cannon Beach), capture BOTH — the arrival airport/city in destination, and the actual lodging or town in lodgingArea. Do not recommend restaurants or activities at the airport city unless they asked to stay there. Ground transfer is part of the trip — acknowledge the drive time.
+
+SCOPE & CORRECTIONS: if they narrow scope ("just flight and car service", "no activities", "skip the hotel"), honor it immediately in scope and in your reply — do not repeat what they rejected. If they correct you after you started planning, treat the correction as binding, recap the updated plan in one line, and call submit_brief again with the revised fields. Never forget what they already told you in this thread.
+
 LOOKING THINGS UP: you can web_search for real, current facts when it genuinely helps the traveler — the season and weather pattern at a destination, whether dates collide with a festival, marathon, holiday, or strike, entry rules, or a current safety/event note. Use it sparingly and only when it changes your advice; never let a search slow down simple slot-gathering, and never invent a fact you could have checked. Cite what you found in plain language, briefly.
 
 READING THEM: notice how they communicate and match it — terse or chatty, detail-first or vibe-first, reading or listening (you can speak, via voice). If they arrive ready, confirm the gaps and go. If they arrive with a wish, take the lead warmly and teach as you go.
@@ -47,7 +54,7 @@ THE REAL RULES:
 - When you are genuinely unsure, ask one short question. Otherwise use common sense and keep things moving.
 - Do not open with the time of day; you may be reaching them in any timezone.
 
-HAND-OFF: the moment you have all the essentials, CALL the submit_brief tool — fill every required field plus a one-sentence brief — and tell them you are putting it together now. Do not keep asking once you have enough. CRITICAL: you MUST actually call the submit_brief tool in the SAME turn — never say you are "building it" or "putting it together" in words without calling the tool, or nothing happens and the traveler is left waiting.`;
+HAND-OFF: the moment you have all the essentials, CALL the submit_brief tool — fill every required field plus a one-sentence brief — and tell them you are putting it together now. Do not keep asking once you have enough. CRITICAL: you MUST actually call the submit_brief tool in the SAME turn — never say you are "building it" or "putting it together" in words without calling the tool, or nothing happens and the traveler is left waiting. Call submit_brief again whenever they materially change or narrow the trip — corrections are not optional.`;
 
 const TOOLS = [
   {
@@ -58,11 +65,17 @@ const TOOLS = [
       type: "object" as const,
       properties: {
         origin: { type: "string", description: "Home / departure city or airport. Required — never guess it." },
-        destination: { type: "string", description: "Where they're going. A vibe like 'somewhere warm, you pick' is acceptable if they want you to choose." },
+        destination: { type: "string", description: "Arrival airport or city they fly into (IATA if known, e.g. PDX). Not the final town if they ground-transfer elsewhere." },
+        lodgingArea: { type: "string", description: "Where they actually stay or spend time when different from the arrival airport, e.g. 'Cannon Beach, OR'. Omit if same as destination." },
         timing: { type: "string", description: "Exact dates or a window plus length, e.g. 'Dec 3–14' or 'a week this winter'." },
         travelers: { type: "string", description: "Who's coming, e.g. '2 adults' or '2 adults + 2 kids'." },
         style: { type: "string", description: "How they fly and stay — cabin + lodging, e.g. 'business, boutique', or 'apply my Taste Print'." },
         budget: { type: "string", description: "Budget posture: budget-friendly | balanced | treat-ourselves | no-limit, plus an optional cap." },
+        scope: {
+          type: "string",
+          description:
+            "What to plan: full (flight+hotel+extras) | flights_stay | flights_transport (flight + ground transfer only, no dining/activities) | flights_only.",
+        },
         brief: { type: "string", description: "One sentence the planner can act on, weaving the above together. E.g. 'From Seattle, a week on Maui in December for two, premium cabin and a boutique stay, treat-ourselves with no hard cap.'" },
         purpose: { type: "string", description: "Optional. celebrate | decompress | adventure | romance | reconnect | business." },
         mustHaves: { type: "string", description: "Optional. Named non-negotiables — a specific hotel, restaurant, or excursion." },
@@ -89,15 +102,17 @@ export async function converseRoutes(app: FastifyInstance) {
     if (p.data.text) msgs.push({ role: "user", content: p.data.text });
     if (!msgs.length) msgs.push({ role: "user", content: "Hello — what are you?" });
     const compacted = compactConversation(msgs);
+    const sessionId = p.data.sessionId || `sess_${Date.now().toString(36)}`;
 
     const latestUser = [...compacted].reverse().find((m) => m.role === "user")?.content ?? "";
+    const recallQuery = recallQueryFromMessages(compacted, latestUser);
     let system = SYSTEM;
     const ctx = capContext(p.data.context);
     if (ctx) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${ctx}`;
 
     try {
       // Personalize from mem0: what we remember about this traveler (taste, past trips). No-op without a key.
-      const memories = await recall(p.data.userId, latestUser);
+      const memories = await recall(p.data.userId, recallQuery);
       if (memories.length) {
         system += `\n\nWHAT YOU REMEMBER about this traveler (from past trips and chats — use it to personalize and to reference what they've loved before, but confirm before assuming):\n- ${memories.join("\n- ")}`;
       }
@@ -188,16 +203,34 @@ export async function converseRoutes(app: FastifyInstance) {
         slots = tool ? (tool.input || {}) : null;
       }
 
-      // Learn from this turn (fire-and-forget), regardless of which brain answered.
-      void remember(p.data.userId, [{ role: "user", content: latestUser }, { role: "assistant", content: text }]);
+      // Verbatim transcript — exact turns for tracing (mem0 infer=false + local audit log).
+      const ready = !!(slots && Object.keys(slots).length);
+      if (p.data.userId && latestUser) {
+        logTurn({ userId: p.data.userId, sessionId, role: "user", content: latestUser });
+      }
+      if (p.data.userId && text) {
+        logTurn({ userId: p.data.userId, sessionId, role: "assistant", content: text, via, ready });
+      }
+      const turnPair: { role: string; content: string }[] = [];
+      if (latestUser) turnPair.push({ role: "user", content: latestUser });
+      if (text) turnPair.push({ role: "assistant", content: text });
+      void rememberTranscript(p.data.userId, sessionId, turnPair, { via, ready, turns: compacted.length });
 
       const dbg = p.data.debug ? { _debug: { via, fuguMessage: fuguRaw } } : {};
+      log.info("converse reply", {
+        via,
+        userId: p.data.userId ? p.data.userId.slice(0, 12) : "anon",
+        sessionId: sessionId.slice(0, 16),
+        turns: compacted.length,
+        memories: memories.length,
+        ready,
+      });
       // submit_brief committed → hand the structured brief to the planner.
       if (slots && Object.keys(slots).length) {
         const brief = String(slots.brief || "").trim();
-        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via, ...dbg };
+        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via, sessionId, ...dbg };
       }
-      return { reply: text, via, ...dbg };
+      return { reply: text, via, sessionId, ...dbg };
     } catch (e: any) {
       log.error("converse failed", {
         message: String(e?.message ?? e),

@@ -79,6 +79,12 @@ const AIRPORTS: Record<string, { city: string; country: string; lat: number; lng
   CPT: { city: "Cape Town", country: "South Africa", lat: -33.9249, lng: 18.4241 },
 };
 
+// Named places that aren't airports — offline geocode for common demo/resort towns.
+const PLACES: Record<string, GeoPoint> = {
+  "CANNON BEACH": { lat: 45.8918, lng: -123.9615, label: "Cannon Beach, OR, USA" },
+  "CANNON BEACH, OR": { lat: 45.8918, lng: -123.9615, label: "Cannon Beach, OR, USA" },
+};
+
 const cache = new Map<string, GeoPoint | null>();
 
 /** Resolve an IATA code or free-form place string to coordinates. Table first, then Google
@@ -88,6 +94,12 @@ export async function geocode(query: string): Promise<GeoPoint | null> {
   if (!q) return null;
   const key = q.toUpperCase();
   if (cache.has(key)) return cache.get(key) ?? null;
+
+  const place = PLACES[key];
+  if (place) {
+    cache.set(key, place);
+    return place;
+  }
 
   // 1. Known airport code → precise, offline.
   const ap = AIRPORTS[key];
