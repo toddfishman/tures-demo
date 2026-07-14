@@ -155,7 +155,7 @@
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Taste Engine</b> recommendations that learn from every trip.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>No per-booking fee</b> — the trips are included.</span></li>
         </ul>
-        <a class="btn" href="signup.html" style="margin-top:auto">Go Concierge</a>
+        <a class="btn" href="signup.html" id="subscribe-concierge" style="margin-top:auto">Go Concierge</a>
       </article>
 
     </div>
@@ -256,6 +256,33 @@
     var b=e.target.closest('.bt'); if(!b) return;
     Array.prototype.forEach.call(tg.querySelectorAll('.bt'), function(x){ x.classList.remove('on'); }); b.classList.add('on');
     var c=COPY[b.dataset.bill]; if(!c) return; amt.textContent=c.amt; per.textContent=c.per; terms.textContent=c.terms;
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var btn=document.getElementById('subscribe-concierge'); if(!btn) return;
+  var banner=document.createElement('p');
+  banner.className='same-line';
+  banner.id='beta-booking-note';
+  banner.style.display='none';
+  banner.innerHTML='<b>Public beta:</b> trip bookings are still <b>Sample-labeled</b> until live money is enabled — subscriptions can still be tested in Stripe.';
+  var tiers=document.querySelector('.tiers');
+  if(tiers && tiers.parentNode) tiers.parentNode.insertBefore(banner, tiers.nextSibling);
+  function refresh(){
+    if(!(window.tures && window.tures.configured && window.tures.health)) return;
+    window.tures.health().then(function(h){
+      if(h && h.capabilities && h.capabilities.bookingSimulated) banner.style.display='';
+      else banner.style.display='none';
+    }).catch(function(){});
+  }
+  refresh();
+  btn.addEventListener('click', function(e){
+    if(!(window.tures && window.tures.signedIn)) return;
+    e.preventDefault();
+    btn.textContent='Starting…';
+    window.tures.billing.checkout().then(function(r){ location.href=r.url; }).catch(function(){ btn.textContent='Go Concierge'; });
   });
 })();
 </script>

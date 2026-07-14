@@ -60,9 +60,9 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 - [ ] **Google Places key** on Render (`GOOGLE_MAPS_API_KEY`) — discover empty-state UX done; needs key for real spots
 - [x] `proactive.html` → redirect to `plan.html?from=proactive` (theater at `?theater=1`)
 - [x] **Guest → signed-in mem0 merge** on login/signup (`/mem0/merge`)
-- [ ] Stripe billing when `billingLive`
+- [x] Stripe billing when `billingLive`
 - [x] CORS: add `tures.app` to engine (`render.yaml`)
-- [ ] Custom domain `tures.app` → v12 · update root `CLAUDE.md` → v12
+- [ ] Custom domain `tures.app` → v12 · ~~update root `CLAUDE.md`~~ *(done)*
 
 ---
 

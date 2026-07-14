@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
-import { recall, rememberTranscript } from "../mem0.ts";
+import { recall, remember, rememberTranscript } from "../mem0.ts";
 import { logTurn } from "../conversation-log.ts";
 import { compactConversation, capContext, recallQueryFromMessages } from "../agent/history.ts";
 import { fuguChat } from "../agent/fugu.ts";
@@ -214,6 +214,14 @@ export async function converseRoutes(app: FastifyInstance) {
       const turnPair: { role: string; content: string }[] = [];
       if (latestUser) turnPair.push({ role: "user", content: latestUser });
       if (text) turnPair.push({ role: "assistant", content: text });
+      if (ready && p.data.userId && slots) {
+        const tripLine = String(slots.brief || slots.destination || "trip").trim().slice(0, 240);
+        void remember(p.data.userId, [
+          { role: "user", content: latestUser || "Ready to plan this trip" },
+          { role: "assistant", content: `Trip brief locked: ${tripLine}` },
+        ]);
+      }
+
       void rememberTranscript(p.data.userId, sessionId, turnPair, { via, ready, turns: compacted.length });
 
       const dbg = p.data.debug ? { _debug: { via, fuguMessage: fuguRaw } } : {};

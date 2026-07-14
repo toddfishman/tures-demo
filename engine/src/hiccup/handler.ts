@@ -10,6 +10,7 @@ import { isSimulatedBooking, simulatedConfirmation } from "../booking/policy.ts"
 import { chooseCard, categoryForKind } from "../wallet/cards.ts";
 import { emitEvent } from "../events/bus.ts";
 import { log } from "../logger.ts";
+import { remember } from "../mem0.ts";
 
 export interface Disruption {
   kind: "cancellation" | "schedule_change" | "delay";
@@ -112,6 +113,13 @@ export async function handleDisruption(bookingId: string, disruption: Disruption
     audit(booking, "rebooked", `${flight.rebookedFrom.title} → ${alt.title} (${confirmation})${simulated ? " [simulated]" : ""}, +$${upchargeUsd.toLocaleString()}`);
     emitEvent(tripId, "hiccup", `Rebooked: ${alt.title}`, { detail: `${confirmation} · +$${upchargeUsd.toLocaleString()} — handled automatically`, data: { bookingId, confirmation, simulated } });
     emitEvent(tripId, "notify", "Disruption handled", { detail: `You're rebooked on ${alt.title}. Nothing for you to do.`, data: { bookingId } });
+
+    if (booking.accountId && booking.accountId !== "demo") {
+      void remember(booking.accountId, [
+        { role: "user", content: `Trip disruption: ${disruption.kind}${disruption.detail ? ` — ${disruption.detail}` : ""}` },
+        { role: "assistant", content: `Rebooked ${flight.rebookedFrom?.title || "flight"} → ${alt.title} (${confirmation})${simulated ? " [sample]" : ""}` },
+      ]);
+    }
 
     const resolution: RebookResolution = { status: "rebooked", disruption, from: flight.rebookedFrom.title, to: alt.title, upchargeUsd, reason: `auto-rebooked on ${alt.title} (+$${upchargeUsd.toLocaleString()})` };
     return record(resolution);

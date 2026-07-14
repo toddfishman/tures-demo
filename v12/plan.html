@@ -330,6 +330,15 @@
   var watchCap = 10;
   var watchOn = true;
   var watchMeta = { marginPercent: 20, defaultCapUsd: 10 };
+  var pendingBookingId = null;
+  var bookingIdemKey = null;
+  var bookingSimulated = true;
+
+  if (live && window.tures.health) {
+    window.tures.health().then(function(h){
+      bookingSimulated = !!(h && h.capabilities && h.capabilities.bookingSimulated);
+    }).catch(function(){});
+  }
 
   if (live && window.tures.watchCapabilities) {
     window.tures.watchCapabilities().then(function(c){
@@ -560,19 +569,36 @@
     typing(true);
     var body={brief:brief};
     if(tripWatchEnabled) body.tripWatch={enabled:true, capUsd:capUsd||watchCap};
-    window.tures.book(body).then(function(bk){ return window.tures.confirm(bk.id || bk.tripId).then(function(conf){ return {bk:bk, conf:conf}; }); })
-    .then(function(r){
+    if(!bookingIdemKey){
+      var uid = (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : 'guest';
+      bookingIdemKey = 'book-' + uid + '-' + Date.now().toString(36);
+    }
+    body.idempotencyKey = bookingIdemKey;
+    var chain;
+    if(pendingBookingId){
+      chain = window.tures.confirm(pendingBookingId).then(function(conf){ return {bk:conf, conf:conf}; });
+    } else {
+      chain = window.tures.book(body).then(function(bk){
+        pendingBookingId = bk.id || bk.tripId;
+        return window.tures.confirm(pendingBookingId).then(function(conf){ return {bk:bk, conf:conf}; });
+      });
+    }
+    chain.then(function(r){
       var bk=r.conf||r.bk;
       typing(false);
       var comps=(bk && bk.components)||[];
+      var anySim = bookingSimulated || comps.some(function(c){ return c.simulated; });
       var rows = comps.map(function(c){
         var code=c.confirmation||c.pnr||c.ref||c.status||'';
-        return '<div class="ln"><span>'+esc(c.label||'Booked')+'</span><span class="mono">'+esc(code)+'</span></div>';
+        return '<div class="ln"><span>'+esc(c.title||c.label||'Booked')+'</span><span class="mono">'+esc(code)+'</span></div>';
       }).join('') || '<div class="ln"><span>Trip held</span><span class="mono">'+esc(bk.tripId||bk.id||'')+'</span></div>';
       var card=document.createElement('div'); card.className='conf msg';
-      card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+rows;
+      card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice'+(anySim?' <span class="demo-tag">Sample</span>':'')+'</div>'+rows;
       thread.appendChild(card); reveal(card);
-      bubble('Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>','t');
+      var doneMsg = anySim
+        ? 'Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>'
+        : 'Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here.';
+      bubble(doneMsg,'t');
       if(tripWatchEnabled && bk.id && window.tures.getWatch){
         window.tures.getWatch(bk.id).then(function(w){
           if(!w||!w.enabled) return;

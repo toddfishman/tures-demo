@@ -54,7 +54,7 @@ This is the **launch** doc. Feature slices live in [`CHECKLIST.md`](CHECKLIST.md
 - [x] Simulated bookings tagged **Sample** in UI
 - [x] Unconfigured signal providers return empty (never fabricated)
 - [x] `/health.capabilities.bookingSimulated` exposed
-- [ ] Audit: no page implies real charges without P6 switches
+- [x] Audit: no page implies real charges without P6 switches
 
 ---
 
@@ -91,7 +91,7 @@ The product is **parse → plan → hold → confirm → prove**. The AI agent i
 - [x] Two-source verification posture documented
 - [x] **mem0 write-back** after successful book (destination + components)
 - [ ] Signed-in held trip → vault → book E2E verified on prod
-- [ ] Idempotency on confirm retried from UI
+- [x] Idempotency on confirm retried from UI
 
 ### Handoffs (no lobotomy)
 
@@ -124,7 +124,7 @@ Three layers must stay aligned:
 - [x] **Conversation compaction** — max turns, per-message cap, total char budget
 - [x] Richer `funnel.context()` (taste, home, loyalty, payment on file)
 - [ ] Structured context object (JSON) instead of prose string — later
-- [ ] Summarize thread to mem0 on `ready:true` handoff (one-shot trip summary)
+- [x] Summarize thread to mem0 on `ready:true` handoff (one-shot trip summary)
 
 ### mem0 product surfacing
 
@@ -134,7 +134,7 @@ Three layers must stay aligned:
 - [x] Discover slates show memory-backed notes when available
 - [x] Post-book: destination + components written to mem0
 - [ ] Post-trip outcome + taste learnings to mem0 (beyond book confirm)
-- [ ] Hiccup resolutions written to mem0
+- [x] Hiccup resolutions written to mem0
 
 ---
 
@@ -175,10 +175,10 @@ Three layers must stay aligned:
 - [x] Discover empty-state UX when Google key off
 - [x] Link `LAUNCH.md` from nav **More** (internal)
 - [ ] Compile Tailwind — **N/A for v12** (uses `v12.css`, no CDN)
-- [ ] SEO / OG audit on any pages still missing meta
+- [x] SEO / OG audit on any pages still missing meta
 - [ ] Custom domain `tures.app` → v12 on GitHub Pages
-- [ ] Update root `CLAUDE.md` → v12 current *(in progress)*
-- [ ] Pricing / checkout trust copy audit
+- [x] Update root `CLAUDE.md` → v12 current
+- [x] Pricing / checkout trust copy audit
 
 ---
 
