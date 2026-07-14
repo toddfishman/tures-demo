@@ -7,42 +7,47 @@
 // IMPORTANT: until a real integration is added, an UNCONFIGURED feed returns []. We never fabricate
 // a tweet, a headline, or a traffic incident — an empty result means "no dedicated feed," not "all
 // clear." (When you wire one, replace the fetch body with the real call and keep the guard.)
+import { pollXAlerts } from "../../watch/x.ts";
+import { buildXQuery } from "../../watch/keywords.ts";
+import { fetchNewsSignals } from "./newsapi.ts";
 import type { Signal, SignalContext, SignalProvider } from "../types.ts";
 import { config } from "../../config.ts";
 
-/** News API (e.g. NewsAPI / GDELT). Set NEWS_API_KEY to enable. */
+/** News API (NewsAPI.org). Set NEWS_API_KEY to enable. */
 export const newsFeed: SignalProvider = {
   name: "News feed",
   category: "news",
   configured: () => !!config.signals.newsApiKey,
-  async fetch(_ctx: SignalContext): Promise<Signal[]> {
-    if (!config.signals.newsApiKey) return [];
-    // TODO: real NewsAPI/GDELT query around ctx.label for the trip window → map to Signals.
-    return [];
+  async fetch(ctx: SignalContext): Promise<Signal[]> {
+    return fetchNewsSignals(ctx);
   },
 };
 
-/** X / Twitter — local real-time chatter (incidents, closures, vibe). Set X_BEARER_TOKEN to enable. */
+/** X / Twitter — local real-time chatter (incidents, closures). Set X_BEARER_TOKEN to enable. */
 export const xFeed: SignalProvider = {
   name: "X / Twitter",
   category: "news",
   configured: () => !!config.signals.xBearerToken,
-  async fetch(_ctx: SignalContext): Promise<Signal[]> {
+  async fetch(ctx: SignalContext): Promise<Signal[]> {
     if (!config.signals.xBearerToken) return [];
-    // TODO: real X recent-search (geo + keywords) → map to Signals. X has no free tier today, so
-    // this stays guarded until a token is provided.
-    return [];
+    const query = await buildXQuery({
+      destination: ctx.destination,
+      origin: ctx.origin ?? "",
+      departDate: ctx.departDate,
+      returnDate: ctx.returnDate,
+    } as import("../../types.ts").Brief);
+    if (!query) return [];
+    const { signals } = await pollXAlerts(ctx, query);
+    return signals;
   },
 };
 
-/** Traffic / incident API (e.g. TomTom, HERE). Set TRAFFIC_API_KEY to enable. */
+/** Traffic / incident API — not wired yet; key is reserved for a future TomTom/HERE adapter. */
 export const trafficFeed: SignalProvider = {
   name: "Traffic / incidents",
   category: "traffic",
-  configured: () => !!config.signals.trafficApiKey,
+  configured: () => false, // honest: TRAFFIC_API_KEY exists in config but no provider is live yet
   async fetch(_ctx: SignalContext): Promise<Signal[]> {
-    if (!config.signals.trafficApiKey) return [];
-    // TODO: real traffic-incident query around ctx.lat/lng → map to Signals.
     return [];
   },
 };

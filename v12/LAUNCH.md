@@ -35,7 +35,7 @@ This is the **launch** doc. Feature slices live in [`CHECKLIST.md`](CHECKLIST.md
 - [x] **`BROWSERBASE_*` + `ACTION_MODEL`** — Action Executor *(live: `stagehand: true`)*
 - [x] **`SAKANA_API_KEY`** — Fugu chat brain *(live: `chatBrain: sakana-fugu`)*
 - [x] **`TRIP_WATCH_*`** — adaptive Trip Watch *(live: `tripWatch: true`)*
-- [ ] **`GOOGLE_MAPS_API_KEY`** — discover restaurants/activities (optional but recommended)
+- [x] **`GOOGLE_MAPS_API_KEY`** — discover restaurants/activities (optional but recommended)
 - [ ] **`ENGINE_API_KEY`** — optional lock-down for public beta
 - [x] `/health` documents `bookingSimulated: true` until P6
 
@@ -222,7 +222,7 @@ Three layers must stay aligned:
 
 ## Current focus (next up)
 
-**Todd (Render):** add `GOOGLE_MAPS_API_KEY` for discover; optional `ENGINE_API_KEY`, `X_BEARER_TOKEN`, `NEWS_API_KEY`. Confirm Stripe test keys if testing checkout.
+**Todd (Render):** add Stripe test keys (`STRIPE_PUBLISHABLE_KEY` fixes `tbd` on `/health`); optional `X_BEARER_TOKEN`, `NEWS_API_KEY`, `ENGINE_API_KEY`.
 
 **Code queue (post-launch polish):**
 - [ ] Custom domain `tures.app` → GitHub Pages v12

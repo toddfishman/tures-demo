@@ -29,7 +29,26 @@ services:
       # Google Maps Platform key — Geocoding API (New) + Places API (New). Powers IATA/city →
       # coordinates (Duffel Stays needs them) and real restaurant / things-to-do discovery.
       # Unset → built-in airport table for geocoding, discovery skipped/mock.
-      - key: GOOGLE_MAPS_API_KEY    # optional
+      - key: GOOGLE_MAPS_API_KEY    # optional — Geocoding + Places discover
+        sync: false
+      # Stripe (Concierge subscriptions + future card-on-file). Test keys OK for beta.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY   # pk_test_… — shown on /health for Stripe.js
+        sync: false
+      - key: STRIPE_PRICE_SUBSCRIPTION  # price_… for Concierge plan
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PUBLIC_BASE_URL
+        value: https://toddfishman.github.io/tures-demo/v12
+      # Trip Watch premium feeds (all optional)
+      - key: X_BEARER_TOKEN           # X API app-only bearer — recent search for disruptions
+        sync: false
+      - key: NEWS_API_KEY             # newsapi.org — headlines on elevated-risk scan days
+        sync: false
+      # TRAFFIC_API_KEY reserved — no provider wired yet; leave unset
+      - key: ENGINE_API_KEY           # optional ops lock-down; public plan/book routes stay open
         sync: false
       - key: AGENT_MODEL
         value: claude-opus-4-8

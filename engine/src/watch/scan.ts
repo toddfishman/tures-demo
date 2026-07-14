@@ -4,11 +4,11 @@ import { gatherSignals } from "../signals/service.ts";
 import { emitEvent } from "../events/bus.ts";
 import { handleDisruption } from "../hiccup/handler.ts";
 import { log } from "../logger.ts";
-import { config } from "../config.ts";
 import type { Signal } from "../signals/types.ts";
 import type { TripWatch, ScanKind } from "./types.ts";
 import { recordUsage, atCap, effectiveCap } from "./meter.ts";
 import { assessRisk } from "./risk.ts";
+import { fetchNewsSignals } from "../signals/providers/newsapi.ts";
 import { pollXAlerts } from "./x.ts";
 import { watches } from "./store.ts";
 
@@ -57,31 +57,6 @@ function surfaceNewSignals(w: TripWatch, b: Booking, signals: Signal[]): number 
   return n;
 }
 
-async function pollNews(ctx: { label: string; lat: number; lng: number; departDate?: string; returnDate?: string; destination: string }): Promise<Signal[]> {
-  if (!config.signals.newsApiKey) return [];
-  const q = encodeURIComponent(`${ctx.label} travel OR airport OR strike OR weather`);
-  try {
-    const res = await fetch(
-      `https://newsapi.org/v2/everything?q=${q}&pageSize=5&sortBy=publishedAt&language=en&apiKey=${config.signals.newsApiKey}`,
-      { signal: AbortSignal.timeout(12000) },
-    );
-    if (!res.ok) return [];
-    const body = (await res.json()) as { articles?: Array<{ title?: string; description?: string; url?: string }> };
-    return (body.articles ?? []).slice(0, 5).map((a, i) => ({
-      id: `news:${ctx.label}:${i}:${String(a.title || i).slice(0, 30)}`,
-      category: "news" as const,
-      severity: /strike|cancel|storm|closure|delay/i.test(String(a.title)) ? "warning" : "watch",
-      title: String(a.title || "News").slice(0, 100),
-      detail: a.description ? String(a.description).slice(0, 200) : undefined,
-      source: "newsapi",
-      url: a.url,
-      travelImpacting: /strike|cancel|storm|airport|flight/i.test(String(a.title ?? "") + String(a.description ?? "")),
-    }));
-  } catch {
-    return [];
-  }
-}
-
 export async function runScan(w: TripWatch, b: Booking, kind: ScanKind): Promise<TripWatch> {
   if (!w.enabled) return w;
   if (atCap(w) && kind !== "alerts") {
@@ -124,7 +99,7 @@ export async function runScan(w: TripWatch, b: Booking, kind: ScanKind): Promise
   if (kind === "news") {
     const geo = await gatherSignals(inp, { deep: false });
     if (geo.context) {
-      const news = await pollNews({ ...geo.context, destination: inp.destination! });
+      const news = await fetchNewsSignals(geo.context);
       recordUsage(w, "news_query", 1);
       surfaced += surfaceNewSignals(w, b, news);
     }

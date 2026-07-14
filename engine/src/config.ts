@@ -141,7 +141,7 @@ export const config = {
   stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
   stripePricePerTrip: parsed.STRIPE_PRICE_PER_TRIP,
   stripePublishableKey: parsed.STRIPE_PUBLISHABLE_KEY,
-  publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v5",
+  publicBaseUrl: parsed.PUBLIC_BASE_URL ?? "https://toddfishman.github.io/tures-demo/v12",
   vgs: {
     url: parsed.VGS_VAULT_URL?.replace(/\/$/, ""),
     username: parsed.VGS_USERNAME,
