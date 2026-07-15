@@ -133,6 +133,10 @@ async function runConverseTurns(
     if (turn.replyIncludes && !includesAll(reply, turn.replyIncludes)) {
       errors.push(`reply missing [${turn.replyIncludes.join(", ")}]: "${reply.slice(0, 120)}…"`);
     }
+    if (turn.replyIncludesAny?.length) {
+      const hit = turn.replyIncludesAny.some((n) => reply.toLowerCase().includes(n.toLowerCase()));
+      if (!hit) errors.push(`reply missing any of [${turn.replyIncludesAny.join(", ")}]: "${reply.slice(0, 120)}…"`);
+    }
     if (turn.replyExcludes && !excludesAll(reply, turn.replyExcludes)) {
       errors.push(`reply should exclude [${turn.replyExcludes.join(", ")}]: "${reply.slice(0, 120)}…"`);
     }

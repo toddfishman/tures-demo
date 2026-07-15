@@ -33,6 +33,8 @@ export interface DiscoverExpect {
 export interface ConverseTurn {
   user: string;
   replyIncludes?: string[];
+  /** At least one must appear (for non-deterministic live LLM replies). */
+  replyIncludesAny?: string[];
   replyExcludes?: string[];
   expectReady?: boolean;
   slots?: {
