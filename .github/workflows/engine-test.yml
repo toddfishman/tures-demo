@@ -10,8 +10,14 @@ on:
     paths:
       - "engine/**"
   schedule:
-    # Nightly live LLM golden refresh check (optional — fails if keys missing, skipped gracefully)
+    # Nightly live LLM golden refresh check
     - cron: "0 14 * * *"
+  workflow_dispatch:
+    inputs:
+      llm:
+        description: Run live LLM scenarios (Sakana / Anthropic)
+        type: boolean
+        default: true
 
 jobs:
   smoke-and-scenarios:
@@ -42,7 +48,7 @@ jobs:
 
   llm-nightly:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.llm)
     defaults:
       run:
         working-directory: engine
