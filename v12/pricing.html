@@ -41,7 +41,7 @@
 
   /* highlighted Concierge card */
   .tier.flag{border-color:var(--acc);box-shadow:0 24px 60px -36px var(--acc)}
-  .tier.flag .tag{position:absolute;top:-11px;right:24px}
+  .tier .tname .tag{flex-shrink:0}
 
   .same-line{text-align:center;max-width:60ch;margin:34px auto 0;color:var(--muted);font-size:15px}
   .same-line b{color:var(--text);font-weight:500}
@@ -138,8 +138,7 @@
 
       <!-- Concierge -->
       <article class="card tier flag">
-        <span class="tag">Most complete</span>
-        <div class="tname"><h3 class="serif">Concierge</h3></div>
+        <div class="tname"><h3 class="serif">Concierge</h3><span class="tag">Most complete</span></div>
         <div class="bill-toggle" id="bill-toggle" role="group" aria-label="Billing period">
           <button class="bt on" data-bill="monthly" type="button">Monthly</button>
           <button class="bt" data-bill="yearly" type="button">Yearly <span class="save">–20%</span></button>
