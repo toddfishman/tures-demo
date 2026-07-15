@@ -1,0 +1,15 @@
+{
+  "id": "pdx-cb-opener",
+  "recordedAt": "2026-07-11",
+  "brain": "fugu",
+  "turns": [
+    {
+      "user": "I need transport from PDX to Cannon Beach",
+      "response": {
+        "reply": "Happy to sort that — it's about a 90-minute drive. When are you landing at PDX, and how many of you need the ride?",
+        "via": "fugu",
+        "ready": false
+      }
+    }
+  ]
+}

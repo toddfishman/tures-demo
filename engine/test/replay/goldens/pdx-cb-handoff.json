@@ -1,0 +1,27 @@
+{
+  "id": "pdx-cb-handoff",
+  "recordedAt": "2026-07-11",
+  "brain": "fugu",
+  "turns": [
+    {
+      "user": "From Seattle, fly into PDX mid-August for 5 days, two adults, balanced economy. Ground transfer to Cannon Beach — flight and car only, no hotel or activities.",
+      "response": {
+        "reply": "Got it — SEA to PDX, then a car to Cannon Beach. About 90 minutes on the ground. Putting that together now.",
+        "via": "fugu",
+        "ready": true,
+        "brief": "From Seattle, fly into PDX August 15-20 for two adults, economy, ground transfer to Cannon Beach — flight and car service only.",
+        "slots": {
+          "origin": "Seattle",
+          "destination": "PDX",
+          "lodgingArea": "Cannon Beach, OR",
+          "timing": "August 15-20",
+          "travelers": "2 adults",
+          "style": "economy",
+          "budget": "balanced",
+          "scope": "flights_transport",
+          "brief": "From Seattle, fly into PDX August 15-20 for two adults, economy, ground transfer to Cannon Beach — flight and car service only."
+        }
+      }
+    }
+  ]
+}

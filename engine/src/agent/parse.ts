@@ -6,6 +6,7 @@ import { BriefSchema } from "../types.ts";
 import type { Brief } from "../types.ts";
 import { config } from "../config.ts";
 import { log } from "../logger.ts";
+import { heuristicParse } from "./parse-heuristic.ts";
 
 export interface ParseResult {
   brief: Brief;
@@ -14,112 +15,10 @@ export interface ParseResult {
 }
 
 // Minimal city → IATA table for the heuristic path (the agent path needs none).
-const CITY_IATA: Record<string, string> = {
-  paris: "CDG", lisbon: "LIS", london: "LHR", "new york": "JFK", tokyo: "HND",
-  kyoto: "KIX", seattle: "SEA", "san francisco": "SFO", "sf": "SFO", copenhagen: "CPH",
-  helsinki: "HEL", ivalo: "IVL", rome: "FCO", barcelona: "BCN", amsterdam: "AMS",
-  berlin: "BER", reykjavik: "KEF", oslo: "OSL", stockholm: "ARN", lima: "LIM",
-  "big island": "KOA", kona: "KOA", hawaii: "KOA", honolulu: "HNL", maui: "OGG",
-  portland: "PDX",
-};
+// Heuristic implementation lives in parse-heuristic.ts (also used by scenario tests).
 
-function isoDaysFromNow(days: number): string {
-  const ms = Date.parse("2026-06-09T00:00:00Z") + days * 86400000; // stable base; refined by deploy clock
-  return new Date(ms).toISOString().slice(0, 10);
-}
-
-function heuristicParse(text: string): ParseResult {
-  const t = text.toLowerCase();
-  const assumptions: string[] = [];
-
-  const found: string[] = [];
-  for (const city of Object.keys(CITY_IATA)) {
-    if (t.includes(city)) found.push(city);
-  }
-  const fromMatch = t.match(/from\s+([a-z\s]+?)[,.\n]/);
-  const fromCity = fromMatch?.[1]?.trim() ?? "";
-  const origin = CITY_IATA[fromCity] ?? "SFO";
-  if (!CITY_IATA[fromCity]) assumptions.push("assumed home airport SFO");
-
-  const destCity = found.find((c) => CITY_IATA[c] !== origin) ?? found[0];
-  const destination = destCity ? CITY_IATA[destCity]! : "LIS";
-  if (!destCity) assumptions.push("couldn't read a destination yet — tell me the city and I'll re-plan");
-
-  // Children, e.g. "(2 kids)", "2 children", "two kids".
-  let children = 0;
-  const kidMatch = t.match(/(\d+)\s*(?:kids?|children|child)/);
-  if (kidMatch) children = Number(kidMatch[1]) || 0;
-
-  let adults = 1;
-  if (/family of (\d+)|(\d+) of us|party of (\d+)|(\d+)\s*people|(\d+)\s*adults/.test(t)) {
-    const m = t.match(/family of (\d+)|(\d+) of us|party of (\d+)|(\d+)\s*people|(\d+)\s*adults/)!;
-    const total = Number(m[1] || m[2] || m[3] || m[4] || m[5]) || 1;
-    // "4 people (2 kids)" → 4 total, 2 kids → 2 adults. "2 adults" → 2 adults flat.
-    adults = m[5] ? total : Math.max(1, total - children);
-  } else if (/\b(couple|two of us|both of us|me and|my partner|my wife|my husband)\b/.test(t)) {
-    adults = 2;
-  }
-
-  const cabin = /business/.test(t)
-    ? "business"
-    : /premium economy/.test(t)
-      ? "premium_economy"
-      : /first class/.test(t)
-        ? "first"
-        : "economy";
-
-  // Budget posture + optional hard cap.
-  let priceSensitivity: "thrifty" | "balanced" | "premium" | "no_limit" = "balanced";
-  if (/budget|cheap|save money|affordable|frugal|inexpensive/.test(t)) priceSensitivity = "thrifty";
-  else if (/no expense|to the nines|money is no object|not price sensitive|splurge|whatever it costs|sky'?s the limit/.test(t)) priceSensitivity = "no_limit";
-  else if (/treat ourselves|treat myself|nice but|spare no|go all out|special/.test(t)) priceSensitivity = "premium";
-  const capMatch = t.match(/(?:under|below|max|up to|budget of|no more than)\s*\$?\s*([\d,]+)\s*(k)?/);
-  const budgetUsd = capMatch ? Number((capMatch[1] ?? "0").replace(/,/g, "")) * (capMatch[2] ? 1000 : 1) || undefined : undefined;
-
-  const placeTypes: string[] = [];
-  for (const kw of ["design-hotel", "design", "boutique", "ryokan", "sauna", "spa", "waterfront", "minimalist", "grand"]) {
-    if (t.includes(kw.replace("-hotel", "")) || t.includes(kw)) placeTypes.push(kw);
-  }
-
-  const departDate = isoDaysFromNow(45);
-  const returnDate = /weekend/.test(t) ? isoDaysFromNow(48) : isoDaysFromNow(52);
-  assumptions.push(`assumed dates ${departDate} → ${returnDate} (none clearly stated)`);
-
-  if (children) assumptions.push(`read ${adults} adult${adults > 1 ? "s" : ""} + ${children} child${children > 1 ? "ren" : ""}`);
-
-  if (priceSensitivity !== "balanced") assumptions.push(`read budget posture: ${priceSensitivity.replace("_", " ")}`);
-
-  let lodgingArea: string | undefined;
-  if (/cannon beach|\bcb\b/i.test(text)) lodgingArea = "Cannon Beach, OR";
-  else {
-    const stayMatch = text.match(/(?:stay(?:ing)? (?:in|at)|lodging (?:in|at)|drive to|transport to)\s+([^,.;\n]+)/i);
-    if (stayMatch?.[1]) lodgingArea = stayMatch[1].trim();
-  }
-  if (lodgingArea) assumptions.push(`lodging area: ${lodgingArea}`);
-
-  let tripScope: "full" | "flights_stay" | "flights_transport" | "flights_only" = "full";
-  if (/flight(s)?\s*(?:and|\+|plus)\s*(?:car|ground|transfer|car service|ride)/i.test(t) || /just\s+(?:the\s+)?flight/i.test(t) && /car|transfer|ground/i.test(t)) {
-    tripScope = "flights_transport";
-    assumptions.push("scope: flight + ground transport only");
-  } else if (/just\s+(?:the\s+)?flights?|flights?\s*only/i.test(t)) {
-    tripScope = "flights_only";
-    assumptions.push("scope: flights only");
-  } else if (/no\s+(?:activities|restaurants|dining|extras)/i.test(t)) {
-    tripScope = "flights_stay";
-    assumptions.push("scope: flight + stay, no extras");
-  }
-
-  const brief = BriefSchema.parse({
-    origin, destination, departDate, returnDate, adults, children, cabin,
-    priceSensitivity, budgetUsd,
-    placeTypes: [...new Set(placeTypes)], bookingMode: "confirm_each",
-    lodgingArea, tripScope,
-  });
-  return { brief, assumptions, via: "heuristic" };
-}
-
-export async function parseBrief(text: string): Promise<ParseResult> {
-  if (!config.anthropicKey) return heuristicParse(text);
+export async function parseBrief(text: string, opts?: { heuristic?: boolean }): Promise<ParseResult> {
+  if (opts?.heuristic || !config.anthropicKey) return heuristicParse(text);
 
   try {
     const { default: Anthropic } = await import("@anthropic-ai/sdk");

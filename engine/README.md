@@ -16,7 +16,24 @@ npm run dev              # Fastify on http://localhost:8787 (tsx watch, no build
 ```bash
 npm run smoke            # in-process smoke test, mock supplier, no keys
 npm run typecheck        # tsc --noEmit
+npm run test:scenarios   # tiered intelligence tests ($0 — deterministic + replay)
+npm run test:scenarios:llm   # live Sakana/Claude converse (costs $; needs keys)
+npm run test:record-goldens  # refresh replay fixtures after prompt/model changes
 ```
+
+### Intelligence test tiers
+
+| Tier | Command | Cost | When |
+|------|---------|------|------|
+| 0 | `npm run smoke` | $0 | Every push (CI) |
+| 1 | `npm run test:scenarios` | $0 | Every push — parse heuristics, discover, transport distance |
+| 2 | Replay goldens in `test/replay/goldens/` | $0 | Same run — frozen Fugu/Claude replies, no API call |
+| 3 | `npm run test:scenarios:llm` | ~$1–2 | Nightly (GitHub Actions) or before Sakana model changes |
+| 4 | `npm run test:record-goldens` | ~$0.10/run | After changing converse prompts — commit updated JSON |
+
+Filter: `npm run test:scenarios -- --tag=transfer` or `--tier=deterministic`.
+
+To compare or replace Sakana: run tier 3, check `via:fugu` vs `via:anthropic` in output; re-record goldens when Fugu behavior is acceptable.
 
 ## API (current)
 

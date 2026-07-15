@@ -11,7 +11,10 @@
     "dev": "tsx watch src/server.ts",
     "start": "node --import tsx src/server.ts",
     "typecheck": "tsc --noEmit",
-    "smoke": "tsx test/smoke.ts"
+    "smoke": "tsx test/smoke.ts",
+    "test:scenarios": "tsx test/run-scenarios.ts",
+    "test:scenarios:llm": "tsx test/run-scenarios.ts --llm",
+    "test:record-goldens": "tsx test/record-goldens.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
