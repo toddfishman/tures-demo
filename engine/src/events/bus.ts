@@ -2,6 +2,7 @@
 // streams them to the front-end. Per-trip topics so one browser only sees its own trip.
 // Chunk 6 swaps the in-memory impl for Redis pub/sub when we run more than one instance.
 import type { ExecutionEvent } from "../types.ts";
+import { onExecutionEvent } from "../notify/proactive.ts";
 
 type Listener = (e: ExecutionEvent) => void;
 
@@ -18,6 +19,7 @@ class EventBus {
     this.history.set(event.tripId, buf);
 
     for (const l of this.listeners.get(event.tripId) ?? []) l(event);
+    onExecutionEvent(event);
   }
 
   subscribe(tripId: string, listener: Listener): () => void {

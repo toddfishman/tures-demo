@@ -193,7 +193,7 @@ Three layers must stay aligned:
 - [ ] `X_BEARER_TOKEN` for X alert polls (optional)
 - [ ] `NEWS_API_KEY` for news scans on elevated risk days
 - [ ] Premium feeds keyed (news / X / traffic) or remain honestly off
-- [ ] Push / SMS notify channel (Telegram first)
+- [x] Push / SMS notify channel — **Telegram proactive** (Trip Watch + hiccup → linked chat); SMS/push still open
 
 ---
 
