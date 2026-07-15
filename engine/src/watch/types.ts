@@ -49,6 +49,13 @@ export interface TripWatch {
   xSinceId?: string;
   surfacedSignalIds: string[];
 
+  /** Pass-through settlement — charged once when the watch window closes. */
+  settledAt?: string;
+  settlementUsd?: number;
+  settlementPaymentId?: string;
+  settlementStatus?: "succeeded" | "mock" | "skipped" | "failed";
+  settlementNote?: string;
+
   createdAt: string;
   updatedAt: string;
 }
@@ -64,4 +71,11 @@ export interface WatchPricing {
   atCap: boolean;
   pendingCapUsd?: number;
   remainingUsd: number;
+  settlement?: {
+    status: TripWatch["settlementStatus"];
+    usd?: number;
+    settledAt?: string;
+    paymentId?: string;
+    note?: string;
+  };
 }

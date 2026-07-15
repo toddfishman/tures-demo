@@ -11,6 +11,7 @@ import { watches } from "./store.ts";
 import { runScan, utcDay } from "./scan.ts";
 import { assessRisk } from "./risk.ts";
 import { gatherSignals } from "../signals/service.ts";
+import { settleWatchBilling, watchWindowClosed } from "./settle.ts";
 
 const DAY = 86400000;
 
@@ -69,7 +70,22 @@ export async function enableTripWatch(bookingId: string, opts: EnableWatchOpts =
 export function getTripWatch(bookingId: string): (TripWatch & { pricing: WatchPricing }) | null {
   const w = watches.get(bookingId);
   if (!w) return null;
-  return { ...w, pricing: pricing(w) };
+  const p = pricing(w);
+  return {
+    ...w,
+    pricing: {
+      ...p,
+      settlement: w.settledAt
+        ? {
+            status: w.settlementStatus,
+            usd: w.settlementUsd,
+            settledAt: w.settledAt,
+            paymentId: w.settlementPaymentId,
+            note: w.settlementNote,
+          }
+        : undefined,
+    },
+  };
 }
 
 export function listWatchesForAccount(accountId: string): TripWatch[] {
@@ -86,7 +102,14 @@ export async function processWatchTick(): Promise<void> {
 
   for (const w of active) {
     const b = bookings.get(w.bookingId);
-    if (!b || b.status !== "booked" || !withinWatchWindow(b)) continue;
+    if (!b) continue;
+
+    if (watchWindowClosed(b)) {
+      if (!w.settledAt) await settleWatchBilling(w, b).catch((e) => log.warn("watch settle failed", { bookingId: w.bookingId, err: String(e) }));
+      continue;
+    }
+
+    if (b.status !== "booked" || !withinWatchWindow(b)) continue;
 
     try {
       // New UTC day → reset counters + morning brief

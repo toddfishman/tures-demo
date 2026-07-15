@@ -176,6 +176,14 @@
           return;
         }
         var pr = w.pricing || {};
+        var settleHtml = "";
+        if (pr.settlement && pr.settlement.settledAt) {
+          var st = pr.settlement.status || "";
+          var stLabel = st === "succeeded" ? "Charged" : st === "mock" ? "Settled (simulated)" : st === "skipped" ? "No charge" : st === "failed" ? "Settlement failed" : "Settled";
+          settleHtml = '<div class="it2">' + esc(stLabel) +
+            (pr.settlement.usd ? " · $" + esc(String(pr.settlement.usd.toFixed(2))) : "") +
+            (st === "mock" ? ' <span class="demo-tag">Sample</span>' : "") + "</div>";
+        }
         var capHtml = "";
         if (pr.atCap && pr.pendingCapUsd && window.tures.approveWatchCap) {
           capHtml = '<div class="it2" style="margin-top:8px"><button type="button" class="btn sm watch-cap-btn" data-id="' + esc(bk.id) + '">Approve $' + esc(String(pr.pendingCapUsd)) + ' more scans</button></div>';
@@ -184,6 +192,7 @@
           '<div class="item"><span class="idot"></span><div class="ibody"><div class="it1">Risk · ' + esc(w.riskLevel || "clear") + " (" + esc(String(w.riskScore || 0)) + ')</div>' +
           '<div class="it2">Alerts on · ' + esc(String(w.scansToday || 0)) + "/" + esc(String(w.scansBudgetToday || 0)) + " scans today</div>" +
           '<div class="it2">Spend · $" + esc(String((pr.billableUsd || 0).toFixed(2))) + " of $" + esc(String(pr.effectiveCapUsd || pr.capUsd || w.capUsd)) + " cap (pass-through +" + esc(String(pr.marginPercent || 20)) + "%)</div>" +
+          settleHtml +
           capHtml + "</div></div></div>";
         var capBtn = el.querySelector(".watch-cap-btn");
         if (capBtn) {

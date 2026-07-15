@@ -186,7 +186,7 @@ Three layers must stay aligned:
 
 - [x] Trip radar (`/signals`) on plan
 - [x] **Adaptive Trip Watch** — alerts always on + risk-scored scans (replaces naive 30m deep poll)
-- [x] Pass-through pricing (Option A) — metered COGS + 20% margin, cap per trip
+- [x] Pass-through pricing (Option A) — metered COGS + 20% margin, cap per trip, **settled at trip end**
 - [x] SSE live watch on trips + hiccup
 - [x] Watcher → hiccup proposal pipeline
 - [x] Set `TRIP_WATCH_*` env on Render + redeploy *(live 2026-07-09)*

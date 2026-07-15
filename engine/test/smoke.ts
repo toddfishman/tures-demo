@@ -492,6 +492,68 @@ let bookingId = "";
   ok("trip watch: risk scoring + pass-through metering");
 }
 
+// 15.6 trip watch pass-through settlement at trip end
+{
+  const { settleWatchBilling, watchWindowClosed } = await import("../src/watch/settle.ts");
+  const { recordUsage, emptyMeter } = await import("../src/watch/meter.ts");
+  const { watches } = await import("../src/watch/store.ts");
+
+  await connectCard("Watch Settle Card", "generic_cashback", "4242");
+
+  const pastBrief = { ...brief, departDate: "2020-01-01", returnDate: "2020-01-05" };
+  const fakeBooking = {
+    id: "bk_watch_settle",
+    tripId: "trip_watch_settle",
+    accountId: "demo",
+    brief: pastBrief,
+    status: "booked" as const,
+    totalUsd: 1000,
+    currency: "USD",
+    components: [],
+    charges: [],
+    violations: [],
+    audit: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  } as unknown as import("../src/booking/types.ts").Booking;
+  assert.ok(watchWindowClosed(fakeBooking), "past trip window is closed");
+
+  const w0 = {
+    bookingId: fakeBooking.id,
+    tripId: fakeBooking.tripId,
+    accountId: "demo",
+    enabled: true,
+    capUsd: 10,
+    marginPercent: 20,
+    alertsOn: true,
+    riskScore: 0,
+    riskLevel: "clear" as const,
+    scansToday: 0,
+    scansBudgetToday: 0,
+    deepScansToday: 0,
+    meter: emptyMeter(),
+    keywords: ["HEL"],
+    surfacedSignalIds: [],
+    createdAt: "",
+    updatedAt: "",
+  };
+  watches.put(w0);
+  const skipped = await settleWatchBilling(watches.get(fakeBooking.id)!, fakeBooking);
+  assert.equal(skipped.settlementStatus, "skipped", "zero spend → no charge");
+  assert.ok(skipped.settledAt, "settlement timestamp recorded");
+
+  const w1 = watches.get(fakeBooking.id)!;
+  w1.settledAt = undefined;
+  w1.settlementStatus = undefined;
+  recordUsage(w1, "deep_scout", 2);
+  watches.put(w1);
+  const settled = await settleWatchBilling(watches.get(fakeBooking.id)!, fakeBooking);
+  assert.equal(settled.settlementStatus, "mock", "mock mode settles pass-through spend");
+  assert.ok((settled.settlementUsd ?? 0) > 0, "billable amount captured");
+  assert.equal(settled.enabled, false, "watch disabled after settlement");
+  ok("trip watch: pass-through settlement charges once at trip end");
+}
+
 // 36. Action executor — permissions, grants, run → handoff
 {
   const caps = await app.inject({ method: "GET", url: "/actions/capabilities" });

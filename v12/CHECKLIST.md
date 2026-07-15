@@ -71,7 +71,7 @@ Use this for **feature slices**. For **launch readiness** (agent, memory, integr
 - [x] **Engine:** TripWatch store, risk scorer, adaptive scheduler
 - [x] **Always-on alerts** — weather thresholds + optional X poll (when `X_BEARER_TOKEN` set)
 - [x] **Morning brief** + risk-scored scan budget (0–3 scans/day)
-- [x] **Pass-through metering** — COGS + margin %, hard cap per trip
+- [x] **Pass-through metering** — COGS + margin %, hard cap per trip, **settled at trip end**
 - [x] **Book opt-in** — `tripWatch` on `/book`; plan.html UI with cap selector
 - [x] **My Trips** — watch status + spend on trip detail
 - [x] **Over-cap approve** — `POST /watch/:id/approve-cap` + My Trips button
