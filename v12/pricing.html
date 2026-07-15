@@ -142,7 +142,7 @@
         <div class="tname"><h3 class="serif">Concierge</h3></div>
         <div class="bill-toggle" id="bill-toggle" role="group" aria-label="Billing period">
           <button class="bt on" data-bill="monthly" type="button">Monthly</button>
-          <button class="bt" data-bill="yearly" type="button">Yearly <span class="save">–25%</span></button>
+          <button class="bt" data-bill="yearly" type="button">Yearly <span class="save">–20%</span></button>
         </div>
         <div class="price"><span class="amt" id="cc-amt">$129</span><span class="per" id="cc-per">/ month</span></div>
         <p class="terms" id="cc-terms">Always on. No per-booking fee — book as much as you travel.</p>
@@ -212,7 +212,7 @@
     <div class="faq">
       <details>
         <summary><span class="q">When am I charged</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-        <div class="a">On Per trip, only when a trip actually books — confirmation numbers in hand. On Concierge, it is $129 a month — or $97 a month billed yearly, saving 25% — with no per-booking fee. Either way, nothing is charged for a trip that does not complete.</div>
+        <div class="a">On Per trip, only when a trip actually books — confirmation numbers in hand. On Concierge, it is $129 a month — or $103 a month billed yearly (20% off, $1,236 annually) — with no per-booking fee. Either way, nothing is charged for a trip that does not complete.</div>
       </details>
       <details>
         <summary><span class="q">What is Trip Watch</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
@@ -244,19 +244,26 @@
 
 </main>
 <script>
-/* Concierge billing toggle — monthly $129 / yearly $97 (25% off, $1,161/yr) */
+/* Concierge billing toggle — monthly $129 / yearly $103 (20% off, $1,236/yr) */
 (function(){
   var tg=document.getElementById('bill-toggle'); if(!tg) return;
   var amt=document.getElementById('cc-amt'), per=document.getElementById('cc-per'), terms=document.getElementById('cc-terms');
+  var selected='monthly';
   var COPY={
     monthly:{amt:'$129', per:'/ month', terms:'Always on. No per-booking fee — book as much as you travel.'},
-    yearly:{amt:'$97', per:'/ mo, billed yearly', terms:'Save 25% — $1,161 billed annually. No per-booking fee.'}
+    yearly:{amt:'$103', per:'/ mo, billed yearly', terms:'Save 20% — $1,236 billed annually. No per-booking fee.'}
   };
+  function paint(which){
+    selected=which;
+    var c=COPY[which]; if(!c) return;
+    amt.textContent=c.amt; per.textContent=c.per; terms.textContent=c.terms;
+  }
   tg.addEventListener('click', function(e){
     var b=e.target.closest('.bt'); if(!b) return;
     Array.prototype.forEach.call(tg.querySelectorAll('.bt'), function(x){ x.classList.remove('on'); }); b.classList.add('on');
-    var c=COPY[b.dataset.bill]; if(!c) return; amt.textContent=c.amt; per.textContent=c.per; terms.textContent=c.terms;
+    paint(b.dataset.bill||'monthly');
   });
+  window.turesBillingPeriod=function(){ return selected; };
 })();
 </script>
 
@@ -282,7 +289,8 @@
     if(!(window.tures && window.tures.signedIn)) return;
     e.preventDefault();
     btn.textContent='Starting…';
-    window.tures.billing.checkout().then(function(r){ location.href=r.url; }).catch(function(){ btn.textContent='Go Concierge'; });
+    var period=(window.turesBillingPeriod&&window.turesBillingPeriod())||'monthly';
+    window.tures.billing.checkout(period).then(function(r){ location.href=r.url; }).catch(function(){ btn.textContent='Go Concierge'; });
   });
 })();
 </script>

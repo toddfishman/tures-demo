@@ -29,7 +29,8 @@ const Env = z.object({
   AUTH_SECRET: z.string().optional(),
   // Stripe billing (Chunk: real money). Price IDs for the subscription + the per-trip fee.
   STRIPE_PUBLISHABLE_KEY: z.string().optional(), // pk_… — safe to expose; used by Stripe.js
-  STRIPE_PRICE_SUBSCRIPTION: z.string().optional(),
+  STRIPE_PRICE_SUBSCRIPTION: z.string().optional(), // monthly Concierge price_…
+  STRIPE_PRICE_SUBSCRIPTION_YEARLY: z.string().optional(), // yearly Concierge price_… (20% off)
   STRIPE_PRICE_PER_TRIP: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   // Charge real cards for travel + per-trip fees. Requires a SetupIntent "save a card" flow
@@ -138,6 +139,7 @@ export const config = {
   dataDir: parsed.DATA_DIR,
   authSecret: parsed.AUTH_SECRET,
   stripePriceSubscription: parsed.STRIPE_PRICE_SUBSCRIPTION,
+  stripePriceSubscriptionYearly: parsed.STRIPE_PRICE_SUBSCRIPTION_YEARLY,
   stripeWebhookSecret: parsed.STRIPE_WEBHOOK_SECRET,
   stripePricePerTrip: parsed.STRIPE_PRICE_PER_TRIP,
   stripePublishableKey: parsed.STRIPE_PUBLISHABLE_KEY,

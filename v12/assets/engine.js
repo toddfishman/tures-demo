@@ -208,7 +208,12 @@
       recommend: function (category, amount) { return api("/wallet/recommend?accountId=" + acctId() + "&category=" + category + "&amount=" + amount); },
     },
     billing: {
-      checkout: function () { return api("/billing/checkout", { method: "POST", body: JSON.stringify({ accountId: acctId() }) }); },
+      checkout: function (interval) {
+        return api("/billing/checkout", {
+          method: "POST",
+          body: JSON.stringify({ accountId: acctId(), interval: interval === "yearly" ? "yearly" : "monthly" }),
+        });
+      },
       setupIntent: function () { return api("/billing/setup-intent", { method: "POST" }); },
       saveCard: function (body) { return api("/billing/save-card", { method: "POST", body: JSON.stringify(body) }); },
     },

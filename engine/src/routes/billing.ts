@@ -8,7 +8,8 @@ export async function billingRoutes(app: FastifyInstance) {
   app.post("/billing/checkout", async (req: any, reply) => {
     const accountId = resolveAccountId(req, (req.body || {}).accountId);
     if (accountId === "demo") return reply.status(401).send({ error: "sign_in_required" });
-    return startSubscription(accountId);
+    const interval = (req.body?.interval === "yearly" ? "yearly" : "monthly") as "monthly" | "yearly";
+    return startSubscription(accountId, interval);
   });
 
   // POST /billing/setup-intent — start collecting a real card (Stripe Elements client secret).

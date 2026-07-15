@@ -36,7 +36,9 @@ services:
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY   # pk_test_… — shown on /health for Stripe.js
         sync: false
-      - key: STRIPE_PRICE_SUBSCRIPTION  # price_… for Concierge plan
+      - key: STRIPE_PRICE_SUBSCRIPTION  # monthly Concierge price_…
+        sync: false
+      - key: STRIPE_PRICE_SUBSCRIPTION_YEARLY  # yearly Concierge price_… (20% off)
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false

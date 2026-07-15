@@ -40,31 +40,36 @@ export interface CheckoutResult {
 }
 
 /** Start a subscription purchase. Returns a URL to redirect the browser to. */
-export async function startSubscription(accountId: string): Promise<CheckoutResult> {
+export async function startSubscription(accountId: string, interval: "monthly" | "yearly" = "monthly"): Promise<CheckoutResult> {
   const user = getUser(accountId);
   const base = config.publicBaseUrl;
 
-  if (!config.stripeKey || !config.stripePriceSubscription) {
+  const priceId =
+    interval === "yearly"
+      ? config.stripePriceSubscriptionYearly || config.stripePriceSubscription
+      : config.stripePriceSubscription;
+
+  if (!config.stripeKey || !priceId) {
     // Mock: activate immediately so the funnel works end-to-end without Stripe keys.
     if (user) {
       user.plan = "subscribe";
       saveUser(user);
     }
     log.info("billing: mock subscription activated", { accountId });
-    return { url: `${base}/account.html?subscribed=1`, mock: true };
+    return { url: `${base}/vault.html?subscribed=1`, mock: true };
   }
 
   const { default: Stripe } = await import("stripe");
   const stripe = new Stripe(config.stripeKey);
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    line_items: [{ price: config.stripePriceSubscription, quantity: 1 }],
-    success_url: `${base}/account.html?subscribed=1`,
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${base}/vault.html?subscribed=1`,
     cancel_url: `${base}/pricing.html`,
     client_reference_id: accountId,
     customer_email: user?.email,
   });
-  return { url: session.url ?? `${base}/account.html`, mock: false };
+  return { url: session.url ?? `${base}/vault.html`, mock: false };
 }
 
 /** Stripe webhook: confirm a subscription and flip the user's plan. */

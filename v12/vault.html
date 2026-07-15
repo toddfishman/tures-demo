@@ -736,4 +736,17 @@ window.turesBestCard = function(category, amount, cards){
   render();
 })();
 </script>
+<script>
+(function(){
+  if(!/[?&]subscribed=1/.test(location.search)) return;
+  var hero=document.querySelector('.vault-hero .lead');
+  if(!hero) return;
+  var n=document.createElement('p');
+  n.className='lead center';
+  n.style.cssText='margin-top:12px;color:var(--gold);font-weight:500';
+  n.textContent='Concierge is active — thanks for subscribing. Your plan updates once Stripe confirms payment.';
+  hero.after(n);
+  history.replaceState(null,'',location.pathname);
+})();
+</script>
 </body></html>
