@@ -210,6 +210,11 @@ if (tierFilter) list = list.filter((s) => s.tier === tierFilter);
 if (tagFilter) list = list.filter((s) => s.tags?.includes(tagFilter));
 if (!includeLlm) list = list.filter((s) => s.tier !== "llm");
 
+if (includeLlm && !hasLlmKeys()) {
+  console.error("\nNeed ANTHROPIC_API_KEY or SAKANA_API_KEY (repository secrets for CI).\n");
+  process.exit(1);
+}
+
 const app = await build();
 console.log(`\nTures scenario runner — ${list.length} scenario(s)${includeLlm ? " (incl. live LLM)" : ""}\n`);
 

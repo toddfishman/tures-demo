@@ -64,6 +64,16 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Verify LLM secrets
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SAKANA_API_KEY: ${{ secrets.SAKANA_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$SAKANA_API_KEY" ]; then
+            echo "::error::Add ANTHROPIC_API_KEY and/or SAKANA_API_KEY under Settings → Secrets → Actions for this repo."
+            exit 1
+          fi
+
       - name: Live LLM scenarios (Sakana / Anthropic)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
