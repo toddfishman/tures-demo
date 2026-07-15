@@ -163,8 +163,8 @@ export const SCENARIOS: Scenario[] = [
     turns: [
       {
         user: "I need transport from PDX to Cannon Beach",
-        replyIncludes: ["PDX", "Cannon"],
-        replyExcludes: ["restaurant"],
+        replyIncludes: ["90", "minute", "PDX"],
+        replyExcludes: ["restaurant", "things to do"],
       },
     ],
   },
