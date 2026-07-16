@@ -45,6 +45,9 @@
   if (cur === "cover") document.documentElement.classList.add("px-cover");
   function on(p) { return p === cur ? " on" : ""; }
   var MARK = 't<span class="spark">✦</span>ures';
+  var LOGO =
+    '<img class="mark-img mark-img--ink" src="assets/logo.png" alt="Tures" width="91" height="30">' +
+    '<img class="mark-img mark-img--white" src="assets/logo-white.png" alt="" aria-hidden="true" width="91" height="30">';
 
   /* ---- travel backdrop (assets/travel-bg.mp4 — portrait-cut, cover on desktop) ---- */
   var VID_KEY = "tures.travelVideo";
@@ -123,7 +126,7 @@
   nav.innerHTML =
     '<div class="in">' +
       '<div class="v11-menu-wrap">' +
-        '<a class="v11-home" href="index.html" aria-label="Tures — home"><span class="mark">' + MARK + '</span></a>' +
+        '<a class="v11-home" href="index.html" aria-label="Tures — home">' + LOGO + '</a>' +
         '<button class="v11-logo" id="v11-menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu"><span class="chev">▾</span></button>' +
         '<div class="v11-menu" id="v11-menu" role="menu">' + menuHtml + '</div>' +
       '</div>' +

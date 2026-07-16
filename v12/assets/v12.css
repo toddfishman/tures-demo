@@ -211,6 +211,12 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
   background:linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.7))}
 .v11-nav .in{max-width:var(--maxw);margin:0 auto;padding:0 22px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:18px}
 .v11-nav .mark{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;letter-spacing:.5px}
+.v11-nav .mark-img{display:block;height:30px;width:auto;max-width:none}
+.v11-nav .mark-img--white{display:none}
+html.dark .v11-nav .mark-img--ink{display:none}
+html.dark .v11-nav .mark-img--white{display:block}
+html.px-cover .v11-nav:not(.px-nav-solid) .mark-img--ink{display:none}
+html.px-cover .v11-nav:not(.px-nav-solid) .mark-img--white{display:block}
 
 /* left — logo + chevron → page menu */
 .v11-menu-wrap{position:relative;flex:0 0 auto}
@@ -274,6 +280,7 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
   .v11-nav{padding-top:env(safe-area-inset-top)} /* clear the iOS status bar in standalone/app mode */
   .v11-nav .in{gap:10px;height:56px}
   .v11-nav .mark{font-size:20px}
+  .v11-nav .mark-img{height:24px}
   .v11-plan{max-width:none;padding-left:14px}
   .v11-acct{width:36px;height:36px}
   .v11-right{gap:10px}
@@ -432,7 +439,6 @@ html.px-cover .v11-nav{
 html.dark.px-cover .v11-nav{
   background:linear-gradient(to bottom, rgba(8,10,14,.72), rgba(8,10,14,.12));
 }
-html.px-cover .v11-nav .mark,
 html.px-cover .v11-nav .v11-logo,
 html.px-cover .v11-nav .v11-acct{color:#fff}
 html.px-cover .v11-nav .v11-logo .chev{color:rgba(255,255,255,.55)}
@@ -444,7 +450,6 @@ html.px-cover .v11-nav.px-nav-solid{
 html.dark.px-cover .v11-nav.px-nav-solid{
   background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66));
 }
-html.px-cover .v11-nav.px-nav-solid .mark,
 html.px-cover .v11-nav.px-nav-solid .v11-logo,
 html.px-cover .v11-nav.px-nav-solid .v11-acct{color:var(--text)}
 html.px-cover .v11-nav.px-nav-solid .v11-logo .chev{color:var(--muted)}
