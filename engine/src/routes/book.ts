@@ -3,8 +3,8 @@ import { z } from "zod";
 import { BriefSchema } from "../types.ts";
 import { createBooking, confirmBooking } from "../booking/service.ts";
 import { bookings } from "../booking/store.ts";
-import { resolveAccountId, actsFor, getUser } from "../auth/index.ts";
-import { config } from "../config.ts";
+import { resolveAccountId, actsFor } from "../auth/index.ts";
+import { perTripFee } from "../billing/fees.ts";
 
 const BookBody = z.object({
   brief: BriefSchema,
@@ -18,14 +18,6 @@ const BookBody = z.object({
 });
 
 let tripCounter = 0;
-
-/** Per-trip concierge fee, derived from the account's plan — never trusted from the body.
- *  Subscribers (Concierge) pay no per-booking fee; anonymous/demo previews are never fee'd. */
-function perTripFee(accountId: string): number {
-  const user = getUser(accountId);
-  if (!user || user.plan === "subscribe") return 0;
-  return config.perTripFeeUsd;
-}
 
 export async function bookRoutes(app: FastifyInstance) {
   // POST /book — open a booking. Default brief.bookingMode (confirm_each) returns

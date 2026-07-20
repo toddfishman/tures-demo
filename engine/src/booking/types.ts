@@ -26,6 +26,13 @@ export interface BookedComponent {
   /** Which loyalty program this leg credits — matched to the booked carrier/chain, with estimated accrual. */
   loyalty?: { program: string; status?: string; numberMasked?: string; kind: string; estPoints: number; reason: string };
   payment?: PaymentRecord;
+  /** Concierge Mode — extraction metadata for imported legs. */
+  importMeta?: {
+    confidence: "high" | "medium" | "low";
+    sourceHint?: string;
+    detail?: string;
+    schedule?: string;
+  };
 }
 
 export interface PaymentRecord {
@@ -49,6 +56,8 @@ export interface Booking {
   tripId: string;
   accountId: string;
   brief: Brief;
+  /** How this trip entered Tures. `import` = Concierge Mode (Bring your trip) — alert + guide, not autonomous rebook. */
+  source?: "tures" | "import";
   status: BookingStatus;
   totalUsd: number;
   currency: string;

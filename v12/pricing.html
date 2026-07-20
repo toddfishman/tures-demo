@@ -113,8 +113,8 @@
   <!-- HERO -->
   <section class="wrap price-hero">
     <span class="eyebrow"><span class="dot"></span> Pricing</span>
-    <h1 class="serif">Two ways <em>in.</em></h1>
-    <p class="lead center">Pay per trip when you book, or keep Tures on around the clock with Concierge — always-on Trip Watch and the Hiccup Handler that rebooks before trouble reaches you.</p>
+    <h1 class="serif">Three ways <em>in.</em></h1>
+    <p class="lead center">Book with Tures, bring a trip you already booked, or keep Concierge on around the clock — same $99 per trip or $129/month, whether we booked it or you did.</p>
   </section>
 
   <!-- TIERS -->
@@ -160,6 +160,18 @@
     </div>
 
     <p class="same-line"><b>Per trip is pay-as-you-go; Concierge keeps the watch on.</b> Trip Watch uses real API sources — we pass through the cost plus 20%, capped so you never get surprised.</p>
+
+    <div class="tw-band" id="bring-your-trip" style="border-color:var(--acc-line);background:linear-gradient(180deg,var(--acc-dim),rgba(255,73,41,.03))">
+      <h3 class="serif">Already booked? <em>Bring your trip.</em></h3>
+      <p class="tw-sub">Same pricing — <b>$99 per trip</b> or <b>Concierge at $129/month</b> for unlimited imports. Upload confirmations, paste your itinerary, or drop screenshots. Tures watches 24/7 and <b>alerts + guides you</b> when something slips.</p>
+      <div class="tw-grid">
+        <div class="tw-cell"><b>Alert &amp; guide me</b> Disruption alerts, researched steps, concierge chat — on imported trips.</div>
+        <div class="tw-cell"><b>Not autonomous rebook</b> We did not place the original booking — we walk you through fixes.</div>
+        <div class="tw-cell"><b>Book with us next time</b> Tures-booked trips get the Hiccup Handler — rebook held on your yes.</div>
+      </div>
+      <p class="tw-note">If Tures had booked your trip originally, the Hiccup Handler could rebook autonomously. On imported trips we are upfront: we monitor, alert, and guide — we do not pretend we hold the reservation.</p>
+      <a class="ao-link" href="bring-your-trip.html" style="margin-top:16px">Bring your trip &nbsp;→</a>
+    </div>
 
     <div class="tw-band" aria-labelledby="tw-band-title">
       <h3 id="tw-band-title" class="serif">Trip Watch — <em>how billing works</em></h3>
@@ -226,6 +238,10 @@
         <div class="a">Yes. Payments run through Stripe over 256-bit encryption, and everything Tures stores lives tokenized in <a href="vault.html">the Vault</a> — Tures works from tokens, never your raw card number. You can revoke any of it anytime.</div>
       </details>
       <details>
+        <summary><span class="q">Can I bring a trip I already booked</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Yes — <a href="bring-your-trip.html">Bring your trip</a> is the same price ($99 per trip or Concierge at $129/month). Upload confirmations or paste your itinerary. Tures watches and guides you through trouble. On imported trips we alert and walk you through fixes; if Tures had booked the trip originally, the Hiccup Handler could rebook autonomously.</div>
+      </details>
+      <details>
         <summary><span class="q">Can Tures really book</span><span class="ch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
         <div class="a">It books the whole trip end to end — flights, hotels, cars, tables — and hands you confirmation numbers, not a list of links to go finish yourself. Every booking is verified twice before it is called done. See it run when you <a href="plan.html">plan a trip</a>.</div>
       </details>
@@ -239,6 +255,7 @@
     <p class="lead center" style="margin:16px auto 26px">Start a conversation about the next trip. Tures takes it from there.</p>
     <a class="btn" href="signup.html">Get started</a>
     <a class="btn ghost" href="plan.html">Plan a trip</a>
+    <a class="btn ghost" href="bring-your-trip.html">Bring your trip</a>
   </section>
 
 </main>

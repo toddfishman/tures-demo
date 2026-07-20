@@ -13,7 +13,8 @@
     var d = String(dest || "T").trim();
     return d.charAt(0).toUpperCase() || "T";
   }
-  function statusLabel(st) {
+  function statusLabel(st, bk) {
+    if (bk && bk.source === "import" && st === "booked") return "Watching";
     if (st === "booked") return "Booked";
     if (st === "booking") return "Booking";
     if (st === "confirmation_required") return "Held";
@@ -114,10 +115,12 @@
       else other.push(c);
     });
     var id = "trip-" + bk.id;
+    var imported = bk.source === "import";
+    var modeTag = imported ? ' <span class="demo-tag" style="background:var(--rain);color:#fff;border:none">Imported</span>' : "";
     var html = '<section class="section tight" id="' + id + '" style="scroll-margin-top:var(--nav-h)">' +
       '<div class="wrap"><div class="detail-hero">' +
       '<div class="dh-initial">' + esc(initial(dest)) + "</div>" +
-      '<div class="dh-t"><span class="tag" style="margin-bottom:10px">' + esc(statusLabel(bk.status)) + "</span>" +
+      '<div class="dh-t"><span class="tag" style="margin-bottom:10px">' + esc(statusLabel(bk.status, bk)) + "</span>" + modeTag +
       "<h2>" + esc(dest) + " · <em>your trip</em></h2>" +
       '<div class="dh-meta"><span class="mono">' + route(brief) + "</span>" +
       (fmtDates(brief) ? "<span>" + esc(fmtDates(brief)) + "</span>" : "") +
@@ -139,6 +142,7 @@
       html += "</div>";
     }
     if (bk.status === "booked" || bk.status === "booking") {
+      html += imported ? '<p style="font-size:14px;color:var(--muted);margin:12px 0 0;max-width:58ch"><b>Alert &amp; guide me</b> — Tures watches and walks you through fixes. Autonomous rebook applies when Tures books the trip.</p>' : "";
       html += '<div class="trip-stream" id="stream-' + esc(bk.id) + '" data-trip-id="' + esc(bk.tripId || "") + '">' +
         '<div class="ts-head"><span class="pulse"></span><span>Live watch</span><span class="demo-tag" style="margin-left:auto">Live</span></div>' +
         '<div class="ts-feed"><div class="ts-empty">Connected — waiting for signals from the engine watcher.</div></div></div>' +
@@ -154,9 +158,10 @@
     var dest = brief.destination || "Trip";
     var dates = fmtDates(brief);
     var href = "#trip-" + bk.id;
+    var imported = bk.source === "import";
     return '<a href="' + href + '" class="card hover trip-card">' +
       '<div class="trip-head" style="background:linear-gradient(135deg,var(--acc-2),var(--acc) 55%,var(--acc-deep))">' +
-      '<span class="initial">' + esc(initial(dest)) + '</span><span class="tag">' + esc(statusLabel(bk.status)) + "</span></div>" +
+      '<span class="initial">' + esc(initial(dest)) + '</span><span class="tag">' + esc(statusLabel(bk.status, bk)) + (imported ? ' · Imported' : '') + "</span></div>" +
       '<div class="trip-body"><div class="tname">' + esc(dest) + "</div>" +
       '<div class="tsub">' + route(brief) + "</div>" +
       (dates ? '<div class="tdates">' + esc(dates.toUpperCase()) + "</div>" : "") +

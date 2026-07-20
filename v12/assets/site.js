@@ -21,6 +21,7 @@
       { href: "setup.html",     label: "Set up step by step", page: "setup" },
       { href: "telegram.html",  label: "Connect Telegram", page: "telegram" },
       { href: "plan.html",      label: "Plan a trip",      page: "plan" },
+      { href: "bring-your-trip.html", label: "Bring your trip", page: "bring-trip" },
       { href: "onboard.html",   label: "Set up Tures",     page: "onboard" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
       { href: "signup.html",    label: "Join the waitlist", page: "signup" },

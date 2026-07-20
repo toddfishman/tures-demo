@@ -683,6 +683,33 @@ let bookingId = "";
   ok("conversation log: verbatim session transcript");
 }
 
+// 16.5 Concierge Mode — import trip (fee only, alert + guide)
+{
+  const su = await app.inject({ method: "POST", url: "/auth/signup", payload: { email: "import@b.com", name: "Importer", password: "password123" } });
+  assert.equal(su.statusCode, 200);
+  const auth = { authorization: "Bearer " + su.json().token };
+  await app.inject({
+    method: "POST", url: "/connections", headers: auth,
+    payload: { kind: "payment", label: "Visa", secret: { customerId: "c2", paymentMethodId: "p2" }, meta: { cardKey: "visa" } },
+  });
+  const text = "NH 105 SEA to HND 2026-03-08 conf 7XK2M9. Okura Tokyo check in Mar 8 conf OKU8841";
+  const anon = await app.inject({ method: "POST", url: "/trips/import", payload: { text } });
+  assert.equal(anon.statusCode, 401, "import requires sign-in");
+  const imp = (await app.inject({ method: "POST", url: "/trips/import", headers: auth, payload: { text, heuristic: true } })).json();
+  assert.equal(imp.booking.source, "import");
+  assert.equal(imp.booking.status, "confirmation_required");
+  assert.ok(imp.booking.components.length >= 1, "at least one leg parsed");
+  assert.equal(imp.mode, "alert_and_guide");
+  const confirmed = (await app.inject({ method: "POST", url: `/trips/import/${imp.booking.id}/confirm`, headers: auth })).json();
+  assert.equal(confirmed.booking.status, "booked");
+  assert.ok(confirmed.booking.audit.some((a: any) => a.action === "import_active"), "import active in audit");
+  assert.ok(confirmed.booking.audit.some((a: any) => a.action === "concierge_fee"), "import charges concierge fee");
+  assert.equal(confirmed.booking.charges.length, 1, "fee only — no component charges");
+  const listed = (await app.inject({ method: "GET", url: "/bookings", headers: auth })).json().bookings;
+  assert.ok(listed.some((b: any) => b.id === imp.booking.id && b.source === "import"), "import appears in trips list");
+  ok("Concierge Mode: import → confirm → fee only → booked with watch");
+}
+
 await app.close();
 
 // 17. API-key auth: blocks without key, allows with, /health stays open

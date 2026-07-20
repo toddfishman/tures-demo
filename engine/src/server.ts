@@ -17,6 +17,7 @@ import { searchRoutes } from "./routes/search.ts";
 import { planRoutes } from "./routes/plan.ts";
 import { parseRoutes } from "./routes/parse.ts";
 import { bookRoutes } from "./routes/book.ts";
+import { tripsRoutes } from "./routes/trips.ts";
 import { connectionRoutes } from "./routes/connections.ts";
 import { profileRoutes } from "./routes/profile.ts";
 import { prefsRoutes } from "./routes/prefs.ts";
@@ -81,6 +82,7 @@ export async function build() {
   await app.register(planRoutes);
   await app.register(parseRoutes);
   await app.register(bookRoutes);
+  await app.register(tripsRoutes);
   await app.register(connectionRoutes);
   await app.register(profileRoutes);
   await app.register(prefsRoutes);
