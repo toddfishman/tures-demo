@@ -31,9 +31,51 @@
     return base + "handoff.html?id=" + encodeURIComponent(token);
   }
 
+  /** Sign-in that returns the traveler to this exact page (login.html honors ?next=). */
+  function loginUrl() {
+    try {
+      var here = location.pathname.replace(/^.*\//, "") + location.search + location.hash;
+      return "login.html?next=" + encodeURIComponent(here || "plan.html");
+    } catch (_) {
+      return "login.html";
+    }
+  }
+
+  function signedIn() {
+    return !!(window.tures && window.tures.signedIn);
+  }
+
+  /** Say what actually went wrong. Acting on someone's behalf needs an account, so a 401 is a
+   *  sign-in prompt — not a connection error, and never "try again" (retrying can't fix it). */
+  function failureFor(e) {
+    var st = e && e.status;
+    if (e && e.offline) {
+      return { html: '<p class="warn">I can\'t reach Tures from this page right now.</p>' };
+    }
+    if (st === 401) {
+      return {
+        signin: true,
+        html:
+          '<p class="warn">Sign in and I\'ll take it from here — doing things on your behalf needs an account.</p>' +
+          '<a class="handoff" href="' + esc(loginUrl()) + '">Sign in &rarr;</a>',
+      };
+    }
+    if (st === 402 || st === 403) {
+      return { html: '<p class="warn">Your account does not have permission for this one yet.</p>' };
+    }
+    if (st === 429) {
+      return { html: '<p class="warn">That is a lot at once — give me a minute and try again.</p>' };
+    }
+    if (st >= 500) {
+      return { html: '<p class="warn">Something broke on my end, not yours. Try again in a moment.</p>' };
+    }
+    // No status at all — a genuine network failure, where "try again" is honest advice.
+    return { html: '<p class="warn">Could not reach Tures just now. Try again in a moment.</p>' };
+  }
+
   function grantAndRun(action, tripId) {
     var T = window.tures;
-    if (!T || !T.actions) return Promise.reject(new Error("offline"));
+    if (!T || !T.actions) return Promise.reject(Object.assign(new Error("offline"), { offline: true }));
     var chain = action.readonly
       ? T.actions.run({ permission: action.permission, title: action.title, detail: action.detail, tripId: tripId })
       : T.actions.grant(action.permission, action.title).then(function (r) {
@@ -68,8 +110,24 @@
         '<div class="status"></div>';
       var btn = card.querySelector(".go");
       var status = card.querySelector(".status");
+
+      // One click handler, one mode — so a button that has become "Sign in" or "Open your step"
+      // navigates instead of silently re-running the action underneath.
+      var mode = "run"; // run | signin | handoff
+      var handoffHref = "";
+
+      // Acting always needs an account. If they're signed out, say so up front rather than
+      // letting them click into a guaranteed failure.
+      if (!signedIn()) {
+        mode = "signin";
+        btn.textContent = "Sign in to run this";
+        btn.classList.add("ghost");
+      }
+
       btn.addEventListener("click", function () {
         if (btn.disabled) return;
+        if (mode === "signin") { location.href = loginUrl(); return; }
+        if (mode === "handoff") { window.open(handoffHref, "_blank", "noopener"); return; }
         btn.disabled = true;
         btn.textContent = "Working…";
         grantAndRun(action, opts.tripId)
@@ -81,12 +139,10 @@
                 '<a class="handoff" href="' +
                 esc(handoffUrl(run.handoffToken)) +
                 '" target="_blank" rel="noopener">Your turn → open this step</a>';
-              btn.textContent = "Waiting on you";
+              mode = "handoff";
+              handoffHref = handoffUrl(run.handoffToken);
               btn.classList.add("ghost");
               btn.disabled = false;
-              btn.onclick = function () {
-                window.open(handoffUrl(run.handoffToken), "_blank", "noopener");
-              };
               btn.textContent = "Open your step";
               return;
             }
@@ -104,10 +160,17 @@
             btn.disabled = false;
             btn.textContent = btnLabel;
           })
-          .catch(function () {
-            status.innerHTML = '<p class="warn">Could not reach Tures just now. Try again in a moment.</p>';
+          .catch(function (e) {
+            var f = failureFor(e);
+            status.innerHTML = f.html;
             btn.disabled = false;
-            btn.textContent = btnLabel;
+            if (f.signin) {
+              mode = "signin";
+              btn.textContent = "Sign in to continue";
+              btn.classList.add("ghost");
+            } else {
+              btn.textContent = btnLabel;
+            }
           });
       });
       wrap.appendChild(card);
