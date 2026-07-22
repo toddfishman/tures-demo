@@ -17,6 +17,8 @@
     ".act-card .note{font-size:12px;color:var(--good,#2e9e5b);margin-top:6px}" +
     ".act-card .warn{font-size:12px;color:var(--warn,#c77a00);margin-top:6px}" +
     ".act-card .handoff{display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:var(--acc-deep,#cf3b1f);font-weight:600;font-size:13px;text-decoration:none}" +
+    ".act-card .alt{display:inline-block;margin:8px 0 0 12px;color:var(--muted,#6f6f6f);font-size:12.5px;text-decoration:underline}" +
+    ".act-card .alt:hover{color:var(--acc-deep,#cf3b1f)}" +
     ".plan .act-card{background:var(--surface,#f6f6f6)}" +
     ".cz-thread .act-card{background:var(--surface,#f6f6f6)}" +
     "html.dark .act-card{background:var(--surface,#1a1a1e);border-color:var(--line)}";
@@ -31,14 +33,24 @@
     return base + "handoff.html?id=" + encodeURIComponent(token);
   }
 
-  /** Sign-in that returns the traveler to this exact page (login.html honors ?next=). */
-  function loginUrl() {
+  /** Auth that returns the traveler to this exact page (login.html honors ?next= and ?create=1). */
+  function authUrl(create) {
+    var here = "plan.html";
     try {
-      var here = location.pathname.replace(/^.*\//, "") + location.search + location.hash;
-      return "login.html?next=" + encodeURIComponent(here || "plan.html");
-    } catch (_) {
-      return "login.html";
-    }
+      here = location.pathname.replace(/^.*\//, "") + location.search + location.hash;
+    } catch (_) {}
+    return "login.html?" + (create ? "create=1&" : "") + "next=" + encodeURIComponent(here || "plan.html");
+  }
+  function loginUrl() { return authUrl(false); }
+
+  /** An anonymous visitor most likely has no account yet, so lead with creating one and offer
+   *  sign-in as the smaller, secondary path for people who already have a seat. */
+  function accountPrompt(lead) {
+    return (
+      '<p class="warn">' + lead + "</p>" +
+      '<a class="handoff" href="' + esc(authUrl(true)) + '">Create an account &rarr;</a>' +
+      '<a class="alt" href="' + esc(loginUrl()) + '">or sign in</a>'
+    );
   }
 
   function signedIn() {
@@ -56,23 +68,18 @@
     if (st === 401) {
       // The engine tells us WHY an account is needed — use its words when it does.
       var why = (e && e.body && e.body.reason) || "doing things on your behalf needs an account";
-      return {
-        signin: true,
-        html:
-          '<p class="warn">Sign in and I\'ll take it from here &mdash; ' + esc(why) + ".</p>" +
-          '<a class="handoff" href="' + esc(loginUrl()) + '">Sign in &rarr;</a>',
-      };
+      return { signin: true, html: accountPrompt("I can take this one from here &mdash; " + esc(why) + ".") };
     }
     if (st === 402 || st === 403) {
       return { html: '<p class="warn">Your account does not have permission for this one yet.</p>' };
     }
     if (st === 429 && code === "free_limit_reached") {
-      // Used up the free lookups — signing in is the fix, so offer that, not "try again".
+      // The free lookups are spent. An account is the fix — so offer that warmly, not "try again".
       return {
         signin: true,
-        html:
-          '<p class="warn">That is all the free lookups for today. Sign in and I\'ll keep going.</p>' +
-          '<a class="handoff" href="' + esc(loginUrl()) + '">Sign in &rarr;</a>',
+        html: accountPrompt(
+          "That is the last of today's free lookups. Make an account and I'll keep going &mdash; and I'll remember what you like.",
+        ),
       };
     }
     if (st === 429) {
@@ -161,11 +168,20 @@
             }
             if (run && run.status === "completed") {
               var sim = run.result && run.result.simulated;
+              var free = res && res.freeTier;
+              // Warn as the free runs run out, so the wall is never a surprise.
+              var heads = "";
+              if (free && free.remaining === 0) {
+                heads = '<p class="warn">That was your last free lookup today. ' +
+                  '<a class="handoff" href="' + esc(authUrl(true)) + '">Create an account</a> to keep going.</p>';
+              } else if (free && free.remaining === 1) {
+                heads = '<p class="warn">One free lookup left today.</p>';
+              }
               status.innerHTML =
                 "<p class=\"note\">" +
                 esc((run.result && run.result.summary) || "Done.") +
                 (sim ? " (preview mode)" : "") +
-                "</p>";
+                "</p>" + heads;
               btn.remove();
               return;
             }

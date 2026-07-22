@@ -41,7 +41,11 @@ import { watchRoutes } from "./routes/watch.ts";
 import { mem0Routes } from "./routes/mem0.ts";
 
 export async function build() {
-  const app = Fastify({ logger: false });
+  // trustProxy: 1 — Render puts exactly one proxy in front of us. Without this, req.ip is the
+  // PROXY's address, so every "per IP" limit (the global rate limit, the login throttle, the free
+  // action quota) collapses into one bucket shared by the whole internet. Trusting exactly one hop
+  // also means a client-supplied X-Forwarded-For can't be used to fake an address and reset a quota.
+  const app = Fastify({ logger: false, trustProxy: 1 });
 
   // Wildcard → literal "*" (emits Access-Control-Allow-Origin: *). Otherwise an explicit
   // allowlist that reflects a matching Origin. (origin:true is avoided — it can omit the

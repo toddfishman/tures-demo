@@ -35,9 +35,10 @@ function takeFreeRun(ip: string): { ok: boolean; used: number; limit: number } {
   freeRuns.set(ip, rec);
   return { ok: true, used: rec.count, limit };
 }
+/** req.ip is resolved by Fastify's trustProxy (one hop) — the real client address, and not
+ *  something a caller can spoof with a header to reset their quota. */
 function clientIp(req: any): string {
-  const fwd = req.headers["x-forwarded-for"];
-  return (typeof fwd === "string" ? fwd.split(",")[0]?.trim() : "") || req.ip || "unknown";
+  return req.ip || "unknown";
 }
 
 export async function actionsRoutes(app: FastifyInstance) {
@@ -103,6 +104,7 @@ export async function actionsRoutes(app: FastifyInstance) {
 
     // Anonymous visitors get the cheap, read-only lookups on us — so "try it before you sign up"
     // is real — but never anything that acts on someone's behalf, and never past the daily quota.
+    let freeTier: { used: number; limit: number; remaining: number } | undefined;
     if (accountId === "demo") {
       const verdict = freeForAnonymous(p.data.permission);
       if (!verdict.allowed) {
@@ -112,6 +114,8 @@ export async function actionsRoutes(app: FastifyInstance) {
       if (!quota.ok) {
         return reply.status(429).send({ error: "free_limit_reached", limit: quota.limit });
       }
+      // Tell the client what's left, so it can warn before the wall instead of at it.
+      freeTier = { used: quota.used, limit: quota.limit, remaining: Math.max(0, quota.limit - quota.used) };
     }
 
     try {
@@ -119,6 +123,7 @@ export async function actionsRoutes(app: FastifyInstance) {
       return {
         run,
         executor: actionExecutorStatus(),
+        freeTier,
         handoffUrl: run.handoffToken ? `/handoff.html?id=${run.handoffToken}` : undefined,
       };
     } catch (e: any) {

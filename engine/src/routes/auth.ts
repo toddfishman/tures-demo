@@ -19,8 +19,10 @@ function throttled(key: string): boolean {
   attempts.set(key, recent);
   return recent.length > MAX_ATTEMPTS;
 }
+/** Trust Fastify's proxy-aware req.ip rather than the raw header — a caller could otherwise send
+ *  a fake X-Forwarded-For and walk straight through this throttle. */
 function clientIp(req: any): string {
-  return (req.headers["x-forwarded-for"]?.split(",")[0]?.trim()) || req.ip || "unknown";
+  return req.ip || "unknown";
 }
 
 export async function authRoutes(app: FastifyInstance) {
