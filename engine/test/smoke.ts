@@ -560,9 +560,18 @@ let bookingId = "";
   assert.equal(caps.statusCode, 200);
   assert.ok(caps.json().permissions["act:browser_login"], "browser_login in catalog");
 
+  // Acting on someone's behalf needs an account, so this flow runs signed in.
+  const actor = (await app.inject({
+    method: "POST",
+    url: "/auth/signup",
+    payload: { email: "actions@b.com", password: "password123" },
+  })).json();
+  const actorAuth = { authorization: "Bearer " + actor.token };
+
   const grant = await app.inject({
     method: "POST",
     url: "/actions/grants",
+    headers: actorAuth,
     payload: { permission: "act:browser_login", label: "Sign in to airline site" },
   });
   assert.equal(grant.statusCode, 200);
@@ -571,6 +580,7 @@ let bookingId = "";
   const denied = await app.inject({
     method: "POST",
     url: "/actions/run",
+    headers: actorAuth,
     payload: { permission: "act:fill_forms", title: "Submit form", targetUrl: "https://example.com/form" },
   });
   assert.equal(denied.statusCode, 403, "run without grant blocked");
@@ -578,6 +588,7 @@ let bookingId = "";
   const run = await app.inject({
     method: "POST",
     url: "/actions/run",
+    headers: actorAuth,
     payload: {
       permission: "act:browser_login",
       title: "Sign in to Example Air",
@@ -591,17 +602,62 @@ let bookingId = "";
   assert.ok(body.run.handoffToken);
   const token = body.run.handoffToken;
 
-  const ho = await app.inject({ method: "GET", url: `/actions/handoff/${token}` });
+  const ho = await app.inject({ method: "GET", url: `/actions/handoff/${token}`, headers: actorAuth });
   assert.equal(ho.statusCode, 200);
   assert.equal(ho.json().handoff.status, "open");
 
-  const cont = await app.inject({ method: "POST", url: `/actions/handoff/${token}/continue` });
+  const cont = await app.inject({ method: "POST", url: `/actions/handoff/${token}/continue`, headers: actorAuth });
   assert.equal(cont.statusCode, 200);
   assert.equal(cont.json().run.status, "completed");
 
   const health = await app.inject({ method: "GET", url: "/health" });
   assert.ok(health.json().capabilities.actionExecutor);
   ok("action executor: grant → run → handoff → continue");
+}
+
+// 36b. Anonymous free tier — cheap read-only lookups run on us; acting still needs an account
+{
+  const { config } = await import("../src/config.ts");
+  const ip = (n: number) => ({ "x-forwarded-for": `203.0.113.${n}` });
+
+  // read-only + browser-free + under the cost cap → runs anonymously
+  const free = await app.inject({
+    method: "POST",
+    url: "/actions/run",
+    headers: ip(1),
+    payload: { permission: "act:research", title: "Find family-friendly lodging with a pool" },
+  });
+  assert.equal(free.statusCode, 200, "anonymous research runs free");
+  assert.equal(free.json().run.status, "completed");
+
+  // anything that acts on your behalf → account wall, with a reason (not a grant error)
+  for (const perm of ["act:fill_forms", "act:purchase", "act:contact"]) {
+    const blocked = await app.inject({
+      method: "POST",
+      url: "/actions/run",
+      headers: ip(2),
+      payload: { permission: perm, title: "Do the thing", targetUrl: "https://example.com/x" },
+    });
+    assert.equal(blocked.statusCode, 401, `${perm} needs an account`);
+    assert.equal(blocked.json().error, "sign_in_required");
+    assert.ok(blocked.json().reason, "says why an account is needed");
+  }
+
+  // the daily quota bounds total anonymous spend (per-run cost is capped separately)
+  const limit = config.freeActionDailyLimit;
+  let last = 200;
+  for (let i = 0; i < limit + 2; i++) {
+    const r = await app.inject({
+      method: "POST",
+      url: "/actions/run",
+      headers: ip(3),
+      payload: { permission: "act:research", title: "Lookup " + i },
+    });
+    last = r.statusCode;
+    if (last === 429) { assert.equal(r.json().error, "free_limit_reached"); break; }
+  }
+  assert.equal(last, 429, "free runs are capped per day");
+  ok("anonymous: free read-only research, account wall for acting, daily cap enforced");
 }
 
 // 37. Vault site-login matching for browser actions

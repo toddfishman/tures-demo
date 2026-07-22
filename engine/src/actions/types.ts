@@ -14,6 +14,10 @@ export interface PermissionMeta {
   readonly: boolean;
   browser: boolean;
   description?: string;
+  /** Rough cost of ONE run, in USD. An estimate we control — used to decide what an anonymous
+   *  visitor may run for free (see freeForAnonymous). Web-search actions are cents; anything
+   *  that boots a browser session is far more. Keep these honest; they gate real spend. */
+  estUsd: number;
 }
 
 export type ActionRunStatus =

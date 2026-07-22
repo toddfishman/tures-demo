@@ -99,6 +99,13 @@ const Env = z.object({
   BROWSERBASE_PROJECT_ID: z.string().optional(),
   /** Stagehand agent model — provider/model, e.g. anthropic/claude-sonnet-4-6 */
   ACTION_MODEL: z.string().default("anthropic/claude-sonnet-4-6"),
+  // What an anonymous visitor may run on us, so "try it before you sign up" actually works.
+  // A single run must be read-only, browser-free, and cost at most this much (see catalog
+  // freeForAnonymous). Set to 0 to require an account for every action.
+  FREE_ACTION_MAX_USD: z.coerce.number().nonnegative().default(0.05),
+  // Per-run cost is capped above, but TOTAL anonymous spend is not — so also cap how many free
+  // runs one visitor gets per day. Without this, free research is unbounded real money.
+  FREE_ACTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(5),
 });
 
 const parsed = Env.parse(process.env);
@@ -194,4 +201,8 @@ export const config = {
   },
   /** Stagehand agent model for browser actions (uses ANTHROPIC_API_KEY by default). */
   actionModel: parsed.ACTION_MODEL,
+  /** Ceiling on one free (anonymous) action run, USD. */
+  freeActionMaxUsd: parsed.FREE_ACTION_MAX_USD,
+  /** How many free runs one anonymous visitor gets per day (0 = none). */
+  freeActionDailyLimit: parsed.FREE_ACTION_DAILY_LIMIT,
 } as const;

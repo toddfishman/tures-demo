@@ -49,19 +49,31 @@
    *  sign-in prompt — not a connection error, and never "try again" (retrying can't fix it). */
   function failureFor(e) {
     var st = e && e.status;
+    var code = (e && e.body && e.body.error) || "";
     if (e && e.offline) {
       return { html: '<p class="warn">I can\'t reach Tures from this page right now.</p>' };
     }
     if (st === 401) {
+      // The engine tells us WHY an account is needed — use its words when it does.
+      var why = (e && e.body && e.body.reason) || "doing things on your behalf needs an account";
       return {
         signin: true,
         html:
-          '<p class="warn">Sign in and I\'ll take it from here — doing things on your behalf needs an account.</p>' +
+          '<p class="warn">Sign in and I\'ll take it from here &mdash; ' + esc(why) + ".</p>" +
           '<a class="handoff" href="' + esc(loginUrl()) + '">Sign in &rarr;</a>',
       };
     }
     if (st === 402 || st === 403) {
       return { html: '<p class="warn">Your account does not have permission for this one yet.</p>' };
+    }
+    if (st === 429 && code === "free_limit_reached") {
+      // Used up the free lookups — signing in is the fix, so offer that, not "try again".
+      return {
+        signin: true,
+        html:
+          '<p class="warn">That is all the free lookups for today. Sign in and I\'ll keep going.</p>' +
+          '<a class="handoff" href="' + esc(loginUrl()) + '">Sign in &rarr;</a>',
+      };
     }
     if (st === 429) {
       return { html: '<p class="warn">That is a lot at once — give me a minute and try again.</p>' };
@@ -116,9 +128,10 @@
       var mode = "run"; // run | signin | handoff
       var handoffHref = "";
 
-      // Acting always needs an account. If they're signed out, say so up front rather than
-      // letting them click into a guaranteed failure.
-      if (!signedIn()) {
+      // Read-only lookups run for anonymous visitors (the engine caps cost + a daily quota), so
+      // leave those clickable. Anything that acts on your behalf needs an account — say so up
+      // front rather than letting them click into a guaranteed failure.
+      if (!signedIn() && !action.readonly) {
         mode = "signin";
         btn.textContent = "Sign in to run this";
         btn.classList.add("ghost");

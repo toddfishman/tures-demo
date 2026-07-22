@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { resolveAccountId, actsFor } from "../auth/index.ts";
-import { ACTION_PERMISSIONS, isValidPermission } from "../actions/catalog.ts";
+import { ACTION_PERMISSIONS, isValidPermission, freeForAnonymous } from "../actions/catalog.ts";
 import {
   actionExecutorStatus,
   listGrants,
@@ -17,6 +17,28 @@ import { actionRuns } from "../actions/store.ts";
 import { browserConfigured } from "../actions/browser.ts";
 import { stagehandReady } from "../actions/stagehand.ts";
 import { config } from "../config.ts";
+
+/** Free-run quota for anonymous visitors, keyed by IP and reset daily. The per-run cost cap
+ *  (freeForAnonymous) bounds ONE run; this bounds the total. In-memory per instance — good enough
+ *  for a demo-scale funnel; move to the shared store when this runs on more than one machine. */
+const freeRuns = new Map<string, { day: string; count: number }>();
+function takeFreeRun(ip: string): { ok: boolean; used: number; limit: number } {
+  const limit = config.freeActionDailyLimit;
+  const day = new Date().toISOString().slice(0, 10);
+  const cur = freeRuns.get(ip);
+  const rec = cur && cur.day === day ? cur : { day, count: 0 };
+  if (rec.count >= limit) {
+    freeRuns.set(ip, rec);
+    return { ok: false, used: rec.count, limit };
+  }
+  rec.count += 1;
+  freeRuns.set(ip, rec);
+  return { ok: true, used: rec.count, limit };
+}
+function clientIp(req: any): string {
+  const fwd = req.headers["x-forwarded-for"];
+  return (typeof fwd === "string" ? fwd.split(",")[0]?.trim() : "") || req.ip || "unknown";
+}
 
 export async function actionsRoutes(app: FastifyInstance) {
   app.get("/actions/capabilities", async () => ({
@@ -78,6 +100,20 @@ export async function actionsRoutes(app: FastifyInstance) {
     if (!p.success) return reply.status(400).send({ error: "invalid_request" });
     if (!isValidPermission(p.data.permission)) return reply.status(400).send({ error: "invalid_permission" });
     const accountId = resolveAccountId(req);
+
+    // Anonymous visitors get the cheap, read-only lookups on us — so "try it before you sign up"
+    // is real — but never anything that acts on someone's behalf, and never past the daily quota.
+    if (accountId === "demo") {
+      const verdict = freeForAnonymous(p.data.permission);
+      if (!verdict.allowed) {
+        return reply.status(401).send({ error: "sign_in_required", reason: verdict.reason });
+      }
+      const quota = takeFreeRun(clientIp(req));
+      if (!quota.ok) {
+        return reply.status(429).send({ error: "free_limit_reached", limit: quota.limit });
+      }
+    }
+
     try {
       const run = await runAction(accountId, p.data as any);
       return {

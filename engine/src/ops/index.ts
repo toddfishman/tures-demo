@@ -40,6 +40,12 @@ export function registerOps(app: FastifyInstance) {
       "/signals",
       "/assist",
       "/reserve",
+      // Action surface reachable anonymously — /actions/run then enforces its own policy
+      // (read-only + browser-free + under the free-cost cap, with a daily quota). Everything
+      // that acts on someone's behalf still needs an account, decided in the handler.
+      "/actions/run",
+      "/actions/capabilities",
+      "/actions/permissions",
       "/voice/",
       "/book",
       "/stream/",
