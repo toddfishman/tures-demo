@@ -42,6 +42,24 @@ converse → parse → plan → hold → confirm → prove
 - **Hiccup** — disruption detect + rebook (simulated confirmations when P6 off)
 - **Action Executor** — Browserbase/Stagehand for no-API sites (`handoff.html`)
 
+## Who can do what (easy to break — read before touching `/actions`)
+
+**Anonymous visitors get free read-only lookups** so they can try Tures before signing up. Everything that acts on their behalf needs an account.
+
+| | Anonymous | Signed in |
+|---|---|---|
+| `act:research` (web lookup) | ✅ free, 5/day per IP | ✅ |
+| contact · fill_forms · reserve · purchase · browser_* | ❌ `401 sign_in_required` (+ a `reason`) | ✅ (grant still required) |
+
+- Rule lives in **`engine/src/actions/catalog.ts` → `freeForAnonymous()`** — default-deny, all three required: **read-only**, **no browser session**, **`estUsd` ≤ `FREE_ACTION_MAX_USD`** ($0.05).
+- Each permission carries an **`estUsd`** (research $0.02, browser actions $0.25–0.35). That's what makes the cost rule real — keep it honest if provider costs change.
+- Daily cap `FREE_ACTION_DAILY_LIMIT` (5) bounds *total* anonymous spend; per-run cost is capped separately. Over it → `429 free_limit_reached`.
+- `/actions/run` is in the ops open list so anonymous requests **reach the handler**, which then decides. Don't "simplify" by removing the handler checks.
+
+**`trustProxy: 1` in `engine/src/server.ts` is load-bearing.** Render fronts us with exactly one proxy. Without it `req.ip` is the *proxy's* address, so every per-IP limit (global rate limit, login throttle, free-run quota) becomes one bucket shared by the whole internet. Trusting exactly one hop also stops a forged `X-Forwarded-For` from resetting a quota. **Never read `x-forwarded-for` directly — use `req.ip`.**
+
+**Failure messages must match the cause** (`v12/assets/assist-ui.js` → `failureFor()`): 401 → create-account prompt, 429 free-limit → create-account, 403 → permission, 5xx → "broke on my end", *no response* → "can't reach Tures". Don't collapse these back into one generic message — that was a real bug ("Could not reach Tures" shown when the engine had answered instantly).
+
 ## Payments (designed, not all live)
 
 | What | Rail |
