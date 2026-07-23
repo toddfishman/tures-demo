@@ -4,6 +4,7 @@ import { log } from "../logger.ts";
 import { browserConfigured } from "./browser.ts";
 import type { ActionPermission } from "./types.ts";
 import type { SiteCredentials } from "./vault-creds.ts";
+import { loadPlaybook } from "../agent/playbooks.ts";
 
 export function stagehandReady(): boolean {
   return browserConfigured() && !!config.anthropicKey;
@@ -30,12 +31,7 @@ export interface AgentRunOutcome {
 
 const HUMAN_MARK = "NEEDS_HUMAN";
 
-const TURES_AGENT_PROMPT = `You are Tures — a travel concierge executing one permissioned task in the traveler's browser session.
-Rules:
-- Do only what the instruction asks. Do not browse unrelated pages.
-- Never invent confirmation numbers or success — if you cannot verify completion, say so.
-- If you hit CAPTCHA, OTP, 2FA, or a login wall you cannot pass with information you have, stop immediately and reply starting with ${HUMAN_MARK}: then a short reason (captcha|otp|login|confirm).
-- Do not store or repeat passwords in your reply.`;
+const TURES_AGENT_PROMPT = loadPlaybook("stagehand", { HUMAN_MARK });
 
 function sessionMeta(stagehand: Stagehand): SessionMeta {
   return {
