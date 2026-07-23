@@ -46,6 +46,13 @@ export function registerOps(app: FastifyInstance) {
       "/actions/run",
       "/actions/capabilities",
       "/actions/permissions",
+      // Taste Engine: the lens table and the axis vocabulary are STATIC product copy with no
+      // personal data, and taste.html renders them for anonymous visitors — if they 401 the page
+      // silently falls back to its own copy and drifts from what the planner actually scores.
+      // Everything that touches a traveler's OWN print (/taste, /taste/quiz, /taste/lens,
+      // /taste/feedback) stays closed.
+      "/taste/lenses",
+      "/taste/axes",
       "/voice/",
       "/book",
       "/stream/",

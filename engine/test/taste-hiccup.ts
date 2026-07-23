@@ -479,4 +479,21 @@ async function bookAndConfirm(briefOver: any = {}) {
 }
 
 await app.close();
+
+// 27. With ENGINE_API_KEY set (as it is in prod), an anonymous visitor on taste.html must still
+//     reach the STATIC lens/axis vocabulary — otherwise the page falls back to its own copy and
+//     drifts from what the planner scores. Anything touching a traveler's own print stays closed.
+{
+  process.env.ENGINE_API_KEY = "secret-test-key";
+  const secured = await build();
+  assert.equal((await secured.inject({ method: "GET", url: "/taste/lenses" })).statusCode, 200, "lens table is public");
+  assert.equal((await secured.inject({ method: "GET", url: "/taste/axes" })).statusCode, 200, "axis vocabulary is public");
+  assert.equal((await secured.inject({ method: "GET", url: "/taste" })).statusCode, 401, "a traveler's own print is NOT public");
+  assert.equal((await secured.inject({ method: "POST", url: "/taste/quiz", payload: { dims: {} } })).statusCode, 401, "writing a print is NOT public");
+  assert.equal((await secured.inject({ method: "POST", url: "/taste/feedback", payload: {} })).statusCode, 401, "feedback is NOT public");
+  await secured.close();
+  delete process.env.ENGINE_API_KEY;
+  ok("the static lens vocabulary is public; a traveler's own print is not");
+}
+
 console.log(`\n${passed} checks passed.\n`);
