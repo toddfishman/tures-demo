@@ -1,5 +1,7 @@
 # Tures — agent handoff (read this first)
 
+**Agents:** start with [`AGENTS.md`](AGENTS.md) for the agent map, playbooks, evals, and safety rules. This file is the product-owner handoff.
+
 **Tures** is Todd's AI travel concierge: describe a trip, Tures books every leg and returns **confirmation numbers, not links**. Core rules: human confirms before money moves; **no fake success states** (Sample-labeled until live booking); every action audit-logged.
 
 ## Talking to Todd
@@ -74,6 +76,7 @@ node node_modules/tsx/dist/cli.mjs test/smoke.ts
 |-------|------|
 | Booking orchestration | `engine/src/booking/service.ts` |
 | Duffel search | `engine/src/suppliers/duffel.ts` |
+| Agent guide + playbooks | `AGENTS.md`, `engine/playbooks/` |
 | Chat + brief handoff | `engine/src/routes/converse.ts` |
 | Plan UX | `v12/plan.html`, `v12/assets/engine.js` |
 | Launch checklist | `v12/LAUNCH.md` |
