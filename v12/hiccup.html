@@ -642,15 +642,32 @@
                 act.innerHTML = '<button class="btn sm" data-approve="1" type="button">Approve the swap</button><button class="btn ghost sm" data-hold="1" type="button">Hold</button>';
                 pr.querySelector(".bd").appendChild(act);
                 setStatus("Awaiting your OK", "act");
+                // The proposal id rides on the event, so these buttons act on the real engine
+                // record rather than printing an outcome nobody committed to.
+                var pid = ev.data && ev.data.proposalId;
+                var lockAct = function () { Array.prototype.forEach.call(act.querySelectorAll("button"), function (x) { x.disabled = true; }); };
                 act.querySelector("[data-approve]").addEventListener("click", function () {
-                  Array.prototype.forEach.call(act.querySelectorAll("button"), function (x) { x.disabled = true; });
-                  row({ cls: "good", icon: CHK, kicker: "Rebooked", html: "Swap approved — confirmed on the alternative. Hotel and ground held to match. <span class=\"demo-tag\" style=\"margin-left:4px\">Sample</span>" });
-                  setStatus("Handled", "ok");
+                  lockAct();
+                  if (!pid) { row({ cls: "det", icon: DET, kicker: "Nothing to approve", text: "This alert carried no proposal id." }); return setStatus("All clear", "ok"); }
+                  T.hiccup.accept(pid).then(function (a) {
+                    var ar = (a && a.resolution) || {};
+                    if (ar.status === "rebooked") {
+                      row({ cls: "good", icon: CHK, kicker: "Rebooked", html: "Switched to <b>" + esc(ar.to || "the alternative") + "</b> — " + esc(ar.reason || "") + " <span class=\"demo-tag\" style=\"margin-left:4px\">Sample</span>" });
+                      setStatus("Handled", "ok");
+                    } else {
+                      row({ cls: "det", icon: DET, kicker: "Not rebooked", text: ar.reason || "The engine could not complete that swap." });
+                      setStatus("Needs attention", "warn");
+                    }
+                  }).catch(function (e) {
+                    row({ cls: "det", icon: DET, kicker: "Engine error", text: "Could not complete the swap (" + ((e && e.status) || "network") + ")." });
+                    setStatus("Needs attention", "warn");
+                  });
                 });
                 act.querySelector("[data-hold]").addEventListener("click", function () {
-                  Array.prototype.forEach.call(act.querySelectorAll("button"), function (x) { x.disabled = true; });
-                  row({ kicker: "Held", text: "Kept the original for now — still watching." });
-                  setStatus("All clear", "ok");
+                  lockAct();
+                  var done = function () { row({ kicker: "Held", text: "Kept the original for now — still watching." }); setStatus("All clear", "ok"); };
+                  if (!pid) return done();
+                  T.hiccup.decline(pid, "held from the live monitor").then(done).catch(done);
                 });
                 return;
               }
@@ -687,27 +704,75 @@
     var kind = b.dataset.kind; busy = true; disableDisrupt(true);
     row({cls:'det', icon:DET, kicker:'Detected · '+KINDLABEL[kind], text:DETAILS[kind]});
     setStatus('Handling','act');
-    var assessing = row({icon:SPIN, kicker:'Assessing', text:'Scoring alternatives against your Brief…'});
-    T.disrupt(booking.id, kind, DETAILS[kind]).then(function(d){
+    var assessing = row({icon:SPIN, kicker:'Assessing', text:'Weighing what this actually costs you…'});
+    // A delay is reported WITH its duration, because the engine triages on the number: under 90
+    // minutes it watches rather than moves you. Sending a bare "delay" would be asking it to guess.
+    T.disrupt(booking.id, kind, DETAILS[kind], kind === 'delay' ? { delayMinutes: 180 } : null).then(function(d){
       var r = (d && d.resolution) || {};
       if(assessing) assessing.remove();
+
+      function finish(status, cls){ setStatus(status, cls); disableDisrupt(false); busy=false; }
+      function ripple(){
+        (r.ripple||[]).forEach(function(x){ row({kicker:'Knock-on', text:x}); });
+      }
+
+      // Not every disruption deserves an action. The engine says which this is — echo it honestly
+      // rather than dressing a "we're watching it" up as a fix.
+      if (r.status === 'monitoring') {
+        row({cls:'good', icon:CHK, kicker:'Watching it', text:r.reason||'Real, but not worth moving you over. Tures is on it.'});
+        ripple(); return finish('Watching','ok');
+      }
+      if (r.status === 'no_action') {
+        row({cls:'det', icon:DET, kicker:'No change made', text:r.reason||'Nothing to do here.'});
+        ripple(); return finish('All clear','ok');
+      }
+      if (r.status === 'rebooked') {
+        row({cls:'good', icon:CHK, kicker:'Rebooked', html:'Switched to <b>'+esc(r.to||'the alternative')+'</b> — '+esc(r.reason||'')+' <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+        ripple(); return finish('Handled','ok');
+      }
+
+      // Proposed: the options are real, persisted rows on the engine. Approving CALLS the engine
+      // and renders what actually happened — it does not print a success and hope.
+      var opts = (d.proposals && d.proposals[0] && d.proposals[0].options) || [];
       var prop = '<div class="mon-prop">'+
         '<div class="pr"><span>From</span><span class="mono">'+esc(r.from||'current leg')+'</span></div>'+
         '<div class="pr"><span>To</span><span class="mono">'+esc(r.to||'alternative')+'</span></div>'+
-        (r.upchargeUsd!=null?'<div class="pr"><span>Upcharge</span><span class="mono">+$'+esc(r.upchargeUsd)+'</span></div>':'')+
+        (r.upchargeUsd!=null?'<div class="pr"><span>Fare difference</span><span class="mono">'+(r.upchargeUsd<0?'−$':'+$')+esc(Math.abs(r.upchargeUsd))+'</span></div>':'')+
+        (opts.length>1?'<div class="pr"><span>Also found</span><span class="mono">'+esc(opts.length-1)+' more</span></div>':'')+
         '</div>'+
         '<div class="mon-act"><button class="btn sm" data-approve="1" type="button">Approve the swap</button><button class="btn ghost sm" data-hold="1" type="button">Hold</button></div>';
       var pr = row({cls:'det', icon:FIX, kicker:'Proposed fix', html:esc(r.reason||'Found a workable alternative.'), extra:prop});
+      ripple();
       setStatus('Awaiting your OK','act');
+
+      function lock(){ Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; }); }
+
       pr.querySelector('[data-approve]').addEventListener('click', function(){
-        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
-        row({cls:'good', icon:CHK, kicker:'Rebooked', html:'Switched to <b>'+esc(r.to||'the alternative')+'</b> — confirmed, same cabin. Hotel and ground held to match. <span class="demo-tag" style="margin-left:4px">Sample</span>'});
-        setStatus('Handled','ok'); disableDisrupt(false); busy=false;
+        lock();
+        if(!r.proposalId){ row({cls:'det', icon:DET, kicker:'Nothing to approve', text:'The engine did not return a proposal to act on.'}); return finish('All clear','ok'); }
+        var pending = row({icon:SPIN, kicker:'Rebooking', text:'Securing the seat, then the fare difference…'});
+        T.hiccup.accept(r.proposalId).then(function(a){
+          if(pending) pending.remove();
+          var ar = (a && a.resolution) || {};
+          if(ar.status === 'rebooked'){
+            row({cls:'good', icon:CHK, kicker:'Rebooked', html:'Switched to <b>'+esc(ar.to||'the alternative')+'</b> — '+esc(ar.reason||'')+' <span class="demo-tag" style="margin-left:4px">Sample</span>'});
+            finish('Handled','ok');
+          } else {
+            row({cls:'det', icon:DET, kicker:'Not rebooked', text:ar.reason||'The engine could not complete that swap.'});
+            finish('Needs attention','warn');
+          }
+        }).catch(function(e){
+          if(pending) pending.remove();
+          row({cls:'det', icon:DET, kicker:'Engine error', text:'Could not complete the swap ('+((e&&e.status)||'network')+').'});
+          finish('Needs attention','warn');
+        });
       });
+
       pr.querySelector('[data-hold]').addEventListener('click', function(){
-        Array.prototype.forEach.call(pr.querySelectorAll('.mon-act button'), function(x){ x.disabled=true; });
-        row({kicker:'Held', text:'Kept the original for now — still watching.'});
-        setStatus('All clear','ok'); disableDisrupt(false); busy=false;
+        lock();
+        var done = function(){ row({kicker:'Held', text:'Kept the original for now — still watching.'}); finish('All clear','ok'); };
+        if(!r.proposalId) return done();
+        T.hiccup.decline(r.proposalId, 'held from the live monitor').then(done).catch(done);
       });
     }).catch(function(e){
       if(assessing) assessing.remove();

@@ -54,8 +54,10 @@ async function sweep(): Promise<void> {
           data: { bookingId: b.id, signalId: s.id, category: s.category, severity: s.severity, travelImpacting: !!s.travelImpacting, source: s.source, url: s.url },
         });
         if (s.travelImpacting && (s.severity === "critical" || s.severity === "warning")) {
-          const disruptKind = s.category === "weather" ? "delay" as const : "schedule_change" as const;
-          void handleDisruption(b.id, { kind: disruptKind, detail: s.detail }).catch((e) =>
+          // See watch/scan.ts — a signal is an inference, so it escalates as an UNQUANTIFIED
+          // change (triage proposes rather than moves) and carries the signal id for dedupe.
+          const disruptKind = s.severity === "critical" ? "schedule_change" as const : "delay" as const;
+          void handleDisruption(b.id, { kind: disruptKind, detail: s.detail, sourceId: s.id, severity: s.severity }).catch((e) =>
             log.warn("watcher hiccup escalation failed", { bookingId: b.id, err: String(e) }),
           );
         }

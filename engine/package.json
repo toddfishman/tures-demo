@@ -12,6 +12,7 @@
     "start": "node --import tsx src/server.ts",
     "typecheck": "tsc --noEmit",
     "smoke": "tsx test/smoke.ts",
+    "test:taste-hiccup": "tsx test/taste-hiccup.ts",
     "test:scenarios": "tsx test/run-scenarios.ts",
     "test:scenarios:llm": "tsx test/run-scenarios.ts --llm",
     "test:record-goldens": "tsx test/record-goldens.ts"

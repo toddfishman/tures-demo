@@ -67,6 +67,9 @@ export interface Offer {
   /** 0..1 fit against the brief, filled in by the scorer. */
   score?: number;
   scoreReasons?: string[];
+  /** How this offer read against the traveler's Taste Print, and why — filled in by the scorer.
+   *  `coverage` says how much of it we could actually read; low coverage means low confidence. */
+  taste?: import("./taste/types.ts").TasteFit;
 }
 
 export interface SearchResult {

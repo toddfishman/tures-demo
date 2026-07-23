@@ -47,8 +47,13 @@ function surfaceNewSignals(w: TripWatch, b: Booking, signals: Signal[]): number 
       },
     });
     if (s.travelImpacting && (s.severity === "critical" || s.severity === "warning")) {
-      const disruptKind = s.category === "weather" ? ("delay" as const) : ("schedule_change" as const);
-      void handleDisruption(b.id, { kind: disruptKind, detail: s.detail ?? s.title }).catch((e) =>
+      // A signal is an INFERENCE, not an airline telling us a leg moved — so it never carries a
+      // duration, and triage treats it accordingly: `critical` becomes an unquantified schedule
+      // change (show the alternatives, don't move anyone on a guess) and `warning` becomes a
+      // delay under the threshold (watch it). Passing the signal id as `sourceId` is what stops
+      // three signals about one storm from becoming three rebooks.
+      const disruptKind = s.severity === "critical" ? ("schedule_change" as const) : ("delay" as const);
+      void handleDisruption(b.id, { kind: disruptKind, detail: s.detail ?? s.title, sourceId: s.id, severity: s.severity }).catch((e) =>
         log.warn("watch hiccup escalation failed", { bookingId: b.id, err: String(e) }),
       );
     }

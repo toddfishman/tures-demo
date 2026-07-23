@@ -35,8 +35,12 @@ export async function runSearch(tripId: string, brief: Brief, accountId = "demo"
     }),
   ]);
 
-  const flights = scoreOffers(flightsRaw, brief, [], avoid);
-  const stays = scoreOffers(staysRaw, brief, tasteTags, avoid);
+  // Both sets score against the LENSED taste dims (standing print bent by this trip's purpose).
+  // Flights get the axes too — cabin and stop-count read on register/pace — but their blend
+  // weights taste lightly, so convenience still decides the fare.
+  const dims = context.taste?.effective;
+  const flights = scoreOffers(flightsRaw, brief, { dims, tasteTags: [], avoid });
+  const stays = scoreOffers(staysRaw, brief, { dims, tasteTags, avoid });
 
   const tookMs = Math.round(performance.now() - startedAt);
 

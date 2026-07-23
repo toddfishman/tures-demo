@@ -136,6 +136,21 @@ Three layers must stay aligned:
 - [ ] Post-trip outcome + taste learnings to mem0 (beyond book confirm)
 - [x] Hiccup resolutions written to mem0
 
+### Taste Engine (`engine/src/taste/`)
+
+The Taste Print is now a real scoring input, not a stored artifact. Six axes, standing + per-trip lens.
+
+- [x] Six-axis print drives offer ranking (`taste/fit.ts` → `search/score.ts`) — replaces substring tag matching
+- [x] Offers read on the same axes with per-axis confidence; unreadable offers score neutral (`taste/features.ts`)
+- [x] Per-trip lens server-side and canonical (`taste/lens.ts`); `taste.html` adopts it and mirrors the bend math
+- [x] Learning loop from bookings and swaps, weighted by contrast, converging (`taste/learn.ts`)
+- [x] Auditable — every learning keeps what moved, by how much, and why (`print.history`)
+- [x] Anonymous print adopted into the account on sign-in (`maybeAdoptLocalTaste`)
+- [x] Routes: `/taste`, `/taste/quiz`, `/taste/lens`, `/taste/lenses`, `/taste/axes`, `/taste/feedback`
+- [x] Plan rationale carries taste-derived "why this one" lines
+- [ ] Swap-in-plan UI wired to `/taste/feedback` (endpoint live; `plan.html` doesn't call it yet)
+- [ ] Discover slates (dining/activities) scored by taste — currently ranked by Places rating only
+
 ---
 
 ## P3 — Integrations
@@ -188,7 +203,20 @@ Three layers must stay aligned:
 - [x] **Adaptive Trip Watch** — alerts always on + risk-scored scans (replaces naive 30m deep poll)
 - [x] Pass-through pricing (Option A) — metered COGS + 20% margin, cap per trip, **settled at trip end**
 - [x] SSE live watch on trips + hiccup
-- [x] Watcher → hiccup proposal pipeline
+- [x] Watcher → hiccup proposal pipeline (signals escalate as *unquantified* — they propose, never auto-move)
+
+### Hiccup Handler (`engine/src/hiccup/`)
+
+- [x] **Triage** before action — short delays monitored, closures reported, only real breaks acted on
+- [x] Replacement can never be the disrupted leg (was: `?? flights[0]` could rebook a flight onto itself)
+- [x] Seat secured before the fare difference is charged; a failed charge is reported, never swallowed
+- [x] Proposals persist with options + expiry; `accept`/`decline` endpoints; only offered options acceptable
+- [x] `sourceId` dedupe — three signals about one storm make one proposal, not three rebooks
+- [x] Imported (Concierge Mode) trips advised, never auto-rebooked
+- [x] Ripple surfaced (unused hotel night, mistimed transfer, arrival-day plans)
+- [x] `hiccup.html` approve/hold call the engine (they used to print a fake "Rebooked")
+- [ ] Stay/dining/activity replacement options (flights are ranked properly; stays reuse search ranking)
+- [ ] Component-level departure times — ripple is day-granular until components carry times
 - [x] Set `TRIP_WATCH_*` env on Render + redeploy *(live 2026-07-09)*
 - [ ] `X_BEARER_TOKEN` for X alert polls (optional)
 - [ ] `NEWS_API_KEY` for news scans on elevated risk days

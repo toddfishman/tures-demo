@@ -535,9 +535,18 @@
     var sig = signature(dims, tags);
     var tp = { dims:dims, placeTypes:placeTypes(dims), tags:tags, signature:stripHtml(sig) };
 
-    // PERSIST — funnel (localStorage + nav chip) then server-side if signed in
+    // PERSIST — funnel (localStorage + nav chip) first so the page is instant, then the engine.
+    // The engine re-derives the signature and the search vocabulary from the dims, so we adopt
+    // its version when it answers: the words you read and the terms Tures searches stay identical.
     F.setTaste(tp);
-    if (T && T.signedIn) { try { T.prefs.set({ tastePrint: tp }); } catch(_){} }
+    if (T && T.signedIn && T.taste) {
+      T.taste.quiz(tp.dims, tp.tags).then(function (r) {
+        if (!r || !r.print) return;
+        F.setTaste(r.print);
+        surface(r.print);
+        renderProfile();
+      }).catch(function () { /* offline / cold engine — the local print still stands */ });
+    }
 
     renderResult(tp, sig);
     surface(tp);
@@ -605,7 +614,7 @@
   var SAMPLE_DIMS = {pace:32,register:36,energy:34,palate:74,planning:50,aesthetic:82};
 
   var LENSES = [
-    {id:'usual', label:'My usual', ic:'feather', d:{},
+    {id:'usual', label:'My usual', ic:'feather', d:{},   /* offline fallback — see adoptEngineLenses() */
       sig:'This is <b>you, in general</b> — what Tures reaches for when nothing about the trip says otherwise.'},
     {id:'celebrate', label:'Celebrate', ic:'spark', d:{register:24,energy:30,palate:12,aesthetic:6},
       sig:'A celebration <b>trades up</b> — louder energy, sharper rooms, bolder plates than your everyday. The rest stays you.'},
@@ -620,6 +629,24 @@
     {id:'family', label:'Family', ic:'users', d:{pace:-20,palate:-22,energy:8,planning:12},
       sig:'With family it <b>simplifies</b> — gentler pace, crowd-pleasing food, a little more structure.'}
   ];
+
+  // The engine owns the lens table (engine/src/taste/lens.ts). The list above is the offline
+  // fallback so the page still works cold; when the engine answers we adopt ITS deltas, because
+  // those are the ones the planner actually scores against. A panel that disagrees with the
+  // planner is worse than no panel.
+  function adoptEngineLenses(){
+    if (!T || !T.taste) return;
+    T.taste.lenses().then(function (r) {
+      if (!r || !Array.isArray(r.lenses) || !r.lenses.length) return;
+      LENSES = r.lenses.map(function (l) {
+        return { id:l.id, label:l.label, ic:(SVG[l.icon] ? l.icon : 'feather'), d:l.deltas || {}, sig:l.blurb || '' };
+      });
+      var keep = LENSES.filter(function (l) { return l.id === (curLens && curLens.id); })[0];
+      curLens = keep || LENSES[0];
+      lensSet.innerHTML = '';
+      renderProfile();
+    }).catch(function () { /* keep the built-in table */ });
+  }
 
   var lensSet = document.getElementById('lensSet');
   var lensSig = document.getElementById('lensSig');
@@ -640,8 +667,19 @@
     return { dims:SAMPLE_DIMS, name:'Andy Rockwell', sub:'Standing Taste Print · learned across 11 trips', sample:true };
   }
   function clampD(n){ return Math.max(6, Math.min(96, Math.round(n))); }
+  // Mirrors applyLens() in engine/src/taste/lens.ts — diminishing return as an axis nears its
+  // pole, so a lens bends OUTLIERS rather than flattening everyone to the same extreme. Kept in
+  // step with the engine on purpose: a panel that bends differently from the planner is showing
+  // the traveler something Tures will not actually do.
   function bend(dims, lens){
-    var o = {}; DIM_KEYS.forEach(function(k){ o[k] = clampD(dims[k] + (lens.d[k]||0)); }); return o;
+    var o = {};
+    DIM_KEYS.forEach(function(k){
+      var d = lens.d[k] || 0;
+      if(!d){ o[k] = clampD(dims[k]); return; }
+      var headroom = d > 0 ? (100 - dims[k]) / 100 : dims[k] / 100;
+      o[k] = clampD(dims[k] + d * Math.min(1, headroom * 1.6));
+    });
+    return o;
   }
   function renderDims(usual, trip){
     var h = '';
@@ -689,6 +727,18 @@
   var existing = F.taste();
   if (existing && existing.signature) surface(existing);
   renderProfile();
+  adoptEngineLenses();
+
+  // Signed in? The account's print is the truth — it has been sharpened by what you actually
+  // booked since the quiz, which localStorage knows nothing about.
+  if (T && T.signedIn && T.taste) {
+    T.taste.get().then(function (r) {
+      if (!r || !r.known || !r.print) return;
+      F.setTaste(r.print);
+      surface(r.print);
+      renderProfile();
+    }).catch(function () { /* local print stands */ });
+  }
 })();
 </script>
 

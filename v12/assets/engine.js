@@ -81,6 +81,25 @@
     } catch (_) { return Promise.resolve(); }
   }
 
+  /* An anonymous visitor can build a full Taste Print before they ever have an account — that is
+     the point of taste.html. It lives in localStorage until they sign in; without this step it
+     would STAY there, and the planner (which reads the account) would never see the thing they
+     just spent ten questions building. Adopt it on sign-in, but never overwrite a print the
+     account already has: what the engine learned from real bookings beats a local quiz result. */
+  function maybeAdoptLocalTaste() {
+    try {
+      if (!token) return Promise.resolve();
+      var raw = localStorage.getItem("tures.tastePrint");
+      if (!raw) return Promise.resolve();
+      var tp = JSON.parse(raw);
+      if (!tp || !tp.dims) return Promise.resolve();
+      return api("/taste").then(function (r) {
+        if (r && r.known) return; // the account already knows this traveler — leave it alone
+        return api("/taste/quiz", { method: "POST", body: JSON.stringify({ dims: tp.dims, tags: tp.tags || [] }) });
+      }).catch(function () {});
+    } catch (_) { return Promise.resolve(); }
+  }
+
   function retriableStatus(s) { return s === 502 || s === 503 || s === 504; }
   /** Retry cold-start / gateway blips — Render wakes on first request. */
   function withRetry(fn, retries) {
@@ -129,11 +148,11 @@
     /* ----- real auth ----- */
     signUp: function (name, email, password) {
       return api("/auth/signup", { method: "POST", body: JSON.stringify({ name: name, email: email, password: password }) })
-        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(function () { return r.user; }); });
+        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(maybeAdoptLocalTaste).then(function () { return r.user; }); });
     },
     login: function (email, password) {
       return api("/auth/login", { method: "POST", body: JSON.stringify({ email: email, password: password }) })
-        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(function () { return r.user; }); });
+        .then(function (r) { setSession(r.token, r.user); return maybeMergeGuestMem(r.user.id).then(maybeAdoptLocalTaste).then(function () { return r.user; }); });
     },
     me: function () { return api("/auth/me").then(function (r) { account = r.user; localStorage.setItem(ACCT, JSON.stringify(account)); return r.user; }); },
     signOut: function () { setSession("", null); },
@@ -191,7 +210,37 @@
       abortHandoff: function (token) { return api("/actions/handoff/" + encodeURIComponent(token) + "/abort", { method: "POST" }); },
     },
 
-    disrupt: function (bookingId, kind, detail) { return api("/disruptions", { method: "POST", body: JSON.stringify({ bookingId: bookingId, kind: kind, detail: detail }) }); },
+    /* The Hiccup Handler. `disrupt` reports a break in a booked trip; the engine triages it and
+       either watches it, proposes a fix, or rebooks within standing authority. A proposal is
+       durable — `proposals` lists what's still open and accept/decline act on it later, from any
+       surface. Pass delayMinutes / newDepartureIso when you have them: an unquantified report is
+       deliberately treated as "show options", never "move them". */
+    disrupt: function (bookingId, kind, detail, extra) {
+      var body = { bookingId: bookingId, kind: kind, detail: detail };
+      if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) body[k] = extra[k];
+      return api("/disruptions", { method: "POST", body: JSON.stringify(body) });
+    },
+    hiccup: {
+      proposals: function (bookingId) { return api("/disruptions/" + encodeURIComponent(bookingId)); },
+      accept: function (proposalId, offerId) {
+        return api("/disruptions/proposals/" + encodeURIComponent(proposalId) + "/accept", { method: "POST", body: JSON.stringify({ offerId: offerId }) });
+      },
+      decline: function (proposalId, note) {
+        return api("/disruptions/proposals/" + encodeURIComponent(proposalId) + "/decline", { method: "POST", body: JSON.stringify({ note: note }) });
+      },
+    },
+
+    /* The Taste Engine — two profiles, one traveler. The standing print lives on the account;
+       the lens is per-trip. The lens table and the prose signature come FROM the engine so the
+       panel a traveler reads is exactly what the planner scores against. */
+    taste: {
+      get: function () { return api("/taste"); },
+      axes: function () { return api("/taste/axes"); },
+      lenses: function () { return api("/taste/lenses"); },
+      quiz: function (dims, tags) { return api("/taste/quiz", { method: "POST", body: JSON.stringify({ dims: dims, tags: tags || [] }) }); },
+      lens: function (body) { return api("/taste/lens", { method: "POST", body: JSON.stringify(body || {}) }); },
+      feedback: function (body) { return api("/taste/feedback", { method: "POST", body: JSON.stringify(body || {}) }); },
+    },
 
     connections: {
       connect: function (c) { c = c || {}; if (!c.accountId) c.accountId = acctId(); return api("/connections", { method: "POST", body: JSON.stringify(c) }); },

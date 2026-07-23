@@ -16,9 +16,19 @@ import { enableTripWatch } from "../watch/service.ts";
 import { getUser } from "../auth/index.ts";
 import { chooseCard, categoryForKind } from "../wallet/cards.ts";
 import { passengerSummary, loyaltyCrediter } from "../profile/index.ts";
+import { observe as observeTaste } from "../taste/service.ts";
 
 // Resolved Offer objects kept out of the serialized Booking (supplier.book needs the full offer).
-const offerCache = new Map<string, { flight?: Offer; stay?: Offer }>();
+// The full candidate sets are kept alongside the picks: the Taste Engine learns from the CONTRAST
+// between what was chosen and what it beat, so "the alternatives that were on screen" is real
+// signal, not bookkeeping. See taste/learn.ts.
+const offerCache = new Map<string, { flight?: Offer; stay?: Offer; flights?: Offer[]; stays?: Offer[] }>();
+
+/** The resolved offers behind a booking (picks + the sets they came from). The Hiccup Handler
+ *  uses this to know what the disrupted component actually was, without re-deriving it. */
+export function cachedOffers(bookingId: string): { flight?: Offer; stay?: Offer; flights?: Offer[]; stays?: Offer[] } | undefined {
+  return offerCache.get(bookingId);
+}
 
 function audit(b: Booking, actor: Booking["audit"][number]["actor"], action: string, detail?: string) {
   b.audit.push({ ts: new Date().toISOString(), actor, action, detail });
@@ -77,7 +87,7 @@ export async function createBooking(tripId: string, input: CreateBookingInput): 
     createdAt: now,
     updatedAt: now,
   };
-  offerCache.set(booking.id, { flight, stay });
+  offerCache.set(booking.id, { flight, stay, flights, stays });
   audit(booking, "agent", "booking_created", `${components.map((c) => c.title).join(" + ")} · $${totalUsd.toLocaleString()}`);
 
   if (violations.length) {
@@ -175,6 +185,16 @@ async function execute(booking: Booking): Promise<Booking> {
       const feePay = await payments.charge(booking.feeUsd, booking.currency, `${booking.idempotencyKey ?? booking.id}:fee`, { accountId: booking.accountId, connectionId: choice?.connectionId });
       booking.charges.push(feePay);
       audit(booking, "system", "concierge_fee", `$${booking.feeUsd} Tures fee · ${feePay.provider} ${feePay.intentId}`);
+    }
+
+    // Taste: what a traveler actually CONFIRMS is the truest signal there is. Learn from each
+    // component against the alternatives it beat. Never allowed to fail a booking — observe()
+    // swallows its own errors and a uninformative choice simply teaches nothing.
+    for (const c of booking.components) {
+      const chosen = c.kind === "flight" ? offers.flight : offers.stay;
+      const field = (c.kind === "flight" ? offers.flights : offers.stays) ?? [];
+      if (!chosen) continue;
+      observeTaste(booking.accountId, { type: "booked", chosen, rejected: field.filter((o) => o.id !== chosen.id).slice(0, 8) });
     }
 
     booking.status = "booked";
