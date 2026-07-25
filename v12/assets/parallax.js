@@ -21,7 +21,9 @@
   var nav = document.querySelector(".v11-nav");
   function navSolid() {
     if (!nav) return;
-    nav.classList.toggle("px-nav-solid", window.scrollY > window.innerHeight * 0.42);
+    var solid = window.scrollY > window.innerHeight * 0.42;
+    nav.classList.toggle("nav-solid", solid);
+    nav.classList.toggle("px-nav-solid", solid);
   }
 
   var bgs = [].slice.call(document.querySelectorAll(".px-bg-inner"));

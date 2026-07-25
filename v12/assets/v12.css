@@ -207,16 +207,20 @@ em,.it{font-style:normal;color:var(--acc-2);font-weight:inherit}
 /* ============================================================
    Injected chrome (site.js) — nav + footer
    ============================================================ */
-.v11-nav{position:sticky;top:0;z-index:80;backdrop-filter:blur(14px);
-  background:linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.7))}
+.v11-nav{position:sticky;top:0;z-index:80;
+  background:transparent;border-bottom:1px solid transparent;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  transition:background .28s ease,border-color .28s ease,backdrop-filter .28s ease,-webkit-backdrop-filter .28s ease}
 .v11-nav .in{max-width:var(--maxw);margin:0 auto;padding:0 22px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:18px}
 .v11-nav .mark{font-family:'Playfair Display',serif;font-size:32px;font-weight:600;letter-spacing:.5px}
 .v11-nav .mark-img{display:block;height:30px;width:auto;max-width:none}
 .v11-nav .mark-img--white{display:none}
-html.dark .v11-nav .mark-img--ink{display:none}
-html.dark .v11-nav .mark-img--white{display:block}
-html.px-cover .v11-nav:not(.px-nav-solid) .mark-img--ink{display:none}
-html.px-cover .v11-nav:not(.px-nav-solid) .mark-img--white{display:block}
+html.dark .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--ink{display:none}
+html.dark .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--white{display:block}
+html.dark.v11-travel-on .v11-nav.nav-solid .mark-img--ink,
+html.dark.v11-travel-on .v11-nav.px-nav-solid .mark-img--ink{display:none}
+html.dark.v11-travel-on .v11-nav.nav-solid .mark-img--white,
+html.dark.v11-travel-on .v11-nav.px-nav-solid .mark-img--white{display:block}
 
 /* left — logo + chevron → page menu */
 .v11-menu-wrap{position:relative;flex:0 0 auto}
@@ -339,7 +343,8 @@ html.dark.v11-travel-on .card,
 html.dark.v11-travel-on .browser{background:rgba(22,22,28,.88)}
 html.dark.v11-travel-on .v11-foot{background:rgba(22,22,28,.9)}
 /* shared chrome + components that hardcode light values */
-html.dark .v11-nav{background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66))}
+html.dark .v11-nav.nav-solid,
+html.dark .v11-nav.px-nav-solid{background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}
 html.dark .v11-menu,html.dark .v11-acct-menu,html.dark .card,html.dark .browser{background:var(--surface)}
 /* chat bubbles — dark surface + light text everywhere (covers index arc-hero + plan + demos) */
 html.dark .from-me .bubble{background:var(--bubble-me);border-color:var(--acc-deep);color:var(--bubble-me-text)}
@@ -432,28 +437,74 @@ html.dark .tg::after{background:var(--surface-2);box-shadow:0 1px 3px rgba(0,0,0
    v12 PARALLAX COVER — full-bleed cinematic hero + scroll panels
    (index.html only; uses its own video — data-no-travel-bg on body)
    ============================================================ */
-html.px-cover .v11-nav{
-  background:linear-gradient(to bottom, rgba(8,10,14,.55), rgba(8,10,14,.08));
-  border-bottom-color:transparent;
-}
-html.dark.px-cover .v11-nav{
-  background:linear-gradient(to bottom, rgba(8,10,14,.72), rgba(8,10,14,.12));
-}
-html.px-cover .v11-nav .v11-logo,
-html.px-cover .v11-nav .v11-acct{color:#fff}
-html.px-cover .v11-nav .v11-logo .chev{color:rgba(255,255,255,.55)}
-html.px-cover .v11-nav .v11-acct{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
-html.px-cover .v11-nav.px-nav-solid{
+/* ---- transparent nav over video / hero — light controls until scroll ---- */
+.v11-nav.nav-solid,
+.v11-nav.px-nav-solid{
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   background:linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.7));
   border-bottom-color:var(--line);
 }
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--ink{display:none}
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--white{display:block}
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-logo,
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-acct,
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-theme{color:rgba(255,255,255,.88)}
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-logo .chev{color:rgba(255,255,255,.55)}
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-acct,
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-theme{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+html.v11-travel-on .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-home{filter:drop-shadow(0 1px 10px rgba(0,0,0,.4))}
+html.v11-travel-on .v11-nav.nav-solid .mark-img--ink,
+html.v11-travel-on .v11-nav.px-nav-solid .mark-img--ink{display:block}
+html.v11-travel-on .v11-nav.nav-solid .mark-img--white,
+html.v11-travel-on .v11-nav.px-nav-solid .mark-img--white{display:none}
+html.v11-travel-on .v11-nav.nav-solid .v11-logo,
+html.v11-travel-on .v11-nav.nav-solid .v11-acct,
+html.v11-travel-on .v11-nav.nav-solid .v11-theme,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-logo,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-acct,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-theme{color:var(--text)}
+html.v11-travel-on .v11-nav.nav-solid .v11-logo .chev,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-logo .chev{color:var(--muted)}
+html.v11-travel-on .v11-nav.nav-solid .v11-acct,
+html.v11-travel-on .v11-nav.nav-solid .v11-theme,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-acct,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-theme{border-color:var(--line-2);background:var(--bg);color:var(--muted)}
+html.v11-travel-on .v11-nav.nav-solid .v11-home,
+html.v11-travel-on .v11-nav.px-nav-solid .v11-home{filter:none}
+
+html.px-cover .v11-nav{
+  position:fixed;top:0;left:0;right:0;width:100%;
+  background:transparent;border-bottom-color:transparent;
+}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--ink{display:none}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .mark-img--white{display:block}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-logo,
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-acct,
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-theme{color:rgba(255,255,255,.88)}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-logo .chev{color:rgba(255,255,255,.55)}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-acct,
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-theme{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08)}
+html.px-cover .v11-nav:not(.nav-solid):not(.px-nav-solid) .v11-home{filter:drop-shadow(0 1px 10px rgba(0,0,0,.4))}
+html.px-cover .v11-nav.nav-solid .v11-logo,
+html.px-cover .v11-nav.nav-solid .v11-acct,
+html.px-cover .v11-nav.px-nav-solid .v11-logo,
+html.px-cover .v11-nav.px-nav-solid .v11-acct{color:var(--text)}
+html.px-cover .v11-nav.nav-solid .v11-logo .chev,
+html.px-cover .v11-nav.px-nav-solid .v11-logo .chev{color:var(--muted)}
+html.px-cover .v11-nav.nav-solid .v11-acct,
+html.px-cover .v11-nav.px-nav-solid .v11-acct{border-color:var(--line-2);background:var(--bg);color:var(--muted)}
+html.px-cover .v11-nav.nav-solid .v11-theme,
+html.px-cover .v11-nav.px-nav-solid .v11-theme{border-color:var(--line-2);background:var(--bg);color:var(--muted)}
+html.px-cover .v11-nav.nav-solid .v11-home,
+html.px-cover .v11-nav.px-nav-solid .v11-home{filter:none}
+html.px-cover .v11-nav.nav-solid .mark-img--ink,
+html.px-cover .v11-nav.px-nav-solid .mark-img--ink{display:block}
+html.px-cover .v11-nav.nav-solid .mark-img--white,
+html.px-cover .v11-nav.px-nav-solid .mark-img--white{display:none}
+html.dark.px-cover .v11-nav.nav-solid,
 html.dark.px-cover .v11-nav.px-nav-solid{
   background:linear-gradient(to bottom, rgba(16,16,20,.93), rgba(16,16,20,.66));
 }
-html.px-cover .v11-nav.px-nav-solid .v11-logo,
-html.px-cover .v11-nav.px-nav-solid .v11-acct{color:var(--text)}
-html.px-cover .v11-nav.px-nav-solid .v11-logo .chev{color:var(--muted)}
-html.px-cover .v11-nav.px-nav-solid .v11-acct{border-color:var(--line-2);background:var(--bg);color:var(--muted)}
 html.px-cover .v11-foot{margin-top:0}
 
 .px-root{position:relative}

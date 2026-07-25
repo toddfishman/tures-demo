@@ -146,6 +146,21 @@
     '</div>';
   document.body.insertBefore(nav, document.body.firstChild);
 
+  /* ---- nav: transparent over media; solid bar after scroll ---- */
+  (function () {
+    var bar = nav;
+    if (!bar) return;
+    var isCover = document.documentElement.classList.contains("px-cover");
+    if (isCover) return; /* parallax.js handles the cover */
+    function syncNav() {
+      var solid = window.scrollY > 72;
+      bar.classList.toggle("nav-solid", solid);
+    }
+    window.addEventListener("scroll", syncNav, { passive: true });
+    window.addEventListener("resize", syncNav, { passive: true });
+    syncNav();
+  })();
+
   /* ---- dropdown open/close (logo menu + account menu) ---- */
   var drops = [];
   function closeAll() { drops.forEach(function (d) { d.panel.classList.remove("open"); d.btn.setAttribute("aria-expanded", "false"); }); }
