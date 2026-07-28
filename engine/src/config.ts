@@ -106,6 +106,23 @@ const Env = z.object({
   // Per-run cost is capped above, but TOTAL anonymous spend is not — so also cap how many free
   // runs one visitor gets per day. Without this, free research is unbounded real money.
   FREE_ACTION_DAILY_LIMIT: z.coerce.number().int().nonnegative().default(5),
+  // ── Marketing Agent — the growth loop (research → create → brand-check → publish → measure → optimize) ──
+  // The loop logic + scheduler run when enabled, but all publishing/spend is SIMULATED until the
+  // hard live switch below is flipped (Todd-explicit only, exactly like ALLOW_LIVE_BOOKING).
+  MARKETING_ENABLED: z.enum(["true", "false"]).default("true"),
+  // Hard safety switch: real ad publishing + real spend are refused unless this is "true" AND the
+  // target channel has a token. Default false so dev/test can never place a real ad or spend a cent.
+  MARKETING_LIVE: z.enum(["true", "false"]).default("false"),
+  // Largest daily budget one campaign may request, USD. Bounds blast radius even when live.
+  MARKETING_DAILY_BUDGET_CAP_USD: z.coerce.number().positive().default(50),
+  // Minutes between loop passes for running campaigns.
+  MARKETING_TICK_MIN: z.coerce.number().int().positive().default(60),
+  // Optional ad-channel tokens. A channel with no token here always SIMULATES (never fabricates a
+  // real publish), even with MARKETING_LIVE=true.
+  META_ADS_TOKEN: z.string().optional(),
+  GOOGLE_ADS_TOKEN: z.string().optional(),
+  REDDIT_ADS_TOKEN: z.string().optional(),
+  X_ADS_TOKEN: z.string().optional(),
 });
 
 const parsed = Env.parse(process.env);
@@ -205,4 +222,19 @@ export const config = {
   freeActionMaxUsd: parsed.FREE_ACTION_MAX_USD,
   /** How many free runs one anonymous visitor gets per day (0 = none). */
   freeActionDailyLimit: parsed.FREE_ACTION_DAILY_LIMIT,
+  /** Marketing Agent — the growth loop. `live` is the hard switch; `channelKeys` gate real
+   *  publishing per channel (no key → simulated even when live). */
+  marketing: {
+    enabled: parsed.MARKETING_ENABLED === "true",
+    live: parsed.MARKETING_LIVE === "true",
+    dailyBudgetCapUsd: parsed.MARKETING_DAILY_BUDGET_CAP_USD,
+    tickMin: parsed.MARKETING_TICK_MIN,
+    channelKeys: {
+      meta: parsed.META_ADS_TOKEN,
+      google: parsed.GOOGLE_ADS_TOKEN,
+      reddit: parsed.REDDIT_ADS_TOKEN,
+      x: parsed.X_ADS_TOKEN,
+      email: undefined as string | undefined, // email sends go through the existing notify layer
+    } as Record<import("./marketing/types.ts").Channel, string | undefined>,
+  },
 } as const;

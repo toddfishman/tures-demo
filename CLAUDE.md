@@ -28,7 +28,7 @@ Strategy docs (BRIEF, ARCHITECTURE, etc.) live **outside this repo** — ask Tod
 
 Typical prod: `durable:true`, `auth:true`, `agentLoop:true`, `voice:true`, `tripWatch:true`, `stagehand:true`, `chatBrain:sakana-fugu`, `realInventorySearch:true`, **`bookingSimulated:true`**, `paymentProvider:mock`, `billingLive:true` (Stripe test).
 
-**P6 real money** (`ALLOW_LIVE_BOOKING`, `STRIPE_CHARGE_CARDS`, live Duffel orders) — **Todd explicit only**. Never flip without him.
+**P6 real money** (`ALLOW_LIVE_BOOKING`, `STRIPE_CHARGE_CARDS`, live Duffel orders, **`MARKETING_LIVE`** = real ad spend) — **Todd explicit only**. Never flip without him.
 
 ## Product spine
 
@@ -44,6 +44,7 @@ converse → parse → plan → hold → confirm → prove
 - **Trip Watch** — pass-through COGS + 20%, adaptive scans
 - **Hiccup** — triage → options → propose/rebook (simulated confirmations when P6 off)
 - **Action Executor** — Browserbase/Stagehand for no-API sites (`handoff.html`)
+- **Marketing Agent** (`/marketing`) — growth loop: research pains → write on-brand creatives → brand-check → **human-confirm gate** → publish → measure → kill losers/scale winners. Publishing is **simulated** (sample-labeled, no spend) until `MARKETING_LIVE`; same safety spine as booking.
 
 ## Who can do what (easy to break — read before touching `/actions`)
 
@@ -118,6 +119,7 @@ node node_modules/tsx/dist/cli.mjs test/taste-hiccup.ts
 | Topic | Path |
 |-------|------|
 | Booking orchestration | `engine/src/booking/service.ts` |
+| Marketing Agent | `engine/src/marketing/` (service.ts = spine · brand.ts = guardrails) |
 | Taste Engine | `engine/src/taste/` · `v12/taste.html` |
 | Hiccup Handler | `engine/src/hiccup/` · `v12/hiccup.html` |
 | Duffel search | `engine/src/suppliers/duffel.ts` |

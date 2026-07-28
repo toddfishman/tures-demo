@@ -4,6 +4,7 @@ import { providerStatus } from "../signals/registry.ts";
 import { actionExecutorStatus } from "../actions/service.ts";
 import { browserConfigured } from "../actions/browser.ts";
 import { stagehandReady } from "../actions/stagehand.ts";
+import { marketingStatus } from "../marketing/service.ts";
 
 export async function healthRoutes(app: FastifyInstance) {
   app.get("/health", async () => ({
@@ -30,6 +31,8 @@ export async function healthRoutes(app: FastifyInstance) {
       hiccupHandler: true, // Chunk 5 — disruption detection + autonomous rebooking
       situationalAwareness: true, // Signals layer — weather/air/events/advisories radar + watcher
       tripWatch: config.watch.enabled, // Adaptive Trip Watch — pass-through + risk-scored scans
+      marketingAgent: config.marketing.enabled, // Growth loop: research → create → brand-check → publish → measure → optimize
+      marketingSimulated: !config.marketing.live, // launches are sample-labeled; no ad spend until Todd flips MARKETING_LIVE
       assist: !!config.anthropicKey, // "handle anything" concierge — web research + permissioned actions
       actionExecutor: actionExecutorStatus(), // browserbase | simulated
       browserAutomation: browserConfigured(),
@@ -55,6 +58,8 @@ export async function healthRoutes(app: FastifyInstance) {
       marginPercent: config.watch.marginPercent,
       defaultCapUsd: config.watch.defaultCapUsd,
     },
+    marketing: marketingStatus(), // enabled/live/simulated + brain + budget cap + tick
+
     durable: !!config.dataDir, // persists accounts/vault/bookings across restarts
     piiVault: config.vgs.enabled ? "vgs" : "local-aes", // where passport/KTN/etc. are stored
     stripePublishableKey: config.stripePublishableKey, // pk_… for Stripe.js card forms (public)

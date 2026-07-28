@@ -60,6 +60,9 @@ export function registerOps(app: FastifyInstance) {
       "/actions/capabilities",
       "/actions/permissions",
       "/actions/handoff/",
+      // Marketing Agent capabilities are static product copy (objectives/channels/honesty labels),
+      // rendered for anonymous visitors. Everything that creates or mutates a campaign stays closed.
+      "/marketing/capabilities",
     ];
     if (open.some((p) => path === p || path.startsWith(p))) return;
     if (session) return; // a signed-in user is authorized

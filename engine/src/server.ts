@@ -40,6 +40,8 @@ import { startSignalWatcher } from "./signals/watcher.ts";
 import { startTripWatchScheduler } from "./watch/scheduler.ts";
 import { watchRoutes } from "./routes/watch.ts";
 import { mem0Routes } from "./routes/mem0.ts";
+import { marketingRoutes } from "./routes/marketing.ts";
+import { startMarketingScheduler } from "./marketing/scheduler.ts";
 
 export async function build() {
   // trustProxy: 1 — Render puts exactly one proxy in front of us. Without this, req.ip is the
@@ -108,6 +110,7 @@ export async function build() {
   await app.register(actionsRoutes);
   await app.register(channelRoutes);
   await app.register(telegramRoutes);
+  await app.register(marketingRoutes);
 
   return app;
 }
@@ -129,6 +132,9 @@ if (isMain) {
       // Start adaptive Trip Watch (pass-through + risk-scored scans). Legacy deep watcher stays
       // off unless SIGNAL_WATCH_INTERVAL_MIN>0 AND trip watch is disabled.
       startTripWatchScheduler();
+      // Marketing Agent growth loop — advances running campaigns on a tick (simulated spend
+      // until MARKETING_LIVE). Off unless MARKETING_ENABLED.
+      startMarketingScheduler();
       if (!config.watch.enabled) startSignalWatcher();
       // Point Telegram at this engine's webhook (no-op unless a bot token is set).
       void registerTelegramWebhook();
