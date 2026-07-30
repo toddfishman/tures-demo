@@ -3,6 +3,7 @@
 // card the user never connected.
 import type { PaymentRecord } from "./types.ts";
 import { config } from "../config.ts";
+import { isSimulatedBooking } from "./policy.ts";
 import { activeConnection, connectionById, reveal } from "../vault/index.ts";
 
 export interface ChargeContext {
@@ -41,8 +42,13 @@ class MockPayments implements PaymentProvider {
   readonly provider = "mock" as const;
   readonly live = false;
   async charge(amountUsd: number, currency: string, idempotencyKey: string, ctx: ChargeContext): Promise<PaymentRecord> {
-    // Even in mock mode, a payment method must be connected — mirrors the real authorization rule.
-    resolvePaymentConnection(ctx);
+    // When a card IS connected we mirror the real authorization rule and "charge" it. But in
+    // simulated mode (ALLOW_LIVE_BOOKING off) no money can ever move, so a signed-out visitor with
+    // no card on file must still be able to run the $0 demo end to end — the mock charge succeeds
+    // as a clearly non-live record. In live mode this path never runs (getPayments → Stripe).
+    if (!(isSimulatedBooking() && !activeConnection(ctx.accountId, "payment") && !ctx.connectionId)) {
+      resolvePaymentConnection(ctx);
+    }
     return {
       provider: "mock",
       intentId: `pi_mock_${hash(idempotencyKey)}`,

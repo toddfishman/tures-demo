@@ -50,6 +50,9 @@
   .bill-toggle{display:inline-flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;margin:14px 0 2px}
   .bill-toggle .bt{border:none;background:none;cursor:pointer;font:500 12.5px 'DM Sans',sans-serif;color:var(--muted);padding:7px 13px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;transition:background .18s,color .18s}
   .bill-toggle .bt.on{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  /* whole tier card is a click target — subtle affordance; CTA button stays the keyboard focus */
+  .tier.clickable{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+  .tier.clickable:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.10)}
   .bill-toggle .bt .save{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--acc-deep);background:var(--acc-dim);border-radius:6px;padding:2px 6px}
 
   /* trust strip */
@@ -154,7 +157,7 @@
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Taste Engine</b> recommendations that learn from every trip.</span></li>
           <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>No per-booking fee</b> — the trips are included.</span></li>
         </ul>
-        <a class="btn" href="signup.html" id="subscribe-concierge" style="margin-top:auto">Go Concierge</a>
+        <a class="btn" href="login.html?create=1&next=pricing.html" id="subscribe-concierge" style="margin-top:auto">Go Concierge</a>
       </article>
 
     </div>
@@ -307,6 +310,21 @@
     btn.textContent='Starting…';
     var period=(window.turesBillingPeriod&&window.turesBillingPeriod())||'monthly';
     window.tures.billing.checkout(period).then(function(r){ location.href=r.url; }).catch(function(){ btn.textContent='Go Concierge'; });
+  });
+})();
+</script>
+<script>
+/* Whole pricing card is clickable → triggers its primary CTA. Inner controls (billing toggle,
+   links, the button itself) still win the click, and the CTA <a> remains the real keyboard focus
+   target, so this is a mouse affordance only — no accessibility regression. */
+(function(){
+  [].slice.call(document.querySelectorAll('.tier')).forEach(function(card){
+    var cta=card.querySelector('.btn'); if(!cta) return;
+    card.classList.add('clickable');
+    card.addEventListener('click', function(e){
+      if(e.target.closest('a,button,input,label,.bill-toggle')) return; // real controls handle themselves
+      cta.click();
+    });
   });
 })();
 </script>

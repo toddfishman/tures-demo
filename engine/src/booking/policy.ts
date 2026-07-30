@@ -28,7 +28,11 @@ export function checkPolicy(input: PolicyInput): string[] {
   if (!input.flight && !input.stay) v.push("nothing to book (no flight or stay selected)");
 
   // Authorization: a payment method must be connected and grant payment:charge (Chunk 4 vault).
-  if (!hasScope(input.accountId, "payment:charge")) {
+  // Required only when a booking can actually move money. In simulated mode (ALLOW_LIVE_BOOKING
+  // off) no charge ever happens and orders are sample-labeled, so the public $0 demo — and any
+  // signed-out visitor trying Tures — must be able to book without a card on file. The matching
+  // money gate is execute() in service.ts, which places a real order only when NOT simulated.
+  if (!isSimulatedBooking() && !hasScope(input.accountId, "payment:charge")) {
     v.push("no payment method connected (grant payment:charge by connecting a card)");
   }
 
