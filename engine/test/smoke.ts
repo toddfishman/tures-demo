@@ -3,6 +3,7 @@
 // Runs with the mock supplier (no keys). `npm run smoke`.
 import assert from "node:assert/strict";
 import { build } from "../src/server.ts";
+import { config } from "../src/config.ts";
 import { bus } from "../src/events/bus.ts";
 import { encrypt, decrypt } from "../src/vault/crypto.ts";
 import { consumeLinkCode, resolveAccount, unlinkChannel } from "../src/channels/index.ts";
@@ -258,15 +259,34 @@ let bookingId = "";
   ok("Hiccup Handler proposes (no auto-charge) without standing authority");
 }
 
-// 12. revoking all payment methods blocks new bookings at the policy gate
+// 12. the payment-method gate is posture-aware: skipped when simulated, enforced when live.
 {
   await app.inject({ method: "POST", url: `/connections/${platConnId}/revoke` });
   const rev = await app.inject({ method: "POST", url: `/connections/${csrConnId}/revoke` });
   assert.equal(rev.json().status, "revoked");
-  const res = await app.inject({ method: "POST", url: "/book", payload: { brief } });
-  assert.equal(res.statusCode, 409, "no payment method → blocked");
-  assert.ok(res.json().violations.some((v: string) => /payment method/.test(v)), "violation cites payment method");
-  ok("revoking all payment methods immediately blocks new bookings");
+
+  // Simulated mode (the beta/demo default): no money can move, so a cardless booking is ALLOWED
+  // and comes back sample-labeled. This is what makes the public $0 demo runnable for a signed-out
+  // visitor — the regression behind the dead "Watch it live" demo.
+  const sim = await app.inject({ method: "POST", url: "/book", payload: { brief } });
+  assert.equal(sim.statusCode, 200, "simulated mode: cardless booking allowed");
+  await app.inject({ method: "POST", url: `/book/${sim.json().id}/confirm` });
+  const done = (await app.inject({ method: "GET", url: `/book/${sim.json().id}` })).json();
+  assert.ok(done.components.length > 0 && done.components.every((c: any) => c.simulated), "simulated: components sample-labeled");
+  assert.ok(done.components.every((c: any) => /^SAMPLE-/.test(c.confirmation)), "simulated: SAMPLE confirmations, no real PNR");
+  ok("simulated mode lets a signed-out visitor run the $0 demo without a card");
+
+  // Live mode (P6, real money): a connected card IS still required — the gate must fire.
+  const cfg = config as { allowLiveBooking: boolean }; // runtime-mutable; typed readonly
+  cfg.allowLiveBooking = true;
+  try {
+    const res = await app.inject({ method: "POST", url: "/book", payload: { brief } });
+    assert.equal(res.statusCode, 409, "live mode: no payment method → blocked");
+    assert.ok(res.json().violations.some((v: string) => /payment method/.test(v)), "violation cites payment method");
+  } finally {
+    cfg.allowLiveBooking = false; // restore the default posture for later tests
+  }
+  ok("live mode still blocks a booking with no payment method");
 }
 
 // 13.5 auth + sessions + per-trip fee + mock billing
@@ -375,10 +395,15 @@ let bookingId = "";
   // try to self-grant payment:charge via a loyalty connection — must NOT work
   const sneaky = (await app.inject({ method: "POST", url: "/connections", headers: auth, payload: { kind: "loyalty", label: "United", scopes: ["payment:charge"], secret: { n: "x" } } })).json();
   assert.deepEqual(sneaky.scopes, ["loyalty:read"], "loyalty connection gets only loyalty:read, not the smuggled payment:charge");
-  // with no real payment method, a booking is still blocked at the policy gate
-  const blocked = await app.inject({ method: "POST", url: "/book", headers: auth, payload: { brief } });
-  assert.equal(blocked.statusCode, 409, "no payment:charge → booking blocked despite the scope smuggling attempt");
-  ok("scope hardening: client cannot self-grant payment:charge via the scopes field");
+  // The scope smuggle bought nothing: in simulated mode the booking is allowed, but with no real
+  // payment method NOTHING is charged — components come back sample-labeled, no money moves. (In
+  // live mode the policy gate blocks it outright; see the posture-aware gate test above.)
+  const attempt = await app.inject({ method: "POST", url: "/book", headers: auth, payload: { brief } });
+  assert.equal(attempt.statusCode, 200, "simulated mode: booking allowed even without payment:charge");
+  await app.inject({ method: "POST", url: `/book/${attempt.json().id}/confirm`, headers: auth });
+  const booked = (await app.inject({ method: "GET", url: `/book/${attempt.json().id}`, headers: auth })).json();
+  assert.ok(booked.components.length > 0 && booked.components.every((c: any) => c.simulated), "smuggled scope charges nothing — components are simulated");
+  ok("scope hardening: client cannot self-grant payment:charge, and the scope buys no real charge");
 }
 
 // 14.8 situational-awareness /signals: locates a destination, returns ranked signals + provider status

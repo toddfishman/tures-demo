@@ -24,7 +24,7 @@
       { href: "bring-your-trip.html", label: "Bring your trip", page: "bring-trip" },
       { href: "onboard.html",   label: "Set up Tures",     page: "onboard" },
       { href: "pricing.html",   label: "Pricing",          page: "pricing" },
-      { href: "signup.html",    label: "Join the waitlist", page: "signup" },
+      { href: "login.html?create=1", label: "Create account", page: "signup" },
       { href: "login.html",     label: "Sign in",           page: "login" }
     ]},
     { title: "Features", items: [
@@ -252,7 +252,7 @@
     var setupRow = st ? '<a class="setup" href="' + ((nx && nx.href) || "trips.html") + '"><span>Your setup</span><span class="pct">' + st.percent + '%</span></a>' : '';
     var auth = signed
       ? '<button class="signout" id="v11-signout" type="button">Sign out</button>'
-      : '<a href="login.html">Sign in</a><a class="req" href="signup.html">Join the waitlist</a>';
+      : '<a href="login.html">Sign in</a><a class="req" href="login.html?create=1">Create account</a>';
     menu.innerHTML = head + '<div class="sec">' + member + '</div>' + (setupRow ? '<div class="sec">' + setupRow + '</div>' : '') + '<div class="sec">' + auth + '</div>';
     var so = document.getElementById("v11-signout");
     if (so) so.addEventListener("click", function () { try { window.tures.signOut(); } catch (_) {} location.reload(); });
