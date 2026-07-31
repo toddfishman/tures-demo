@@ -43,7 +43,7 @@ services:
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: PUBLIC_BASE_URL
-        value: https://toddfishman.github.io/tures-demo/v12
+        value: https://tures.app
       # Trip Watch premium feeds (all optional)
       - key: X_BEARER_TOKEN           # X API app-only bearer — recent search for disruptions
         sync: false
