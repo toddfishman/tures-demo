@@ -11,14 +11,14 @@ Todd is **not very technical**. Use **short, plain English** — what it means a
 ## First actions on entry
 
 1. **`git pull --rebase origin main`** — parallel sessions push here.
-2. **Front-end = `v12/`** — https://toddfishman.github.io/tures-demo/v12 (target: `tures.app`). `v2`–`v11` are archives.
-3. **Launch docs:** [`v12/LAUNCH.md`](v12/LAUNCH.md) · [`v12/CHECKLIST.md`](v12/CHECKLIST.md).
+2. **Front-end = `docs/`** — published by GitHub Pages **as the site root** at **`tures.app`** (Pages source = branch `main`, folder `/docs`). `v2`–`v11` (and the old `v12`, now renamed to `docs`) are archives; only `docs/` is served. URLs carry no version path — `tures.app/pricing.html` resolves directly.
+3. **Launch docs:** [`docs/LAUNCH.md`](docs/LAUNCH.md) · [`docs/CHECKLIST.md`](docs/CHECKLIST.md).
 
 ## Repo layout
 
 | Path | Role |
 |------|------|
-| `v12/` | Current front-end (GitHub Pages) |
+| `docs/` | Current front-end (GitHub Pages) |
 | `engine/` | Back-end — https://tures-engine.onrender.com |
 | `render.yaml` | Render deploy config |
 
@@ -84,7 +84,7 @@ Two profiles, one traveler: a **standing Taste Print** (six 0–100 axes) and a 
 - **Signals are inferences, not facts.** The watcher escalates `critical` as an *unquantified* schedule change (→ propose) and `warning` as a delay (→ monitor). Never let a guess auto-move someone.
 - **Never rebook an imported trip.** `source === "import"` (Concierge Mode) is somebody else's PNR — advise only.
 
-**Failure messages must match the cause** (`v12/assets/assist-ui.js` → `failureFor()`): 401 → create-account prompt, 429 free-limit → create-account, 403 → permission, 5xx → "broke on my end", *no response* → "can't reach Tures". Don't collapse these back into one generic message — that was a real bug ("Could not reach Tures" shown when the engine had answered instantly).
+**Failure messages must match the cause** (`docs/assets/assist-ui.js` → `failureFor()`): 401 → create-account prompt, 429 free-limit → create-account, 403 → permission, 5xx → "broke on my end", *no response* → "can't reach Tures". Don't collapse these back into one generic message — that was a real bug ("Could not reach Tures" shown when the engine had answered instantly).
 
 ## Payments (designed, not all live)
 
@@ -107,7 +107,7 @@ node node_modules/tsx/dist/cli.mjs test/taste-hiccup.ts
 
 ## What's left before public beta
 
-**Todd (Render/dashboard):** `GOOGLE_MAPS_API_KEY`, optional `ENGINE_API_KEY`, `X_BEARER_TOKEN`, `NEWS_API_KEY`, custom domain `tures.app` → GitHub Pages v12.
+**Todd (Render/dashboard):** `GOOGLE_MAPS_API_KEY`, optional `ENGINE_API_KEY`, `X_BEARER_TOKEN`, `NEWS_API_KEY`. Custom domain `tures.app` → GitHub Pages (source = `main` `/docs`).
 
 **Code polish (no real money):** E2E signed-in vault→book on prod, integration verification script, FX normalization for non-USD fares.
 
@@ -118,10 +118,10 @@ node node_modules/tsx/dist/cli.mjs test/taste-hiccup.ts
 | Topic | Path |
 |-------|------|
 | Booking orchestration | `engine/src/booking/service.ts` |
-| Taste Engine | `engine/src/taste/` · `v12/taste.html` |
-| Hiccup Handler | `engine/src/hiccup/` · `v12/hiccup.html` |
+| Taste Engine | `engine/src/taste/` · `docs/taste.html` |
+| Hiccup Handler | `engine/src/hiccup/` · `docs/hiccup.html` |
 | Duffel search | `engine/src/suppliers/duffel.ts` |
 | Agent guide + playbooks | `AGENTS.md`, `engine/playbooks/` |
 | Chat + brief handoff | `engine/src/routes/converse.ts` |
-| Plan UX | `v12/plan.html`, `v12/assets/engine.js` |
-| Launch checklist | `v12/LAUNCH.md` |
+| Plan UX | `docs/plan.html`, `docs/assets/engine.js` |
+| Launch checklist | `docs/LAUNCH.md` |

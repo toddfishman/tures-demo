@@ -72,9 +72,9 @@ Reference that repo as read-only context; Tures local truth (this guide, playboo
 
 ## Front-end integration
 
-- API client: `v12/assets/engine.js`
-- Main flow: `v12/plan.html` (chat → parse → plan → book)
-- Corner concierge: `v12/assets/concierge.js` (`/converse` or `/assist`)
+- API client: `docs/assets/engine.js`
+- Main flow: `docs/plan.html` (chat → parse → plan → book)
+- Corner concierge: `docs/assets/concierge.js` (`/converse` or `/assist`)
 
 Live engine: https://tures-engine.onrender.com/health
 
@@ -86,4 +86,4 @@ Live engine: https://tures-engine.onrender.com/health
 | Chat + Fugu | `engine/src/routes/converse.ts`, `engine/src/agent/fugu.ts` |
 | Plan orchestrator | `engine/src/agent/orchestrator.ts` |
 | Scenario harness | `engine/test/scenarios/` |
-| Launch checklist | `v12/LAUNCH.md` |
+| Launch checklist | `docs/LAUNCH.md` |
