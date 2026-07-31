@@ -178,6 +178,14 @@
       unlink: function (channel) { return api("/channels/" + channel + "/unlink", { method: "POST" }); },
     },
     /* Simulated reservation of an extra → { confirmation, simulated, note }. */
+    // Memory 2.0 — household capture→confirm loop. extract PROPOSES (stores nothing); remember saves.
+    household: {
+      extract: function (text) { return api("/household/extract", { method: "POST", body: JSON.stringify({ text: text }) }); },
+      remember: function (members) { return api("/household/remember", { method: "POST", body: JSON.stringify({ members: members || [] }) }); },
+      summary: function () { return api("/household/summary"); },
+      list: function () { return api("/travelers"); },
+      remove: function (id) { return api("/travelers/" + id, { method: "DELETE" }); },
+    },
     reserve: function (item) { return api("/reserve", { method: "POST", body: JSON.stringify(item || {}) }); },
 
     /* ----- booking (session-scoped) ----- */

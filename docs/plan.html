@@ -413,12 +413,48 @@
     w.appendChild(row); thread.appendChild(w); reveal(w); scroll(); return w;
   }
 
+  // ── Memory 2.0: offer to remember the people a traveler mentions (confirm-first, never silent) ──
+  var offeredRemember = {};
+  function ageLabel(age){
+    // "an" before ages that start with a vowel sound (8, 11, 18, 80–89), else "a"
+    var an = age===8 || age===11 || age===18 || (age>=80 && age<=89);
+    return (an?'an ':'a ')+age+'-year-old';
+  }
+  function humanCrew(props){
+    var names = props.map(function(p){
+      if(p.relationship==='child') return p.age!=null ? ageLabel(p.age) : 'a child';
+      return 'your '+p.relationship;
+    });
+    return names.length>1 ? (names.slice(0,-1).join(', ')+' and '+names[names.length-1]) : (names[0]||'them');
+  }
+  function maybeOfferRemember(text){
+    try{
+      if(!(window.tures && window.tures.household && window.tures.signedIn)) return; // account-scoped; sign in to save
+      window.tures.household.extract(text).then(function(r){
+        var props=(r&&r.proposals)||[]; if(!props.length) return;
+        var human=humanCrew(props);
+        if(offeredRemember[human]) return; offeredRemember[human]=1;      // don't re-offer the same crew this session
+        var chip=bubble('Want me to remember <b>'+esc(human)+'</b> for future trips? <span style="color:var(--muted)">You can edit anytime in your Vault.</span>','t');
+        actions([
+          {label:'Yes, remember', on:function(){
+            window.tures.household.remember(props).then(function(){
+              bubble('Got it — I’ll remember '+esc(human)+', plan around them, and ask “same crew?” next time.','t');
+            }).catch(function(){ bubble('Could not save that just now — no harm done.','t'); });
+          }},
+          {label:'Not now', cls:'ghost', on:function(){ /* dismissed; chip stays as context */ }}
+        ]);
+        void chip;
+      }).catch(function(){});
+    }catch(_){}
+  }
+
   // ── live conversation ──
   // Warm the engine on load so the first message isn't a cold-start.
   try{ if(window.tures && window.tures.health) window.tures.health(); }catch(_){}
   function send(text){
     if(busy || !text) return;
     bubble(esc(text),'me'); history.push({role:'user',content:text});
+    maybeOfferRemember(text);
     input.value=''; busy=true; sendBtn.disabled=true; typing(true);
     var ctx = convoContext();
     var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;

@@ -55,7 +55,7 @@ export async function build() {
   const wildcard = config.corsOrigins.length === 1 && config.corsOrigins[0] === "*";
   await app.register(cors, {
     origin: wildcard ? "*" : config.corsOrigins,
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   });
 
   // Per-IP rate limit; /health is exempt so uptime checks never trip it.
