@@ -9,7 +9,7 @@
 // lens. One source of truth for all three.
 import type { Brief } from "../types.ts";
 import { getPrefs } from "../profile/prefs.ts";
-import { getTravelerProfileRedacted } from "../profile/index.ts";
+import { getTravelerProfileRedacted, partySummary, type PartySummary } from "../profile/index.ts";
 import { tasteSignal } from "../places/index.ts";
 import { effectiveTaste, tasteProse, paceForBrief, type EffectiveTaste } from "../taste/service.ts";
 
@@ -28,6 +28,8 @@ export interface TravelerContext {
   loyalty: string[];
   /** The two taste profiles for this trip — standing print, lens, and the bent result. */
   taste: EffectiveTaste;
+  /** Standing household composition (self + saved companions) — who Tures plans for by default. */
+  party: PartySummary;
   /** A short prose brief the agent reads ahead of the raw JSON. */
   prose: string;
 }
@@ -46,6 +48,7 @@ export function assembleContext(accountId: string, brief: Brief, lensId?: string
   const signal = tasteSignal(accountId);
   const profile = getTravelerProfileRedacted(accountId);
   const loyalty = ((profile?.meta as any)?.memberships ?? []).map((m: any) => m.program).filter(Boolean);
+  const party = partySummary(accountId);
 
   const taste = effectiveTaste(accountId, brief, lensId);
   const tp = prefs?.tastePrint;
@@ -66,7 +69,22 @@ export function assembleContext(accountId: string, brief: Brief, lensId?: string
   if (loyalty.length) lines.push(`Loyalty to credit/weigh: ${loyalty.join(", ")}.`);
   if (placeTypes.length) lines.push(`Place types that fit: ${placeTypes.join(", ")}.`);
 
-  const context: TravelerContext = { placeTypes, tasteTags, avoid, cabin, priceSensitivity, loyalty, taste, prose: lines.join(" ") };
+  // Household on file — who Tures plans for by default. The per-trip brief still overrides this;
+  // it's the standing crew so a family trip reads as one without the traveler re-stating it.
+  if (party.travelingAs === "family") {
+    const kids = party.childAges.length ? ` (ages ${party.childAges.join(", ")})` : "";
+    lines.push(
+      `Household on file: ${party.adults} adult${party.adults > 1 ? "s" : ""} + ${party.children} child${party.children > 1 ? "ren" : ""}${kids} — plan kid-friendly (room configs that fit everyone, family-appropriate spots) unless this trip says otherwise.`,
+    );
+  } else if (party.travelingAs === "couple") {
+    lines.push(`Household on file: usually travels as a couple (2 adults).`);
+  } else if (party.travelingAs === "group") {
+    lines.push(`Household on file: a group of ${party.adults + party.children}.`);
+  }
+  const dietary = [...new Set([...(prefs?.dietary ?? []), ...party.dietary])];
+  if (dietary.length) lines.push(`Dietary needs across the party: ${dietary.join(", ")}.`);
+
+  const context: TravelerContext = { placeTypes, tasteTags, avoid, cabin, priceSensitivity, loyalty, taste, party, prose: lines.join(" ") };
 
   // Keep the brief's own pace consistent with the lensed print rather than letting the two
   // disagree — a "unwind" lens that leaves pace on "full" produces incoherent plans.
