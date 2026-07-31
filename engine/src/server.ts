@@ -25,6 +25,7 @@ import { tasteRoutes } from "./routes/taste.ts";
 import { walletRoutes } from "./routes/wallet.ts";
 import { disruptionRoutes } from "./routes/disruptions.ts";
 import { travelerRoutes } from "./routes/travelers.ts";
+import { householdRoutes } from "./routes/household.ts";
 import { placeRoutes } from "./routes/places.ts";
 import { waitlistRoutes } from "./routes/waitlist.ts";
 import { voiceRoutes } from "./routes/voice.ts";
@@ -54,7 +55,7 @@ export async function build() {
   const wildcard = config.corsOrigins.length === 1 && config.corsOrigins[0] === "*";
   await app.register(cors, {
     origin: wildcard ? "*" : config.corsOrigins,
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   });
 
   // Per-IP rate limit; /health is exempt so uptime checks never trip it.
@@ -95,6 +96,7 @@ export async function build() {
   await app.register(walletRoutes);
   await app.register(disruptionRoutes);
   await app.register(travelerRoutes);
+  await app.register(householdRoutes);
   await app.register(placeRoutes);
   await app.register(waitlistRoutes);
   await app.register(voiceRoutes);

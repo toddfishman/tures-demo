@@ -336,6 +336,34 @@
     </div>
   </section>
 
+  <!-- WHO TRAVELS WITH YOU — Memory 2.0 -->
+  <section class="wrap section tight" style="padding-top:8px">
+    <article class="card" id="people-card">
+      <div class="vhead">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg></span>
+        <div>
+          <h3 class="serif">Who travels with you</h3>
+          <div class="vsub">Your usual crew — so Tures plans for everyone and never re-asks. Ages help it pick kid-friendly stays and the right rooms; names and dates of birth are encrypted like your passport.</div>
+        </div>
+      </div>
+      <div class="saved" id="people-list"></div>
+      <button class="btn ghost sm" id="add-person-btn" type="button" style="margin-top:12px">+ Add a person</button>
+      <div id="add-person-form" style="display:none;flex-direction:column;gap:10px;margin-top:12px;max-width:420px">
+        <input class="field" id="p-name" placeholder="Name (optional)" autocomplete="off">
+        <select class="field" id="p-rel">
+          <option value="spouse">Spouse</option>
+          <option value="partner">Partner</option>
+          <option value="child">Child</option>
+          <option value="parent">Parent</option>
+          <option value="companion" selected>Companion</option>
+        </select>
+        <input class="field" id="p-age" type="number" min="0" max="120" placeholder="Age (optional)">
+        <input class="field" id="p-diet" placeholder="Dietary needs, comma-separated (optional)" autocomplete="off">
+        <button class="btn sm" id="p-save" type="button">Save person</button>
+      </div>
+    </article>
+  </section>
+
   <!-- ACCESS GRANTS — demoted, optional -->
   <section class="wrap section tight" style="padding-top:8px">
     <div class="grants" id="access-grants">
@@ -590,6 +618,40 @@ window.turesBestCard = function(category, amount, cards){
     addForm.style.display='none'; renderCards(); renderHeld(); if(window.__bcRefresh) window.__bcRefresh();
     flash('Card connected — Tures can book now');
   });
+
+  // ----- Memory 2.0: who travels with you -----
+  (function(){
+    var listEl=document.getElementById('people-list'); if(!listEl||!T||!T.household) return;
+    var REL={spouse:'Spouse',partner:'Partner',child:'Child',parent:'Parent',companion:'Companion'};
+    function render(){
+      T.household.list().then(function(r){
+        var ppl=(r&&r.travelers)||[];
+        if(!ppl.length){ listEl.innerHTML='<div class="vsub" style="padding:4px 0">No one saved yet. Tures also offers to remember people you mention while planning.</div>'; return; }
+        listEl.innerHTML=ppl.map(function(t){
+          var m=t.meta||{}; var age=(m.age!=null)?(' · age '+m.age):''; var diet=(m.dietary&&m.dietary.length)?(' · '+m.dietary.join(', ')):'';
+          return '<div class="row"><span class="rl"><span class="rk">'+esc(m.fullName||REL[m.relationship]||'Companion')+'</span>'+
+            '<span class="rv">'+esc((REL[m.relationship]||'Companion')+age+diet)+'</span></span>'+
+            '<span class="rtail"><span class="tag">Encrypted</span><button class="edit" type="button" data-id="'+esc(t.id)+'">Remove</button></span></div>';
+        }).join('');
+        Array.prototype.forEach.call(listEl.querySelectorAll('button[data-id]'), function(b){
+          b.addEventListener('click', function(){ T.household.remove(b.getAttribute('data-id')).then(render).catch(function(){ flash('Could not remove just now'); }); });
+        });
+      }).catch(function(){ listEl.innerHTML='<div class="vsub" style="padding:4px 0">Sign in to manage the people you travel with.</div>'; });
+    }
+    var pab=document.getElementById('add-person-btn'), paf=document.getElementById('add-person-form');
+    if(pab&&paf) pab.addEventListener('click', function(){ paf.style.display=(paf.style.display==='none'?'flex':'none'); });
+    var ps=document.getElementById('p-save');
+    if(ps) ps.addEventListener('click', function(){
+      var member={ relationship:document.getElementById('p-rel').value, dietary:(document.getElementById('p-diet').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean) };
+      var name=(document.getElementById('p-name').value||'').trim(); if(name) member.fullName=name;
+      var ageRaw=(document.getElementById('p-age').value||'').trim(); if(ageRaw) member.age=Number(ageRaw);
+      T.household.remember([member]).then(function(){
+        document.getElementById('p-name').value=''; document.getElementById('p-age').value=''; document.getElementById('p-diet').value='';
+        paf.style.display='none'; render(); flash('Saved — Tures will plan for them');
+      }).catch(function(){ flash('Could not save just now'); });
+    });
+    render();
+  })();
 
   // ----- grants → state -----
   document.querySelectorAll('#access-grants .tg').forEach(function(t){

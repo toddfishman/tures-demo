@@ -62,20 +62,75 @@ export function getTravelerProfileRedacted(accountId: string): RedactedConnectio
 export const CompanionSchema = TravelerProfileSchema.extend({
   fullName: z.string(),
   relationship: z.enum(["spouse", "partner", "child", "parent", "companion"]).default("companion"),
+  dietary: z.array(z.string()).default([]), // per-traveler needs, e.g. ["nut allergy"]
+  age: z.number().int().min(0).max(120).optional(), // when known from chat but the exact DOB isn't
 });
 export type Companion = z.infer<typeof CompanionSchema>;
 
-/** Add a traveler (spouse/child/companion). PII is VGS-tokenized like the account holder's. */
+/** Coarse age from an ISO date of birth. We keep the exact DOB only in the encrypted secret (a
+ *  real booking manifest needs it); the redacted meta carries just the age the planner reasons on,
+ *  so "there's a 10-year-old on this trip" never requires revealing a child's birth date. */
+export function ageFromDob(dob: string | undefined): number | undefined {
+  const m = dob && /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return undefined;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const now = new Date();
+  let age = now.getFullYear() - y;
+  if (now.getMonth() + 1 < mo || (now.getMonth() + 1 === mo && now.getDate() < d)) age--;
+  return age >= 0 && age < 130 ? age : undefined;
+}
+
+/** Add a traveler (spouse/child/companion). PII is VGS-tokenized like the account holder's.
+ *  meta exposes only planner-safe values: relationship, coarse age (not DOB), dietary. */
 export async function addTraveler(accountId: string, c: Companion): Promise<RedactedConnection> {
   const meta = {
     fullName: c.fullName,
     relationship: c.relationship,
+    age: c.age ?? ageFromDob(c.dateOfBirth), // exact DOB (in secret) preferred; else the stated age
+    dietary: c.dietary ?? [],
     hasPassport: !!c.passport,
     passportMasked: mask(c.passport?.number),
     ktnOnFile: !!c.knownTravelerNumber,
     memberships: c.memberships.map((m) => ({ kind: m.kind, program: m.program, numberMasked: mask(m.number) })),
   };
   return connect({ accountId, kind: "traveler", label: c.fullName, secret: c, meta });
+}
+
+// ---- party composition (the redacted household view the planner reasons on) ----
+export interface PartySummary {
+  adults: number; // includes the account holder
+  children: number;
+  childAges: number[]; // known ages only, high → low
+  dietary: string[]; // companions' dietary needs (the holder's live in prefs)
+  travelingAs: "solo" | "couple" | "family" | "group";
+  members: { relationship: string; age?: number; name?: string }[];
+}
+
+/** Standing household composition = the account holder (1 adult) + saved companions. The brief's
+ *  per-trip travelers still override this; it's the default so Tures can plan and ask "same crew?". */
+export function partySummary(accountId: string): PartySummary {
+  const members: PartySummary["members"] = [{ relationship: "self" }];
+  let adults = 1;
+  let children = 0;
+  const childAges: number[] = [];
+  const dietary = new Set<string>();
+  for (const t of listTravelers(accountId)) {
+    const m = ((t as unknown as { meta?: Record<string, unknown> }).meta ?? {}) as Record<string, any>;
+    const relationship = String(m.relationship ?? "companion");
+    const age = typeof m.age === "number" ? m.age : undefined;
+    const isChild = relationship === "child" || (age !== undefined && age < 18);
+    if (isChild) {
+      children++;
+      if (age !== undefined) childAges.push(age);
+    } else {
+      adults++;
+    }
+    (Array.isArray(m.dietary) ? m.dietary : []).forEach((d: unknown) => typeof d === "string" && dietary.add(d));
+    members.push({ relationship, age, name: typeof m.fullName === "string" ? m.fullName : undefined });
+  }
+  const total = adults + children;
+  const travelingAs = children > 0 ? "family" : total <= 1 ? "solo" : total === 2 ? "couple" : "group";
+  return { adults, children, childAges: childAges.sort((a, b) => b - a), dietary: [...dietary], travelingAs, members };
 }
 
 /** List the account's additional travelers (redacted/masked). */
