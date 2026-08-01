@@ -50,6 +50,7 @@
     '.cz-m.me .cz-b{background:var(--bubble-me,var(--acc,#ff4929));border:1px solid var(--acc-deep,#cf3b1f);border-bottom-right-radius:4px;color:var(--bubble-me-text,#fff)}' +
     '.cz-m a{color:var(--acc-deep,#cf3b1f);font-weight:600}' +
     '.cz-typ .cz-b{display:inline-flex;gap:4px}.cz-typ i{width:6px;height:6px;border-radius:50%;background:var(--muted,#6f6f6f);opacity:.5;animation:czbl 1.4s infinite}.cz-typ i:nth-child(2){animation-delay:.2s}.cz-typ i:nth-child(3){animation-delay:.4s}@keyframes czbl{0%,80%,100%{opacity:.3}40%{opacity:1}}' +
+    '.cz-work{font-size:13px;font-style:italic;opacity:.85}' +
     '.cz-cta{align-self:flex-start;margin-top:2px;display:inline-flex;align-items:center;gap:7px;background:var(--acc,#ff4929);color:#fff;border:none;border-radius:999px;padding:10px 17px;font:500 13.5px "DM Sans",sans-serif;cursor:pointer}' +
     '.cz-comp{display:flex;gap:9px;align-items:center;padding:14px 16px;border-top:1px solid var(--line,rgba(26,26,26,.10));background:var(--surface,#f6f6f6)}' +
     '.cz-comp input{flex:1;border:1px solid var(--line-2,rgba(26,26,26,.16));border-radius:999px;padding:11px 16px;font:14.5px "DM Sans",sans-serif;color:var(--text,#1a1a1a);outline:none;background:#fff;min-width:0}' +
@@ -96,8 +97,19 @@
   function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function scroll(){ thread.scrollTop = thread.scrollHeight; }
   function bubble(html, who){ var m=document.createElement("div"); m.className="cz-m "+(who==="me"?"me":"ai"); m.innerHTML='<div class="cz-b">'+html+'</div>'; thread.appendChild(m); scroll(); return m; }
-  var typingEl=null;
-  function typing(on){ if(on){ if(typingEl)return; typingEl=document.createElement("div"); typingEl.className="cz-m ai cz-typ"; typingEl.innerHTML='<div class="cz-b"><i></i><i></i><i></i></div>'; thread.appendChild(typingEl); scroll(); } else if(typingEl){ typingEl.remove(); typingEl=null; } }
+  var typingEl=null, typTimers=[];
+  function typing(on){
+    if(on){
+      if(typingEl)return;
+      typingEl=document.createElement("div"); typingEl.className="cz-m ai cz-typ";
+      typingEl.setAttribute("aria-live","polite"); typingEl.setAttribute("role","status");
+      typingEl.innerHTML='<div class="cz-b"><i></i><i></i><i></i></div>';
+      thread.appendChild(typingEl); scroll();
+      // Escalate the wait copy so a long action run (research/contact can take ~15s) never reads as stalled.
+      typTimers.push(setTimeout(function(){ if(typingEl) typingEl.querySelector(".cz-b").innerHTML='<span class="cz-work">Still working on it…</span>'; }, 4500));
+      typTimers.push(setTimeout(function(){ if(typingEl) typingEl.querySelector(".cz-b").innerHTML='<span class="cz-work">Almost there — pulling it together…</span>'; }, 11000));
+    } else if(typingEl){ typingEl.remove(); typingEl=null; typTimers.forEach(clearTimeout); typTimers=[]; }
+  }
 
   function open(){
     modal.classList.add("open");
