@@ -5,6 +5,7 @@ import { createBooking, confirmBooking } from "../booking/service.ts";
 import { bookings } from "../booking/store.ts";
 import { resolveAccountId, actsFor } from "../auth/index.ts";
 import { perTripFee } from "../billing/fees.ts";
+import { expenseCsv, expenseJson } from "../booking/export.ts";
 
 const BookBody = z.object({
   brief: BriefSchema,
@@ -59,6 +60,19 @@ export async function bookRoutes(app: FastifyInstance) {
     const booking = bookings.get(req.params.id);
     if (!booking || !actsFor(req, booking.accountId)) return reply.status(404).send({ error: "not_found" });
     return booking;
+  });
+
+  // GET /book/:id/export?format=csv|json — structured expense export (owner only). Drops straight
+  // into Expensify/Concur/Ramp/QuickBooks (CSV) or a future direct integration (JSON).
+  app.get<{ Params: { id: string }; Querystring: { format?: string } }>("/book/:id/export", async (req, reply) => {
+    const booking = bookings.get(req.params.id);
+    if (!booking || !actsFor(req, booking.accountId)) return reply.status(404).send({ error: "not_found" });
+    if ((req.query.format || "json").toLowerCase() === "csv") {
+      reply.header("Content-Type", "text/csv; charset=utf-8");
+      reply.header("Content-Disposition", `attachment; filename="tures-${booking.tripId}.csv"`);
+      return expenseCsv(booking);
+    }
+    return expenseJson(booking);
   });
 
   // GET /bookings?accountId=… — an account's trips (newest first) for the dashboard.
