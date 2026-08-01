@@ -41,9 +41,6 @@ const Body = z.object({
   userId: z.string().optional(),
   // Client session id — keys verbatim transcript (mem0 run_id + engine audit log).
   sessionId: z.string().optional(),
-  // Diagnostics: when true, the response includes the raw Fugu assistant message so we can see how
-  // (or whether) it emitted the submit_brief tool. Safe — it's the model's own message, no secrets.
-  debug: z.boolean().optional(),
 });
 
 const SYSTEM = loadPlaybook("converse");
@@ -102,8 +99,6 @@ export async function converseRoutes(app: FastifyInstance) {
     const ctx = capContext(p.data.context);
     if (ctx) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${ctx}`;
 
-    let fuguErr: string | null = null; // why the primary brain fell back — hoisted so the catch can report it under debug
-
     try {
       // Personalize from mem0: what we remember about this traveler (taste, past trips). No-op without a key.
       const memories = await recall(p.data.userId, recallQuery);
@@ -118,78 +113,24 @@ export async function converseRoutes(app: FastifyInstance) {
         system += `\n\nWHO USUALLY TRAVELS (household on file): ${crewLine(party)}. When this trip's travelers aren't stated, do NOT ask cold — confirm this crew ("Same crew this time?") and count them for the brief's travelers. Plan kid-friendly when children are along. If they mention someone new, offer to remember them; if this trip is clearly just them, that's fine — don't force the crew on.`;
       }
 
-      let text = "";
-      let slots: Record<string, any> | null = null; // submit_brief args when the model committed a brief
-      let via: "fugu" | "anthropic" = "anthropic";
-      let fuguRaw: any = null; // raw Fugu message, surfaced only under the debug flag
+      type BrainResult = { text: string; slots: Record<string, any> | null; via: "anthropic" | "fugu" };
 
-      // ── Primary brain: Sakana Fugu (experiment) ──
-      // When keyed, Fugu answers the chat. ANY failure (missing/expired key, wrong endpoint,
-      // unexpected shape, network) falls through to Anthropic so chat never breaks. Note: the
-      // Anthropic-only web_search server tool isn't available on the Fugu path.
-      if (config.sakana.enabled) {
-        try {
-          const f = await fuguChat(
-            system,
-            compacted,
-            { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
-            320,
-          );
-          text = f.text;
-          slots = f.toolInput;
-          fuguRaw = f.raw;
-          via = "fugu";
-        } catch (err) {
-          fuguErr = String((err as any)?.message ?? err).slice(0, 300);
-          log.warn("sakana fugu failed — falling back to anthropic", { err: fuguErr });
-          via = "anthropic";
-        }
-      }
-
-      // Phantom hand-off guard: Fugu sometimes narrates "on it — building it" WITHOUT calling
-      // submit_brief, which would leave the traveler waiting on a trip that never builds. When it
-      // produced no brief but its reply clearly signals a hand-off, force exactly one structured
-      // retry with tool_choice pinned to submit_brief.
-      if (via === "fugu" && !slots && /\b(on it|buil(d|t|ding)|put(ting)?\b[^.]*together|here'?s your plan|let me put)/i.test(text)) {
-        try {
-          const forced = await fuguChat(
-            system,
-            [...compacted, { role: "assistant", content: text }, { role: "user", content: "Call submit_brief now with the essentials you have." }],
-            { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
-            320,
-            true,
-          );
-          if (forced.toolInput && Object.keys(forced.toolInput).length) {
-            slots = forced.toolInput;
-            if (forced.text) text = forced.text;
-            log.info("fugu phantom hand-off recovered via forced submit_brief");
-          }
-        } catch (e) {
-          log.warn("fugu forced hand-off retry failed", { err: String((e as any)?.message ?? e) });
-        }
-      }
-
-      // ── Fallback brain: Anthropic ──
-      if (via !== "fugu") {
-        if (!config.anthropicKey) {
-          // Fugu was the only brain configured and it failed — no fallback to reach.
-          return reply.status(502).send({ error: "chat_brain_unavailable" });
-        }
+      // ── Primary brain: Anthropic. Streams the response (survives "Premature close"), retries
+      //    transient network errors, and gets the Anthropic-only web_search server tool. ──
+      async function runAnthropic(): Promise<BrainResult> {
         const { default: Anthropic } = await import("@anthropic-ai/sdk");
-        const client = new Anthropic({ apiKey: config.anthropicKey, maxRetries: 3 });
-        // The connection to Anthropic can drop mid-response ("Premature close"); retry such
-        // transient network errors a couple of times before surfacing a failure.
+        const client = new Anthropic({ apiKey: config.anthropicKey!, maxRetries: 3 });
         async function createWithRetry(tries: number): Promise<any> {
           try {
-            // Stream the response and assemble it — reads the body in chunks (SSE), which
-            // survives transport quirks that break a single one-shot body read ("Premature close").
-            return await client.messages.stream({
-              model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
-              max_tokens: 320,
-              system,
-              tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
-              messages: compacted,
-            }).finalMessage();
+            return await client.messages
+              .stream({
+                model: process.env.AGENT_MODEL ?? "claude-opus-4-8",
+                max_tokens: 320,
+                system,
+                tools: [...TOOLS, WEB_SEARCH_TOOL] as any,
+                messages: compacted,
+              })
+              .finalMessage();
           } catch (err) {
             const m = String((err && (err as any).message) || err);
             if (tries > 0 && /premature close|fetcherror|econnreset|terminated|socket hang up|fetch failed|network|aborted/i.test(m)) {
@@ -200,10 +141,65 @@ export async function converseRoutes(app: FastifyInstance) {
           }
         }
         const resp = await createWithRetry(2);
-        text = resp.content.filter((b: any) => b.type === "text").map((b: any) => b.text).join(" ").trim();
+        const t = resp.content.filter((b: any) => b.type === "text").map((b: any) => b.text).join(" ").trim();
         const tool = resp.content.find((b: any) => b.type === "tool_use" && b.name === "submit_brief") as any;
-        slots = tool ? (tool.input || {}) : null;
+        return { text: t, slots: tool ? (tool.input || {}) : null, via: "anthropic" };
       }
+
+      // ── Fallback brain: Sakana Fugu (experimental, optional). Only reached if Anthropic isn't
+      //    configured or errors. No web_search on this path. ──
+      async function runFugu(): Promise<BrainResult> {
+        const f = await fuguChat(
+          system,
+          compacted,
+          { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
+          320,
+        );
+        let t = f.text;
+        let s: Record<string, any> | null = f.toolInput;
+        // Phantom hand-off guard: Fugu sometimes narrates "on it — building it" WITHOUT calling
+        // submit_brief, which would leave the traveler waiting on a trip that never builds. When it
+        // produced no brief but its reply clearly signals a hand-off, force one structured retry.
+        if (!s && /\b(on it|buil(d|t|ding)|put(ting)?\b[^.]*together|here'?s your plan|let me put)/i.test(t)) {
+          try {
+            const forced = await fuguChat(
+              system,
+              [...compacted, { role: "assistant", content: t }, { role: "user", content: "Call submit_brief now with the essentials you have." }],
+              { name: "submit_brief", description: TOOLS[0]!.description, parameters: TOOLS[0]!.input_schema },
+              320,
+              true,
+            );
+            if (forced.toolInput && Object.keys(forced.toolInput).length) {
+              s = forced.toolInput;
+              if (forced.text) t = forced.text;
+              log.info("fugu phantom hand-off recovered via forced submit_brief");
+            }
+          } catch (e) {
+            log.warn("fugu forced hand-off retry failed", { err: String((e as any)?.message ?? e) });
+          }
+        }
+        return { text: t, slots: s, via: "fugu" };
+      }
+
+      // Anthropic first; fall back to Fugu only if Anthropic errors and Fugu is configured.
+      let result: BrainResult;
+      if (config.anthropicKey) {
+        try {
+          result = await runAnthropic();
+        } catch (primaryErr) {
+          if (config.sakana.enabled) {
+            log.warn("anthropic failed — falling back to fugu", { err: String((primaryErr as any)?.message ?? primaryErr).slice(0, 300) });
+            result = await runFugu(); // if this also throws, the outer catch returns converse_failed
+          } else {
+            throw primaryErr;
+          }
+        }
+      } else if (config.sakana.enabled) {
+        result = await runFugu();
+      } else {
+        return reply.status(502).send({ error: "chat_brain_unavailable" });
+      }
+      const { text, slots, via } = result;
 
       // Verbatim transcript — exact turns for tracing (mem0 infer=false + local audit log).
       const ready = !!(slots && Object.keys(slots).length);
@@ -226,7 +222,6 @@ export async function converseRoutes(app: FastifyInstance) {
 
       void rememberTranscript(p.data.userId, sessionId, turnPair, { via, ready, turns: compacted.length });
 
-      const dbg = p.data.debug ? { _debug: { via, fuguMessage: fuguRaw } } : {};
       log.info("converse reply", {
         via,
         userId: p.data.userId ? p.data.userId.slice(0, 12) : "anon",
@@ -238,24 +233,17 @@ export async function converseRoutes(app: FastifyInstance) {
       // submit_brief committed → hand the structured brief to the planner.
       if (slots && Object.keys(slots).length) {
         const brief = String(slots.brief || "").trim();
-        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via, sessionId, ...dbg };
+        return { reply: text || "On it — I have what I need. Putting your trip together now.", brief, ready: true, slots, via, sessionId };
       }
-      return { reply: text, via, sessionId, ...dbg };
+      return { reply: text, via, sessionId };
     } catch (e: any) {
-      const detail = {
+      log.error("converse failed", {
         message: String(e?.message ?? e).slice(0, 300),
         name: e?.name,
         status: e?.status,
         type: e?.error?.type ?? e?.type,
-      };
-      log.error("converse failed", detail);
-      // Debug-gated diagnostic (opt-in via {debug:true}) so an operator can see WHICH brain failed
-      // and why — Fugu's fallback reason plus the Anthropic error — without reading Render logs or
-      // exposing anything to normal traffic. No secrets: provider error bodies carry none.
-      const diag = p.data.debug
-        ? { _debug: { brainsConfigured: { fugu: config.sakana.enabled, anthropic: !!config.anthropicKey }, fuguError: fuguErr, anthropicError: detail, agentModel: process.env.AGENT_MODEL ?? "claude-opus-4-8" } }
-        : {};
-      return reply.status(502).send({ error: "converse_failed", ...diag });
+      });
+      return reply.status(502).send({ error: "converse_failed" });
     }
   });
 }

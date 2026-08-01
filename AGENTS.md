@@ -32,7 +32,7 @@ Prompts load via [`engine/src/agent/playbooks.ts`](engine/src/agent/playbooks.ts
 
 | Env var | Used by |
 | --- | --- |
-| `SAKANA_*` | Chat (Fugu primary) |
+| `SAKANA_*` | Chat (Fugu fallback; Anthropic primary) |
 | `AGENT_MODEL` | Parse, plan, converse fallback |
 | `ASSIST_MODEL` | `/assist` (falls back to `AGENT_MODEL`) |
 | `ACTION_MODEL` | Stagehand browser agent |
