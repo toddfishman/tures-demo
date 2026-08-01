@@ -102,6 +102,8 @@ export async function converseRoutes(app: FastifyInstance) {
     const ctx = capContext(p.data.context);
     if (ctx) system += `\n\nWHAT YOU ALREADY KNOW about this traveler (skip any question these answer; do not re-ask): ${ctx}`;
 
+    let fuguErr: string | null = null; // why the primary brain fell back — hoisted so the catch can report it under debug
+
     try {
       // Personalize from mem0: what we remember about this traveler (taste, past trips). No-op without a key.
       const memories = await recall(p.data.userId, recallQuery);
@@ -138,7 +140,8 @@ export async function converseRoutes(app: FastifyInstance) {
           fuguRaw = f.raw;
           via = "fugu";
         } catch (err) {
-          log.warn("sakana fugu failed — falling back to anthropic", { err: String((err as any)?.message ?? err) });
+          fuguErr = String((err as any)?.message ?? err).slice(0, 300);
+          log.warn("sakana fugu failed — falling back to anthropic", { err: fuguErr });
           via = "anthropic";
         }
       }
@@ -239,13 +242,20 @@ export async function converseRoutes(app: FastifyInstance) {
       }
       return { reply: text, via, sessionId, ...dbg };
     } catch (e: any) {
-      log.error("converse failed", {
-        message: String(e?.message ?? e),
+      const detail = {
+        message: String(e?.message ?? e).slice(0, 300),
         name: e?.name,
         status: e?.status,
         type: e?.error?.type ?? e?.type,
-      });
-      return reply.status(502).send({ error: "converse_failed" });
+      };
+      log.error("converse failed", detail);
+      // Debug-gated diagnostic (opt-in via {debug:true}) so an operator can see WHICH brain failed
+      // and why — Fugu's fallback reason plus the Anthropic error — without reading Render logs or
+      // exposing anything to normal traffic. No secrets: provider error bodies carry none.
+      const diag = p.data.debug
+        ? { _debug: { brainsConfigured: { fugu: config.sakana.enabled, anthropic: !!config.anthropicKey }, fuguError: fuguErr, anthropicError: detail, agentModel: process.env.AGENT_MODEL ?? "claude-opus-4-8" } }
+        : {};
+      return reply.status(502).send({ error: "converse_failed", ...diag });
     }
   });
 }
