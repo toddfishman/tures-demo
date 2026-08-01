@@ -1,0 +1,172 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tures — an AI travel concierge in your pocket. It books, it protects, it proves.">
+<meta name="theme-color" content="#0a0c10">
+<title>t✦ures — travels with you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0c10;
+    --silver:#c9cfdb; --silver-2:#e7eaf1; --silver-deep:#9aa2b2;
+    --silver-sheen:linear-gradient(115deg,#f2f4f8,#c3cad6 38%,#f4f6fa 62%,#c9cfdb);
+    --glass:rgba(16,18,24,.32);
+    --glass-2:rgba(16,18,24,.5);
+    --hair:rgba(226,230,238,.32);
+    --hair-strong:rgba(226,230,238,.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,sans-serif;color:#fff;background:var(--ink);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100dvh;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* ── full-bleed video ── */
+  .bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#0a0c10}
+  .bg video,.bg .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .bg .poster{background-size:cover;background-position:center;background-image:url('assets/travel-bg.jpg')}
+  /* legibility scrim — keeps type crisp without hiding the footage */
+  .scrim{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      linear-gradient(to bottom, rgba(8,10,14,.42) 0%, rgba(8,10,14,.06) 26%, rgba(8,10,14,.14) 60%, rgba(8,10,14,.6) 100%),
+      radial-gradient(130% 90% at 18% 26%, transparent 40%, rgba(8,10,14,.4) 100%)}
+
+  /* ── glass primitives ── */
+  .glass{background:var(--glass);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);
+    border:1px solid var(--hair);box-shadow:0 24px 70px -26px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.14)}
+
+  /* ── top bar ── */
+  .bar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+    padding:calc(18px + env(safe-area-inset-top)) clamp(20px,4vw,52px) 18px}
+  .mark{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:600;letter-spacing:.5px;color:#fff;text-shadow:0 1px 20px rgba(0,0,0,.4)}
+  .mark .sp{background:var(--silver-sheen);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .bar .signin{font-size:13.5px;font-weight:500;color:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;border:1px solid var(--hair);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:border-color .2s,background .2s}
+  .bar .signin:hover{border-color:var(--hair-strong);background:rgba(255,255,255,.06)}
+
+  /* ── stage ── */
+  .stage{position:relative;z-index:10;min-height:100dvh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:40px;
+    max-width:1240px;margin:0 auto;padding:120px clamp(20px,4vw,52px) 60px}
+
+  .eyebrow{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--silver);margin-bottom:22px;display:inline-flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--silver),transparent)}
+  h1{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(40px,6.4vw,78px);line-height:1.02;letter-spacing:-.01em;
+    text-shadow:0 2px 40px rgba(0,0,0,.35)}
+  h1 em{font-style:italic;background:var(--silver-sheen);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .sub{margin-top:22px;font-size:clamp(16px,1.5vw,19px);font-weight:300;line-height:1.55;color:rgba(255,255,255,.82);max-width:34ch}
+
+  .cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:600;letter-spacing:.01em;
+    border-radius:999px;padding:15px 28px;cursor:pointer;transition:transform .16s,box-shadow .25s,background .2s,border-color .2s}
+  .btn:hover{transform:translateY(-1px)}
+  /* primary — brushed silver, ink text */
+  .btn.primary{background:var(--silver-sheen);color:#12151b;border:1px solid rgba(255,255,255,.5);box-shadow:0 14px 40px -14px rgba(210,216,228,.6)}
+  .btn.primary:hover{box-shadow:0 20px 54px -14px rgba(210,216,228,.8)}
+  /* secondary — glass, white text */
+  .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--hair);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .btn.ghost:hover{border-color:var(--hair-strong);background:rgba(255,255,255,.1)}
+
+  .verbs{margin-top:30px;font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.6);display:flex;gap:16px;flex-wrap:wrap}
+  .verbs b{color:var(--silver-2);font-weight:400}
+  .verbs .dot{color:var(--silver-deep)}
+
+  /* ── glass demo (phone) ── */
+  .demo{justify-self:end;position:relative;width:clamp(280px,32vw,360px)}
+  .phone{border-radius:42px;padding:12px;position:relative;z-index:2}
+  .screen{border-radius:32px;overflow:hidden;background:rgba(10,12,16,.42);border:1px solid var(--hair)}
+  .sc-top{display:flex;align-items:center;gap:11px;padding:16px 16px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .av{width:34px;height:34px;border-radius:50%;flex:0 0 auto;background:var(--silver-sheen);display:grid;place-items:center;color:#12151b;font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+  .sc-top .nm{font-weight:600;font-size:14.5px}
+  .sc-top .st{font-size:11.5px;color:var(--silver);display:flex;align-items:center;gap:6px}
+  .sc-top .st i{width:6px;height:6px;border-radius:50%;background:#5ec98a;display:inline-block;box-shadow:0 0 8px #5ec98a}
+  .thread{padding:15px 14px;display:flex;flex-direction:column;gap:11px}
+  .m{max-width:90%;font-size:13.5px;line-height:1.45}
+  .m.me{align-self:flex-end}.m.ai{align-self:flex-start}
+  .b{padding:11px 14px;border-radius:16px}
+  .m.me .b{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-bottom-right-radius:5px}
+  .m.ai .b{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-bottom-left-radius:5px;color:rgba(255,255,255,.9)}
+  .held{margin-top:2px;border:1px solid var(--hair);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04)}
+  .held .hh{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.08);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--silver)}
+  .held .hh .tg{margin-left:auto;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--silver-deep);border:1px solid var(--hair);border-radius:5px;padding:2px 6px}
+  .held .r{display:flex;justify-content:space-between;gap:10px;padding:9px 13px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .held .r:last-child{border-bottom:none}
+  .held .r .c{font-family:'Space Mono',monospace;font-size:11px;color:var(--silver-2)}
+  /* floating status pill */
+  .pill{position:absolute;left:-26px;bottom:64px;z-index:3;display:flex;align-items:center;gap:9px;
+    padding:11px 16px;border-radius:999px;font-size:12.5px;font-weight:500;color:#fff}
+  .pill i{width:7px;height:7px;border-radius:50%;background:#5ec98a;box-shadow:0 0 10px #5ec98a;animation:pulse 2.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .glow{position:absolute;inset:-12% -8%;z-index:1;background:radial-gradient(closest-side,rgba(201,207,219,.18),transparent 70%);filter:blur(16px)}
+
+  @media (max-width:900px){
+    .stage{grid-template-columns:1fr;gap:30px;padding-top:104px;text-align:left;align-content:center}
+    .demo{justify-self:center;width:min(320px,80vw);order:2}
+    .pill{left:auto;right:-14px;bottom:auto;top:70px}
+    .sub{max-width:none}
+  }
+  @media (max-width:560px){
+    .stage{padding-top:96px;padding-bottom:44px}
+    .demo{display:none}          /* on mobile the vertical footage IS the show — keep it clean */
+    h1{font-size:clamp(38px,12vw,56px)}
+    .cta{margin-top:28px}
+    .btn{flex:1;justify-content:center;padding:15px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="poster"></div>
+  <video autoplay muted loop playsinline preload="auto" poster="assets/travel-bg.jpg">
+    <source src="assets/travel-bg.mp4" type="video/mp4">
+  </video>
+</div>
+<div class="scrim"></div>
+
+<header class="bar">
+  <a class="mark" href="index.html">t<span class="sp">✦</span>ures</a>
+  <a class="signin" href="onboard.html">Sign in</a>
+</header>
+
+<main class="stage">
+  <div class="copy">
+    <span class="eyebrow">AI travel concierge</span>
+    <h1>A concierge that<br>travels <em>with you.</em></h1>
+    <p class="sub">Describe a trip. Tures books every leg, watches it around the clock, and hands you the receipts. Confirmation numbers, not links.</p>
+    <div class="cta">
+      <a class="btn primary" href="plan.html">Plan a trip
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#12151b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn ghost" href="demo.html">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch it work</a>
+    </div>
+    <div class="verbs"><b>Books</b><span class="dot">·</span><b>Protects</b><span class="dot">·</span><b>Proves</b></div>
+  </div>
+
+  <div class="demo">
+    <div class="glow"></div>
+    <div class="glass phone">
+      <div class="screen">
+        <div class="sc-top">
+          <span class="av">t</span>
+          <div><div class="nm">Tures</div><div class="st"><i></i> On the trip</div></div>
+        </div>
+        <div class="thread">
+          <div class="m me"><div class="b">Seattle to Maui in June — oceanfront, great food, business if it&rsquo;s reasonable.</div></div>
+          <div class="m ai"><div class="b">On it — holding the flights, an ocean-view room, and a table.</div></div>
+          <div class="held">
+            <div class="hh">Trip held <span class="tg">Sample</span></div>
+            <div class="r"><span>Hawaiian · SEA → OGG · First</span><span class="c">HA · QK7T2P</span></div>
+            <div class="r"><span>Montage Kapalua Bay · 5 nts</span><span class="c">held</span></div>
+            <div class="r"><span>Mama&rsquo;s Fish House · 7:30p</span><span class="c">held</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="glass pill"><i></i> On watch · 24/7</div>
+  </div>
+</main>
+
+</body></html>

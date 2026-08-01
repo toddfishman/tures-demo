@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — My Trips</title>
+<meta name="description" content="Every trip in one place — lodging, flights, reservations, excursions, and local tips, each booked and verified." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v8/07-itinerary.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — My Trips" />
+<meta property="og:description" content="Every trip in one place — lodging, flights, reservations, excursions, and local tips, each booked and verified." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v8/07-itinerary.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — My Trips" />
+<meta name="twitter:description" content="Every trip in one place — lodging, flights, reservations, excursions, and local tips." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+
+  /* trip cards (list view) */
+  .trip-card{ position:relative; display:block; cursor:pointer; border-radius:16px; overflow:hidden;
+    border:1px solid rgba(200,162,74,0.22); box-shadow:0 22px 50px -30px rgba(0,0,0,0.9);
+    min-height:230px; transition:transform .18s ease, border-color .2s ease; opacity:0; transform:translateY(12px); }
+  .trip-card.in{ opacity:1; transform:none; transition:transform .18s ease, border-color .2s ease, opacity .5s ease; }
+  .trip-card:hover{ transform:translateY(-3px); border-color:rgba(230,200,115,0.6); }
+  .trip-card .art{ position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
+  .trip-card .veil{ position:absolute; inset:0; z-index:1;
+    background:linear-gradient(180deg, rgba(11,9,7,0.22) 0%, rgba(11,9,7,0.72) 60%, rgba(11,9,7,0.96) 100%); }
+  .trip-card .body{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:18px 18px 18px; min-height:230px; }
+
+  /* detail view */
+  .sec-tab{ cursor:pointer; padding:7px 13px; border-radius:99px; font-size:12.5px; white-space:nowrap;
+    border:1px solid var(--canvas-line); color:var(--ink-soft); background:rgba(255,253,247,0.5); transition:all .14s; }
+  .sec-tab:hover{ border-color:rgba(200,162,74,0.5); color:var(--ink); }
+  .sec-tab.on{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
+  .item-thumb{ width:64px; height:64px; border-radius:11px; flex-shrink:0; background-size:cover; background-position:center;
+    border:1px solid var(--canvas-line); display:grid; place-items:center; font-family:'Cormorant Garamond',serif; color:var(--gold-deep); font-size:24px; }
+  .alts{ overflow:hidden; max-height:0; opacity:0; transition:max-height .3s ease, opacity .25s ease, margin .3s ease; }
+  .alts.open{ max-height:220px; opacity:1; margin-top:10px; }
+  .fade{ opacity:0; transform:translateY(8px); transition:opacity .45s ease, transform .45s ease; }
+  .fade.in{ opacity:1; transform:none; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-10 right-2 text-[26vw] sm:text-[16vw] z-0" data-parallax="0.14">VI</div>
+ <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9">
+  <div class="caps text-[11px] text-gold/70 mb-3">My Trips</div>
+  <h1 id="heroTitle" class="font-display text-5xl sm:text-6xl leading-[1.0]">Everything, in one place.</h1>
+  <p id="heroSub" class="text-canvas/70 mt-3 max-w-xl leading-relaxed">Every trip you've planned with Tures — lodging, flights, reservations, excursions, and the local tips worth keeping. Tap a trip to open it.</p>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12" data-reveal>
+
+  <!-- LIST VIEW -->
+  <div id="tripsView">
+    <div class="flex items-end justify-between mb-6 flex-wrap gap-3">
+      <div class="caps text-[11px] text-ink-faint"><span id="tripCount">0</span> trips</div>
+      <a href="03-paste-trip.html" class="btn-ink px-5 py-2.5 rounded-xl text-sm quiet">+ Plan a new trip</a>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" id="tripsGrid"></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detailView" style="display:none"></div>
+
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">My Trips</div>
+</footer>
+
+<div class="cta-bar">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="08-concierge.html" class="text-xs text-gold/70 hover:text-gold-bright quiet shrink-0">Text the concierge →</a>
+    <span class="flex-1"></span>
+    <a href="03-paste-trip.html" class="btn-gold sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Plan a trip →</a>
+  </div>
+</div>
+
+<script>
+/* ===== example trips (mock) — the drill-down hub ===== */
+var TRIPS = [
+  {
+    id:'nordic', name:'Paris · Lapland · Copenhagen', dates:'Dec 3 – 13, 2026', who:'2 travelers',
+    status:'upcoming', statusPill:['pill-confirm','Upcoming · verified ×2'], hero:'assets/img/aurora-1920.webp',
+    blurb:'Eleven days, three cities, booked leg by leg. The Hiccup Handler is watching every leg.',
+    lodging:[
+      {name:'Real Christine, Paris', meta:'Junior Suite · Dec 4–7 · 3 nts', img:'assets/img/stay-paris-320.webp', note:'Garden view, breakfast, Virtuoso amenities at check-in.', conf:'8849-RCP', alts:['Hôtel des Grands Boulevards — $40/nt less','Le Pavillon de la Reine — quieter courtyard']},
+      {name:'Javri Lodge, Saariselkä', meta:'Aurora Suite · Dec 7–10 · 3 nts', img:'assets/img/lapland-cabin-320.webp', note:'Private terrace, half-board, airport transfer included.', conf:'JL-12041', alts:['Kakslauttanen Arctic Resort — glass igloo','Northern Lights Village — closer to town']},
+      {name:'Hotel Sanders, Copenhagen', meta:'Junior Suite · Dec 10–13 · 3 nts', img:'assets/img/stay-cph-320.webp', note:'Booked direct, rate-protected −$351. Four minutes from Nyhavn.', conf:'SAN-3398', alts:['Nimb Hotel — Tivoli-side','Coco Hotel — design-forward, lower tier']}
+    ],
+    flights:[
+      {title:'AA 142 · SEA → CDG', meta:'Dec 3 · Business · non-stop · seat 5A', conf:'LXJ7Q3', alts:['DL 134 via JFK — earns SkyMiles instead']},
+      {title:'AY 1574 · CDG → HEL → IVL', meta:'Dec 7 · Business · approved alt (no non-stop)', conf:'—', alts:['AF1697 + AY633 — longer, Flying Blue miles']},
+      {title:'AY 945 · IVL → HEL → CPH', meta:'Dec 10 · Business · refundable', conf:'5RT2QK', alts:[]},
+      {title:'KL/DL · CPH → AMS → SEA', meta:'Dec 13 · Business · rerouted around the CDG strike', conf:'7QZ2RB', alts:[]}
+    ],
+    transport:[ {title:'Ivalo airport transfer', meta:'Dec 7 · met at arrivals → Javri Lodge'} ],
+    reservations:[
+      {name:'Le Bistrot Paul Bert', meta:'Paris · Dec 5, 8:00 pm · quiet corner', conf:'R-8212'},
+      {name:'Septime', meta:'Paris · Dec 6, 9:15 pm', conf:'R-4490'},
+      {name:'Geranium', meta:'Copenhagen · Dec 11, 7:30 pm', conf:'R-7731'}
+    ],
+    excursions:[
+      {name:'Aurora snowmobile safari', meta:'Saariselkä · Dec 8, evening · KP forecast 5'},
+      {name:'Louvre after-hours, small group', meta:'Paris · Dec 5, 6:30 pm'}
+    ],
+    tips:[
+      'Real Christine holds a quieter garden-side table on request — already noted.',
+      'Aurora odds peak Dec 8; Tures will text if the KP index spikes earlier.',
+      'Copenhagen runs cold and dark by 3 pm in December — pack accordingly.'
+    ]
+  },
+  {
+    id:'tokyo', name:'Tokyo', dates:'Apr 12 – 16, 2026', who:'2 travelers',
+    status:'completed', statusPill:['pill-confirm','Completed'], hero:'assets/img/tokyo-1920.webp',
+    blurb:'Forty-eight hours, every reservation handled. Nothing missed.',
+    lodging:[
+      {name:'Trunk Hotel, Shibuya', meta:'Suite · Apr 12–16 · 4 nts', img:'', note:'Design-forward, walkable to everything.', conf:'TRK-2208', alts:['Aman Tokyo — grander register','Hoshinoya Tokyo — ryokan in the city']}
+    ],
+    flights:[
+      {title:'NH 175 · SEA → HND', meta:'Apr 12 · Business · non-stop', conf:'NH8841', alts:[]},
+      {title:'NH 176 · HND → SEA', meta:'Apr 16 · Business · non-stop', conf:'NH8842', alts:[]}
+    ],
+    transport:[ {title:'HND limousine bus + private car', meta:'Apr 12 · to Shibuya'} ],
+    reservations:[
+      {name:'Sukiyabashi Jiro Roppongi', meta:'Apr 13, 6:00 pm', conf:'R-1188'},
+      {name:'Den', meta:'Apr 14, 7:00 pm', conf:'R-2231'},
+      {name:'Bar High Five', meta:'Apr 14, 10:00 pm', conf:'walk-in held'}
+    ],
+    excursions:[ {name:'TeamLab Planets, early entry', meta:'Apr 13, 9:00 am'}, {name:'Tsukiji outer market, guided', meta:'Apr 15, 7:30 am'} ],
+    tips:['Den books out 60 days ahead — Tures held it the day it opened.','Carry cash; the best yakitori counters are cash-only.']
+  },
+  {
+    id:'bigisland', name:'Hawaii · Big Island', dates:'Window: October 2026', who:'2 travelers',
+    status:'planning', statusPill:['pill-pending','Planning'], hero:'assets/img/tulum-1920.webp',
+    blurb:'A week of warm, slow mornings. Still gathering the details — pick up where you left off.',
+    lodging:[
+      {name:'Four Seasons Hualalai', meta:'Ocean-view · 7 nts · holding', img:'', note:'On hold pending your dates. Adults-only pool, snorkel lagoon.', conf:'pending', alts:['Mauna Lani, Auberge — lower tier','Kona Village, a Rosewood Resort — newly reopened']}
+    ],
+    flights:[ {title:'SEA → KOA', meta:'October · Business · ~6h non-stop · watching fares', conf:'—', alts:['Alaska vs Hawaiian — Tures will pick the best fare/seat']} ],
+    transport:[ {title:'KOA convertible rental', meta:'on hold'} ],
+    reservations:[ {name:'(none yet)', meta:'Tures suggests booking Merriman\'s once dates lock', conf:'—'} ],
+    excursions:[ {name:'Mauna Kea summit stargazing', meta:'suggested · books 2 weeks out'}, {name:'Manta ray night snorkel', meta:'suggested'} ],
+    tips:['Tell Tures your exact dates and it will lock the Hualalai rate before October fills.','October is shoulder season — quieter beaches, better rates.']
+  }
+];
+
+var SECTIONS = [
+  {key:'lodging',      label:'Lodging',          icon:'⌂'},
+  {key:'flights',      label:'Flights & transport', icon:'✈'},
+  {key:'reservations', label:'Reservations',     icon:'✦'},
+  {key:'excursions',   label:'Excursions',       icon:'◎'},
+  {key:'tips',         label:'Tips',             icon:'❝'}
+];
+
+var gridEl = document.getElementById('tripsGrid');
+var listView = document.getElementById('tripsView');
+var detailView = document.getElementById('detailView');
+var heroTitle = document.getElementById('heroTitle');
+var heroSub = document.getElementById('heroSub');
+var esc = function(s){ return String(s).replace(/</g,'&lt;'); };
+
+/* ---------- list ---------- */
+function tripCard(t){
+  return '<a class="trip-card" data-trip="'+t.id+'" href="#'+t.id+'">'+
+    '<div class="art" style="background-image:url(\''+t.hero+'\')"></div><div class="veil"></div>'+
+    '<div class="body">'+
+      '<span class="pill '+t.statusPill[0]+' self-start mb-3">'+t.statusPill[1]+'</span>'+
+      '<div class="font-display text-2xl text-canvas leading-tight">'+esc(t.name)+'</div>'+
+      '<div class="text-canvas/70 text-sm mt-1">'+esc(t.dates)+' · '+esc(t.who)+'</div>'+
+      '<div class="arr text-gold-bright text-[12px] mt-3 inline-flex items-center gap-2" style="letter-spacing:.08em;text-transform:uppercase">Open trip →</div>'+
+    '</div></a>';
+}
+function renderList(){
+  document.getElementById('tripCount').textContent = TRIPS.length;
+  gridEl.innerHTML = TRIPS.map(tripCard).join('');
+  [].forEach.call(gridEl.querySelectorAll('.trip-card'), function(c,i){ setTimeout(function(){ c.classList.add('in'); }, 60*i); });
+}
+
+/* ---------- detail ---------- */
+function rowItem(it, withAlts){
+  var alts = (withAlts && it.alts && it.alts.length)
+    ? '<button class="text-[12px] text-gold-deep quiet hover:underline mt-1 alts-toggle">See '+it.alts.length+' alternative'+(it.alts.length>1?'s':'')+' ›</button>'+
+      '<div class="alts"><div class="rule-ink my-2"></div>'+it.alts.map(function(a){ return '<div class="text-[13px] text-ink-soft py-1 flex items-center gap-2"><span class="text-gold-deep">◦</span>'+esc(a)+'<button class="ml-auto text-[11px] text-gold-deep quiet hover:underline">Swap in</button></div>'; }).join('')+'</div>'
+    : '';
+  var conf = it.conf ? '<span class="font-mono text-[11px] text-ink-faint shrink-0">'+esc(it.conf)+'</span>' : '';
+  return '<div class="leaf p-4">'+
+    '<div class="flex items-center justify-between gap-3">'+
+      '<div class="min-w-0"><div class="font-display text-lg text-ink leading-tight">'+esc(it.name||it.title)+'</div>'+
+        '<div class="text-[12.5px] text-ink-soft mt-0.5">'+esc(it.meta)+'</div></div>'+ conf +
+    '</div>'+
+    (it.note ? '<p class="text-[13px] text-ink-soft mt-2 leading-relaxed">'+esc(it.note)+'</p>' : '')+
+    alts +
+  '</div>';
+}
+function lodgeItem(it){
+  var thumb = it.img ? '<div class="item-thumb" style="background-image:url(\''+it.img+'\')"></div>'
+                     : '<div class="item-thumb">'+esc((it.name||'?').charAt(0))+'</div>';
+  var alts = (it.alts && it.alts.length)
+    ? '<button class="text-[12px] text-gold-deep quiet hover:underline mt-2 alts-toggle">See '+it.alts.length+' alternative'+(it.alts.length>1?'s':'')+' ›</button>'+
+      '<div class="alts"><div class="rule-ink my-2"></div>'+it.alts.map(function(a){ return '<div class="text-[13px] text-ink-soft py-1 flex items-center gap-2"><span class="text-gold-deep">◦</span>'+esc(a)+'<button class="ml-auto text-[11px] text-gold-deep quiet hover:underline">Swap stay</button></div>'; }).join('')+'</div>'
+    : '';
+  return '<div class="leaf p-4">'+
+    '<div class="flex gap-3.5">'+thumb+
+      '<div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2">'+
+        '<div class="font-display text-lg text-ink leading-tight">'+esc(it.name)+'</div>'+
+        (it.conf?'<span class="font-mono text-[11px] text-ink-faint shrink-0">'+esc(it.conf)+'</span>':'')+'</div>'+
+        '<div class="text-[12.5px] text-ink-soft mt-0.5">'+esc(it.meta)+'</div>'+
+        (it.note?'<p class="text-[13px] text-ink-soft mt-1.5 leading-relaxed">'+esc(it.note)+'</p>':'')+ alts +
+      '</div>'+
+    '</div></div>';
+}
+function sectionBlock(t, sec){
+  var items = t[sec.key] || [];
+  var inner = '';
+  if(sec.key==='lodging') inner = items.map(lodgeItem).join('');
+  else if(sec.key==='tips') inner = '<div class="leaf p-5"><ul class="space-y-3">'+items.map(function(tip){ return '<li class="flex gap-2.5 text-[14px] text-ink/90 leading-relaxed"><span class="text-gold-deep mt-0.5">✦</span><span>'+esc(tip)+'</span></li>'; }).join('')+'</ul></div>';
+  else inner = '<div class="space-y-2.5">'+items.map(function(it){ return rowItem(it, sec.key==='flights'); }).join('')+'</div>';
+  return '<div class="sec-block fade" data-sec="'+sec.key+'" style="scroll-margin-top:90px">'+
+    '<div class="flex items-center gap-2 mb-3 mt-9"><span class="text-gold-deep text-lg">'+sec.icon+'</span>'+
+      '<h2 class="font-display text-2xl text-ink">'+sec.label+'</h2>'+
+      '<span class="text-[11px] text-ink-faint ml-1">'+items.length+'</span></div>'+
+    inner +
+  '</div>';
+}
+function openTrip(id){
+  var t = TRIPS.filter(function(x){return x.id===id;})[0];
+  if(!t) return;
+  heroTitle.textContent = t.name;
+  heroSub.textContent = t.dates + ' · ' + t.who + ' — ' + t.blurb;
+  var tabs = SECTIONS.map(function(s){ return '<a href="#sec-'+s.key+'" class="sec-tab" data-jump="'+s.key+'">'+s.label+'</a>'; }).join('');
+  detailView.innerHTML =
+    '<button class="back btn-ink px-4 py-2 rounded-xl text-sm quiet mb-6">← My Trips</button>'+
+    '<div class="flex items-center justify-between flex-wrap gap-3 mb-1">'+
+      '<div class="font-display text-3xl sm:text-4xl text-ink leading-tight">'+esc(t.name)+'</div>'+
+      '<span class="pill '+t.statusPill[0]+'">'+t.statusPill[1]+'</span></div>'+
+    '<div class="text-ink-soft text-sm mb-5">'+esc(t.dates)+' · '+esc(t.who)+'</div>'+
+    '<div class="flex gap-2 overflow-x-auto pb-1 sticky top-[64px] z-10 -mx-1 px-1" style="background:linear-gradient(180deg,var(--canvas) 60%,transparent)">'+tabs+'</div>'+
+    SECTIONS.map(function(s){ return '<span id="sec-'+s.key+'"></span>'+sectionBlock(t, s); }).join('');
+  listView.style.display='none';
+  detailView.style.display='';
+  window.scrollTo({top:0, behavior:'auto'});
+  [].forEach.call(detailView.querySelectorAll('.sec-block'), function(b,i){ setTimeout(function(){ b.classList.add('in'); }, 70*i); });
+}
+function backToList(){
+  detailView.style.display='none';
+  listView.style.display='';
+  heroTitle.textContent = 'Everything, in one place.';
+  heroSub.textContent = "Every trip you've planned with Tures — lodging, flights, reservations, excursions, and the local tips worth keeping. Tap a trip to open it.";
+  if(location.hash) history.replaceState(null,'',location.pathname);
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+/* ---------- events (delegation) ---------- */
+document.addEventListener('click', function(e){
+  var card = e.target.closest('.trip-card');
+  if(card){ e.preventDefault(); openTrip(card.getAttribute('data-trip')); return; }
+  if(e.target.closest('.back')){ backToList(); return; }
+  var alt = e.target.closest('.alts-toggle');
+  if(alt){ e.preventDefault(); var box = alt.parentElement.querySelector('.alts'); if(box) box.classList.toggle('open'); alt.textContent = box.classList.contains('open') ? 'Hide alternatives ›' : alt.textContent.replace('Hide alternatives','See alternatives'); return; }
+  var jump = e.target.closest('[data-jump]');
+  if(jump){ e.preventDefault(); var tgt = document.getElementById('sec-'+jump.getAttribute('data-jump')); if(tgt) tgt.scrollIntoView({behavior:'smooth'}); document.querySelectorAll('.sec-tab').forEach(function(x){x.classList.toggle('on', x===jump);}); }
+});
+
+renderList();
+/* deep link: #tripId opens that trip */
+if(location.hash){ var id = location.hash.slice(1); if(TRIPS.some(function(t){return t.id===id;})) openTrip(id); }
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

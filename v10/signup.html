@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Start planning</title>
+<meta name="description" content="Create your Tures account to book the trip you just planned." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/signup.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Start planning" />
+<meta property="og:description" content="Create your Tures account to book the trip you just planned." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/signup.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Start planning" />
+<meta name="twitter:description" content="Create your Tures account to book the trip you just planned." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* form field — greenhouse glass */
+  .fld{ width:100%; border-radius:10px; border:1px solid rgba(255,255,255,0.14);
+        background:rgba(255,255,255,0.05); backdrop-filter:blur(14px);
+        padding:14px 16px; font-size:15px; color:var(--gh-cream); outline:none;
+        font-family:'DM Sans',sans-serif; transition:border-color .25s, box-shadow .25s; }
+  .fld::placeholder{ color:var(--gh-cream-dim); }
+  .fld:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,255,255,0.06), 0 0 18px -8px var(--gold); }
+
+  /* tabs */
+  .tab{ flex:1; text-align:center; padding:11px 8px; font-size:12px; cursor:pointer; color:var(--gh-cream-dim);
+        border-bottom:2px solid transparent; letter-spacing:.06em; text-transform:uppercase;
+        transition:color .25s, border-color .25s; }
+  .tab.on{ color:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  .err{ color:#e88; font-size:13px; }
+</style>
+</head>
+<body class="gh antialiased min-h-screen">
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+    <a href="index.html" style="font-size:13px; color:var(--gh-cream-dim); text-decoration:none; letter-spacing:.04em;">← Back</a>
+  </nav>
+</header>
+
+<main class="gh-wash-surface gh-tile relative overflow-hidden min-h-[88vh] flex items-center">
+ <div class="relative z-10 max-w-md w-full mx-auto px-6 py-12">
+  <div class="gh-glass" style="border-radius:16px; padding:34px 30px;">
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Welcome aboard</span></div>
+    <h1 class="gh-h2" style="margin-bottom:10px;">Plan your first trip.</h1>
+    <p class="gh-lead" style="font-size:14px; margin-bottom:26px;">Free to plan. You only pay when Tures actually books — never without your say-so.</p>
+
+    <div class="flex mb-6" style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <div class="tab on" data-tab="signup">Create account</div>
+      <div class="tab" data-tab="login">Log in</div>
+      <div class="tab" data-tab="waitlist">Early access</div>
+    </div>
+
+    <!-- SIGN UP -->
+    <form id="signupForm" class="space-y-3">
+      <input id="suName" class="fld" placeholder="Your name" autocomplete="name" />
+      <input id="suEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <input id="suPass" type="password" class="fld" placeholder="Password (8+ characters)" autocomplete="new-password" required />
+      <button class="gh-btn gh-btn-lg w-full mt-1">Start planning — free →</button>
+      <div id="suErr" class="err"></div>
+      <p class="text-center pt-1" style="font-size:12px; color:var(--gh-cream-dim);">No card required to start. Plan all you like.</p>
+    </form>
+
+    <!-- LOG IN -->
+    <form id="loginForm" class="space-y-3" style="display:none">
+      <input id="liEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <input id="liPass" type="password" class="fld" placeholder="Password" autocomplete="current-password" required />
+      <button class="gh-btn gh-btn-lg w-full mt-1">Log in →</button>
+      <div id="liErr" class="err"></div>
+    </form>
+
+    <!-- WAITLIST -->
+    <form id="waitlistForm" class="space-y-3" style="display:none">
+      <p class="gh-lead" style="font-size:14px;">Not ready to dive in? Get an invite as we open the doors.</p>
+      <input id="wlName" class="fld" placeholder="Your name (optional)" autocomplete="name" />
+      <input id="wlEmail" type="email" class="fld" placeholder="Email" autocomplete="email" required />
+      <button class="gh-btn gh-btn-ghost gh-btn-lg w-full mt-1">Request an invite →</button>
+      <div id="wlMsg" class="text-center pt-1" style="font-size:13px;"></div>
+    </form>
+  </div>
+ </div>
+</main>
+
+<script src="assets/engine.js"></script>
+<script>
+function showTab(which){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab')===which); });
+  ['signup','login','waitlist'].forEach(function(n){ document.getElementById(n+'Form').style.display = n===which ? '' : 'none'; });
+}
+document.querySelectorAll('.tab').forEach(function(t){ t.onclick = function(){ showTab(t.getAttribute('data-tab')); }; });
+if(location.hash === '#waitlist') showTab('waitlist');
+if(location.hash === '#login') showTab('login');
+
+document.getElementById('signupForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector('button'); var err = document.getElementById('suErr'); err.textContent='';
+  btn.disabled=true; btn.style.opacity=.7; btn.textContent='Creating…';
+  tures.signUp(document.getElementById('suName').value.trim(), document.getElementById('suEmail').value.trim(), document.getElementById('suPass').value)
+    .then(function(){ location.href='welcome.html'; })
+    .catch(function(ex){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Start planning — free →'; err.textContent = ex.status===409 ? 'That email already has an account — try logging in.' : 'Could not sign up. Check your details and try again.'; });
+});
+
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var btn = e.target.querySelector('button'); var err = document.getElementById('liErr'); err.textContent='';
+  btn.disabled=true; btn.style.opacity=.7; btn.textContent='Logging in…';
+  tures.login(document.getElementById('liEmail').value.trim(), document.getElementById('liPass').value)
+    .then(function(){ location.href='account.html'; })
+    .catch(function(){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Log in →'; err.textContent='Wrong email or password.'; });
+});
+
+document.getElementById('waitlistForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('wlEmail').value.trim(); var name = document.getElementById('wlName').value.trim();
+  if(!email) return;
+  var msg = document.getElementById('wlMsg');
+  function done(extra){ msg.style.color='var(--confirm)'; msg.innerHTML = "✓ You're on the list." + (extra||''); e.target.querySelector('button').textContent='Added ✓'; }
+  tures.waitlist(email, name).then(function(r){ done(r && r.position ? ' You\'re #' + r.position + '.' : ''); }).catch(function(){ done(''); });
+});
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

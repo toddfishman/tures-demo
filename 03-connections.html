@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Connections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #2D1B2E;
+    --brass: #B8965A;
+    --clay: #F4EFE8;
+    --ink: #1C1816;
+    --slate: #7A7167;
+    --confirm: #3F6B3F;
+    --pending: #C58A2A;
+    --alert: #C25444;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .card { background: #fff; border: 1px solid rgba(45,27,46,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; letter-spacing:0.07em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(63,107,63,0.1); color: var(--confirm); }
+  .pill-pending { background: rgba(197,138,42,0.12); color: var(--pending); }
+  .pill-alert   { background: rgba(194,84,68,0.1);  color: var(--alert); }
+  .pill-neutral { background: rgba(45,27,46,0.06); color: var(--aubergine); }
+  .pill-off     { background: rgba(45,27,46,0.04); color: var(--slate); }
+  .divider { height: 1px; background: rgba(45,27,46,0.1); }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(45,27,46,0.2); }
+  .logo {
+    width: 44px; height: 44px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 500;
+  }
+  .switch { width: 36px; height: 20px; background: rgba(45,27,46,0.15); border-radius: 99px; position: relative; cursor: pointer; transition: background 150ms; }
+  .switch.on { background: var(--brass); }
+  .switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 99px; transition: transform 150ms; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+  .switch.on .knob { transform: translateX(16px); }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .chev { transition: transform 150ms; display:inline-block; }
+  details[open] .chev { transform: rotate(90deg); }
+</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-aubergine/10 bg-clay/80 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <a href="01-landing.html" class="font-serif text-2xl text-aubergine">Tures</a>
+      <nav class="hidden md:flex gap-8 text-sm text-aubergine/70">
+        <a href="02-paste-trip.html">New trip</a>
+        <a href="04-execution-dashboard.html">In flight</a>
+        <a href="05-itinerary.html">Past trips</a>
+        <a href="06-notifications.html">Notifications</a>
+        <a href="03-connections.html" class="text-aubergine">Connections</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="caps text-xs text-slate-warm">Andy Rockwell</span>
+      <div class="w-9 h-9 rounded-full bg-aubergine text-brass flex items-center justify-center font-serif text-lg">A</div>
+    </div>
+  </div>
+</header>
+
+<!-- TITLE -->
+<section class="max-w-7xl mx-auto px-8 pt-12 pb-8">
+  <div class="caps text-xs text-slate-warm mb-3">Settings · accounts · 9 connected · 4 available</div>
+  <h1 class="font-serif text-5xl text-aubergine leading-[1.05]">Your connections.</h1>
+  <p class="mt-3 text-aubergine/70 max-w-2xl">Tures only does what you've given it permission to do. Every credential is revocable from this screen. Every use is logged in your <a href="#" class="text-brass underline underline-offset-4">audit timeline</a>.</p>
+</section>
+
+<!-- LAYOUT -->
+<section class="max-w-7xl mx-auto px-8 pb-24 grid lg:grid-cols-12 gap-8">
+
+  <!-- SIDEBAR -->
+  <aside class="lg:col-span-3">
+    <div class="card rounded-md p-5">
+      <div class="caps text-xs text-slate-warm mb-4">Categories</div>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#payment" class="flex items-center justify-between py-1 text-aubergine">Payment <span class="pill pill-confirm">1</span></a></li>
+        <li><a href="#airlines" class="flex items-center justify-between py-1 text-aubergine">Airlines <span class="pill pill-confirm">3</span></a></li>
+        <li><a href="#hotels" class="flex items-center justify-between py-1 text-aubergine">Hotels <span class="pill pill-confirm">2</span></a></li>
+        <li><a href="#dining" class="flex items-center justify-between py-1 text-aubergine">Dining <span class="pill pill-confirm">1</span> <span class="pill pill-off">1 pending</span></a></li>
+        <li><a href="#identity" class="flex items-center justify-between py-1 text-aubergine">Identity &amp; messaging <span class="pill pill-confirm">2</span></a></li>
+      </ul>
+      <div class="divider my-5"></div>
+      <a href="#" class="block px-3 py-2 text-sm text-aubergine hover:bg-aubergine/5 rounded">Audit timeline →</a>
+      <a href="#" class="block px-3 py-2 text-sm text-aubergine hover:bg-aubergine/5 rounded">Revoke everything</a>
+    </div>
+    <div class="mt-4 p-5 card rounded-md bg-[#FBF8F2]">
+      <div class="caps text-xs text-slate-warm mb-2">Trust principles</div>
+      <ul class="text-xs text-aubergine/75 space-y-2 leading-relaxed">
+        <li>· Card-on-file held by Stripe, never on our servers.</li>
+        <li>· Loyalty credentials encrypted; used per-booking and never displayed.</li>
+        <li>· No marketing emails to your inbox. Ever.</li>
+        <li>· Revoke any connection in one click — bookings remain.</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="lg:col-span-9 space-y-6">
+
+    <!-- PAYMENT -->
+    <section id="payment" class="card rounded-md">
+      <header class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div>
+          <div class="caps text-xs text-slate-warm">Payment</div>
+          <h2 class="font-serif text-2xl text-aubergine mt-1">Card on file</h2>
+        </div>
+        <span class="pill pill-confirm">1 connected</span>
+      </header>
+      <div class="divide-y divide-aubergine/8">
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#016FD0] text-white">AX</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">American Express · Platinum</div>
+            <div class="text-sm text-slate-warm">Card ending <span class="font-mono">·· 1004</span> · expires 02/29 · stored via Stripe vault</div>
+            <div class="text-xs text-aubergine/70 mt-1">Used per booking, with a one-time virtual card generated for each transaction.</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+            <button class="text-xs text-slate-warm hover:text-aubergine">Manage</button>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-[#FBF8F2] border-t border-aubergine/10 text-sm">
+        <a href="#" class="text-brass">+ Add a backup card</a>
+      </div>
+    </section>
+
+    <!-- AIRLINES -->
+    <section id="airlines" class="card rounded-md">
+      <header class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div>
+          <div class="caps text-xs text-slate-warm">Airlines &amp; alliances</div>
+          <h2 class="font-serif text-2xl text-aubergine mt-1">Loyalty programs</h2>
+        </div>
+        <span class="pill pill-confirm">3 of 4 connected</span>
+      </header>
+      <div class="divide-y divide-aubergine/8">
+
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#0F1F4B] text-white">AY</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Finnair Plus</div>
+            <div class="text-sm text-slate-warm">Member <span class="font-mono">AY 2987441</span> · OneWorld Sapphire</div>
+            <details class="mt-2 text-xs text-aubergine/75">
+              <summary><span class="chev">▸</span> What Tures does with this</summary>
+              <ul class="mt-2 ml-3 space-y-1 leading-relaxed">
+                <li>· Applies your member number to all AY bookings to earn Tier Points</li>
+                <li>· Uses Sapphire status for upgrade requests and seat selection</li>
+                <li>· Reads award availability when you ask Tures to use miles</li>
+              </ul>
+            </details>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+            <button class="text-xs text-slate-warm hover:text-aubergine">Revoke</button>
+          </div>
+        </div>
+
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#002157] text-white">AF</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Air France · Flying Blue</div>
+            <div class="text-sm text-slate-warm">Member <span class="font-mono">FB 392 110 887</span> · Silver</div>
+            <div class="text-xs text-aubergine/70 mt-1">Linked via OAuth · last verified 4 days ago</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+            <button class="text-xs text-slate-warm hover:text-aubergine">Revoke</button>
+          </div>
+        </div>
+
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#C00] text-white">AA</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">American AAdvantage</div>
+            <div class="text-sm text-slate-warm">Member <span class="font-mono">3HJ8DD2</span> · Executive Platinum</div>
+            <div class="text-xs text-aubergine/70 mt-1">Credential vault · used at booking time only</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+            <button class="text-xs text-slate-warm hover:text-aubergine">Revoke</button>
+          </div>
+        </div>
+
+        <div class="px-6 py-5 flex items-center gap-5 opacity-70">
+          <div class="logo bg-aubergine/10 text-aubergine">+</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Add another airline</div>
+            <div class="text-sm text-slate-warm">SAS, Lufthansa, BA, Delta SkyMiles, JAL, United MileagePlus, others.</div>
+          </div>
+          <button class="text-sm px-4 py-2 border border-aubergine/20 text-aubergine hover:bg-aubergine/5">Connect</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- HOTELS -->
+    <section id="hotels" class="card rounded-md">
+      <header class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div>
+          <div class="caps text-xs text-slate-warm">Hotels</div>
+          <h2 class="font-serif text-2xl text-aubergine mt-1">Loyalty &amp; preferences</h2>
+        </div>
+        <span class="pill pill-confirm">2 connected</span>
+      </header>
+      <div class="divide-y divide-aubergine/8">
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#1A2D52] text-white">HY</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">World of Hyatt</div>
+            <div class="text-sm text-slate-warm">Member <span class="font-mono">8419 233</span> · Globalist · 60 nights</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+            <button class="text-xs text-slate-warm hover:text-aubergine">Revoke</button>
+          </div>
+        </div>
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-aubergine text-brass">V</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Virtuoso &amp; FHR amenities</div>
+            <div class="text-sm text-slate-warm">Through Tures' partner network · auto-applied to eligible properties</div>
+            <div class="text-xs text-aubergine/70 mt-1">$100 F&amp;B credit, room upgrade, and 4th-night-free on participating properties (Real Christine: ✓, Hotel Sanders: ✓, Javri Lodge: not currently eligible)</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="switch on"><div class="knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DINING -->
+    <section id="dining" class="card rounded-md">
+      <header class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div>
+          <div class="caps text-xs text-slate-warm">Dining</div>
+          <h2 class="font-serif text-2xl text-aubergine mt-1">Reservation platforms</h2>
+        </div>
+        <div class="flex gap-2"><span class="pill pill-confirm">1 connected</span><span class="pill pill-pending">1 pending</span></div>
+      </header>
+      <div class="divide-y divide-aubergine/8">
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#D5232E] text-white">R</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Resy</div>
+            <div class="text-sm text-slate-warm">Linked via Resy OAuth · andy@rockwell.io</div>
+            <div class="text-xs text-aubergine/70 mt-1">Used for ~60% of urban reservations. Coverage: Paris ✓, Copenhagen ✓, Saariselkä — not applicable.</div>
+          </div>
+          <div class="flex items-center gap-3"><div class="switch on"><div class="knob"></div></div></div>
+        </div>
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#DA3743] text-white">O</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">OpenTable</div>
+            <div class="text-sm text-slate-warm">Awaiting your confirmation email · check inbox</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="pill pill-pending">Pending</span>
+            <button class="text-xs text-brass hover:underline">Resend</button>
+          </div>
+        </div>
+        <div class="px-6 py-5 flex items-center gap-5 bg-[#FBF8F2]">
+          <div class="logo bg-aubergine text-brass">★</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Top-tier concierge requests</div>
+            <div class="text-sm text-slate-warm">Restaurants without public booking (Septime, Le Bistrot Paul Bert peak nights, Geranium, Noma residencies) — Tures requests via our concierge desk.</div>
+            <div class="text-xs text-aubergine/70 mt-1">No API. We use real humans. Median turnaround: <span class="font-mono">4h 20m</span>.</div>
+          </div>
+          <div class="flex items-center gap-3"><span class="pill pill-confirm">Enabled</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IDENTITY -->
+    <section id="identity" class="card rounded-md">
+      <header class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div>
+          <div class="caps text-xs text-slate-warm">Identity &amp; messaging</div>
+          <h2 class="font-serif text-2xl text-aubergine mt-1">How we reach you</h2>
+        </div>
+        <span class="pill pill-confirm">2 connected</span>
+      </header>
+      <div class="divide-y divide-aubergine/8">
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-[#EA4335] text-white">G</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">Gmail</div>
+            <div class="text-sm text-slate-warm">andy@rockwell.io · OAuth · read-only on confirmations only</div>
+            <div class="text-xs text-aubergine/70 mt-1">We parse incoming confirmations from airlines, hotels, and restaurants. We do not read any other mail. Verifiable in audit log.</div>
+          </div>
+          <div class="flex items-center gap-3"><div class="switch on"><div class="knob"></div></div></div>
+        </div>
+        <div class="px-6 py-5 flex items-center gap-5">
+          <div class="logo bg-aubergine text-brass">📱</div>
+          <div class="flex-1">
+            <div class="font-serif text-xl text-aubergine">SMS &amp; iMessage</div>
+            <div class="text-sm text-slate-warm">+1 ··· ··· 0427 · verified · used for in-trip concierge chat</div>
+          </div>
+          <div class="flex items-center gap-3"><div class="switch on"><div class="knob"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST BANNER -->
+    <section class="card rounded-md bg-aubergine text-white p-8">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <div class="font-mono text-brass text-sm">SOC 2 Type II</div>
+          <div class="font-serif text-2xl mt-2">Audited annually</div>
+          <p class="text-white/70 text-sm mt-2">Independent assessor reviews every aspect of how we store and use your credentials.</p>
+        </div>
+        <div>
+          <div class="font-mono text-brass text-sm">PCI-DSS</div>
+          <div class="font-serif text-2xl mt-2">Card data offloaded</div>
+          <p class="text-white/70 text-sm mt-2">Tures servers never touch your full card number. Stripe holds it. We hold a token.</p>
+        </div>
+        <div>
+          <div class="font-mono text-brass text-sm">Revocable</div>
+          <div class="font-serif text-2xl mt-2">One click, everything off</div>
+          <p class="text-white/70 text-sm mt-2">Your bookings remain. Our access ends. Audit log preserved for your records.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-aubergine/10 py-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-warm">
+    <span>Tures · transparent by construction</span>
+    <a href="#" class="hover:text-aubergine">Audit log · last 30 days</a>
+  </div>
+</footer>
+
+</body>
+</html>

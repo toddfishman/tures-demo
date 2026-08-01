@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Create your Tures account — free to start, no card needed until you book.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta name="robots" content="noindex">
+<!-- The waitlist is retired: Tures now creates real accounts. This page forwards to the
+     Create Account form so every existing "Get started / Go Concierge" link still works. -->
+<link rel="canonical" href="https://tures.app/login.html">
+<title>t✦ures — Create account</title>
+<script>
+  (function () {
+    // Preserve any incoming params (e.g. ?next=pricing.html) and land on the Create Account tab.
+    var q = location.search || "";
+    var join = q ? (q.indexOf("create=1") >= 0 ? q : q + "&create=1") : "?create=1";
+    location.replace("login.html" + join);
+  })();
+</script>
+<meta http-equiv="refresh" content="0; url=login.html?create=1">
+<style>
+  body{font-family:'DM Sans',system-ui,sans-serif;background:#faf8f5;color:#1a1a1a;
+    display:grid;place-items:center;min-height:100vh;margin:0}
+  a{color:#ff4929;font-weight:600}
+</style>
+</head>
+<body>
+  <p>Taking you to <a href="login.html?create=1">create your account</a>…</p>
+</body></html>

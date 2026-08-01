@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Confirm &amp; book</title>
+<meta name="description" content="Confirm and authorize your trip. Payments run on Stripe; nothing is ever charged without your approval." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/checkout.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Confirm &amp; book" />
+<meta property="og:description" content="Confirm and authorize your trip. Payments run on Stripe; nothing is ever charged without your approval." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/checkout.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Confirm &amp; book" />
+<meta name="twitter:description" content="Confirm and authorize your trip. Payments run on Stripe; nothing is ever charged without your approval." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  /* checkout shell */
+  .co-wrap{ max-width:680px; margin:0 auto; padding:clamp(48px,6vw,88px) clamp(24px,5vw,40px); }
+  .co-block{ padding:22px 24px; }
+
+  /* selectable option / saved row */
+  .opt{ border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:14px 16px; cursor:pointer;
+    transition:border-color .2s ease, background .2s ease; background:rgba(255,255,255,0.03); color:var(--gh-cream); }
+  .opt.on{ border-color:var(--gold); background:rgba(255,255,255,0.05); }
+  .opt .tick{ width:18px;height:18px;border-radius:99px;border:2px solid rgba(255,255,255,0.2); display:inline-grid;place-items:center; }
+  .opt.on .tick{ border-color:var(--gold); background:var(--gold); }
+
+  /* form fields */
+  .fld{ border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05);
+    padding:11px 13px; font-size:14px; color:var(--gh-cream); outline:none; font-family:'DM Sans',sans-serif;
+    transition:border-color .3s ease; }
+  .fld:focus{ border-color:var(--gold); }
+  .fld::placeholder{ color:var(--gh-cream-dim); }
+  .fld option{ background:var(--gh-card); color:var(--gh-cream); }
+
+  /* small inline buttons (Add card / Save card) */
+  .co-ibtn{ font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    background:rgba(255,255,255,0.05); border:1.5px solid var(--gold); color:var(--gold); border-radius:10px; cursor:pointer;
+    transition:background .25s ease; }
+  .co-ibtn:hover{ background:rgba(255,255,255,0.1); }
+
+  /* fee box */
+  .co-fee{ border-radius:12px; padding:16px 18px; background:rgba(255,255,255,0.04); border:1px solid var(--gold); color:var(--gh-cream); }
+  .co-fee a{ color:var(--gold); text-decoration:underline; }
+
+  /* itinerary rows */
+  .co-itin .row{ display:flex; justify-content:space-between; gap:12px; font-size:14px; color:var(--gh-cream); }
+
+  /* trust cells — kept prominent and reassuring */
+  .trust-cell{ border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); border-radius:12px;
+    padding:14px 8px; text-align:center; }
+  .trust-cell .ic{ color:var(--gold); display:grid; place-items:center; height:24px; margin-bottom:7px; }
+  .trust-cell .lb{ font-size:11px; line-height:1.3; color:var(--gh-cream-dim); }
+
+  .secure-badge{ display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--gh-cream-dim); }
+  .secure-badge svg{ color:var(--gold); }
+  .secure-badge strong{ color:var(--gh-cream); font-weight:500; }
+
+  /* confirmation rows on the booked screen */
+  .conf-row{ display:flex; justify-content:space-between; gap:12px; border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px; padding:9px 13px; color:var(--gh-cream); }
+  .conf-row .mono{ font-family:'JetBrains Mono',monospace; color:var(--gh-cream-dim); font-size:13px; }
+
+  .co-rule{ height:1px; background:rgba(255,255,255,0.1); }
+</style>
+</head>
+<body class="antialiased min-h-screen gh">
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+    <a href="03-paste-trip.html" class="gh-eyebrow" style="color:var(--gh-cream-dim);">← Back to planning</a>
+  </nav>
+</header>
+
+<main class="gh-wash-surface gh-tile" style="min-height:88vh;">
+ <div class="co-wrap">
+
+  <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Final step</span></div>
+  <h1 class="gh-h1" style="font-size:clamp(32px,4.6vw,56px); margin-bottom:14px;">You're only charged <span class="gh-accent gh-italic">because it books.</span></h1>
+  <p class="gh-lead" style="margin-bottom:36px; max-width:56ch;">Everything up to here was free. Confirm below and Tures books your itinerary — travel charges pass through to your card, plus your Tures fee.</p>
+
+  <!-- gate states -->
+  <div id="needPlan" class="gh-card co-block" style="display:none; text-align:center; border-radius:14px;">
+    <p class="gh-lead" style="margin-bottom:18px;">No itinerary to book yet.</p>
+    <a href="03-paste-trip.html" class="gh-btn">Plan a trip →</a>
+  </div>
+  <div id="needAccount" class="gh-card co-block" style="display:none; text-align:center; border-radius:14px;">
+    <p class="gh-lead" style="margin-bottom:18px;">Create a free account to book this trip.</p>
+    <a href="signup.html" class="gh-btn">Sign up →</a>
+  </div>
+
+  <div id="checkout" style="display:none">
+    <!-- itinerary -->
+    <div class="gh-card co-block co-itin" style="border-radius:14px; margin-bottom:20px;">
+      <div class="gh-eyebrow" style="margin-bottom:14px;">Your itinerary</div>
+      <div id="itin" class="space-y-2"></div>
+      <div class="gh-rule" style="margin:14px 0;"></div>
+      <div class="row"><span style="color:var(--gh-cream-dim);">Travel total (to your card)</span><span style="font-family:'JetBrains Mono',monospace;" id="travelTotal">—</span></div>
+    </div>
+
+    <!-- tures fee -->
+    <div class="gh-eyebrow" style="margin-bottom:12px;">Tures fee</div>
+    <div id="feeBox" class="co-fee" style="margin-bottom:24px;"></div>
+
+    <!-- payment method -->
+    <div class="gh-eyebrow" style="margin-bottom:12px;">Card for this trip</div>
+    <div id="cards" class="space-y-2 mb-3"></div>
+    <div id="addCardRow" class="flex gap-2 mb-6">
+      <select id="cardPick" class="fld flex-1"></select>
+      <button id="addCard" class="co-ibtn px-4 py-2.5">Add card</button>
+    </div>
+    <!-- real card via Stripe Elements (shown when the engine has a publishable key) -->
+    <div id="realCardRow" class="mb-6" style="display:none">
+      <select id="cardPickReal" class="fld w-full mb-2" title="Card type — for picking the best rewards"></select>
+      <div id="cardElement" class="fld" style="padding:13px 14px"></div>
+      <button id="saveCardBtn" class="co-ibtn px-4 py-2.5 mt-2 w-full">Save card</button>
+      <div id="cardErr" class="text-[12px] mt-1" style="color:var(--alert)"></div>
+      <div class="text-[11px] mt-1" style="color:var(--gh-cream-dim);">Test card: 4242 4242 4242 4242 · any future date · any CVC · any ZIP</div>
+    </div>
+
+    <!-- three truthful assurances at the highest-anxiety moment -->
+    <div class="grid grid-cols-3 gap-2 mb-5">
+      <div class="trust-cell">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/><path d="M23 6l-9 9"/></svg></div>
+        <div class="lb">Verified against<br>two sources</div>
+      </div>
+      <div class="trust-cell">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="lb">Secured by<br>Stripe</div>
+      </div>
+      <div class="trust-cell">
+        <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 4v4h4"/></svg></div>
+        <div class="lb">Cancel<br>anytime</div>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-baseline mb-4">
+      <span class="gh-lead" style="font-size:14px;">Charged now</span>
+      <span class="gh-display" style="font-size:30px; color:#fff;" id="grand">—</span>
+    </div>
+    <button id="payBtn" class="gh-btn gh-btn-lg w-full">Confirm &amp; book →</button>
+    <div id="payErr" class="text-center text-sm mt-2" style="color:var(--alert)"></div>
+
+    <!-- secure-payment badge + one-line reassurance beside the pay button -->
+    <div class="flex items-center justify-center gap-2 mt-4">
+      <span class="secure-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Secured by <strong>Stripe</strong> · 256-bit encryption</span>
+    </div>
+    <p class="text-[13px] text-center mt-2" style="color:var(--gh-cream-dim);">You approve every charge. Nothing books — and nothing is charged — without your word.</p>
+    <p class="text-[12px] text-center mt-2" style="color:var(--gh-cream-dim); opacity:.8;">Tures acts as agent-of-record for flights and books boutique stays in your name. Cancel anytime.</p>
+
+    <!-- A truthful guarantee instead of a testimonial: no real customers yet, and per
+         "no fake success states" we don't invent a quote or a trips-booked number. This
+         restates the real model (pay only on a verified booking). Swap in a REAL testimonial
+         once there is one to show. -->
+    <div class="gh-glass-acc co-block mt-6" style="border-radius:14px;">
+      <div class="flex items-start gap-3">
+        <span class="gh-accent" style="font-size:24px; line-height:1; margin-top:2px;">✦</span>
+        <div>
+          <div class="gh-h3" style="font-size:20px;">Charged only when it’s confirmed.</div>
+          <p class="gh-lead" style="font-size:13px; margin-top:8px;">If Tures can’t book your itinerary exactly as you approved it, you pay nothing. The fee applies only to a completed booking — and every leg is verified against both the provider receipt and your inbox before we say &ldquo;Booked.&rdquo;</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- success -->
+  <div id="booked" class="gh-card-acc co-block" style="display:none; text-align:center; border-radius:14px;">
+    <div class="gh-accent" style="font-size:46px; margin-bottom:10px;">✦</div>
+    <h2 class="gh-h2" style="font-size:32px; margin-bottom:8px;">Booked.</h2>
+    <p class="gh-lead" style="margin-bottom:22px;">Confirmations are in. You were charged because it booked — exactly as promised.</p>
+    <div id="confs" class="space-y-2 text-left mb-6"></div>
+    <a href="05-execution.html" class="gh-btn block">Watch it work →</a>
+  </div>
+
+ </div>
+</main>
+
+<script src="assets/engine.js"></script>
+<script>
+var pending = null;
+try { pending = JSON.parse(localStorage.getItem('tures.pendingTrip') || 'null'); } catch(e){}
+
+function money(n){ return '$' + Math.round(n).toLocaleString(); }
+var isSub = !!(window.tures && tures.account && tures.account.plan === 'subscribe');
+var fee = isSub ? 0 : 99;
+function renderFee(){
+  var box = document.getElementById('feeBox');
+  if(isSub) box.innerHTML = '<span style="color:var(--gh-cream); font-weight:500;">$0 — concierge fee waived</span><span class="gh-lead" style="font-size:13px; display:block;">You\'re on the Concierge plan. Travel charges still pass through to your card.</span>';
+  else box.innerHTML = '<div class="flex items-baseline justify-between"><span style="color:var(--gh-cream); font-weight:500;">$99 concierge fee</span><span class="gh-lead" style="font-size:13px;">on this booking only</span></div><span class="gh-lead" style="font-size:13px; display:block; margin-top:4px;">Booking unlimited? <a href="pricing.html">Subscribe for $99/mo</a> and skip per-trip fees.</span>';
+}
+
+function gate(){
+  if(!pending){ document.getElementById('needPlan').style.display=''; return false; }
+  if(window.tures && !tures.signedIn){ document.getElementById('needAccount').style.display=''; return false; }
+  document.getElementById('checkout').style.display='';
+  return true;
+}
+
+function renderItin(){
+  var html = '';
+  if(pending.flightTitle) html += '<div class="row"><span style="color:var(--gh-cream);">✈ '+pending.flightTitle+'</span></div>';
+  if(pending.stayTitle) html += '<div class="row"><span style="color:var(--gh-cream);">⌂ '+pending.stayTitle+'</span></div>';
+  document.getElementById('itin').innerHTML = html || '<span style="color:var(--gh-cream-dim);">Your selected trip</span>';
+  document.getElementById('travelTotal').textContent = money(pending.totalUsd||0);
+  recompute();
+}
+function recompute(){ document.getElementById('grand').textContent = money((pending.totalUsd||0) + fee); }
+
+// payment cards
+function refreshCards(){
+  if(!(window.tures && tures.configured)){ document.getElementById('cards').innerHTML = '<div class="text-[13px]" style="color:var(--gh-cream-dim);">Demo mode — a card will be simulated.</div>'; document.getElementById('addCardRow').style.display='none'; return; }
+  tures.wallet.catalog().then(function(cat){
+    var pick = document.getElementById('cardPick'); pick.innerHTML='';
+    (cat.cards||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; pick.appendChild(o); });
+  }).catch(function(){});
+  tures.connections.list().then(function(res){
+    var cards = (res.connections||[]).filter(function(c){return c.kind==='payment';});
+    var el = document.getElementById('cards');
+    el.innerHTML = cards.length ? '' : '<div class="text-[13px] mb-1" style="color:var(--gh-cream-dim);">Add a card to book.</div>';
+    cards.forEach(function(c){
+      var row=document.createElement('div'); row.className='flex items-center justify-between rounded-lg px-3 py-2 text-sm';
+      row.style='border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04)';
+      row.innerHTML='<span style="color:var(--gh-cream);">'+c.label+'</span><span class="text-[11px]" style="color:var(--gold);">on file</span>';
+      el.appendChild(row);
+    });
+  }).catch(function(){});
+}
+var addCard = document.getElementById('addCard');
+if(addCard) addCard.onclick = function(){
+  var pick=document.getElementById('cardPick'); var key=pick.value; var name=pick.options[pick.selectedIndex].textContent;
+  tures.connections.connect({ kind:'payment', label:name, secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key}, meta:{cardKey:key, last4:'0000'} }).then(refreshCards);
+};
+
+// Real card via Stripe Elements — used when the engine exposes a publishable key.
+var stripe, cardElement;
+function initRealCard(){
+  if(!(window.tures && tures.configured) || !window.Stripe) return;
+  tures.health().then(function(h){
+    var pk = h && h.stripePublishableKey;
+    if(!pk) return; // mock mode — keep the demo picker
+    document.getElementById('addCardRow').style.display='none';
+    document.getElementById('realCardRow').style.display='';
+    tures.wallet.catalog().then(function(cat){ var p=document.getElementById('cardPickReal'); p.innerHTML=''; (cat.cards||[]).forEach(function(c){ if(c.key==='generic_cashback') return; var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; p.appendChild(o); }); }).catch(function(){});
+    stripe = Stripe(pk);
+    cardElement = stripe.elements().create('card', { style:{ base:{ fontSize:'15px', color:'#F0EAD8', '::placeholder':{ color:'#B8AD96' } } } });
+    cardElement.mount('#cardElement');
+    document.getElementById('saveCardBtn').onclick = function(){
+      var btn=this; btn.disabled=true; btn.textContent='Saving…'; document.getElementById('cardErr').textContent='';
+      tures.billing.setupIntent()
+        .then(function(si){ return stripe.confirmCardSetup(si.clientSecret, { payment_method:{ card: cardElement } }); })
+        .then(function(r){ if(r.error) throw new Error(r.error.message); var sel=document.getElementById('cardPickReal');
+          return tures.billing.saveCard({ paymentMethodId: r.setupIntent.payment_method, label: sel.options[sel.selectedIndex].textContent, cardKey: sel.value }); })
+        .then(function(){ btn.disabled=false; btn.textContent='Save card'; cardElement.clear(); refreshCards(); })
+        .catch(function(e){ btn.disabled=false; btn.textContent='Save card'; document.getElementById('cardErr').textContent=(e&&e.message)||'Could not save card.'; });
+    };
+  }).catch(function(){});
+}
+
+document.getElementById('payBtn').addEventListener('click', function(){
+  var btn=this; btn.textContent='Booking…'; btn.disabled=true; btn.style.opacity=.7;
+
+  function showBooked(components){
+    document.getElementById('checkout').style.display='none';
+    var c = document.getElementById('confs');
+    c.innerHTML = (components||[]).map(function(x){
+      return '<div class="conf-row"><span>'+(x.title||'Booked')+'</span><span class="mono">'+(x.confirmation||'confirmed')+(x.card? ' · '+x.card.name : '')+'</span></div>';
+    }).join('');
+    document.getElementById('booked').style.display='';
+    localStorage.removeItem('tures.pendingTrip');
+  }
+
+  function fail(msg){ btn.disabled=false; btn.style.opacity=1; btn.textContent='Confirm & book →'; var e=document.getElementById('payErr'); if(e){ e.textContent=msg; } }
+
+  if(window.tures && tures.configured){
+    tures.book({ brief: pending.brief, flightId: pending.flightId, stayId: pending.stayId, feeUsd: fee })
+      .then(function(b){ return b.status === 'confirmation_required' ? tures.confirm(b.id) : b; })
+      .then(function(b){
+        if(b.status !== 'booked'){ throw Object.assign(new Error('not booked'), { body: b }); }
+        showBooked(b.components);
+      })
+      .catch(function(err){
+        fail('Could not book: ' + ((err && err.body && (err.body.violations||[]).join('; ')) || (err && err.message) || err));
+      });
+  } else {
+    setTimeout(function(){ showBooked([{title: pending.flightTitle, confirmation:'PNR-DEMO1'},{title: pending.stayTitle, confirmation:'CONF-DEMO2'}]); }, 900);
+  }
+});
+
+if(gate()){ renderFee(); renderItin(); refreshCards(); initRealCard(); }
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

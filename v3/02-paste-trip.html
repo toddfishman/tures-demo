@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Paste your trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #0F3D2E;
+    --brass: #E97A5E;
+    --clay: #F4EDDC;
+    --ink: #1A1A1A;
+    --slate: #6F7A66;
+    --confirm: #1F6E5A;
+    --pending: #B8860B;
+    --alert: #C75D43;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-serif { font-family: 'DM Serif Display', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .card { background: #fff; border: 1px solid rgba(15,61,46,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; letter-spacing:0.07em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(31,110,90,0.1); color: var(--confirm); }
+  .pill-pending { background: rgba(184,134,11,0.12); color: var(--pending); }
+  .pill-alert   { background: rgba(199,93,67,0.1);  color: var(--alert); }
+  .pill-neutral { background: rgba(15,61,46,0.06); color: var(--aubergine); }
+  .leg-row { padding: 14px 18px; border-bottom: 1px solid rgba(15,61,46,0.07); display: flex; align-items: center; gap: 16px; }
+  .leg-row:last-child { border-bottom: 0; }
+  .dot { width:8px; height:8px; border-radius:99px; flex-shrink: 0; }
+  .dot-brass { background: var(--brass); }
+  .dot-amber { background: var(--pending); }
+  .dot-green { background: var(--confirm); }
+  .dot-alert { background: var(--alert); }
+  .step-pulse { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(15,61,46,0.2); }
+  .divider { height: 1px; background: rgba(15,61,46,0.1); }
+  textarea { font-family: 'Inter', system-ui, sans-serif; }
+  .rounded-md { border-radius: 9px !important; }
+  .rounded-lg { border-radius: 12px !important; }</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-aubergine/10 bg-clay/80 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <a href="01-landing.html" class="font-serif text-2xl text-aubergine">Tures</a>
+      <nav class="hidden md:flex gap-8 text-sm text-aubergine/70">
+        <a href="02-paste-trip.html" class="text-aubergine">New trip</a>
+        <a href="04-execution-dashboard.html">In flight</a>
+        <a href="05-itinerary.html">Past trips</a>
+        <a href="06-notifications.html">Notifications</a>
+        <a href="03-connections.html">Connections</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="caps text-xs text-slate-warm">Andy Rockwell</span>
+      <div class="w-9 h-9 rounded-full bg-aubergine text-brass flex items-center justify-center font-serif text-lg">A</div>
+    </div>
+  </div>
+</header>
+
+<!-- TITLE -->
+<section class="max-w-7xl mx-auto px-8 pt-12 pb-6">
+  <div class="caps text-xs text-slate-warm mb-3">New trip · paste, dictate, or forward</div>
+  <h1 class="font-serif text-5xl text-aubergine leading-[1.05]">Describe the trip.</h1>
+  <p class="mt-3 text-aubergine/70 max-w-2xl">Type it, paste an email, or forward to <span class="font-mono text-aubergine">trip@tures.app</span>. We'll build a structured plan as you write.</p>
+</section>
+
+<!-- TWO-PANEL: input + parsed plan -->
+<section class="max-w-7xl mx-auto px-8 pb-24">
+  <div class="grid lg:grid-cols-12 gap-8">
+
+    <!-- LEFT — Input -->
+    <div class="lg:col-span-6">
+      <div class="card rounded-md overflow-hidden">
+        <div class="px-5 py-3 border-b border-aubergine/10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="dot dot-brass"></span>
+            <span class="caps text-xs text-slate-warm">From inbox · andy@rockwell.io</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-warm">
+            <button class="px-2 py-1 hover:bg-aubergine/5">Paste</button>
+            <button class="px-2 py-1 hover:bg-aubergine/5">Voice</button>
+            <button class="px-2 py-1 hover:bg-aubergine/5">Forward</button>
+          </div>
+        </div>
+        <textarea class="w-full p-5 h-[480px] resize-none border-0 focus:outline-none text-[15px] leading-relaxed text-aubergine/85 bg-white">Show me this can be done and my mind is officially blown. More curious if it can be done with the room types I want, flight schedules, etc. Another absolute dynamite operation would be booking dinner reservations at the requested locations.
+
+Leave Thursday December 3rd > Fly direct into Paris arriving on the 4th. Business Class.
+Stay in Paris 4-5-6th at Real Christine.
+Fly Paris to Ivalo on the 7th. Should be non-stop on Finnair?
+Stay at Javri Lodge 7-8-9th.
+Fly Ivalo to Copenhagen on the 10th.
+Stay at Hotel Sanders 10-11-12.
+Fly to Seattle on the 13th. Probably through Paris to make non-stop both ways on business.</textarea>
+        <div class="px-5 py-3 border-t border-aubergine/10 flex items-center justify-between bg-[#FBF4E4]">
+          <div class="text-xs text-slate-warm">
+            <span class="dot dot-green inline-block mr-1.5 align-middle"></span> Auto-parsing as you type
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="text-xs text-slate-warm hover:text-aubergine">Clear</button>
+            <button class="px-4 py-2 bg-aubergine text-white text-sm hover-lift">Generate plan →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Helper hint -->
+      <div class="mt-4 text-xs text-slate-warm leading-relaxed">
+        Tip — Tures handles airline codes, IATA airports, hotel names, dates in any format, cabin preferences, and "non-stop" / "via X" routing notes. The more you specify, the less we'll ask.
+      </div>
+    </div>
+
+    <!-- RIGHT — Structured Plan -->
+    <div class="lg:col-span-6">
+      <div class="card rounded-md overflow-hidden">
+        <div class="px-5 py-3 border-b border-aubergine/10 flex items-center justify-between">
+          <div class="caps text-xs text-slate-warm">Structured plan · v1</div>
+          <span class="pill pill-confirm">7 of 7 legs parsed</span>
+        </div>
+
+        <!-- Trip header -->
+        <div class="px-5 py-5 bg-[#FBF4E4] border-b border-aubergine/10">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-serif text-2xl text-aubergine leading-tight">Paris · Saariselkä · Copenhagen</div>
+              <div class="text-sm text-slate-warm mt-1">Dec 3 — Dec 13, 2026 · 11 days · 1 traveler · Business</div>
+            </div>
+            <div class="text-right text-xs">
+              <div class="caps text-slate-warm mb-1">Est. cost</div>
+              <div class="font-mono text-aubergine text-base">$24,800–$28,400</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legs -->
+        <div>
+          <div class="leg-row">
+            <span class="dot dot-green"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-aubergine">SEA → CDG</span>
+                <span class="pill pill-neutral">Flight 1</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Thu Dec 3 · Business · non-stop · arrives Dec 4</div>
+            </div>
+            <span class="pill pill-confirm">Match found</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-green"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-serif text-lg text-aubergine">Real Christine</span>
+                <span class="pill pill-neutral">Stay 1 · Paris</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Dec 4 → Dec 7 · 3 nights · room type pending your spec</div>
+            </div>
+            <span class="pill pill-confirm">Available</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-alert step-pulse"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-aubergine">CDG → IVL</span>
+                <span class="pill pill-neutral">Flight 2</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Sun Dec 7 · prefer non-stop on AY</div>
+            </div>
+            <span class="pill pill-alert">Needs decision</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-green"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-serif text-lg text-aubergine">Javri Lodge</span>
+                <span class="pill pill-neutral">Stay 2 · Saariselkä</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Dec 7 → Dec 10 · 3 nights · Aurora-view room preferred</div>
+            </div>
+            <span class="pill pill-confirm">Available</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-green"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-aubergine">IVL → CPH</span>
+                <span class="pill pill-neutral">Flight 3</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Wed Dec 10 · best one-stop · earn AY tier points</div>
+            </div>
+            <span class="pill pill-confirm">3 options</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-green"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-serif text-lg text-aubergine">Hotel Sanders</span>
+                <span class="pill pill-neutral">Stay 3 · Copenhagen</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Dec 10 → Dec 13 · 3 nights · Junior Suite if available</div>
+            </div>
+            <span class="pill pill-confirm">Available</span>
+          </div>
+          <div class="leg-row">
+            <span class="dot dot-amber step-pulse"></span>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-aubergine">CPH → CDG → SEA</span>
+                <span class="pill pill-neutral">Flight 4</span>
+              </div>
+              <div class="text-xs text-slate-warm mt-1">Sun Dec 13 · via Paris · non-stop CDG→SEA on AF · Business</div>
+            </div>
+            <span class="pill pill-pending">Confirming</span>
+          </div>
+        </div>
+
+        <!-- Decision callout -->
+        <div class="m-5 p-5 rounded border border-aubergine/10 bg-[#FBF4E4]">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="dot dot-alert"></span>
+            <span class="caps text-xs text-aubergine">One question before we stage bookings</span>
+          </div>
+          <p class="text-[14px] text-aubergine/85 leading-relaxed">
+            <strong>You wrote: "should be non-stop on Finnair?"</strong> Finnair does not operate non-stop CDG → IVL in December. The two cleanest alternatives:
+          </p>
+          <div class="mt-3 space-y-2">
+            <label class="flex items-start gap-3 p-3 rounded hover:bg-white cursor-pointer border border-transparent hover:border-aubergine/10">
+              <input type="radio" name="cdg-ivl" class="mt-1.5 accent-[#E97A5E]" checked />
+              <div class="flex-1 text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-aubergine">AY 1574 · CDG → HEL → IVL</span>
+                  <span class="text-slate-warm">10h 35m total</span>
+                </div>
+                <div class="text-xs text-slate-warm mt-1">1h 50m HEL connection · same airline · 4,300 AY Tier Points</div>
+              </div>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded hover:bg-white cursor-pointer border border-transparent hover:border-aubergine/10">
+              <input type="radio" name="cdg-ivl" class="mt-1.5 accent-[#E97A5E]" />
+              <div class="flex-1 text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-aubergine">AF 1497 + AY 633 · CDG → HEL → IVL</span>
+                  <span class="text-slate-warm">11h 10m total</span>
+                </div>
+                <div class="text-xs text-slate-warm mt-1">Mixed-carrier · Flying Blue + AY · slightly longer</div>
+              </div>
+            </label>
+          </div>
+          <button class="mt-3 text-xs text-slate-warm hover:text-aubergine underline underline-offset-4">Show 3 more →</button>
+        </div>
+
+        <!-- Footer actions -->
+        <div class="px-5 py-4 border-t border-aubergine/10 flex items-center justify-between bg-[#FBF4E4]">
+          <div class="text-xs text-slate-warm">9 dinners across 3 cities — we'll work on those after flights + hotels clear.</div>
+          <a href="04-execution-dashboard.html" class="px-4 py-2 bg-brass text-aubergine text-sm font-medium hover-lift">Approve &amp; stage all 7 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-aubergine/10 py-8 mt-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-warm">
+    <span>Tures · transparent by construction</span>
+    <span>Plan v1 · auto-saved <span class="font-mono">12:48 PT</span></span>
+  </div>
+</footer>
+
+</body>
+</html>

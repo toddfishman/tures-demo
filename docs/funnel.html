@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="How Tures works">
+<meta property="og:description" content="See how Tures plans, books, watches, and proves every trip — start to finish.">
+<meta property="og:url" content="https://tures.app/funnel.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Tures works">
+<meta name="twitter:description" content="See how Tures plans, books, watches, and proves every trip — start to finish.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — Funnel map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  .legend{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:22px;color:var(--muted);font-size:13px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend .k{width:22px;height:0;border-top:2px solid var(--acc)}
+  .legend .kd{width:9px;height:9px;border-radius:50%;background:var(--acc)}
+
+  .flow{position:relative;padding:8px 0 40px 0;margin-left:6px}
+  .flow::before{content:"";position:absolute;left:13px;top:14px;bottom:60px;width:2px;
+    background:linear-gradient(to bottom,var(--acc),var(--acc-line));border-radius:2px}
+
+  .phase{display:flex;align-items:center;gap:12px;margin:34px 0 16px;padding-left:40px;position:relative}
+  .phase:first-child{margin-top:6px}
+  .phase .pl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .phase .pln{font-family:'Space Mono',monospace;font-size:11px;color:var(--faint)}
+  .phase .hr{flex:1;height:1px;background:var(--line)}
+
+  .node{position:relative;margin:12px 0;padding-left:40px}
+  .node .dot{position:absolute;left:7px;top:22px;width:15px;height:15px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--acc);box-shadow:0 0 0 4px var(--bg)}
+  .node.soft .dot{border-color:var(--acc-line)}
+  .ncard{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px 20px;
+    transition:border-color .2s,transform .2s,box-shadow .2s}
+  .ncard:hover{border-color:var(--acc-line);transform:translateY(-1px);box-shadow:0 16px 36px -28px rgba(0,0,0,.35)}
+  .nhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .nnum{font-family:'Space Mono',monospace;font-size:13px;color:var(--acc);font-weight:700}
+  .nname{font-family:'Inter',system-ui,sans-serif;font-size:21px;font-weight:700;letter-spacing:-.02em}
+  .nname a:hover{color:var(--acc-deep)}
+  .nfile{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--faint);margin-left:auto}
+  .nrole{color:var(--muted);font-size:14.5px;margin:8px 0 0;max-width:62ch}
+  .nlinks{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:13px}
+  .nlinks .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text);
+    border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;transition:border-color .15s,color .15s}
+  .chip:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .chip.feed{border-style:dashed;color:var(--muted)}
+  .chip .ar{color:var(--acc)}
+
+  .always{margin-top:30px;border:1px dashed var(--line-2);border-radius:14px;padding:20px 22px;background:var(--surface)}
+  .always h3{font-size:18px;margin-bottom:6px}
+  .always p{color:var(--muted);font-size:14px;max-width:70ch}
+  @media (max-width:560px){ .nfile{margin-left:0;flex-basis:100%} }
+</style>
+</head>
+<body data-page="funnel">
+<main>
+  <section class="section tight">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span>The map</span>
+      <h1 style="margin-top:18px">The whole journey, <em>one thread.</em></h1>
+      <p class="lead" style="margin:18px auto 0">Every page in the v11 funnel and how it hands off to the next — discover, plan, set up, execute, manage, decide. The top nav — the menu beside the logo, and your account — reaches all of them from anywhere; this is the order a traveler actually moves through.</p>
+      <div class="legend">
+        <span><i class="k"></i> the journey spine</span>
+        <span><i class="kd"></i> a page · click any name to open it</span>
+        <span><i class="chip feed" style="padding:2px 9px">dashed</i> feeds / informs another page</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" style="max-width:880px">
+    <div class="flow">
+
+      <!-- DISCOVER -->
+      <div class="phase"><span class="pl">Discover</span><span class="pln">first touch</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">00</span><span class="nname"><a href="index.html">Cover</a></span><span class="nfile">index.html</span></div>
+          <p class="nrole">The first impression — the live thread working in front of you, and the promise: stop planning trips, start taking them.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="what-is.html"><span class="ar">→</span> What is Tures</a>
+            <a class="chip" href="plan.html"><span class="ar">→</span> Plan a trip</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">01</span><span class="nname"><a href="what-is.html">What is Tures</a></span><span class="nfile">what-is.html</span></div>
+          <p class="nrole">The pitch: an executor, not a search box. The three jobs, and the you-vs-agent-vs-Tures comparison.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="plan.html"><span class="ar">→</span> Plan a trip</a>
+            <a class="chip" href="app.html"><span class="ar">→</span> Live demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAN -->
+      <div class="phase"><span class="pl">Plan</span><span class="pln">the brief</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">02</span><span class="nname"><a href="plan.html">Plan a trip</a></span><span class="nfile">plan.html</span></div>
+          <p class="nrole">The heart. You have a conversation &mdash; as much or as little detail as you like; Tures asks only for what it needs (it never guesses your origin) and proposes picks.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="app.html"><span class="ar">→</span> Live demo</a>
+            <a class="chip" href="vault.html"><span class="ar">→</span> The Vault</a>
+            <a class="chip feed" href="taste.html">uses · Taste Engine</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="node soft"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">03</span><span class="nname"><a href="taste.html">The Taste Engine</a></span><span class="nfile">taste.html</span></div>
+          <p class="nrole">Why the picks fit you. Learns from every trip, correction, and booking — and justifies each recommendation.</p>
+          <div class="nlinks"><span class="lbl">feeds</span>
+            <a class="chip feed" href="plan.html">Plan a trip · the picks</a>
+            <a class="chip feed" href="trips.html">My Trips · “like you loved at…”</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SET UP -->
+      <div class="phase"><span class="pl">Set up</span><span class="pln">once</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">04</span><span class="nname"><a href="vault.html">The Vault</a></span><span class="nfile">vault.html</span></div>
+          <p class="nrole">Your details — card, documents, loyalty — tokenized via VGS so Tures can book without asking each time. Raw numbers never stored in plain text.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="app.html"><span class="ar">→</span> Live demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXECUTE -->
+      <div class="phase"><span class="pl">Execute</span><span class="pln">the work</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">05</span><span class="nname"><a href="app.html">Live demo</a></span><span class="nfile">app.html</span></div>
+          <p class="nrole">Watch the agent work in one window: conversation on the left, the live trip status on the right — booked, secured, watching.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="trips.html"><span class="ar">→</span> My Trips</a>
+            <a class="chip" href="proactive.html"><span class="ar">→</span> The Concierge</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">07</span><span class="nname"><a href="proactive.html">The Concierge</a></span><span class="nfile">proactive.html</span></div>
+          <p class="nrole">Always-on. It moves first — catches the delay, reroutes around the storm, holds the better table — and sends one calm message, already solved.</p>
+          <div class="nlinks"><span class="lbl">surfaces in</span>
+            <a class="chip feed" href="trips.html">every trip</a>
+            <a class="chip feed" href="pricing.html">the Concierge plan</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE -->
+      <div class="phase"><span class="pl">Manage</span><span class="pln">after</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">06</span><span class="nname"><a href="trips.html">My Trips</a></span><span class="nfile">trips.html</span></div>
+          <p class="nrole">Every booking in one place — lodging, flights, reservations, excursions, tips — with the option to swap anything.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="proactive.html"><span class="ar">→</span> The Concierge</a>
+            <a class="chip" href="plan.html"><span class="ar">→</span> Plan another</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECIDE -->
+      <div class="phase"><span class="pl">Decide</span><span class="pln">convert</span><span class="hr"></span></div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">08</span><span class="nname"><a href="pricing.html">Pricing</a></span><span class="nfile">pricing.html</span></div>
+          <p class="nrole">Per trip or Concierge — the same price on purpose; the difference is what it does, not what it costs.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="signup.html"><span class="ar">→</span> Get started</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="node"><span class="dot"></span>
+        <div class="ncard">
+          <div class="nhead"><span class="nnum">09</span><span class="nname"><a href="signup.html">Get started</a></span><span class="nfile">signup.html</span></div>
+          <p class="nrole">Request access, connect the Vault, plan the first trip — and the loop begins again.</p>
+          <div class="nlinks"><span class="lbl">leads to</span>
+            <a class="chip" href="plan.html"><span class="ar">→</span> Plan a trip</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="always">
+      <h3>Always available</h3>
+      <p>The top nav is three things — the <b>menu</b> (open it from the chevron beside the t<span class="spark">✦</span>ures logo), a <b>plan-a-trip field</b> that drops whatever you type straight into the chat, and your <b>account</b> (My Trips, The Vault, The Taste Engine). The footer groups every page, plus <a href="about.html" style="color:var(--acc-deep)">About</a>, <a href="about.html#contact" style="color:var(--acc-deep)">Contact</a>, and <a href="legal.html" style="color:var(--acc-deep)">Privacy &amp; Terms</a>. Nothing is more than one click away.</p>
+    </div>
+  </div>
+
+  <section class="section center">
+    <div class="wrap">
+      <h2>Walk it end to end.</h2>
+      <p class="lead" style="margin:14px auto 26px">Start at the cover and click straight through, or jump anywhere from the menu beside the logo.</p>
+      <a class="btn" href="index.html">Start at the cover →</a>
+      <a class="btn ghost" href="plan.html" style="margin-left:10px">Jump to Plan a trip</a>
+    </div>
+  </section>
+</main>
+<script src="assets/site.js" defer></script>
+</body>
+</html>

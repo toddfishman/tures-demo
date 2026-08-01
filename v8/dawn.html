@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Dawn</title>
+<meta name="description" content="Night becomes day. The gold logo summons the dawn." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; box-sizing:border-box; }
+  html,body{ height:100%; background:#01030c; overflow:hidden; }
+  .stage{ position:fixed; inset:0; overflow:hidden; font-family:'Inter',system-ui,sans-serif; background:#01030c; }
+
+  /* drop-in photo-real time-lapse video; covers the CSS fallback scene once it loads */
+  .scene-fallback{ position:absolute; inset:0; }
+  .bgvideo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:9; background:#01030c; opacity:0; transition:opacity .9s ease; }
+  .bgvideo.on{ opacity:1; }
+  /* keep the centre legible over whatever the video is doing (night or bright day) */
+  .scrim{ position:absolute; inset:0; z-index:18; pointer-events:none; opacity:0; transition:opacity 1.2s ease;
+    background:radial-gradient(120% 90% at 50% 52%, rgba(0,0,0,0.32), transparent 60%); }
+  .stage.logo-in .scrim{ opacity:1; }
+
+  /* ===== sky (crossfade night → day) ===== */
+  .sky{ position:absolute; inset:0; transition:opacity 6.5s ease; }
+  .sky-night{ background:linear-gradient(180deg,#01030c 0%,#050f29 40%,#0a2036 66%,#0c2334 100%); opacity:1; }
+  .sky-day{ background:linear-gradient(180deg,#49a7e2 0%,#8ed2ec 32%,#cfeef0 54%,#ffe7bf 78%,#ffd596 100%); opacity:0; }
+  .stage.day .sky-night{ opacity:0; }
+  .stage.day .sky-day{ opacity:1; }
+
+  /* sunrise glow at the horizon */
+  .glow{ position:absolute; left:0; right:0; bottom:34%; height:34%; opacity:0; filter:blur(10px); z-index:1;
+    background:radial-gradient(58% 120% at 58% 100%, rgba(255,196,110,0.75), rgba(255,150,90,0.2) 55%, transparent 74%);
+    transition:opacity 6.5s ease; }
+  .stage.day .glow{ opacity:1; }
+
+  /* ===== stars ===== */
+  .stars{ position:absolute; left:0; right:0; top:0; height:60%; opacity:1; transition:opacity 3.5s ease; z-index:2; }
+  .stage.day .stars{ opacity:0; }
+  .star{ position:absolute; border-radius:50%; background:#fff; animation:tw 3s ease-in-out infinite; }
+  @keyframes tw{ 0%,100%{ opacity:.2; transform:scale(.7) } 50%{ opacity:1; transform:scale(1) } }
+
+  /* moon (night) / sun (rises at day) */
+  .moon{ position:absolute; top:12%; left:57%; width:62px; height:62px; border-radius:50%; z-index:3;
+    background:radial-gradient(circle at 38% 34%, #fdfcf5, #dbe2ec 58%, #aeb8c8); box-shadow:0 0 44px 8px rgba(220,230,245,0.32);
+    opacity:1; transition:opacity 3s ease, transform 6.5s ease; }
+  .stage.day .moon{ opacity:0; transform:translateY(-34px); }
+  .sun{ position:absolute; left:54%; bottom:32%; width:96px; height:96px; border-radius:50%; z-index:3;
+    background:radial-gradient(circle at 50% 46%, #fff7e2, #ffd277 54%, #ff9e3d); box-shadow:0 0 90px 26px rgba(255,178,88,0.55);
+    opacity:0; transform:translateY(150px) scale(.82);
+    transition:opacity 5s ease 1s, transform 7s cubic-bezier(.4,0,.2,1) .8s; }
+  .stage.day .sun{ opacity:1; transform:translateY(-22px) scale(1); }
+
+  /* ===== sea ===== */
+  .sea{ position:absolute; left:0; right:0; bottom:0; height:38%; z-index:4; overflow:hidden; }
+  .water{ position:absolute; inset:0; transition:opacity 6.5s ease; }
+  .water-night{ background:linear-gradient(180deg,#0d2a3e 0%,#06161f 100%); opacity:1; }
+  .water-day{ background:linear-gradient(180deg,#46bccd 0%,#1c7e9a 100%); opacity:0; }
+  .stage.day .water-night{ opacity:0; }
+  .stage.day .water-day{ opacity:1; }
+  /* the light reflection on the water (moon → sun) */
+  .reflection{ position:absolute; top:0; bottom:0; left:58%; width:76px; transform:translateX(-50%); filter:blur(4px);
+    background:linear-gradient(180deg, rgba(216,226,242,0.55), rgba(216,226,242,0) 82%); transition:background 6.5s ease;
+    animation:wob 6s ease-in-out infinite; }
+  .stage.day .reflection{ background:linear-gradient(180deg, rgba(255,222,150,0.7), rgba(255,222,150,0) 82%); }
+  @keyframes wob{ 0%,100%{ transform:translateX(-50%) scaleX(1) } 50%{ transform:translateX(-46%) scaleX(1.3) } }
+  /* gentle lapping — slow horizontal shimmer bands */
+  .ripple{ position:absolute; inset:0; opacity:.5; mix-blend-mode:screen;
+    background:repeating-linear-gradient(90deg, transparent 0 46px, rgba(255,255,255,0.05) 46px 48px);
+    animation:lap 14s linear infinite; }
+  @keyframes lap{ to{ transform:translateX(-48px) } }
+
+  /* sand shore that rises into view at day */
+  .shore{ position:absolute; left:0; right:0; bottom:0; height:0; opacity:0; z-index:5;
+    background:linear-gradient(180deg,#f2dcad,#e2c283); box-shadow:inset 0 3px 0 rgba(255,255,255,0.4);
+    transition:height 6.5s ease, opacity 6.5s ease; }
+  .stage.day .shore{ height:7vh; opacity:1; }
+
+  /* palms — silhouette at night, green at day */
+  .palm{ position:absolute; bottom:0; z-index:6; }
+  .palm-r{ right:-6px; height:48%; }
+  .palm-l{ left:-6px; height:40%; transform:scaleX(-1); }
+  .palm path, .palm circle{ fill:#03070c; transition:fill 6.5s ease; }
+  .stage.day .palm path, .stage.day .palm circle{ fill:#123726; }
+
+  /* cinematic vignette */
+  .vignette{ position:absolute; inset:0; pointer-events:none; z-index:8;
+    box-shadow:inset 0 0 220px 50px rgba(0,0,0,0.62); transition:box-shadow 6.5s ease; }
+  .stage.day .vignette{ box-shadow:inset 0 0 170px 34px rgba(0,0,0,0.16); }
+
+  /* ===== the centre — the gold logo enters, then the words ===== */
+  .centre{ position:absolute; inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; }
+  .eyebrow{ font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:rgba(255,240,210,0.0); transition:color 1.6s ease;
+    margin-bottom:18px; }
+  .stage.logo-in .eyebrow{ color:rgba(255,240,210,0.72); }
+  .wordmark{ font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(56px,12vw,128px); line-height:1; letter-spacing:.02em;
+    background:linear-gradient(96deg,#9c7a2e 0%,#e6c873 26%,#fff3c8 46%,#c8a24a 60%,#e6c873 78%,#8a6a26 100%); background-size:220% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    opacity:0; transform:translateY(20px) scale(.9); filter:blur(9px);
+    transition:opacity 2.6s ease, transform 2.6s cubic-bezier(.2,.7,.2,1), filter 2.6s ease; }
+  .wordmark .spark{ font-size:.5em; vertical-align:super; }
+  .stage.logo-in .wordmark{ opacity:1; transform:none; filter:blur(0); animation:sweep 7s linear 2.6s infinite; }
+  @keyframes sweep{ 0%{ background-position:175% 0 } 100%{ background-position:-75% 0 } }
+  /* soft gold halo behind the logo, blooms as day breaks */
+  .halo{ position:absolute; width:60vw; max-width:680px; aspect-ratio:1; border-radius:50%; z-index:19; pointer-events:none;
+    background:radial-gradient(circle, rgba(230,200,115,0.22), transparent 62%); opacity:0; transition:opacity 2.6s ease; }
+  .stage.logo-in .halo{ opacity:.5; }
+  .stage.day .halo{ opacity:.85; }
+
+  .tagline{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px,3.2vw,28px); color:#fff;
+    opacity:0; transform:translateY(10px); transition:opacity 1.5s ease, transform 1.5s ease; margin-top:20px; text-shadow:0 2px 22px rgba(0,0,0,.4); }
+  .stage.arrived .tagline{ opacity:.96; transform:none; }
+  .cta{ margin-top:26px; display:inline-flex; align-items:center; gap:8px; text-decoration:none; font-weight:600; font-size:15px;
+    color:#3a2a0e; background:linear-gradient(180deg,#e6c873,#c8a24a 60%,#a8842f); border:1px solid #8a6a26; border-radius:99px; padding:13px 28px;
+    box-shadow:0 12px 34px -12px rgba(230,200,115,.7); opacity:0; transform:translateY(8px); transition:opacity 1.2s ease .2s, transform 1.2s ease .2s; }
+  .stage.arrived .cta{ opacity:1; transform:none; }
+  .cta:hover{ filter:brightness(1.05); }
+
+  .replay{ position:absolute; bottom:18px; left:0; right:0; z-index:30; text-align:center; }
+  .replay button{ appearance:none; cursor:pointer; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7);
+    border:1px solid rgba(255,255,255,0.2); border-radius:99px; padding:7px 16px; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    backdrop-filter:blur(6px); transition:color .2s, border-color .2s; }
+  .replay button:hover{ color:#fff; border-color:rgba(255,255,255,0.5); }
+
+  @media (prefers-reduced-motion: reduce){
+    .star{ animation:none; } .reflection,.ripple{ animation:none; } .wordmark{ animation:none !important; }
+    .sky,.glow,.stars,.moon,.sun,.water,.shore,.palm path,.vignette,.wordmark,.tagline,.cta{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <!-- generated CSS scene — the fallback shown until a real time-lapse is dropped at assets/video/dawn.* -->
+    <div class="scene-fallback" id="fallback">
+    <div class="sky sky-night"></div>
+    <div class="sky sky-day"></div>
+    <div class="glow"></div>
+    <div class="stars" id="stars"></div>
+    <div class="moon"></div>
+    <div class="sun"></div>
+
+    <div class="sea">
+      <div class="water water-night"></div>
+      <div class="water water-day"></div>
+      <div class="reflection"></div>
+      <div class="ripple"></div>
+    </div>
+    <div class="shore"></div>
+
+    <svg class="palm palm-r" viewBox="0 0 220 320" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M150 320 C 140 240 138 180 128 122 C 126 110 133 106 141 112 C 150 172 156 242 168 320 Z"/>
+      <path d="M132 110 C 90 72 50 62 12 66 C 52 76 96 94 132 118 Z"/>
+      <path d="M132 110 C 100 58 70 32 36 16 C 70 46 110 82 134 116 Z"/>
+      <path d="M132 110 C 150 60 180 36 214 26 C 178 52 150 86 136 118 Z"/>
+      <path d="M132 110 C 170 86 206 82 218 94 C 184 94 152 104 134 120 Z"/>
+      <path d="M132 110 C 118 62 120 30 130 2 C 140 42 142 82 138 114 Z"/>
+      <circle cx="132" cy="112" r="5"/>
+    </svg>
+    <svg class="palm palm-l" viewBox="0 0 220 320" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M150 320 C 140 240 138 180 128 122 C 126 110 133 106 141 112 C 150 172 156 242 168 320 Z"/>
+      <path d="M132 110 C 90 72 50 62 12 66 C 52 76 96 94 132 118 Z"/>
+      <path d="M132 110 C 100 58 70 32 36 16 C 70 46 110 82 134 116 Z"/>
+      <path d="M132 110 C 150 60 180 36 214 26 C 178 52 150 86 136 118 Z"/>
+      <path d="M132 110 C 170 86 206 82 218 94 C 184 94 152 104 134 120 Z"/>
+      <path d="M132 110 C 118 62 120 30 130 2 C 140 42 142 82 138 114 Z"/>
+      <circle cx="132" cy="112" r="5"/>
+    </svg>
+
+    <div class="vignette"></div>
+    </div><!-- /scene-fallback -->
+
+    <!-- DROP-IN: a photo-real night→day time-lapse (Veo / Sora). Muted autoplay, no loop (holds on the
+         day frame). When assets/video/dawn.* loads it replaces the CSS scene and drives the logo timing. -->
+    <video class="bgvideo" id="bg" muted autoplay playsinline preload="auto">
+      <source src="assets/video/dawn.webm" type="video/webm">
+      <source src="assets/video/dawn.mp4" type="video/mp4">
+    </video>
+
+    <div class="scrim"></div>
+    <div class="halo"></div>
+    <div class="centre">
+      <div class="eyebrow">The AI Travel Concierge</div>
+      <div class="wordmark">t<span class="spark">✦</span>ures</div>
+      <div class="tagline">Adventures, handled.</div>
+      <a class="cta" href="01-landing.html">Plan a trip →</a>
+    </div>
+
+    <div class="replay"><button id="replay" type="button">↻ Replay</button></div>
+  </div>
+
+<script>
+  var stage = document.getElementById('stage');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scatter the stars
+  var starsEl = document.getElementById('stars');
+  for (var i = 0; i < 80; i++) {
+    var s = document.createElement('div'); s.className = 'star';
+    var sz = (Math.random() * 2 + 1).toFixed(1);
+    s.style.width = sz + 'px'; s.style.height = sz + 'px';
+    s.style.left = (Math.random() * 100).toFixed(2) + '%';
+    s.style.top = (Math.random() * 96).toFixed(2) + '%';
+    s.style.animationDuration = (2 + Math.random() * 3).toFixed(1) + 's';
+    s.style.animationDelay = (Math.random() * 4).toFixed(1) + 's';
+    starsEl.appendChild(s);
+  }
+
+  var fallback = document.getElementById('fallback');
+  var bg = document.getElementById('bg');
+
+  // ===== tune to YOUR clip once it's dropped in (seconds into the video) =====
+  var LOGO_AT = 1.4;   // the gold logo begins to enter — set just before the clip's sunrise
+  var DAY_AT  = 3.2;   // the halo blooms as the sun breaks
+
+  var mode = '', t = [];
+  function clearTimers(){ t.forEach(clearTimeout); t = []; }
+
+  function playFallback() {
+    mode = 'fallback'; clearTimers();
+    fallback.style.display = ''; bg.classList.remove('on');
+    stage.classList.remove('logo-in', 'day', 'arrived'); void stage.offsetWidth;
+    if (reduce) { stage.classList.add('logo-in', 'day', 'arrived'); return; }
+    t.push(setTimeout(function(){ stage.classList.add('logo-in'); }, 1800));   // the gold logo enters
+    t.push(setTimeout(function(){ stage.classList.add('day'); }, 4600));        // …and summons the dawn
+    t.push(setTimeout(function(){ stage.classList.add('arrived'); }, 9600));    // the words & the way in
+  }
+
+  function startVideo() {
+    mode = 'video';
+    fallback.style.display = 'none'; bg.classList.add('on');
+    stage.classList.remove('logo-in', 'day', 'arrived');
+    bg.addEventListener('timeupdate', function () {
+      if (bg.currentTime >= LOGO_AT) stage.classList.add('logo-in');   // logo enters just before the sunrise
+      if (bg.currentTime >= DAY_AT) stage.classList.add('day');        // halo blooms
+    });
+    bg.addEventListener('ended', function () { stage.classList.add('logo-in', 'day', 'arrived'); });
+    if (reduce) { try { bg.pause(); bg.currentTime = bg.duration || 0; } catch (e) {} stage.classList.add('logo-in', 'day', 'arrived'); return; }
+    var p = bg.play(); if (p && p.catch) p.catch(function(){});
+  }
+
+  // Use the video if it loads; otherwise fall back to the generated CSS scene (so the page works today).
+  var decided = false;
+  function decide(useVideo){ if (decided) return; decided = true; if (useVideo) startVideo(); else playFallback(); }
+  bg.addEventListener('loadeddata', function(){ decide(true); });
+  bg.addEventListener('canplay', function(){ decide(true); });
+  bg.addEventListener('error', function(){ decide(false); });
+  setTimeout(function(){ if (!decided) decide(false); }, 2600);   // no file yet → CSS scene
+
+  document.getElementById('replay').addEventListener('click', function () {
+    stage.classList.remove('logo-in', 'day', 'arrived');
+    if (mode === 'video') { try { bg.currentTime = 0; var p = bg.play(); if (p && p.catch) p.catch(function(){}); } catch (e) {} }
+    else playFallback();
+  });
+</script>
+</body>
+</html>

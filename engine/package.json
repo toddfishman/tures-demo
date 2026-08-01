@@ -1,0 +1,34 @@
+{
+  "name": "tures-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The agentic booking engine behind the Tures demo — find good deals to the right places and finish the purchase.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node --import tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx test/smoke.ts",
+    "test:taste-hiccup": "tsx test/taste-hiccup.ts",
+    "test:scenarios": "tsx test/run-scenarios.ts",
+    "test:scenarios:llm": "tsx test/run-scenarios.ts --llm",
+    "test:record-goldens": "tsx test/record-goldens.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "@browserbasehq/stagehand": "^3.6.0",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/rate-limit": "^10.2.1",
+    "fastify": "^5.1.0",
+    "stripe": "^17.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

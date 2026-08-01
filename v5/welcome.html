@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Get set up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .step-panel{ display:none; }
+  .step-panel.on{ display:block; }
+  .pdot{ height:6px; border-radius:99px; background:var(--canvas-line); flex:1; transition:background .2s; }
+  .pdot.on{ background:var(--gold); }
+  .chip{ padding:8px 15px; border-radius:999px; font-size:14px; cursor:pointer; border:1px solid var(--canvas-line);
+    color:var(--ink-soft); background:rgba(255,253,247,0.5); transition:all .14s; user-select:none; }
+  .chip.on{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
+  .fld{ width:100%; border-radius:10px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.7); padding:11px 13px; font-size:14px; color:var(--ink); outline:none; }
+  .perm-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 15px; border:1px solid var(--canvas-line); border-radius:12px; background:rgba(255,253,247,0.5); }
+  .sw{ width:44px;height:26px;border-radius:99px;background:var(--canvas-line);position:relative;cursor:pointer;transition:all .16s; flex-shrink:0; }
+  .sw::after{ content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:99px;background:#fff;transition:all .16s; }
+  .sw.on{ background:var(--gold); } .sw.on::after{ left:21px; }
+  .deck{ position:relative; height:300px; max-width:300px; margin-inline:auto; }
+  .vcard{ position:absolute; inset:0; border-radius:20px; overflow:hidden; cursor:grab; user-select:none;
+    box-shadow:0 10px 34px rgba(0,0,0,.22); display:flex; flex-direction:column; justify-content:flex-end; padding:20px; color:#fff;
+    transition:transform .28s cubic-bezier(.34,1.4,.64,1), opacity .28s ease; }
+  .vcard:active{ cursor:grabbing; }
+  .vcard .vemoji{ position:absolute; inset:0; display:grid; place-items:center; font-size:96px; opacity:.92; }
+  .vcard .vlabel{ position:relative; font-family:'DM Serif Display',serif; font-size:28px; line-height:1; }
+  .vcard .vsub{ position:relative; font-size:13px; opacity:.9; margin-top:4px; }
+  .vcard .vtag{ position:absolute; top:16px; font-size:13px; font-weight:700; letter-spacing:.08em; padding:6px 12px; border-radius:99px; opacity:0; transition:opacity .1s; }
+  .vcard .vtag.like{ right:16px; color:#0c1f16; background:#7fdca6; transform:rotate(8deg); }
+  .vcard .vtag.nope{ left:16px; color:#fff; background:rgba(181,84,58,.95); transform:rotate(-8deg); }
+  .deckbtn{ padding:10px 22px; border-radius:99px; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.6); font-size:14px; cursor:pointer; color:var(--ink-soft); transition:all .14s; }
+  .deckbtn:hover{ border-color:rgba(200,162,74,.5); }
+  .deckbtn.yes{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <a href="03-paste-trip.html" class="text-sm text-canvas/60 quiet">Skip setup →</a>
+  </nav>
+</header>
+
+<main class="canvas-surface text-ink min-h-[90vh]">
+ <div class="max-w-xl mx-auto px-6 py-10">
+
+  <!-- progress -->
+  <div class="flex gap-1.5 mb-2" id="progress">
+    <div class="pdot on"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div>
+  </div>
+  <div class="flex justify-between items-center mb-8">
+    <span class="caps text-[11px] text-ink-faint" id="stepLabel">Step 1 of 4 · Your taste</span>
+    <span class="text-[11px] text-ink-faint" id="who"></span>
+  </div>
+
+  <!-- STEP 1 — taste -->
+  <div class="step-panel on" data-step="0">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2" id="hi">How do you travel?</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">A couple taps gives Tures a standing read on your taste — every trip starts from here.</p>
+    <div class="caps text-[11px] text-ink-faint mb-3">Swipe the vibes you love — drag, or use the buttons</div>
+    <div class="deck mb-4" id="vibeDeck"></div>
+    <div class="flex items-center justify-center gap-5 mb-2">
+      <button type="button" id="vNo" class="deckbtn">✕ Skip</button>
+      <button type="button" id="vYes" class="deckbtn yes">♥ Love</button>
+    </div>
+    <div id="vibePicked" class="text-[13px] text-ink-soft text-center mb-6" style="min-height:18px"></div>
+    <div class="caps text-[11px] text-ink-faint mb-3">Pace</div>
+    <div class="flex flex-wrap gap-2 mb-8" data-group="pace" data-single="1">
+      <span class="chip" data-v="easy">Easy</span>
+      <span class="chip on" data-v="balanced">Balanced</span>
+      <span class="chip" data-v="full">Full</span>
+    </div>
+  </div>
+
+  <!-- STEP 2 — wallet -->
+  <div class="step-panel" data-step="1">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Your wallet.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">Add the cards you carry — Tures charges each leg to whichever earns the most. You won't be charged anything now; cards are only used when you book.</p>
+    <div class="flex gap-2 mb-3">
+      <select id="cardPick" class="fld flex-1"></select>
+      <button id="addCard" class="btn-ink px-4 rounded-lg text-sm press shrink-0">Add</button>
+    </div>
+    <div id="walletList" class="space-y-2 mb-3"></div>
+    <div id="walletRec" class="text-[13px] text-ink-soft rounded-lg p-3 mb-2" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28);display:none"></div>
+  </div>
+
+  <!-- STEP 3 — docs -->
+  <div class="step-panel" data-step="2">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Travel documents.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">What a real booking needs — stored encrypted, shown only masked. Optional, but it lets Tures ticket international trips and credit your miles.</p>
+    <div class="space-y-2.5 mb-3">
+      <input id="pfPassport" class="fld" placeholder="Passport number" />
+      <input id="pfKtn" class="fld" placeholder="Known Traveler Number (TSA Pre)" />
+      <div class="flex gap-2">
+        <input id="pfProgram" class="fld flex-1" placeholder="Loyalty program (e.g. Finnair Plus)" />
+        <input id="pfNumber" class="fld w-28" placeholder="Number" />
+      </div>
+    </div>
+    <div id="docStatus" class="text-[13px] text-ink-soft"></div>
+  </div>
+
+  <!-- STEP 4 — connections -->
+  <div class="step-panel" data-step="3">
+    <h1 class="font-display text-4xl text-ink leading-tight mb-2">Connected services.</h1>
+    <p class="text-ink-soft text-sm leading-relaxed mb-6">A permission gradient — grant only what you like. Tures uses these to verify bookings and catch disruptions early.</p>
+    <div class="space-y-2.5">
+      <div class="perm-row"><span><span class="text-ink font-medium">Travel inbox</span><span class="text-ink-soft text-sm block">Read-only, travel senders only — the second check on every booking.</span></span><span class="sw" data-perm="email" data-label="Travel inbox"></span></div>
+      <div class="perm-row"><span><span class="text-ink font-medium">Calendar</span><span class="text-ink-soft text-sm block">Route around what's already on your plate; write trips back.</span></span><span class="sw" data-perm="calendar" data-label="Calendar"></span></div>
+      <div class="perm-row"><span><span class="text-ink font-medium">Loyalty</span><span class="text-ink-soft text-sm block">Apply status &amp; credit miles automatically.</span></span><span class="sw" data-perm="loyalty" data-label="Loyalty"></span></div>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="step-panel" data-step="4">
+    <div class="text-center py-6">
+      <div class="text-5xl text-gold-deep mb-3">✦</div>
+      <h1 class="font-display text-4xl text-ink leading-tight mb-2">You're set.</h1>
+      <p class="text-ink-soft text-sm leading-relaxed mb-7 max-w-sm mx-auto">Everything's in place. Plan a trip whenever you like — you'll only pay if Tures books it.</p>
+      <a href="03-paste-trip.html" class="btn-gold px-7 py-3.5 rounded-xl quiet font-semibold inline-block">Plan my first trip →</a>
+    </div>
+  </div>
+
+  <!-- nav -->
+  <div class="flex items-center justify-between mt-8" id="navRow">
+    <button id="backBtn" class="text-sm text-ink-faint quiet" style="visibility:hidden">← Back</button>
+    <div class="flex gap-3">
+      <button id="skipBtn" class="btn-ghost px-5 py-2.5 rounded-xl quiet text-sm">Skip</button>
+      <button id="nextBtn" class="btn-gold px-6 py-2.5 rounded-xl quiet font-semibold">Continue</button>
+    </div>
+  </div>
+
+ </div>
+</main>
+
+<script src="assets/engine.js"></script>
+<script>
+if(!(window.tures && tures.account)){ location.href = 'signup.html'; }
+
+var LABELS = ['Step 1 of 4 · Your taste','Step 2 of 4 · Your wallet','Step 3 of 4 · Travel documents','Step 4 of 4 · Connected services','All set'];
+var step = 0;
+var taste = { vibe:[], pace:'balanced' };
+
+document.getElementById('who').textContent = (tures.account && tures.account.email) || '';
+document.getElementById('hi').textContent = 'How do you travel, ' + ((tures.account && (tures.account.name||'').split(' ')[0]) || 'friend') + '?';
+
+function render(){
+  document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.toggle('on', Number(p.getAttribute('data-step'))===step); });
+  document.querySelectorAll('#progress .pdot').forEach(function(d,i){ d.classList.toggle('on', i <= Math.min(step,3)); });
+  document.getElementById('stepLabel').textContent = LABELS[step];
+  document.getElementById('backBtn').style.visibility = step>0 && step<4 ? 'visible' : 'hidden';
+  document.getElementById('navRow').style.display = step===4 ? 'none' : 'flex';
+  document.getElementById('nextBtn').textContent = step===3 ? 'Finish' : 'Continue';
+  window.scrollTo(0,0);
+}
+function go(n){ step = Math.max(0, Math.min(4, n)); if(step===4) saveTaste(); render(); if(step===1) loadWallet(); }
+
+document.getElementById('nextBtn').onclick = function(){ saveStep(step); go(step+1); };
+document.getElementById('skipBtn').onclick = function(){ go(step+1); };
+document.getElementById('backBtn').onclick = function(){ go(step-1); };
+
+/* step 1 — taste chips */
+document.querySelectorAll('[data-group]').forEach(function(group){
+  var single = group.getAttribute('data-single');
+  group.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      if(single){ group.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); chip.classList.add('on'); }
+      else chip.classList.toggle('on');
+    });
+  });
+});
+function saveTaste(){
+  taste.vibe = tasteLikes.slice();
+  var p = document.querySelector('[data-group="pace"] .chip.on'); taste.pace = p ? p.getAttribute('data-v') : 'balanced';
+  try { localStorage.setItem('tures.taste', JSON.stringify(taste)); } catch(e){}
+}
+
+/* step 1 — visual vibe swipe deck (drag / press, like the taste engine) */
+var VIBES = [
+  { k:'design-forward', label:'Design-forward', sub:'Architecture, clean lines, minimalism', emoji:'🏛️', grad:'linear-gradient(155deg,#2b2a4a,#6b4f8a)' },
+  { k:'boutique', label:'Boutique', sub:'Small, characterful, personal', emoji:'🗝️', grad:'linear-gradient(155deg,#5a3a2e,#a9764f)' },
+  { k:'grand', label:'Grand classics', sub:'Old-world, iconic, dressed up', emoji:'🥂', grad:'linear-gradient(155deg,#3a2f1a,#9c7b3a)' },
+  { k:'off-the-map', label:'Off the map', sub:'Remote, wild, few crowds', emoji:'🧭', grad:'linear-gradient(155deg,#16302b,#3f7d5e)' },
+  { k:'foodie', label:'Food-first', sub:'Plan the trip around the table', emoji:'🍤', grad:'linear-gradient(155deg,#4a1f24,#b0584a)' },
+  { k:'sun-sea', label:'Sun & sea', sub:'Water, warmth, slow days', emoji:'🏝️', grad:'linear-gradient(155deg,#16364a,#3a9bbf)' },
+  { k:'after-dark', label:'After dark', sub:'Bars, music, late nights', emoji:'🌃', grad:'linear-gradient(155deg,#241a3a,#6b3a8a)' }
+];
+var tasteLikes = [];
+var deck = document.getElementById('vibeDeck');
+var di = 0;
+function buildDeck(){
+  deck.innerHTML = '';
+  for(var i=Math.min(di+2, VIBES.length-1); i>=di; i--){
+    var v = VIBES[i]; if(!v) continue;
+    var card = document.createElement('div'); card.className='vcard'; card.style.background=v.grad; card.style.zIndex=10-i;
+    card.style.transform = 'scale('+(1-(i-di)*0.04)+') translateY('+((i-di)*8)+'px)';
+    card.innerHTML = '<span class="vemoji">'+v.emoji+'</span><span class="vtag like">LOVE</span><span class="vtag nope">SKIP</span><span class="vlabel">'+v.label+'</span><span class="vsub">'+v.sub+'</span>';
+    deck.appendChild(card);
+    if(i===di){ card.classList.add('top'); makeDraggable(card, v); }
+  }
+  if(di >= VIBES.length){ deck.innerHTML = '<div class="grid place-items-center h-full text-ink-soft text-sm">✓ Got your vibe — '+(tasteLikes.length||'no')+' picked. Continue below.</div>'; }
+  document.getElementById('vibePicked').textContent = tasteLikes.length ? 'You love: ' + tasteLikes.map(function(k){ return (VIBES.find(function(x){return x.k===k;})||{}).label; }).join(', ') : '';
+}
+function decide(card, v, like){
+  if(like && tasteLikes.indexOf(v.k)<0) tasteLikes.push(v.k);
+  card.style.transform = 'translateX('+(like?1:-1)*420+'px) rotate('+(like?18:-18)+'deg)'; card.style.opacity='0';
+  di++; setTimeout(buildDeck, 180);
+}
+function makeDraggable(card, v){
+  var sx=0, dx=0, drag=false;
+  function down(x){ drag=true; sx=x; card.style.transition='none'; }
+  function move(x){ if(!drag) return; dx=x-sx; card.style.transform='translateX('+dx+'px) rotate('+(dx*0.05)+'deg)';
+    card.querySelector('.vtag.like').style.opacity = dx>30? Math.min(1,dx/120):0;
+    card.querySelector('.vtag.nope').style.opacity = dx<-30? Math.min(1,-dx/120):0; }
+  function up(){ if(!drag) return; drag=false; card.style.transition='';
+    if(Math.abs(dx)>90){ decide(card, v, dx>0); } else { card.style.transform=''; card.querySelectorAll('.vtag').forEach(function(t){t.style.opacity=0;}); } dx=0; }
+  card.addEventListener('mousedown', function(e){ down(e.clientX); });
+  window.addEventListener('mousemove', function(e){ move(e.clientX); });
+  window.addEventListener('mouseup', up);
+  card.addEventListener('touchstart', function(e){ down(e.touches[0].clientX); }, {passive:true});
+  card.addEventListener('touchmove', function(e){ move(e.touches[0].clientX); }, {passive:true});
+  card.addEventListener('touchend', up);
+  card._v = v;
+}
+document.getElementById('vYes').onclick = function(){ var c=deck.querySelector('.vcard.top'); if(c&&c._v) decide(c, c._v, true); };
+document.getElementById('vNo').onclick = function(){ var c=deck.querySelector('.vcard.top'); if(c&&c._v) decide(c, c._v, false); };
+buildDeck();
+
+/* step 2 — wallet (engine) */
+var walletLoaded = false;
+function loadWallet(){
+  if(walletLoaded || !tures.configured) return; walletLoaded = true;
+  var pick = document.getElementById('cardPick');
+  tures.wallet.catalog().then(function(cat){ (cat.cards||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.key; o.textContent=c.name; pick.appendChild(o); }); }).catch(function(){});
+  refreshWallet();
+}
+function refreshWallet(){
+  if(!tures.configured) return;
+  tures.connections.list().then(function(res){
+    var cards = (res.connections||[]).filter(function(c){return c.kind==='payment';});
+    var list = document.getElementById('walletList');
+    list.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — optional, add later if you like.</div>';
+    cards.forEach(function(c){ var r=document.createElement('div'); r.className='perm-row'; r.innerHTML='<span class="text-ink text-sm">'+c.label+'</span><button class="text-[12px] text-gold-deep" data-rev="'+c.id+'">remove</button>'; list.appendChild(r); });
+    list.querySelectorAll('[data-rev]').forEach(function(b){ b.onclick=function(){ tures.connections.revoke(b.getAttribute('data-rev')).then(refreshWallet); }; });
+    if(cards.length>=1){
+      Promise.all([tures.wallet.recommend('airfare',5000), tures.wallet.recommend('hotel',2000)]).then(function(rs){
+        var rec=document.getElementById('walletRec'); rec.style.display=''; rec.innerHTML='<strong>How Tures would charge:</strong> ✈ '+(rs[0].name||'—')+' · ⌂ '+(rs[1].name||'—');
+      }).catch(function(){});
+    }
+  }).catch(function(){});
+}
+document.getElementById('addCard').onclick = function(){
+  if(!tures.configured) return;
+  var pick=document.getElementById('cardPick'); var key=pick.value; var name=pick.options[pick.selectedIndex].textContent;
+  tures.connections.connect({ kind:'payment', label:name, secret:{customerId:'cus_demo',paymentMethodId:'pm_'+key}, meta:{cardKey:key, last4:'0000'} }).then(refreshWallet);
+};
+
+/* step 3 — docs (engine) */
+function saveDocs(){
+  if(!tures.configured) return Promise.resolve();
+  var pass = document.getElementById('pfPassport').value.trim();
+  var ktn = document.getElementById('pfKtn').value.trim();
+  var prog = document.getElementById('pfProgram').value.trim();
+  if(!pass && !ktn && !prog) return Promise.resolve();
+  var profile = {
+    passport: pass ? { number: pass, country:'US' } : undefined,
+    knownTravelerNumber: ktn || undefined,
+    memberships: prog ? [{ kind:'airline', program: prog, number: document.getElementById('pfNumber').value.trim() }] : []
+  };
+  return tures.profile.set(profile).then(function(c){ document.getElementById('docStatus').innerHTML='✓ Saved · passport '+((c.meta&&c.meta.passportMasked)||'—'); }).catch(function(){});
+}
+
+/* step 4 — connections (engine) */
+document.querySelectorAll('.sw').forEach(function(sw){
+  sw.addEventListener('click', function(){
+    var on = sw.classList.toggle('on');
+    if(!tures.configured) return;
+    var kind = sw.getAttribute('data-perm'); var label = sw.getAttribute('data-label');
+    if(on){ tures.connections.connect({ kind:kind, label:label, secret:{token:'demo'} }).then(function(c){ sw.setAttribute('data-id', c.id); }); }
+    else { var id=sw.getAttribute('data-id'); if(id) tures.connections.revoke(id); }
+  });
+});
+
+function saveStep(s){ if(s===2) saveDocs(); }
+
+render();
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

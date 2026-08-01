@@ -1,0 +1,130 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Sign in to Tures — your trips, Vault, and Telegram link follow one account.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="Sign in to Tures">
+<meta property="og:description" content="Sign in to Tures — your trips, Vault, and Telegram link follow one account.">
+<meta property="og:url" content="https://tures.app/login.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sign in to Tures">
+<meta name="twitter:description" content="Sign in to Tures — your trips, Vault, and Telegram link follow one account.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+
+<title>t✦ures — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<script src="assets/account-sync.js"></script>
+<style>
+  .auth-wrap{max-width:440px;margin:0 auto;padding:72px 22px 80px}
+  .auth-tabs{display:flex;gap:0;border:1px solid var(--line-2);border-radius:12px;overflow:hidden;margin:28px 0 22px}
+  .auth-tabs button{flex:1;padding:11px 14px;font:600 13px 'Inter',sans-serif;border:none;background:var(--surface);color:var(--muted);cursor:pointer}
+  .auth-tabs button.on{background:var(--bg);color:var(--text);box-shadow:inset 0 -2px 0 var(--acc)}
+  .auth-panel{display:none}
+  .auth-panel.on{display:block}
+  .auth-panel .grp{margin-bottom:16px}
+  .auth-panel label{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+  .auth-panel .btn{width:100%;margin-top:6px}
+  .auth-err{display:none;margin-top:12px;padding:11px 13px;border-radius:10px;border:1px solid rgba(255,73,41,.35);background:var(--acc-dim);font-size:13.5px;color:var(--acc-deep)}
+  .auth-err.show{display:block}
+  .auth-foot{margin-top:20px;text-align:center;font-size:13.5px;color:var(--muted)}
+  .auth-foot a{color:var(--acc-deep);font-weight:600}
+  .auth-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.45}
+</style>
+</head>
+<body data-page="login" data-no-travel-bg="1">
+<main class="auth-wrap">
+  <div class="center">
+    <span class="eyebrow"><span class="dot"></span> Your account</span>
+    <h1 style="margin-top:18px">One Tures, <em>everywhere.</em></h1>
+    <p class="lead center" style="margin-top:14px">Trips, Vault, and Telegram share one account — so nothing starts over when you switch devices.</p>
+  </div>
+
+  <div class="auth-tabs" role="tablist">
+    <button type="button" class="on" data-tab="in" role="tab" aria-selected="true">Sign in</button>
+    <button type="button" data-tab="up" role="tab" aria-selected="false">Create account</button>
+  </div>
+
+  <form class="auth-panel on" id="panel-in" data-panel="in">
+    <div class="grp"><label for="in-email">Email</label><input class="field" id="in-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+    <div class="grp"><label for="in-pass">Password</label><input class="field" id="in-pass" type="password" autocomplete="current-password" required></div>
+    <button class="btn" type="submit">Sign in →</button>
+    <div class="auth-err" id="err-in" role="alert"></div>
+  </form>
+
+  <form class="auth-panel" id="panel-up" data-panel="up">
+    <div class="grp"><label for="up-name">Name</label><input class="field" id="up-name" type="text" autocomplete="name" required placeholder="Andy Rockwell"></div>
+    <div class="grp"><label for="up-email">Email</label><input class="field" id="up-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+    <div class="grp"><label for="up-pass">Password</label><input class="field" id="up-pass" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></div>
+    <button class="btn" type="submit">Create account →</button>
+    <div class="auth-err" id="err-up" role="alert"></div>
+    <p class="auth-note">Free to create — no card needed to start. You only add payment when you're ready to book.</p>
+  </form>
+
+  <p class="auth-foot">Rather talk it through? <a href="plan.html">Plan a trip</a> without an account.</p>
+</main>
+<script src="assets/site.js" defer></script>
+<script>
+(function(){
+  var T=window.tures,F=window.turesFunnel;
+  if(T&&T.signedIn){ location.replace('plan.html'); return; }
+  var tabs=[].slice.call(document.querySelectorAll('.auth-tabs button'));
+  var panels=[].slice.call(document.querySelectorAll('.auth-panel'));
+  function tab(id){
+    tabs.forEach(function(b){ var on=b.getAttribute('data-tab')===id; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); });
+    panels.forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-panel')===id); });
+  }
+  tabs.forEach(function(b){ b.addEventListener('click',function(){ tab(b.getAttribute('data-tab')); }); });
+  if(location.search.indexOf('create=1')>=0) tab('up');
+
+  function err(id,msg){ var el=document.getElementById(id); if(!el) return; el.textContent=msg||''; el.classList.toggle('show',!!msg); }
+  function go(){
+    var next=new URLSearchParams(location.search).get('next')||'plan.html';
+    if(next.indexOf('://')<0 && next.charAt(0)!=='/') location.href=next;
+    else location.href='plan.html';
+  }
+  function val(id){ var el=document.getElementById(id); return el?String(el.value||'').trim():''; }
+
+  document.getElementById('panel-in').addEventListener('submit',function(ev){
+    ev.preventDefault(); err('err-in','');
+    if(!T||!T.configured){ err('err-in','Planner is offline — try again in a moment.'); return; }
+    var btn=ev.target.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent='Signing in…';
+    T.login(val('in-email'), val('in-pass')).then(function(u){
+      if(F&&u){ F.setTraveler({ name:u.name||'', email:u.email||val('in-email') }); }
+      var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
+      return sync.then(go);
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent='Sign in →';
+      err('err-in', (e&&e.status===401) ? 'Email or password did not match.' : 'Could not sign in just now — try again.');
+    });
+  });
+
+  document.getElementById('panel-up').addEventListener('submit',function(ev){
+    ev.preventDefault(); err('err-up','');
+    if(!T||!T.configured){ err('err-up','Planner is offline — try again in a moment.'); return; }
+    var btn=ev.target.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent='Creating…';
+    T.signUp(val('up-name'), val('up-email'), val('up-pass')).then(function(u){
+      if(F&&u){ F.setTraveler({ name:u.name||val('up-name'), email:u.email||val('up-email') }); }
+      var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
+      return sync.then(go);
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent='Create account →';
+      var msg='Could not create account — try again.';
+      if(e&&e.status===409) msg='That email is already registered. Sign in instead.';
+      if(e&&e.body&&e.body.error) msg=e.body.error;
+      err('err-up', msg);
+    });
+  });
+
+  var tr=F?F.traveler():{};
+  if(tr.email){ document.getElementById('in-email').value=tr.email; document.getElementById('up-email').value=tr.email; }
+  if(tr.name) document.getElementById('up-name').value=tr.name;
+})();
+</script>
+</body></html>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Billing</title>
+<meta name="description" content="Your Tures subscription, transaction history, and billing details." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/billing.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Billing" />
+<meta property="og:description" content="Your Tures subscription, transaction history, and billing details." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/billing.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Billing" />
+<meta name="twitter:description" content="Your Tures subscription, transaction history, and billing details." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; padding-bottom:96px; }
+
+  .check{ width:20px; height:20px; border-radius:99px; display:grid; place-items:center; flex-shrink:0;
+    background:rgba(255,255,255,.05); border:1px solid var(--gold); color:var(--gold); font-size:11px; }
+
+  /* ───── invoice / charge list rows ───── */
+  table{ border-collapse:collapse; width:100%; }
+  td,th{ text-align:left; padding:13px 14px; vertical-align:middle; font-size:13px; line-height:1.45;
+    border-bottom:1px solid rgba(255,255,255,0.07); color:var(--gh-cream); }
+  th{ color:var(--gold); font-weight:500; letter-spacing:.14em; text-transform:uppercase; font-size:10px; }
+  tr:last-child td{ border-bottom:0; }
+  .txrow{ cursor:pointer; transition:background .15s ease; }
+  .txrow:hover{ background:rgba(255,255,255,.035); }
+  .tx-date{ font-family:'JetBrains Mono',monospace; color:var(--gh-cream-dim); }
+  .tx-item{ color:var(--gh-cream); }
+  .tx-amt{ font-family:'JetBrains Mono',monospace; color:var(--gh-cream); }
+  .tx-amt-void{ font-family:'JetBrains Mono',monospace; color:var(--gh-cream-dim); text-decoration:line-through; }
+  .tx-receipt{ color:var(--gold); text-decoration:underline; text-underline-offset:2px; }
+  .tx-receipt:hover{ color:var(--gold-bright); }
+
+  /* ───── payment card mock ───── */
+  .pcard{ position:relative; border-radius:14px; padding:16px; min-height:104px; display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
+    background:linear-gradient(150deg,#16201a,#0a0f0b 72%); border:1px solid var(--gold); box-shadow:0 18px 40px -24px rgba(0,0,0,.85), 0 0 22px -14px var(--gold); }
+  .pcard .chip{ width:30px; height:22px; border-radius:5px; background:linear-gradient(135deg,var(--gold-bright),var(--gold)); }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="account.html" class="text-sm quiet flex items-center gap-2"><span>←</span> Account</a>
+    <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="gh-wash-surface gh-tile relative overflow-hidden">
+ <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
+   <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Billing &amp; subscription</span></div>
+   <h1 class="gh-h1" style="margin-top:10px; max-width:18ch;">The fee is the only<br><span class="gh-accent gh-italic">thing you negotiate.</span></h1>
+   <p class="gh-lead" style="margin-top:18px; max-width:46ch;">One concierge subscription. Supplier commissions disclosed in every receipt. No markup games.</p>
+ </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<main class="gh-wash">
+ <div class="relative z-10 max-w-3xl mx-auto px-6 py-12 space-y-12">
+
+  <!-- ============ SUBSCRIPTION TIER ============ -->
+  <section>
+    <div class="gh-eyebrow">Section I</div>
+    <h2 class="gh-h2" style="font-size:clamp(26px,3vw,38px); margin-bottom:18px;">Your plan</h2>
+    <div class="gh-card-acc" style="border-radius:16px; padding:26px;">
+      <div class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <div class="flex items-center gap-2"><span class="gh-display" style="font-size:30px; color:#fff; line-height:1;">Founders</span><span class="pill pill-gold">Active</span></div>
+          <p style="font-size:14px; color:var(--gh-cream-dim); margin-top:6px;">Unlimited trips · all of Tures, before anyone else.</p>
+        </div>
+        <div class="text-right">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:30px; color:var(--gh-cream); line-height:1;">$150<span style="font-size:15px; color:var(--gh-cream-dim);">/mo</span></div>
+          <div class="gh-eyebrow" style="margin-top:6px; letter-spacing:.1em;">or $1,800/yr · billed annually</div>
+        </div>
+      </div>
+
+      <div class="seg mt-5" data-seg id="plan-seg">
+        <button data-v="yearly" class="on">Yearly · save $0</button>
+        <button data-v="monthly">Monthly</button>
+      </div>
+
+      <div class="gh-rule-soft my-5"></div>
+
+      <div class="grid sm:grid-cols-2 gap-x-6 gap-y-3">
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Unlimited trips, every leg booked end-to-end</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Hiccup Handler — 24/7 disruption monitoring</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Per-traveler Taste Engine that sharpens over time</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Boutique &amp; no-API reservations (Resy, Tock, SLH)</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Status &amp; loyalty applied automatically</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Transparent commissions, disclosed per receipt</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Household sharing — one trip, both travelers</span></div>
+        <div class="flex items-start gap-2.5"><span class="check">✓</span><span style="font-size:14px; color:var(--gh-cream-dim);">Founders pricing locked for life</span></div>
+      </div>
+
+      <div class="gh-rule-soft my-5"></div>
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div class="gh-eyebrow" style="letter-spacing:.1em;">Next renewal · Jun 2, 2027 · <span style="color:var(--gh-cream-dim);">$1,800</span></div>
+        <div class="flex gap-2">
+          <button class="gh-btn-ghost gh-btn" style="padding:10px 18px;">Switch to monthly</button>
+          <button data-sheet="sheet-cancel" class="text-xs quiet" style="color:#c97a5a">Cancel plan</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="gh-rule"></div>
+
+  <!-- ============ TRANSACTION HISTORY ============ -->
+  <section>
+    <div class="flex items-end justify-between mb-4">
+      <div><div class="gh-eyebrow">Section II</div><h2 class="gh-h2" style="font-size:clamp(26px,3vw,38px);">Transaction history</h2></div>
+      <span class="gh-eyebrow refresh-hint" style="letter-spacing:.14em;"><span class="rh-chev">↻</span> live</span>
+    </div>
+    <div class="gh-card overflow-hidden" style="border-radius:16px;">
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>Date</th><th>Item</th><th>Status</th><th class="text-right">Amount</th><th></th></tr></thead>
+          <tbody>
+            <tr class="txrow"><td class="tx-date">May 18</td><td class="tx-item">Tures concierge — annual</td><td><span class="pill pill-confirm">Paid</span></td><td class="text-right tx-amt">$1,800.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">May 04</td><td class="tx-item">Le Sirenuse · 4 nights</td><td><span class="pill pill-confirm">Confirmed</span></td><td class="text-right tx-amt">€4,260.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Apr 28</td><td class="tx-item">Air France · SEA→NAP · 2 pax</td><td><span class="pill pill-confirm">Ticketed</span></td><td class="text-right tx-amt">$3,884.40</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Apr 12</td><td class="tx-item">Hotel Sanders · 2 nights</td><td><span class="pill pill-confirm">Confirmed</span></td><td class="text-right tx-amt">€612.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Apr 03</td><td class="tx-item">Hoshinoya Tokyo · 3 nights</td><td><span class="pill pill-confirm">Confirmed</span></td><td class="text-right tx-amt">$2,940.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Mar 30</td><td class="tx-item">Delta · SEA→HND · 2 pax</td><td><span class="pill pill-confirm">Ticketed</span></td><td class="text-right tx-amt">$5,120.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Mar 14</td><td class="tx-item">Den · Sushi Saito · deposit</td><td><span class="pill pill-pending">Held</span></td><td class="text-right tx-amt">¥40,000</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Feb 14</td><td class="tx-item">Palácio Belmonte · 3 nights</td><td><span class="pill pill-confirm">Confirmed</span></td><td class="text-right tx-amt">€1,485.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Feb 11</td><td class="tx-item">TAP Air · SEA→LIS · 2 pax</td><td><span class="pill pill-alert">Refunded</span></td><td class="text-right tx-amt-void">$2,210.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+            <tr class="txrow"><td class="tx-date">Jan 02</td><td class="tx-item">Tures concierge — setup</td><td><span class="pill pill-confirm">Paid</span></td><td class="text-right tx-amt">$0.00</td><td class="text-right"><a href="#" class="tx-receipt quiet">Receipt</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-4 py-3 flex items-center justify-between text-xs" style="border-top:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.02);">
+        <span style="color:var(--gh-cream-dim);">Travel charges pass through at cost. <a href="legal/terms.html#refunds" class="tx-receipt quiet">Refund policy</a></span>
+        <a href="#" class="tx-receipt quiet">Export CSV</a>
+      </div>
+    </div>
+    <p class="text-xs mt-2 leading-relaxed" style="color:var(--gh-cream-dim);">Amounts shown in the currency Tures paid the supplier. Your card is charged in USD at Stripe's conversion rate on the booking date; the FX line appears on each receipt.</p>
+  </section>
+
+  <div class="gh-rule"></div>
+
+  <!-- ============ PAYMENT + ADDRESS ============ -->
+  <section class="grid sm:grid-cols-2 gap-6">
+    <div>
+      <div class="gh-eyebrow">Section III</div>
+      <h2 class="gh-h3" style="font-size:24px; margin-bottom:12px;">Payment method</h2>
+      <div class="pcard mb-3">
+        <div class="flex items-start justify-between"><div class="chip"></div><span class="pill pill-d-gold">Default</span></div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.18em; color:var(--gh-cream);">•••• •••• •••• 6411</div>
+          <div class="flex items-center justify-between mt-1.5"><span class="gh-eyebrow" style="font-size:9px; color:var(--gh-cream-dim); letter-spacing:.12em;">Andy Rockwell · 09/27</span><span class="gh-display" style="font-size:16px; color:var(--gh-cream);">VISA</span></div>
+        </div>
+      </div>
+      <button class="gh-btn-ghost gh-btn w-full" style="padding:11px 18px;">Update payment method</button>
+      <a href="account.html" class="block text-center text-xs tx-receipt quiet mt-2">Manage all cards →</a>
+    </div>
+    <div>
+      <div class="gh-eyebrow">Section IV</div>
+      <h2 class="gh-h3" style="font-size:24px; margin-bottom:12px;">Billing address</h2>
+      <div class="gh-card p-4 text-sm leading-relaxed" style="border-radius:12px; color:var(--gh-cream-dim);">
+        <div style="color:var(--gh-cream); font-weight:500;">Andy Rockwell</div>
+        <div>1100 Western Ave, Apt 12C</div>
+        <div>Seattle, WA 98104</div>
+        <div>United States</div>
+        <div class="gh-eyebrow" style="margin-top:8px; letter-spacing:.1em;">Tax: WA sales tax applied to concierge fee</div>
+      </div>
+      <button class="gh-btn-ghost gh-btn w-full mt-3" style="padding:11px 18px;">Edit billing address</button>
+    </div>
+  </section>
+
+ </div>
+</main>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:22px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-eyebrow" style="margin-top:10px;">Billing · Founders edition</div>
+  <div class="mt-3 flex items-center justify-center gap-4 text-xs" style="color:var(--gh-cream-dim);">
+    <a href="account.html" class="quiet" style="color:var(--gh-cream-dim);">Account</a>
+    <a href="faq.html" class="quiet" style="color:var(--gh-cream-dim);">FAQ</a>
+    <a href="legal/index.html" class="quiet" style="color:var(--gh-cream-dim);">Legal</a>
+  </div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar" style="position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px); background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px); border-top:1px solid rgba(255,255,255,0.08);">
+  <div class="max-w-3xl mx-auto w-full flex items-center gap-3">
+    <a href="account.html" class="gh-btn-ghost gh-btn hidden sm:inline-flex" style="padding:13px 22px;">Account</a>
+    <span class="flex-1"></span>
+    <a href="08-concierge.html" class="gh-btn">Open the concierge →</a>
+  </div>
+</div>
+
+<!-- bottom sheet: cancel -->
+<div class="sheet" id="sheet-cancel"><div class="sheet-backdrop"></div><div class="sheet-panel" style="background:var(--gh-card); border:1px solid rgba(255,255,255,0.1);">
+  <div class="sheet-handle"></div>
+  <div class="gh-eyebrow mb-1">Cancel plan</div>
+  <h3 class="gh-h3" style="font-size:24px; color:var(--gh-cream); margin-bottom:12px;">Cancel your Founders plan?</h3>
+  <p class="text-sm leading-relaxed mb-4" style="color:var(--gh-cream-dim);">Your Founders pricing is locked for life — if you cancel, you lose it. Active trips stay monitored through their end dates. You keep access until Jun 2, 2027.</p>
+  <button class="gh-btn w-full" data-sheet-close>Keep my plan</button>
+  <button data-sheet-close class="w-full mt-2 px-5 py-3 rounded-xl text-sm quiet" style="color:#c97a5a">Cancel anyway</button>
+</div></div>
+
+<script>
+  document.getElementById('plan-seg').addEventListener('segchange', function(e){
+    // purely cosmetic in the mockup
+  });
+</script>
+<script src="assets/ui.js"></script>
+<script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Executing Andy's trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #2D1B2E;
+    --brass: #B8965A;
+    --clay: #F4EFE8;
+    --ink: #1C1816;
+    --slate: #7A7167;
+    --confirm: #3F6B3F;
+    --pending: #C58A2A;
+    --alert: #C25444;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .card { background: #fff; border: 1px solid rgba(45,27,46,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; letter-spacing:0.07em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(63,107,63,0.1); color: var(--confirm); }
+  .pill-pending { background: rgba(197,138,42,0.12); color: var(--pending); }
+  .pill-alert   { background: rgba(194,84,68,0.1);  color: var(--alert); }
+  .pill-neutral { background: rgba(45,27,46,0.06); color: var(--aubergine); }
+  .dot { width:8px; height:8px; border-radius:99px; flex-shrink: 0; display:inline-block; }
+  .dot-brass { background: var(--brass); }
+  .dot-amber { background: var(--pending); }
+  .dot-green { background: var(--confirm); }
+  .dot-alert { background: var(--alert); }
+  .step-pulse { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .divider { height: 1px; background: rgba(45,27,46,0.1); }
+  .progress-track { height: 4px; background: rgba(45,27,46,0.08); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--brass); transition: width 400ms ease-out; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .chev { transition: transform 150ms; display:inline-block; }
+  details[open] .chev { transform: rotate(90deg); }
+  .booking-row { padding: 18px 20px; display: grid; grid-template-columns: 28px 1fr 220px 110px; gap: 16px; align-items: center; border-bottom: 1px solid rgba(45,27,46,0.07); }
+  .booking-row:last-child { border-bottom: 0; }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(45,27,46,0.2); }
+  .reasoning { background: #FBF8F2; border-left: 2px solid var(--brass); padding: 12px 16px; font-size: 13px; color: var(--aubergine); line-height: 1.55; }
+</style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-aubergine/10 bg-clay/80 backdrop-blur sticky top-0 z-20">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <a href="01-landing.html" class="font-serif text-2xl text-aubergine">Tures</a>
+      <nav class="hidden md:flex gap-8 text-sm text-aubergine/70">
+        <a href="02-paste-trip.html">New trip</a>
+        <a href="04-execution-dashboard.html" class="text-aubergine">In flight</a>
+        <a href="05-itinerary.html">Past trips</a>
+        <a href="06-notifications.html">Notifications</a>
+        <a href="03-connections.html">Connections</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="caps text-xs text-slate-warm">Andy Rockwell</span>
+      <div class="w-9 h-9 rounded-full bg-aubergine text-brass flex items-center justify-center font-serif text-lg">A</div>
+    </div>
+  </div>
+</header>
+
+<!-- TITLE STRIP -->
+<section class="max-w-7xl mx-auto px-8 pt-10 pb-6">
+  <div class="flex items-end justify-between flex-wrap gap-4">
+    <div>
+      <div class="caps text-xs text-slate-warm mb-2">Executing · trip #T-2087 · 7 bookings</div>
+      <h1 class="font-serif text-5xl text-aubergine leading-[1.05]">Paris · Saariselkä · Copenhagen</h1>
+      <div class="text-aubergine/70 mt-2">Dec 3 — Dec 13, 2026 · <span class="font-mono">11d</span> · 1 traveler · Business</div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-right">
+        <div class="caps text-xs text-slate-warm">Progress</div>
+        <div class="font-mono text-2xl text-aubergine">5 / 7</div>
+      </div>
+      <div class="text-right">
+        <div class="caps text-xs text-slate-warm">Est. complete</div>
+        <div class="font-mono text-2xl text-aubergine">2 min</div>
+      </div>
+      <div class="text-right">
+        <div class="caps text-xs text-slate-warm">Authorized total</div>
+        <div class="font-mono text-2xl text-aubergine">$26,114</div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-6 progress-track"><div class="progress-fill" style="width: 71%"></div></div>
+</section>
+
+<!-- LAYOUT -->
+<section class="max-w-7xl mx-auto px-8 pb-24 grid lg:grid-cols-12 gap-8">
+
+  <!-- LEFT — Bookings -->
+  <div class="lg:col-span-8 space-y-6">
+
+    <div class="card rounded-md">
+      <header class="px-5 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div class="caps text-xs text-slate-warm">Bookings · in execution order</div>
+        <div class="flex gap-2">
+          <span class="pill pill-confirm">3 booked</span>
+          <span class="pill pill-pending">2 in progress</span>
+          <span class="pill pill-alert">1 needs you</span>
+          <span class="pill pill-neutral">1 queued</span>
+        </div>
+      </header>
+
+      <!-- Booking 1 — done -->
+      <div class="booking-row">
+        <span class="dot dot-green"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-aubergine">AA 142 · SEA → CDG</span>
+            <span class="caps text-xs text-slate-warm">Thu Dec 3 · 18:45 → Fri Dec 4 · 13:25</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Business · seat 5A · AAdvantage #3HJ8DD2 · 25,200 EQM</div>
+          <details class="mt-2 text-xs">
+            <summary class="text-brass"><span class="chev">▸</span> Tures' reasoning</summary>
+            <div class="reasoning mt-2">
+              You wrote "direct into Paris arriving on the 4th." AA 142 is the only same-day non-stop SEA→CDG in business that satisfies "arriving the 4th" without an overnight elsewhere. Delta 134 was a close alternative but departs 2h later and seats were last-3-row only.
+            </div>
+          </details>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">PNR · LXJ7Q3</div>
+        <div class="text-right">
+          <span class="pill pill-confirm">Booked · verified ×2</span>
+        </div>
+      </div>
+
+      <!-- Booking 2 — done -->
+      <div class="booking-row">
+        <span class="dot dot-green"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-serif text-xl text-aubergine">Real Christine, Paris</span>
+            <span class="caps text-xs text-slate-warm">Dec 4 → Dec 7 · 3 nights</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Junior Suite · garden view · breakfast included · €1,640 total</div>
+          <details class="mt-2 text-xs">
+            <summary class="text-brass"><span class="chev">▸</span> Tures' reasoning</summary>
+            <div class="reasoning mt-2">
+              Booked direct (property does not surface inventory through Booking.com for this date range). Junior Suite Garden View — closest match to your prior preference for suite-tier rooms with quiet outlook. Virtuoso amenities applied automatically: €100 F&amp;B credit + room upgrade subject to availability at check-in.
+            </div>
+          </details>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">CONF · 8849-RCP</div>
+        <div class="text-right">
+          <span class="pill pill-confirm">Booked · verified ×2</span>
+        </div>
+      </div>
+
+      <!-- Booking 3 — needs decision -->
+      <div class="booking-row" style="background: #FCF7EE;">
+        <span class="dot dot-alert step-pulse"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-aubergine">AY 1574 · CDG → HEL → IVL</span>
+            <span class="caps text-xs text-slate-warm">Sun Dec 7 · 10:25 → 21:00</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Business · prefer non-stop · <strong class="text-aubergine">your decision required</strong> — non-stop doesn't exist</div>
+          <details class="mt-2 text-xs" open>
+            <summary class="text-brass"><span class="chev">▸</span> Tures' reasoning &amp; options</summary>
+            <div class="reasoning mt-2">
+              You wrote "should be non-stop on Finnair?" — that route is not flown non-stop in December. <strong>Strongest fit:</strong> AY 1574 with a 1h 50m HEL connection, same airline, 4,300 Tier Points, Schengen-side transfer (no re-immigration). I haven't booked this yet. Confirm or pick the alternative below.
+              <div class="mt-3 flex gap-2">
+                <button class="px-3 py-1.5 bg-brass text-aubergine text-xs font-medium">Approve AY 1574</button>
+                <button class="px-3 py-1.5 border border-aubergine/20 text-aubergine text-xs">See AF + AY combo</button>
+                <button class="px-3 py-1.5 text-xs text-slate-warm">Don't book this leg</button>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">—</div>
+        <div class="text-right">
+          <span class="pill pill-alert">Needs you</span>
+        </div>
+      </div>
+
+      <!-- Booking 4 — done -->
+      <div class="booking-row">
+        <span class="dot dot-green"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-serif text-xl text-aubergine">Javri Lodge, Saariselkä</span>
+            <span class="caps text-xs text-slate-warm">Dec 7 → Dec 10 · 3 nights</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Aurora Suite · private terrace · breakfast + dinner included · transfers from IVL arranged</div>
+          <details class="mt-2 text-xs">
+            <summary class="text-brass"><span class="chev">▸</span> Tures' reasoning</summary>
+            <div class="reasoning mt-2">
+              Property has 6 room types; chose Aurora Suite based on your stated interest in Lapland's December aurora season. Booked direct — Javri Lodge does not appear in Booking.com inventory. Confirmed IVL airport transfer for the AY arrival window — I'll adjust automatically if the flight rebooks.
+            </div>
+          </details>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">CONF · JL-12041</div>
+        <div class="text-right">
+          <span class="pill pill-confirm">Booked · verified ×2</span>
+        </div>
+      </div>
+
+      <!-- Booking 5 — in progress -->
+      <div class="booking-row">
+        <span class="dot dot-amber step-pulse"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-aubergine">AY 945 · IVL → HEL → CPH</span>
+            <span class="caps text-xs text-slate-warm">Wed Dec 10 · 14:20 → 19:15</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Business · awaiting fare-class verification from AY</div>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">pending</div>
+        <div class="text-right">
+          <span class="pill pill-pending">Reserving</span>
+        </div>
+      </div>
+
+      <!-- Booking 6 — in progress -->
+      <div class="booking-row">
+        <span class="dot dot-amber step-pulse"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-serif text-xl text-aubergine">Hotel Sanders, Copenhagen</span>
+            <span class="caps text-xs text-slate-warm">Dec 10 → Dec 13 · 3 nights</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Junior Suite — checking with property direct, Booking.com sold out at this tier</div>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">checking direct</div>
+        <div class="text-right">
+          <span class="pill pill-pending">Reserving</span>
+        </div>
+      </div>
+
+      <!-- Booking 7 — queued -->
+      <div class="booking-row">
+        <span class="dot dot-brass"></span>
+        <div>
+          <div class="flex items-baseline gap-3">
+            <span class="font-mono text-aubergine">AF 1351 + AF 376 · CPH → CDG → SEA</span>
+            <span class="caps text-xs text-slate-warm">Sun Dec 13 · 10:35 → 17:10</span>
+          </div>
+          <div class="text-sm text-slate-warm mt-1">Business · non-stop CDG→SEA on AF 376 · Flying Blue credited</div>
+        </div>
+        <div class="text-sm text-aubergine/70 font-mono">—</div>
+        <div class="text-right">
+          <span class="pill pill-neutral">Queued</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DINNERS strip -->
+    <div class="card rounded-md p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="caps text-xs text-slate-warm">Dinners</div>
+          <h3 class="font-serif text-xl text-aubergine mt-1">9 nights · across 3 cities</h3>
+        </div>
+        <a href="07-concierge-chat.html" class="text-xs text-brass hover:underline">Edit preferences →</a>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4 text-sm">
+        <div class="p-4 bg-[#FBF8F2] rounded">
+          <div class="caps text-xs text-slate-warm mb-1">Paris · 3 nights</div>
+          <div class="font-serif text-base text-aubergine">Septime · Le Bistrot Paul Bert · Frenchie</div>
+          <div class="text-xs text-slate-warm mt-1">Resy confirmed × 2 · 1 routed to concierge desk</div>
+        </div>
+        <div class="p-4 bg-[#FBF8F2] rounded">
+          <div class="caps text-xs text-slate-warm mb-1">Saariselkä · 3 nights</div>
+          <div class="font-serif text-base text-aubergine">Lodge dining included</div>
+          <div class="text-xs text-slate-warm mt-1">Reserved via property · no platform needed</div>
+        </div>
+        <div class="p-4 bg-[#FBF8F2] rounded">
+          <div class="caps text-xs text-slate-warm mb-1">Copenhagen · 3 nights</div>
+          <div class="font-serif text-base text-aubergine">Geranium · Apollo Bar · Kadeau</div>
+          <div class="text-xs text-slate-warm mt-1">Geranium routed to concierge desk · ETA <span class="font-mono">~4h</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — Agent Stream -->
+  <aside class="lg:col-span-4">
+    <div class="card rounded-md sticky top-24">
+      <header class="px-5 py-4 border-b border-aubergine/10 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="dot dot-brass step-pulse"></span>
+          <span class="caps text-xs text-aubergine">Agent stream · live</span>
+        </div>
+        <button class="text-xs text-slate-warm hover:text-aubergine">Pause</button>
+      </header>
+      <div class="p-5 space-y-4 text-sm max-h-[600px] overflow-y-auto">
+
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:51:14</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Verifying Hotel Sanders direct inventory for Junior Suite tier.</div>
+            <div class="text-xs text-slate-warm">Source: hotelsanders.com · session warmed · expected response &lt; 40s</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:50:42</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Reserved AY 945 fare class D (Biz, refundable). Awaiting AY confirmation email to verify.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:50:11</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Surfaced decision for CDG → IVL routing. Non-stop unavailable; presenting two cleanest alternatives.</div>
+            <div class="text-xs text-slate-warm">Confidence in stated user preference: 0.84</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:49:38</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Booked Javri Lodge · Aurora Suite · 3 nights. Both provider and email confirmations received.</div>
+            <div class="text-xs text-slate-warm">CONF · JL-12041 · charged €4,890 to AmEx ··1004</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:49:02</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Routed Geranium reservation request to concierge desk (no public API). Median response 4h 20m.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:48:11</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Booked Real Christine · Junior Suite · 3 nights. Email confirmation parsed, matches provider.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:47:55</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Booked AA 142 · SEA → CDG · Business · seat 5A. AAdvantage credit applied.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:47:02</span>
+          <div class="flex-1">
+            <div class="text-aubergine">User approved 7-leg plan. Beginning execution in dependency order: outbound flight → first stay → onward flights → final return.</div>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <span class="font-mono text-xs text-slate-warm mt-0.5">12:46:33</span>
+          <div class="flex-1">
+            <div class="text-aubergine">Parsed trip from forwarded email. 7 legs · 9 dinners · 1 uncertainty flagged (CDG→IVL non-stop).</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="px-5 py-3 border-t border-aubergine/10 bg-[#FBF8F2] text-xs text-slate-warm flex justify-between">
+        <a href="#" class="hover:text-aubergine">Full audit log →</a>
+        <span>83 events</span>
+      </div>
+    </div>
+  </aside>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-aubergine/10 py-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-warm">
+    <span>Tures · trip #T-2087 · execution session <span class="font-mono">12:47 PT</span></span>
+    <a href="#" class="hover:text-aubergine">Need to pause everything? →</a>
+  </div>
+</footer>
+
+</body>
+</html>

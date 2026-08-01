@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Describe a trip. We book it.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --aubergine: #2D1B2E;
+    --brass: #B8965A;
+    --brass-soft: #D4B989;
+    --clay: #F4EFE8;
+    --ink: #1C1816;
+    --slate: #7A7167;
+    --confirm: #3F6B3F;
+    --pending: #C58A2A;
+    --alert: #C25444;
+  }
+  html, body { background: var(--clay); color: var(--ink); }
+  .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-sans  { font-family: 'Inter', system-ui, sans-serif; }
+  .font-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .text-aubergine { color: var(--aubergine); }
+  .bg-aubergine { background: var(--aubergine); }
+  .text-brass { color: var(--brass); }
+  .bg-brass { background: var(--brass); }
+  .text-slate-warm { color: var(--slate); }
+  .ring-brass { box-shadow: 0 0 0 1px var(--brass); }
+  .caps { letter-spacing: 0.08em; text-transform: uppercase; }
+  .hover-lift { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(45,27,46,0.18); }
+  .hero-grad {
+    background:
+      linear-gradient(180deg, rgba(45,27,46,0.0) 0%, rgba(45,27,46,0.55) 70%, rgba(45,27,46,0.85) 100%),
+      linear-gradient(120deg, #3a2a48 0%, #5b3a3a 55%, #7a5a3a 100%);
+  }
+  .dot-brass { display:inline-block; width:6px; height:6px; border-radius:99px; background: var(--brass); margin-right:8px; vertical-align: middle; }
+  .demo-card { background: #fff; border: 1px solid rgba(45,27,46,0.08); }
+  .pill { display:inline-flex; align-items:center; padding: 4px 10px; border-radius: 999px; font-size: 11px; letter-spacing:0.06em; text-transform:uppercase; font-weight:500; }
+  .pill-confirm { background: rgba(63,107,63,0.1); color: var(--confirm); }
+  .pill-pending { background: rgba(197,138,42,0.12); color: var(--pending); }
+  .pill-alert   { background: rgba(194,84,68,0.1);  color: var(--alert); }
+  .divider { height: 1px; background: rgba(45,27,46,0.1); }
+  .tag { font-size:11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); font-weight:500; }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- HEADER -->
+<header class="absolute top-0 inset-x-0 z-20">
+  <nav class="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between text-white/95">
+    <a href="#" class="font-serif text-2xl tracking-wide">Tures</a>
+    <div class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#how" class="hover:text-white">How it works</a>
+      <a href="#demo" class="hover:text-white">Live demo</a>
+      <a href="#pricing" class="hover:text-white">Pricing</a>
+      <a href="#sign-in" class="hover:text-white">Sign in</a>
+      <a href="#request" class="px-4 py-2 rounded-sm bg-brass text-aubergine font-medium text-sm hover-lift">Request access</a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="relative h-[88vh] min-h-[640px] hero-grad overflow-hidden">
+  <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 70% 30%, rgba(184,150,90,0.4), transparent 60%);"></div>
+  <div class="relative max-w-7xl mx-auto px-8 h-full flex flex-col justify-end pb-24">
+    <div class="max-w-3xl text-white">
+      <div class="tag text-brass mb-6">A travel agent that ships</div>
+      <h1 class="font-serif font-light text-6xl md:text-7xl leading-[1.02] tracking-tight">
+        Describe a trip.<br/>We book it.
+      </h1>
+      <p class="mt-8 text-xl text-white/80 max-w-xl leading-relaxed">
+        Tures is an AI concierge with permissions. Paste your itinerary the way you'd send it to a friend. We book every leg — flight, hotel, dinner — to your exact specifications, and tell you the truth when reality doesn't cooperate.
+      </p>
+      <div class="mt-10 flex items-center gap-4">
+        <a href="#demo" class="px-6 py-3.5 bg-brass text-aubergine font-medium text-sm hover-lift">See it book Andy's trip</a>
+        <a href="#how" class="px-6 py-3.5 border border-white/30 text-white text-sm hover:border-white/60">How it works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF STRIP -->
+<section class="border-y border-aubergine/10 py-8">
+  <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-6">
+    <div class="tag">Trusted by travelers from</div>
+    <div class="flex flex-wrap items-center gap-x-12 gap-y-3 text-aubergine/70 font-serif text-2xl">
+      <span>Goldman</span>
+      <span>Bain</span>
+      <span>Sequoia</span>
+      <span>Stripe</span>
+      <span>Mayo Clinic</span>
+      <span>Cravath</span>
+    </div>
+  </div>
+</section>
+
+<!-- THE DEMO — Andy's trip -->
+<section id="demo" class="max-w-7xl mx-auto px-8 py-32">
+  <div class="grid lg:grid-cols-12 gap-12">
+    <div class="lg:col-span-4">
+      <div class="tag mb-4">A live example</div>
+      <h2 class="font-serif text-5xl text-aubergine leading-[1.05] tracking-tight">A real trip<br/>a friend sent us.</h2>
+      <p class="mt-6 text-aubergine/70 leading-relaxed">
+        Andy Rockwell sent his itinerary in an email — the way a frequent traveler actually writes them. Eleven days, four flights, three hotels, two cities he'd never been to. Watch how Tures handles it.
+      </p>
+      <div class="mt-8 space-y-3 text-sm text-aubergine/70">
+        <div class="flex items-start gap-3"><span class="dot-brass mt-2"></span><span>4 international flights, business class, non-stop where possible</span></div>
+        <div class="flex items-start gap-3"><span class="dot-brass mt-2"></span><span>3 boutique hotels named by the traveler</span></div>
+        <div class="flex items-start gap-3"><span class="dot-brass mt-2"></span><span>9 nights of dinner reservations to be arranged</span></div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-8">
+      <div class="demo-card rounded-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-aubergine/10 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="dot-brass"></span>
+            <span class="caps text-xs text-slate-warm">From: andy@rockwell.io · Forwarded to trip@tures.app</span>
+          </div>
+          <span class="pill pill-confirm">Parsed</span>
+        </div>
+        <div class="grid md:grid-cols-2">
+          <!-- LEFT: the email -->
+          <div class="p-6 border-r border-aubergine/10 text-[14px] leading-relaxed text-aubergine/80">
+            <p class="mb-4 italic">Show me this can be done and my mind is officially blown. More curious if it can be done with the room types I want, flight schedules, etc.</p>
+            <p class="mb-3"><strong>Leave Thursday December 3rd</strong> &gt; Fly direct into Paris arriving on the 4th. Business Class.</p>
+            <p class="mb-3"><strong>Stay in Paris</strong> 4-5-6th at Real Christine.</p>
+            <p class="mb-3"><strong>Fly Paris to Ivalo</strong> on the 7th. Should be non-stop on Finnair?</p>
+            <p class="mb-3"><strong>Stay at Javri Lodge</strong> 7-8-9th.</p>
+            <p class="mb-3"><strong>Fly Ivalo to Copenhagen</strong> on the 10th.</p>
+            <p class="mb-3"><strong>Stay at Hotel Sanders</strong> 10-11-12.</p>
+            <p><strong>Fly to Seattle on the 13th.</strong> Probably through Paris to make non-stop both ways on business.</p>
+          </div>
+          <!-- RIGHT: parsed plan -->
+          <div class="p-6 bg-[#FBF8F2] text-[13px]">
+            <div class="caps text-xs text-slate-warm mb-3">Structured plan · 7 legs · 9 dinners</div>
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between"><span class="font-mono text-aubergine">SEA → CDG</span><span class="text-slate-warm">12/03 · Biz · non-stop</span></div>
+              <div class="flex items-center justify-between text-aubergine/80"><span class="font-serif text-base">Real Christine, Paris</span><span class="text-slate-warm">12/04–12/07</span></div>
+              <div class="flex items-center justify-between"><span class="font-mono text-aubergine">CDG → IVL</span><span class="text-slate-warm">12/07 · AY · prefer non-stop</span></div>
+              <div class="flex items-center justify-between text-aubergine/80"><span class="font-serif text-base">Javri Lodge, Saariselkä</span><span class="text-slate-warm">12/07–12/10</span></div>
+              <div class="flex items-center justify-between"><span class="font-mono text-aubergine">IVL → CPH</span><span class="text-slate-warm">12/10</span></div>
+              <div class="flex items-center justify-between text-aubergine/80"><span class="font-serif text-base">Hotel Sanders, Copenhagen</span><span class="text-slate-warm">12/10–12/13</span></div>
+              <div class="flex items-center justify-between"><span class="font-mono text-aubergine">CPH → SEA</span><span class="text-slate-warm">12/13 · via CDG · Biz</span></div>
+            </div>
+            <div class="divider my-4"></div>
+            <div class="text-aubergine/80 leading-relaxed text-[12.5px]">
+              <strong>One thing to verify:</strong> AY does not operate non-stop CDG→IVL in December. Two viable alternatives staged for your approval.
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-aubergine/10 flex items-center justify-between bg-white">
+          <div class="text-sm text-aubergine/70">Ready to stage 7 bookings · est. <span class="font-mono">8 min</span></div>
+          <a href="#" class="px-4 py-2 bg-aubergine text-white text-sm hover-lift">Watch it execute →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="bg-aubergine text-white py-32">
+  <div class="max-w-7xl mx-auto px-8">
+    <div class="max-w-2xl mb-20">
+      <div class="tag text-brass mb-4">How it works</div>
+      <h2 class="font-serif text-5xl leading-[1.05]">An agent, not a search box.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-12">
+      <div>
+        <div class="font-mono text-brass mb-4">01</div>
+        <h3 class="font-serif text-2xl mb-3">Describe the trip</h3>
+        <p class="text-white/70 leading-relaxed">Paste an email, dictate a voice memo, or message us. The way you'd brief a friend who already knows your taste.</p>
+      </div>
+      <div>
+        <div class="font-mono text-brass mb-4">02</div>
+        <h3 class="font-serif text-2xl mb-3">Approve the plan</h3>
+        <p class="text-white/70 leading-relaxed">We parse your itinerary, fan out across providers, and surface trade-offs where reality doesn't match the brief. You approve once.</p>
+      </div>
+      <div>
+        <div class="font-mono text-brass mb-4">03</div>
+        <h3 class="font-serif text-2xl mb-3">We execute</h3>
+        <p class="text-white/70 leading-relaxed">Every leg booked. Loyalty applied. Card charged transparently. We monitor for changes and handle them while you sleep.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT MAKES IT DIFFERENT -->
+<section class="py-32">
+  <div class="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20">
+    <div>
+      <div class="tag mb-4">The difference</div>
+      <h2 class="font-serif text-5xl text-aubergine leading-[1.05]">Most AI travel tools end with a list of links.<br/><span class="text-brass">Tures ends with confirmation numbers.</span></h2>
+    </div>
+    <div class="space-y-8 text-aubergine/80">
+      <div>
+        <div class="caps text-xs text-slate-warm mb-2">Spec-match over price-shop</div>
+        <p class="leading-relaxed">You named Real Christine. We book Real Christine. We don't substitute the comparable Marais boutique because it's $40 cheaper.</p>
+      </div>
+      <div>
+        <div class="caps text-xs text-slate-warm mb-2">Transparent, never autonomous on uncertainty</div>
+        <p class="leading-relaxed">When Finnair doesn't run a non-stop, we surface the two cleanest alternatives with their trade-offs. We never autonomously rebook into something you didn't approve.</p>
+      </div>
+      <div>
+        <div class="caps text-xs text-slate-warm mb-2">Verified twice before "Booked."</div>
+        <p class="leading-relaxed">Every booking is confirmed against both the provider receipt and the email confirmation in your inbox. We don't say "Booked" until both agree.</p>
+      </div>
+      <div>
+        <div class="caps text-xs text-slate-warm mb-2">In-trip concierge that actually responds</div>
+        <p class="leading-relaxed">Text Tures from Paris: <em>push my Friday dinner to 9pm.</em> Done — and confirmed — before you've finished your apéritif.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="bg-[#FBF8F2] py-32 border-t border-aubergine/10">
+  <div class="max-w-4xl mx-auto px-8 text-center">
+    <div class="tag mb-4">Pricing</div>
+    <h2 class="font-serif text-5xl text-aubergine leading-[1.05] mb-4">One subscription. No hidden markup.</h2>
+    <p class="text-aubergine/70 max-w-2xl mx-auto">We pass through wholesale pricing where we can and disclose every commission. The fee is the fee.</p>
+    <div class="mt-12 inline-block demo-card rounded-md px-10 py-10 text-left max-w-md">
+      <div class="font-serif text-3xl text-aubergine">Tures Concierge</div>
+      <div class="mt-2 text-slate-warm text-sm">Unlimited trips · single traveler or household</div>
+      <div class="mt-6 flex items-baseline gap-2">
+        <span class="font-serif text-6xl text-aubergine">$1,800</span>
+        <span class="text-slate-warm">/ year</span>
+      </div>
+      <div class="divider my-6"></div>
+      <ul class="space-y-2 text-sm text-aubergine/80">
+        <li>· Unlimited bookings, flights + hotels + restaurants</li>
+        <li>· In-trip concierge, 24/7</li>
+        <li>· Loyalty + status applied automatically</li>
+        <li>· Two-source verification on every booking</li>
+        <li>· Quarterly transparency report on every dollar charged</li>
+      </ul>
+      <a href="#request" class="mt-8 block w-full text-center py-3.5 bg-brass text-aubergine font-medium hover-lift">Request access</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-aubergine text-white/70 py-16">
+  <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    <div>
+      <div class="font-serif text-2xl text-white">Tures</div>
+      <div class="text-sm mt-2">A trip booked is the only thing we ship.</div>
+    </div>
+    <div class="flex flex-wrap gap-8 text-sm">
+      <a href="#" class="hover:text-white">How it works</a>
+      <a href="#" class="hover:text-white">Pricing</a>
+      <a href="#" class="hover:text-white">Transparency report</a>
+      <a href="#" class="hover:text-white">Security</a>
+      <a href="#" class="hover:text-white">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

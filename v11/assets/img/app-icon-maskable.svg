@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#ff4929"/>
+  <text x="240" y="318" text-anchor="middle" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="230" font-weight="600" fill="#ffffff">t</text>
+  <path d="M346 168 Q356 191 379 201 Q356 211 346 234 Q336 211 313 201 Q336 191 346 168 Z" fill="#ffffff"/>
+</svg>

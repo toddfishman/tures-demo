@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Grant permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+  .perm{ transition:border-color .3s ease, box-shadow .3s ease; }
+  .perm.granted{ border-color:rgba(95,125,79,0.5); box-shadow:0 0 0 1px rgba(95,125,79,0.25); }
+  .grant-flash{ animation:flash .6s ease; }
+  @keyframes flash{ 0%{background:rgba(95,125,79,0)} 40%{background:rgba(95,125,79,0.12)} 100%{background:rgba(95,125,79,0)} }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="04-connections.html" class="active">Connections</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+  <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">IV</div>
+  <div class="relative z-10 max-w-5xl mx-auto px-6 pt-14 pb-9">
+    <div class="caps text-[11px] text-gold/80 mb-3">Chapter IV · Connect</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Grant the access.<br><span class="foil">Pull it any time.</span></h1>
+    <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Scoped, revocable, logged. Exactly what's needed to book and watch — nothing speculative.</p>
+  </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-7">
+
+  <div class="lg:col-span-2 space-y-3">
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="card">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">▦</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Payment · AmEx ··1004</div>
+        <div class="text-xs text-ink-faint mt-0.5">Per-trip cap you set · <button class="text-gold-deep underline" data-sheet="sheet-card">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="loyalty">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(200,162,74,0.14);color:var(--gold-deep)">✦</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Loyalty &amp; status</div>
+        <div class="text-xs text-ink-faint mt-0.5">AAdvantage · Flying Blue · Virtuoso · <button class="text-gold-deep underline" data-sheet="sheet-loyalty">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="calendar">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">▤</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Calendar</div>
+        <div class="text-xs text-ink-faint mt-0.5">Route around what's booked · <button class="text-gold-deep underline" data-sheet="sheet-calendar">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="inbox">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(74,107,134,0.16);color:#3c5a72">✉</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Inbox · read confirmations</div>
+        <div class="text-xs text-ink-faint mt-0.5">Travel senders only, read-only · <button class="text-gold-deep underline" data-sheet="sheet-inbox">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <div class="perm leaf p-4 flex items-center gap-4" data-perm="messaging">
+      <div class="w-11 h-11 rounded-lg grid place-items-center text-xl shrink-0" style="background:rgba(43,33,20,0.08);color:var(--ink-faint)">◈</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-display text-xl text-ink leading-tight">Messaging · WhatsApp / Telegram</div>
+        <div class="text-xs text-ink-faint mt-0.5">Optional — the daily channel · coming soon · <button class="text-gold-deep underline" data-sheet="sheet-messaging">explain</button></div>
+      </div>
+      <div class="switch off" data-toggle></div>
+    </div>
+
+    <button id="grantAll" class="btn-gold w-full px-5 py-3.5 rounded-xl mt-2 font-semibold">⚡ Connect required (4) in sequence</button>
+  </div>
+
+  <aside class="space-y-4">
+    <div class="leaf p-6">
+      <div class="flex items-center justify-between mb-3">
+        <div class="caps text-[11px] text-ink-faint">Status</div>
+        <span class="pill" id="statusPill"><span class="dot dot-amber"></span> Not ready</span>
+      </div>
+      <div class="flex items-baseline gap-2 mb-4">
+        <span class="font-mono text-4xl text-ink" id="connCount">0</span>
+        <span class="text-ink-soft text-sm">of 5 connected</span>
+      </div>
+      <div class="track mb-5"><div class="fill" id="connBar" style="width:0%"></div></div>
+      <div class="caps text-[11px] text-ink-faint mb-3">Your guarantees</div>
+      <ul class="space-y-2.5 text-sm text-ink/85">
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Nothing charged beyond your cap.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Read-only inbox, travel senders only.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Every action in an exportable log.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✓</span> Revoke in one tap — bookings stay yours.</li>
+      </ul>
+    </div>
+  </aside>
+ </div>
+</section>
+
+<!-- ===== WALLET & TRAVELER PROFILE (live with the engine) ===== -->
+<section class="canvas-surface text-ink border-t" style="border-color:var(--canvas-line)">
+ <div class="max-w-5xl mx-auto px-6 py-12">
+  <div id="walletPanel" class="leaf p-6 sm:p-8" style="display:none">
+    <div class="flex items-center justify-between mb-1">
+      <div class="caps text-[11px] text-ink-faint">Wallet &amp; traveler profile</div>
+      <span class="pill pill-confirm text-[11px]"><span class="dot dot-green"></span> Live engine</span>
+    </div>
+    <h2 class="font-display text-3xl text-ink leading-tight mb-2">The things a real booking needs.</h2>
+    <p class="text-sm text-ink-soft leading-relaxed max-w-2xl mb-6">Add the cards you carry and your travel documents. Tures charges each leg to whichever card earns the most on that kind of spend — and applies your passport, Known Traveler Number, and loyalty programs at booking.</p>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- wallet -->
+      <div>
+        <div class="caps text-[11px] text-ink-faint mb-3">Your cards</div>
+        <div class="flex gap-2 mb-3">
+          <select id="cardPick" class="flex-1 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)"></select>
+          <button id="addCard" class="btn-ink px-4 py-2 rounded-lg text-sm press shrink-0">Add</button>
+        </div>
+        <div id="walletList" class="space-y-2 mb-4"></div>
+        <div id="walletRec" class="text-[13px] text-ink-soft rounded-lg p-3" style="background:rgba(200,162,74,0.08);border:1px solid rgba(200,162,74,0.28);display:none"></div>
+      </div>
+
+      <!-- traveler profile -->
+      <div>
+        <div class="caps text-[11px] text-ink-faint mb-3">Traveler details</div>
+        <div class="space-y-2.5">
+          <input id="pfPassport" placeholder="Passport number" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
+          <input id="pfKtn" placeholder="Known Traveler Number (TSA Pre)" class="w-full rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
+          <div class="flex gap-2">
+            <input id="pfProgram" placeholder="Loyalty program (e.g. Finnair Plus)" class="flex-1 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
+            <input id="pfNumber" placeholder="Number" class="w-28 rounded-lg border px-3 py-2 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />
+          </div>
+          <button id="saveProfile" class="btn-gold px-5 py-2.5 rounded-lg text-sm press w-full sm:w-auto">Save profile</button>
+          <div id="profileStatus" class="text-[13px] text-ink-soft"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter IV · Grant permissions</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-5xl mx-auto w-full flex items-center gap-3">
+    <a href="05-execution.html" id="execCta" class="btn-gold flex-1 text-center px-6 py-3 rounded-xl quiet font-semibold" style="opacity:.55;pointer-events:none">Connect 4 required to begin →</a>
+  </div>
+</div>
+
+<!-- ===== bottom sheets ===== -->
+<div class="sheet" id="sheet-card"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Payment</div>
+  <h3 class="font-display text-2xl text-ink mb-3">How your card is used</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">A per-trip authorization with a ceiling you set. Every charge is itemized and pushed to you the moment it's made. The card is held in a PCI-scope tokenization vault — Tures' agent never sees the raw number. Nothing is charged without an authorization you've approved.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-loyalty"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Loyalty &amp; status</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Applied automatically</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">AAdvantage, Flying Blue, Finnair Plus and your Virtuoso membership are attached to every booking that supports them — credits applied, status chased mid-trip, upgrades requested at check-in. You see exactly which program was used on each leg.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-calendar"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Calendar</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Routes around your life</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">We read availability to avoid booking over what's already on your plate, then write the confirmed trip back in — flights, hotels, dinners — with confirmation numbers attached to each event. Scoped to free/busy and the events we create.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-inbox"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Inbox</div>
+  <h3 class="font-display text-2xl text-ink mb-3">The second source of truth</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Read-only, scoped to travel senders only — never marketing, never your personal mail. We use the confirmation email as an independent check against the provider receipt. We don't mark anything "Booked" until both agree.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-messaging"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Messaging</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Where the concierge lives</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Optional, but it's where most of the relationship happens once you're moving. Connect WhatsApp or Telegram and you can brief Tures the way you'd text a fixer. Same agent, same memory, same permissions as the app.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<script src="assets/engine.js"></script>
+<script>
+var REQUIRED = ['card','loyalty','calendar','inbox'];
+function rowFor(name){ return document.querySelector('.perm[data-perm="'+name+'"]'); }
+
+/* When an engine is configured, the toggles connect/revoke real vault grants (kept additive —
+   the scripted UX is unchanged either way). */
+var ENGINE_KIND = { card:'payment', loyalty:'loyalty', calendar:'calendar', inbox:'email' };
+var ENGINE_LABEL = { card:'AmEx ··1004', loyalty:'Loyalty programs', calendar:'Calendar', inbox:'Travel inbox' };
+var ENGINE_SECRET = { card:{ customerId:'cus_demo', paymentMethodId:'pm_demo' } };
+var _connIds = {};
+function syncEngine(name, on){
+  if(!(window.tures && tures.configured)) return;
+  var kind = ENGINE_KIND[name]; if(!kind) return; // messaging has no vault kind
+  if(on){
+    tures.connections.connect({ kind:kind, label:ENGINE_LABEL[name]||name, secret:ENGINE_SECRET[name]||{ token:'demo' }, meta:{ source:'demo' } })
+      .then(function(c){ _connIds[name] = c.id; })
+      .catch(function(e){ console.warn('[tures] connect failed', name, e); });
+  } else if(_connIds[name]){
+    tures.connections.revoke(_connIds[name]).catch(function(e){ console.warn('[tures] revoke failed', name, e); });
+    delete _connIds[name];
+  }
+}
+function setGranted(name, on){
+  var row = rowFor(name); if(!row) return;
+  var sw = row.querySelector('.switch');
+  sw.classList.toggle('on', on); sw.classList.toggle('off', !on);
+  row.classList.toggle('granted', on);
+  if(on){ row.classList.remove('grant-flash'); void row.offsetWidth; row.classList.add('grant-flash'); }
+  update();
+  syncEngine(name, on);
+}
+function update(){
+  var on = [].slice.call(document.querySelectorAll('.switch.on')).length;
+  document.getElementById('connCount').textContent = on;
+  document.getElementById('connBar').style.width = (on/5*100)+'%';
+  var ready = REQUIRED.every(function(n){ return rowFor(n).querySelector('.switch').classList.contains('on'); });
+  var pill = document.getElementById('statusPill');
+  pill.innerHTML = ready ? '<span class="dot dot-green"></span> Ready to book' : '<span class="dot dot-amber"></span> Not ready';
+  pill.className = 'pill ' + (ready ? 'pill-confirm' : 'pill-pending');
+  var cta = document.getElementById('execCta');
+  if(ready){ cta.style.opacity=1; cta.style.pointerEvents='auto'; cta.textContent='Begin execution →'; }
+  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Connect 4 required to begin →'; }
+}
+// individual toggles
+document.querySelectorAll('[data-toggle]').forEach(function(sw){
+  sw.addEventListener('click', function(){
+    var name = sw.closest('.perm').getAttribute('data-perm');
+    setGranted(name, !sw.classList.contains('on'));
+  });
+});
+// sequential grant
+document.getElementById('grantAll').addEventListener('click', function(){
+  var btn=this; btn.disabled=true; btn.style.opacity=.7; btn.textContent='Connecting…';
+  REQUIRED.forEach(function(name, i){
+    setTimeout(function(){
+      setGranted(name, true);
+      if(i===REQUIRED.length-1){ btn.textContent='✓ Connected'; setTimeout(function(){ btn.style.display='none'; }, 700); }
+    }, 350 + i*420);
+  });
+});
+update();
+</script>
+
+<!-- wallet & traveler profile — only active when an engine is configured -->
+<script>
+(function(){
+  if(!(window.tures && tures.configured)) return;        // scripted demo: leave panel hidden
+  var panel = document.getElementById('walletPanel');
+  panel.style.display = '';
+
+  var pick = document.getElementById('cardPick');
+  // populate card types from the engine catalog
+  tures.wallet.catalog().then(function(cat){
+    (cat.cards || []).forEach(function(c){
+      var o = document.createElement('option'); o.value = c.key; o.textContent = c.name; pick.appendChild(o);
+    });
+  }).catch(function(){});
+
+  function refresh(){
+    tures.connections.list().then(function(res){
+      var cards = (res.connections || []).filter(function(c){ return c.kind === 'payment'; });
+      var list = document.getElementById('walletList');
+      list.innerHTML = cards.length ? '' : '<div class="text-[13px] text-ink-faint">No cards yet — add one above.</div>';
+      cards.forEach(function(c){
+        var row = document.createElement('div');
+        row.className = 'flex items-center justify-between rounded-lg px-3 py-2 text-sm';
+        row.style = 'border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)';
+        row.innerHTML = '<span class="text-ink">' + c.label + '</span><button class="text-[12px] text-gold-deep hover:underline" data-revoke="' + c.id + '">remove</button>';
+        list.appendChild(row);
+      });
+      list.querySelectorAll('[data-revoke]').forEach(function(b){
+        b.onclick = function(){ tures.connections.revoke(b.getAttribute('data-revoke')).then(refresh); };
+      });
+      // recommend preview: who wins airfare vs hotel
+      if(cards.length){
+        Promise.all([
+          tures.wallet.recommend('airfare', 5000),
+          tures.wallet.recommend('hotel', 2000)
+        ]).then(function(rs){
+          var rec = document.getElementById('walletRec');
+          rec.style.display = '';
+          rec.innerHTML = '<strong>How Tures would charge:</strong><br>✈ Airfare → ' + (rs[0].name||'—') + '<br>⌂ Hotel → ' + (rs[1].name||'—');
+        }).catch(function(){});
+      } else {
+        document.getElementById('walletRec').style.display = 'none';
+      }
+    });
+  }
+  refresh();
+
+  document.getElementById('addCard').onclick = function(){
+    var key = pick.value; var name = pick.options[pick.selectedIndex].textContent;
+    tures.connections.connect({ kind:'payment', label:name, secret:{ customerId:'cus_demo', paymentMethodId:'pm_'+key }, meta:{ cardKey:key, last4:'0000' } }).then(refresh);
+  };
+
+  document.getElementById('saveProfile').onclick = function(){
+    var profile = {
+      passport: document.getElementById('pfPassport').value ? { number: document.getElementById('pfPassport').value, country:'US' } : undefined,
+      knownTravelerNumber: document.getElementById('pfKtn').value || undefined,
+      memberships: document.getElementById('pfProgram').value ? [{ kind:'airline', program: document.getElementById('pfProgram').value, number: document.getElementById('pfNumber').value }] : []
+    };
+    tures.profile.set(profile)
+      .then(function(c){
+        document.getElementById('profileStatus').innerHTML = '✓ Saved · passport ' + (c.meta && c.meta.passportMasked || '—') + (c.meta && c.meta.ktnOnFile ? ' · KTN on file' : '');
+      }).catch(function(e){ document.getElementById('profileStatus').textContent = 'Save failed: ' + e; });
+  };
+})();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

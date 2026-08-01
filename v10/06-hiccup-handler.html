@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The Hiccup Handler</title>
+<meta name="description" content="Tures watches every booking as a live position in a moving world and pre-stages the fix before a disruption reaches you." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/06-hiccup-handler.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — The Hiccup Handler" />
+<meta property="og:description" content="Tures watches every booking as a live position in a moving world and pre-stages the fix before a disruption reaches you." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/06-hiccup-handler.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — The Hiccup Handler" />
+<meta name="twitter:description" content="Tures watches every booking as a live position in a moving world and pre-stages the fix before a disruption reaches you." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; padding-bottom:84px; }
+
+  /* ───── the live ops map — command-center centerpiece ───── */
+  .ops-map{ position:relative; border-radius:18px; overflow:hidden; border:1px solid var(--gold);
+    background:radial-gradient(120% 130% at 50% 0%, #15241a 0%, #0a0f0b 68%);
+    box-shadow:0 36px 80px -34px rgba(0,0,0,.85), inset 0 0 70px rgba(0,0,0,.45); }
+  .ops-map .grid{ position:absolute; inset:0; opacity:.5; pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-size:42px 42px; mask-image:radial-gradient(120% 100% at 50% 40%, #000 55%, transparent); }
+  .ops-scan{ position:absolute; top:0; bottom:0; width:170px; z-index:3; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(74,222,128,0.12), transparent); animation:opsscan 5.5s linear infinite; }
+  @keyframes opsscan{ 0%{ left:-170px } 100%{ left:100% } }
+  .ops-svg{ position:relative; z-index:2; display:block; width:100%; height:auto; }
+  .arc{ fill:none; stroke:var(--gold); stroke-width:1.6; opacity:.55; stroke-dasharray:4 6; }
+  .arc.live{ animation:dash 22s linear infinite; }
+  @keyframes dash{ to{ stroke-dashoffset:-260; } }
+  .arc.risk{ stroke:#e07a5a; opacity:.9; stroke-width:2; filter:drop-shadow(0 0 6px rgba(224,122,90,.6)); }
+  .node{ fill:var(--gold-bright); }
+  .node-halo{ fill:none; stroke:var(--gold); opacity:.5; }
+  .node.risk{ fill:#f0a98f; }
+  .pulse-halo{ transform-origin:center; transform-box:fill-box; animation:nodepulse 2.2s ease-out infinite; }
+  @keyframes nodepulse{ 0%{ transform:scale(.5); opacity:.7 } 100%{ transform:scale(2.6); opacity:0 } }
+  .ops-label{ font-family:'JetBrains Mono',monospace; font-size:11px; fill:var(--gh-cream); }
+  .ops-label.dim{ fill:var(--gh-cream-dim); }
+  .ops-label.risk{ fill:#f0a98f; }
+  /* HUD overlay on the map */
+  .ops-hud{ position:absolute; z-index:4; left:18px; top:16px; right:18px; display:flex; align-items:center;
+    justify-content:space-between; gap:10px; pointer-events:none; }
+  .ops-hud .tag{ display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--gh-cream); background:rgba(8,12,8,0.6); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12);
+    padding:7px 12px; border-radius:99px; }
+  .ops-legend{ position:absolute; z-index:4; left:18px; bottom:14px; display:flex; gap:14px; font-size:10px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--gh-cream-dim); pointer-events:none; }
+  .ops-legend i{ display:inline-block; width:18px; height:2px; vertical-align:middle; margin-right:6px; }
+
+  /* live signal stream items */
+  .sig{ opacity:0; transform:translateY(-8px); transition:opacity .45s ease, transform .45s ease; border-left:2px solid transparent; }
+  .sig.in{ opacity:1; transform:none; }
+  .sig.watching{ border-left-color:var(--pending); }
+  .sig.noise{ border-left-color:rgba(255,255,255,0.12); }
+  /* feed text reads light in the dark console */
+  #feed .text-ink{ color:var(--gh-cream); }
+  #feed .text-ink-faint{ color:var(--gh-cream-dim); }
+
+  /* tap-to-expand timeline stepper */
+  .timeline{ position:relative; padding-left:30px; }
+  .timeline::before{ content:""; position:absolute; left:7px; top:8px; bottom:8px; width:2px; background:rgba(74,222,128,0.22); }
+  .tstep{ position:relative; margin-bottom:10px; opacity:.5; transition:opacity .4s ease; }
+  .tstep.lit{ opacity:1; }
+  .tnode{ position:absolute; left:-30px; top:14px; width:16px; height:16px; border-radius:99px;
+    border:2px solid var(--gold); background:var(--gh-card); transition:all .4s ease; z-index:2; }
+  .tstep.done .tnode{ background:var(--gold); border-color:var(--gold-bright); }
+  .tstep.active .tnode{ background:var(--alert); border-color:#e39179; box-shadow:0 0 0 4px rgba(181,84,58,0.22); }
+  .gh-step-head{ color:var(--gh-cream); }
+  .gh-step-meta{ color:var(--gh-cream-dim); }
+
+  /* itinerary legs */
+  .leg{ padding:7px 12px; border-radius:6px; border:1px solid rgba(255,255,255,0.12); font-size:11px; white-space:nowrap;
+    color:var(--gh-cream-dim); transition:all .4s ease; background:rgba(255,255,255,0.03); }
+  .leg.risk{ border-color:var(--alert); background:rgba(181,84,58,0.18); color:#f0b8a8; box-shadow:0 0 16px -4px rgba(181,84,58,.5); }
+  .leg.fixed{ border-color:var(--gold); background:rgba(74,222,128,0.14); color:var(--gold-bright); }
+
+  .prob-track{ height:6px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+  .prob-fill{ height:100%; background:linear-gradient(90deg,var(--gold),#b5543a); transition:width .6s ease; }
+
+  .ops-grid{ display:grid; grid-template-columns:1.5fr 1fr; gap:22px; align-items:stretch; }
+  @media(max-width:940px){ .ops-grid{ grid-template-columns:1fr; } }
+
+  .cta-bar{ position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px);
+    background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08); }
+  .what-watch-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<!-- CHROME (menu.js swaps in the floating glass nav + scene picker) -->
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ OPS-ROOM HERO ════════ -->
+<section class="gh-wash-surface gh-tile" style="position:relative; overflow:hidden;">
+  <div class="gh-section">
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">The Hiccup Handler · Command center</span></div>
+    <h1 class="gh-h1" style="max-width:15ch; margin-top:10px;">We see it coming.<br><span class="gh-accent gh-italic">You don't feel it.</span></h1>
+    <p class="gh-lead" style="margin-top:18px; max-width:46ch;">Every booking is a live position in a moving world. Tures watches the whole board — and pre-stages the fix before a disruption ever reaches you.</p>
+
+    <div class="ops-grid" style="margin-top:36px;" data-reveal>
+
+      <!-- LEFT — the live trip map -->
+      <div class="ops-map">
+        <div class="grid"></div>
+        <div class="ops-scan"></div>
+        <div class="ops-hud">
+          <span class="tag"><span class="dot dot-gold pulse" style="width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Watching · trip #T-2087</span>
+          <span class="gh-pill" id="ribbonStatus" style="pointer-events:auto;">All clear</span>
+        </div>
+        <svg class="ops-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-label="Live map of the watched trip">
+          <!-- arcs -->
+          <path class="arc live" d="M90,250 Q255,140 420,248" />
+          <path class="arc live" d="M420,248 Q505,150 560,112" />
+          <path class="arc live" d="M560,112 Q540,150 472,206" />
+          <path class="arc risk live" d="M472,206 Q255,338 92,252" />
+          <!-- nodes -->
+          <g>
+            <circle class="node-halo pulse-halo" cx="90" cy="250" r="8" />
+            <circle class="node" cx="90" cy="250" r="5" />
+            <text class="ops-label dim" x="74" y="276">SEA · Seattle</text>
+          </g>
+          <g>
+            <circle class="node-halo" cx="560" cy="112" r="8" />
+            <circle class="node" cx="560" cy="112" r="5" />
+            <text class="ops-label dim" x="500" y="100">IVL · Saariselkä</text>
+          </g>
+          <g>
+            <circle class="node-halo" cx="472" cy="206" r="8" />
+            <circle class="node" cx="472" cy="206" r="5" />
+            <text class="ops-label dim" x="484" y="200">CPH</text>
+          </g>
+          <g>
+            <circle class="node-halo pulse-halo" cx="420" cy="248" r="10" style="stroke:#e07a5a;" />
+            <circle class="node risk" cx="420" cy="248" r="6" />
+            <text class="ops-label risk" x="360" y="272">CDG · at risk</text>
+          </g>
+        </svg>
+        <div class="ops-legend"><span><i style="background:var(--gold);"></i>Monitored</span><span><i style="background:#e07a5a;"></i>At risk</span><span><i style="background:rgba(255,255,255,.3);"></i>Scanning</span></div>
+      </div>
+
+      <!-- RIGHT — the ops console (live feed + counters) -->
+      <div class="gh-card" style="display:flex; flex-direction:column; overflow:hidden;">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid rgba(255,255,255,0.09);">
+          <div style="padding:16px; border-right:1px solid rgba(255,255,255,0.06);">
+            <div class="gh-eyebrow" style="margin-bottom:6px;">Signals</div>
+            <div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:22px;" id="statScan" data-countup="14208" data-countup-dur="1500">0</div>
+          </div>
+          <div style="padding:16px; border-right:1px solid rgba(255,255,255,0.06);">
+            <div class="gh-eyebrow" style="margin-bottom:6px;">Pre-empted</div>
+            <div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:22px;" data-countup="3" data-countup-dur="1100">0</div>
+          </div>
+          <div style="padding:16px;">
+            <div class="gh-eyebrow" style="margin-bottom:6px;">Lead</div>
+            <div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:22px;" data-countup="27" data-suffix="h" data-countup-dur="1300">0h</div>
+          </div>
+        </div>
+        <div style="padding:13px 18px; border-bottom:1px solid rgba(255,255,255,0.09); display:flex; align-items:center; justify-content:space-between;">
+          <div class="flex items-center gap-2"><span class="dot dot-gold pulse"></span><span class="gh-eyebrow">Scanning now</span></div>
+          <span style="font-size:11px; color:var(--gh-cream-dim); font-family:'JetBrains Mono',monospace;"><span id="feedCount">0</span> seen · 0.3% assessed</span>
+        </div>
+        <div id="feed" class="p-3 space-y-2" style="flex:1; min-height:240px; max-height:300px; overflow:hidden;"></div>
+      </div>
+    </div>
+
+    <!-- the watched legs -->
+    <div style="margin-top:18px; display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;">
+      <span class="leg">SEA→CDG</span><span class="leg">Real Christine</span><span class="leg">CDG→IVL</span>
+      <span class="leg">Javri Lodge</span><span class="leg">IVL→CPH</span><span class="leg">Hotel Sanders</span>
+      <span class="leg" id="legReturn">CPH→CDG→SEA</span>
+    </div>
+
+    <div style="margin-top:24px;">
+      <button data-sheet="sheet-watch" class="press gh-btn-ghost gh-btn">◎ What we watch</button>
+    </div>
+  </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ ANATOMY OF A SAVE ════════ -->
+<section class="gh-wash">
+ <div class="gh-section" data-reveal>
+  <div style="max-width:48ch; margin-bottom:36px;">
+    <p class="gh-eyebrow" style="margin-bottom:12px;">Anatomy of a save</p>
+    <h2 class="gh-h2">From a rumor to a rebooking —<br><span class="gh-accent gh-italic">31 hours early.</span></h2>
+  </div>
+
+  <!-- the active hiccup, the whole story in one card -->
+  <div class="gh-card-acc" style="overflow:hidden;">
+    <header style="padding:26px 28px; border-bottom:1px solid rgba(255,255,255,0.09);">
+      <div class="flex items-start justify-between flex-wrap gap-3 mb-4">
+        <div>
+          <p class="gh-eyebrow" style="margin-bottom:8px;">Active watch</p>
+          <h3 class="gh-h3">French ATC strike — risk to your CDG connection</h3>
+        </div>
+        <span class="gh-pill" id="scPill">—</span>
+      </div>
+      <div class="flex justify-between gh-caps mb-2" style="font-size:11px; color:var(--gh-cream-dim);"><span>Disruption probability</span><span class="gh-accent" style="font-family:'JetBrains Mono',monospace;" id="probLabel">0.18</span></div>
+      <div class="prob-track"><div class="prob-fill" id="probFill" style="width:18%"></div></div>
+    </header>
+
+    <div style="padding:26px 28px;">
+      <p class="gh-eyebrow" style="margin-bottom:22px;">Tap a step for the reasoning</p>
+      <div class="timeline" id="timeline">
+        <div class="tstep exp" data-step="0"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="gh-caps gh-step-meta" style="font-size:10px;">Detected</span><span class="gh-step-meta" style="font-family:'JetBrains Mono',monospace; font-size:11px;">t-31h</span></div>
+              <div class="gh-step-head font-medium mt-1" style="font-family:'Playfair Display',serif;">Union chatter surfaces on X</div></div>
+            <span class="exp-chev gh-accent">›</span></div>
+          <div class="exp-body"><p class="gh-lead" style="font-size:14px; padding-bottom:12px;">A French controllers' union signals action around Dec 12–13. One post, low reach — logged for watch.</p></div>
+        </div>
+        <div class="tstep exp" data-step="1"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="gh-caps gh-step-meta" style="font-size:10px;">Assessed</span><span class="gh-step-meta" style="font-family:'JetBrains Mono',monospace; font-size:11px;">t-26h</span></div>
+              <div class="gh-step-head font-medium mt-1" style="font-family:'Playfair Display',serif;">Pattern matches prior actions</div></div>
+            <span class="exp-chev gh-accent">›</span></div>
+          <div class="exp-body"><p class="gh-lead" style="font-size:14px; padding-bottom:12px;">Cross-referenced two aviation reporters and an early NOTAM precursor. Matches the Mar &amp; Jun strikes. Probability rising.</p></div>
+        </div>
+        <div class="tstep exp" data-step="2"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="gh-caps gh-step-meta" style="font-size:10px;">Pre-staged</span><span class="gh-step-meta" style="font-family:'JetBrains Mono',monospace; font-size:11px;">t-18h</span></div>
+              <div class="gh-step-head font-medium mt-1" style="font-family:'Playfair Display',serif;">Contingency drafted &amp; held</div></div>
+            <span class="exp-chev gh-accent">›</span></div>
+          <div class="exp-body"><p class="gh-lead" style="font-size:14px; padding-bottom:12px;">DGAC orders 25% flight reductions at CDG. Tures drafts and <strong style="color:var(--gh-cream);">holds</strong> a route that avoids CDG entirely — not booked, not charged, ready in one tap.</p>
+            <div class="gh-glass-acc" style="border-radius:10px; padding:16px; margin-bottom:4px;">
+              <div class="gh-eyebrow" style="margin-bottom:6px;">Held contingency</div>
+              <div class="gh-h3" style="font-size:18px;">CPH → AMS → SEA · KLM/DL</div>
+              <div class="gh-lead" style="font-size:12px; margin-top:4px;">Same day · avoids CDG · seats held · $0 until triggered</div>
+            </div></div>
+        </div>
+        <div class="tstep exp" data-step="3"><div class="tnode"></div>
+          <div class="exp-head flex items-start gap-2 cursor-pointer py-2">
+            <div class="flex-1"><div class="flex items-center gap-2"><span class="gh-caps gh-step-meta" style="font-size:10px;">Handled</span><span class="gh-step-meta" style="font-family:'JetBrains Mono',monospace; font-size:11px;">t-3h</span></div>
+              <div class="gh-step-head font-medium mt-1" style="font-family:'Playfair Display',serif;">Rebooked before AF emailed</div></div>
+            <span class="exp-chev gh-accent">›</span></div>
+          <div class="exp-body"><p class="gh-lead" style="font-size:14px; padding-bottom:12px;">AF 1351 (CPH→CDG) cancelled. Held contingency executed instantly. Confirmed before AF's own cancellation email arrived.</p>
+            <div class="gh-glass" style="border-radius:10px; padding:16px; border-color:var(--gold);" id="outcomeBox">
+              <div class="gh-eyebrow" style="margin-bottom:6px;">Lead time over the airline</div>
+              <div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:24px;" id="leadTime">—</div>
+              <div class="gh-lead" style="font-size:12px; margin-top:4px;" id="outcomeNote">Watching…</div>
+            </div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:18px 28px; border-top:1px solid rgba(255,255,255,0.09); display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:12px;">
+      <button onclick="runScenario()" class="gh-btn press" style="padding:12px 22px;" id="replayBtn">▸ Replay the watch</button>
+      <a href="07-itinerary.html" class="gh-btn-ghost gh-btn" style="padding:12px 22px;">See updated itinerary →</a>
+    </div>
+  </div>
+
+  <!-- THE LINE -->
+  <div class="text-center" style="padding:56px 0 8px;">
+    <div class="gh-rule" style="width:64px; margin:0 auto 28px;"></div>
+    <p class="gh-display gh-italic" style="font-size:clamp(24px,3vw,34px); color:var(--gh-cream); line-height:1.3; max-width:32ch; margin:0 auto;">"Andy was notified once —<br>after it was already fixed."</p>
+    <div class="gh-rule" style="width:64px; margin:28px auto 0;"></div>
+  </div>
+ </div>
+</section>
+
+<!-- ════════ PHONE MOCKUPS — saved, before you noticed ════════ -->
+<section class="gh-wash-surface gh-tile">
+  <div class="gh-section" data-reveal>
+    <div style="text-align:center; max-width:46ch; margin:0 auto 56px;">
+      <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">Saved, before you noticed</span><span class="ln"></span></div>
+      <h2 class="gh-h2" style="margin-top:8px;">The day goes sideways.<br><span class="gh-accent gh-italic">You don't.</span></h2>
+      <p class="gh-lead" style="margin-top:18px;">A cancelled flight, a closed restaurant, a storm on the horizon — handled and confirmed while your phone was still in your pocket.</p>
+    </div>
+
+    <div class="gh-phones">
+
+      <!-- 1 · flight cancelled → rebooked -->
+      <div class="gh-phone">
+        <div class="gh-phone-screen">
+          <div class="gh-phone-notch"></div>
+          <div class="gh-phone-bar"><span>11:42</span><span>Tures</span><span>▮▮▮</span></div>
+          <div class="gh-phone-head">
+            <div class="gh-phone-av"><svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#5C2E18"/><ellipse cx="24" cy="14" rx="12" ry="8" fill="#1A0A04"/><rect x="12" y="14" width="24" height="10" fill="#1A0A04"/><ellipse cx="24" cy="24" rx="10" ry="11" fill="#C4784A"/><ellipse cx="20.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><ellipse cx="27.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><path d="M20.5 28.5 Q24 30.5 27.5 28.5" stroke="#8B3A1A" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="24" cy="44" rx="14" ry="6" fill="#1E3A2A"/></svg></div>
+            <div class="gh-phone-meta"><div class="gh-phone-name">Sofia <span class="live"></span></div><div class="gh-phone-sub">Your Tures concierge · Live</div></div>
+          </div>
+          <div class="gh-thread">
+            <div class="gh-tstamp">In the air to JFK</div>
+            <div class="gh-bub gh-bub-c">Your AY1342 to Helsinki just cancelled. I've rebooked you on AY1356 — two hours later, same business cabin.</div>
+            <div class="gh-status-chip"><span class="dot"></span>Rebooked · <span style="font-family:'JetBrains Mono',monospace;">TUR-8842</span></div>
+            <div class="gh-bub gh-bub-c">Your driver's been moved to match, and the hotel is holding your room past check-in.</div>
+            <div class="gh-bub gh-bub-u">You're a lifesaver.</div>
+          </div>
+          <div class="gh-phone-input"><div class="field">Message Sofia…</div><div class="send">↑</div></div>
+        </div>
+      </div>
+
+      <!-- 2 · restaurant closed → better table -->
+      <div class="gh-phone">
+        <div class="gh-phone-screen">
+          <div class="gh-phone-notch"></div>
+          <div class="gh-phone-bar"><span>18:10</span><span>Tures</span><span>▮▮▮</span></div>
+          <div class="gh-phone-head">
+            <div class="gh-phone-av"><svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#5C2E18"/><ellipse cx="24" cy="14" rx="12" ry="8" fill="#1A0A04"/><rect x="12" y="14" width="24" height="10" fill="#1A0A04"/><ellipse cx="24" cy="24" rx="10" ry="11" fill="#C4784A"/><ellipse cx="20.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><ellipse cx="27.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><path d="M20.5 28.5 Q24 30.5 27.5 28.5" stroke="#8B3A1A" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="24" cy="44" rx="14" ry="6" fill="#1E3A2A"/></svg></div>
+            <div class="gh-phone-meta"><div class="gh-phone-name">Sofia <span class="live"></span></div><div class="gh-phone-sub">Your Tures concierge · Live</div></div>
+          </div>
+          <div class="gh-thread">
+            <div class="gh-tstamp">Paris · 6:10pm</div>
+            <div class="gh-bub gh-bub-c">Le Comptoir closed unexpectedly tonight. I've booked Septime instead — 8:30, your table of four.</div>
+            <div class="gh-bub gh-bub-c">They know it's your anniversary. A glass of champagne will be waiting.</div>
+            <div class="gh-status-chip"><span class="dot"></span>Confirmed · <span style="font-family:'JetBrains Mono',monospace;">TUR-9120</span></div>
+            <div class="gh-bub gh-bub-u">Even better than the original.</div>
+          </div>
+          <div class="gh-phone-input"><div class="field">Message Sofia…</div><div class="send">↑</div></div>
+        </div>
+      </div>
+
+      <!-- 3 · storm → itinerary reshuffled -->
+      <div class="gh-phone">
+        <div class="gh-phone-screen">
+          <div class="gh-phone-notch"></div>
+          <div class="gh-phone-bar"><span>07:30</span><span>Tures</span><span>▮▮▮</span></div>
+          <div class="gh-phone-head">
+            <div class="gh-phone-av"><svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#5C2E18"/><ellipse cx="24" cy="14" rx="12" ry="8" fill="#1A0A04"/><rect x="12" y="14" width="24" height="10" fill="#1A0A04"/><ellipse cx="24" cy="24" rx="10" ry="11" fill="#C4784A"/><ellipse cx="20.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><ellipse cx="27.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><path d="M20.5 28.5 Q24 30.5 27.5 28.5" stroke="#8B3A1A" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="24" cy="44" rx="14" ry="6" fill="#1E3A2A"/></svg></div>
+            <div class="gh-phone-meta"><div class="gh-phone-name">Sofia <span class="live"></span></div><div class="gh-phone-sub">Your Tures concierge · Live</div></div>
+          </div>
+          <div class="gh-thread">
+            <div class="gh-tstamp">Reykjavík · 7:30am</div>
+            <div class="gh-bub gh-bub-c">A storm's moving in Thursday. I've shifted your glacier hike to Wednesday — clear skies, and aurora KP 4 that night.</div>
+            <div class="gh-bub gh-bub-c">The lagoon moved to Thursday. Nothing for you to do — it's all rebooked.</div>
+            <div class="gh-status-chip"><span class="dot"></span>Itinerary updated</div>
+            <div class="gh-bub gh-bub-u">Didn't even feel it.</div>
+          </div>
+          <div class="gh-phone-input"><div class="field">Message Sofia…</div><div class="send">↑</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="01-landing.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-eyebrow" style="margin-top:10px;">The Hiccup Handler</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="03-paste-trip.html" class="gh-caps shrink-0" style="font-size:11px; color:var(--gold);">Demo · Start free →</a>
+    <span class="flex-1"></span>
+    <button data-sheet="sheet-watch" class="gh-btn-ghost gh-btn hidden sm:inline-flex">What we watch</button>
+    <a href="07-itinerary.html" class="gh-btn">See the updated itinerary →</a>
+  </div>
+</div>
+
+<!-- bottom sheet: what we watch -->
+<div class="sheet" id="sheet-watch"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <p class="gh-eyebrow" style="margin-bottom:8px;">The Hiccup Handler</p>
+  <h3 class="gh-h3" style="margin-bottom:20px;">What we watch</h3>
+  <div class="what-watch-grid">
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">⚡</div><div style="color:var(--gh-cream); font-weight:500;">Wire services</div><div class="gh-lead" style="font-size:12px;">Reuters, AFP, breaking news</div></div>
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">✈</div><div style="color:var(--gh-cream); font-weight:500;">Aviation ops</div><div class="gh-lead" style="font-size:12px;">Airline feeds &amp; NOTAMs</div></div>
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">❄</div><div style="color:var(--gh-cream); font-weight:500;">Weather models</div><div class="gh-lead" style="font-size:12px;">ECMWF, GFS runs</div></div>
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">𝕏</div><div style="color:var(--gh-cream); font-weight:500;">Social signals</div><div class="gh-lead" style="font-size:12px;">Early chatter, scored</div></div>
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">⚑</div><div style="color:var(--gh-cream); font-weight:500;">Transit &amp; labor</div><div class="gh-lead" style="font-size:12px;">Strike trackers, rail ops</div></div>
+    <div class="gh-glass" style="border-radius:10px; padding:14px;"><div class="gh-accent mb-1" style="font-size:18px;">☕</div><div style="color:var(--gh-cream); font-weight:500;">Venue channels</div><div class="gh-lead" style="font-size:12px;">Restaurants, lodges, transfers</div></div>
+  </div>
+  <p class="gh-lead" style="font-size:12px; margin-top:18px;">Every signal is scored against your specific itinerary. 99.7% is filtered as noise before it ever reaches assessment.</p>
+  <button data-sheet-close class="gh-btn" style="width:100%; margin-top:20px;">Close</button>
+</div></div>
+
+<script>
+/* ---------- ambient signal stream ---------- */
+const SOURCES = [
+  ['𝕏','social','@AvHerald reposts a gate-change rumor at FRA','noise'],
+  ['❄','weather','ECMWF run: Saariselkä holding −19°C, clear','noise'],
+  ['✈','ops','SAS minor delay cluster ARN — not on your routing','noise'],
+  ['⚡','wire','Reuters: Scandinavian rail strike vote fails','noise'],
+  ['☕','venue','Septime posts normal service for the week','noise'],
+  ['◷','delay','CDG departures on-time index 91%','noise'],
+  ['𝕏','social','French controllers union hints at "action"','watching'],
+  ['⚑','labor','DGAC precursor notice flagged in ops feed','watching'],
+  ['❄','weather','Light snow CPH Dec 13 AM — within tolerance','noise'],
+  ['✈','ops','Finnair AY1574 schedule stable since last sweep','noise'],
+  ['☕','venue','Geranium concierge confirms 12/12 holding','noise'],
+  ['⚡','wire','AFP: aviation unions file intent for mid-Dec','watching'],
+];
+const verdictLabel = {noise:'Logged', watching:'Watching'};
+let feedN = 0;
+const feed = document.getElementById('feed');
+function pushSignal(s){
+  const [icon,src,txt,verdict] = s;
+  const el = document.createElement('div');
+  el.className = 'sig '+verdict+' pl-3 py-2 flex items-start gap-3';
+  el.innerHTML = `<span class="text-base leading-none mt-0.5">${icon}</span>
+    <div class="flex-1 min-w-0"><div class="text-[13px] text-ink leading-snug">${txt}</div><div class="text-[10px] text-ink-faint caps mt-0.5">${src}</div></div>
+    <span class="pill ${verdict==='noise'?'pill-gold':'pill-pending'} shrink-0">${verdictLabel[verdict]}</span>`;
+  feed.prepend(el);
+  requestAnimationFrame(()=> el.classList.add('in'));
+  while(feed.children.length > 5) feed.lastChild.remove();
+  feedN++; document.getElementById('feedCount').textContent = feedN;
+}
+/* skeleton first, then live feed */
+(function bootFeed(){
+  for(let i=0;i<5;i++){ const s=document.createElement('div'); s.className='flex gap-3 pl-3 py-2'; s.innerHTML='<span class="skel h-4 w-4 rounded-full"></span><div class="flex-1 space-y-1.5"><div class="skel h-3 w-full"></div><div class="skel h-2.5 w-1/3"></div></div>'; feed.appendChild(s); }
+  setTimeout(()=>{ feed.innerHTML=''; let ai=0; [0,2,4].forEach((i,k)=> setTimeout(()=>pushSignal(SOURCES[i]), k*260)); setInterval(()=>{ pushSignal(SOURCES[ai % SOURCES.length]); ai++; }, 2800); }, 900);
+})();
+/* keep the big number ticking up after the count-up settles */
+setTimeout(function(){
+  setInterval(function(){
+    var el=document.getElementById('statScan'); var v=parseInt(el.textContent.replace(/,/g,''))||14208;
+    el.textContent=(v+Math.floor(20+Math.random()*60)).toLocaleString();
+  }, 2800);
+}, 1700);
+
+/* ---------- scripted scenario ---------- */
+const STAGES = [
+  {prob:0.18, pill:['pill-pending','Watching'], ribbon:['pill-pending','1 watch'], lead:null, note:'Watching…'},
+  {prob:0.41, pill:['pill-pending','Watching ↑'], ribbon:['pill-pending','1 watch'], lead:null, note:'Probability rising — holding.'},
+  {prob:0.78, pill:['pill-alert','Pre-staged'], ribbon:['pill-alert','At risk'], risk:true, lead:null, note:'Contingency drafted & held. Nothing charged.'},
+  {prob:1.00, pill:['pill-confirm','Handled'], ribbon:['pill-confirm','Resolved'], fixed:true, lead:'31h', note:'Rebooked before AF emailed. $0 change fee.'},
+];
+const steps=[...document.querySelectorAll('.tstep')];
+
+function setStage(i){
+  const s = STAGES[i];
+  steps.forEach((st,k)=>{
+    st.classList.remove('active','done');
+    if(k<i) st.classList.add('done');
+    if(k===i){ st.classList.add('active'); st.classList.add('open'); } else { st.classList.remove('open'); }
+    st.classList.toggle('lit', k<=i);
+  });
+  document.getElementById('probLabel').textContent = s.prob.toFixed(2);
+  document.getElementById('probFill').style.width = (s.prob*100)+'%';
+  const p=document.getElementById('scPill'); p.className='pill '+s.pill[0]; p.textContent=s.pill[1];
+  const rb=document.getElementById('ribbonStatus'); rb.className='pill '+s.ribbon[0]; rb.textContent=s.ribbon[1];
+  const leg=document.getElementById('legReturn'); leg.classList.remove('risk','fixed');
+  if(s.fixed){ leg.classList.add('fixed'); leg.textContent='CPH→AMS→SEA'; }
+  else if(s.risk){ leg.classList.add('risk'); leg.textContent='CPH→CDG→SEA'; }
+  else { leg.textContent='CPH→CDG→SEA'; }
+  document.getElementById('leadTime').textContent = s.lead ? s.lead+' ahead' : '—';
+  document.getElementById('outcomeNote').textContent = s.note;
+  document.getElementById('outcomeBox').style.background = s.fixed? 'rgba(95,125,79,0.16)' : 'rgba(95,125,79,0.1)';
+}
+let scTimer;
+function runScenario(){
+  clearInterval(scTimer);
+  let i=0; setStage(0);
+  scTimer = setInterval(()=>{ i++; if(i>=STAGES.length){ clearInterval(scTimer); return;} setStage(i); }, 1900);
+}
+setStage(0);
+setTimeout(runScenario, 900);
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

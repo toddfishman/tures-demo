@@ -1,0 +1,303 @@
+/* My Trips — load real bookings from the engine when signed in. */
+(function () {
+  if (window.__turesTripsLive) return;
+  window.__turesTripsLive = true;
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function money(n) {
+    return "$" + Number(n || 0).toLocaleString("en-US");
+  }
+  function initial(dest) {
+    var d = String(dest || "T").trim();
+    return d.charAt(0).toUpperCase() || "T";
+  }
+  function statusLabel(st, bk) {
+    if (bk && bk.source === "import" && st === "booked") return "Watching";
+    if (st === "booked") return "Booked";
+    if (st === "booking") return "Booking";
+    if (st === "confirmation_required") return "Held";
+    if (st === "failed") return "Failed";
+    return st || "Trip";
+  }
+  function statusClass(st) {
+    if (st === "booked") return "good";
+    if (st === "confirmation_required") return "watch";
+    return "info";
+  }
+  function actionStatusLabel(st) {
+    if (st === "completed") return "Done";
+    if (st === "needs_human") return "Needs you";
+    if (st === "running") return "Running";
+    if (st === "failed") return "Failed";
+    if (st === "aborted") return "Aborted";
+    return st || "Action";
+  }
+  function actionDotClass(st) {
+    if (st === "completed") return "";
+    if (st === "needs_human" || st === "failed") return " warn";
+    return "";
+  }
+  function replayUrl(run) {
+    if (!run) return "";
+    if (run.result && run.result.sessionUrl) return run.result.sessionUrl;
+    if (run.liveViewUrl) return run.liveViewUrl;
+    if (run.browserSessionId) return "https://www.browserbase.com/sessions/" + run.browserSessionId;
+    return "";
+  }
+  function fmtWhen(iso) {
+    if (!iso) return "";
+    try {
+      var d = new Date(iso);
+      return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    } catch (_) { return iso; }
+  }
+  function actionAuditHtml(runs, tripId) {
+    var list = (runs || []).filter(function (r) {
+      if (tripId) return r.tripId === tripId;
+      return !r.tripId;
+    });
+    if (!list.length) return "";
+    var rows = list.map(function (run) {
+      var replay = replayUrl(run);
+      var audit = (run.audit || []).slice(-4).map(function (a) {
+        return '<div class="it2" style="margin-top:4px">' + esc(fmtWhen(a.ts)) + " · " + esc(a.action) +
+          (a.detail ? " — " + esc(a.detail) : "") + "</div>";
+      }).join("");
+      var links = "";
+      if (replay) links += '<a class="swap" href="' + esc(replay) + '" target="_blank" rel="noopener">Watch session →</a>';
+      if (run.handoffToken && run.status === "needs_human") {
+        links += (links ? " · " : "") + '<a class="swap" href="handoff.html?id=' + esc(run.handoffToken) + '">Open handoff →</a>';
+      }
+      var sum = run.result && run.result.summary ? '<div class="it2">' + esc(run.result.summary) + "</div>" : "";
+      return '<div class="item"><span class="idot' + actionDotClass(run.status) + '"></span><div class="ibody">' +
+        '<div class="it1">' + esc(run.title) + (run.result && run.result.simulated ? ' <span class="demo-tag">Sample</span>' : "") + "</div>" +
+        sum +
+        (audit || "") +
+        (links ? '<div class="iconf">' + links + "</div>" : "") +
+        "</div><div class=\"side\">" + esc(actionStatusLabel(run.status)) + "<br>" + esc(fmtWhen(run.updatedAt || run.createdAt)) + "</div></div>";
+    }).join("");
+    return '<div class="cat" id="' + (tripId ? "trip-" + tripId + "-actions" : "account-actions") + '">' +
+      '<div class="cat-h"><span class="cn">Actions Tures took</span><span class="demo-tag">Audit</span></div>' + rows + "</div>";
+  }
+  function fmtDates(brief) {
+    if (!brief) return "";
+    if (brief.departDate && brief.returnDate) return brief.departDate + " – " + brief.returnDate;
+    if (brief.departDate) return "From " + brief.departDate;
+    return "";
+  }
+  function route(brief) {
+    if (!brief) return "";
+    var o = brief.origin || "";
+    var d = brief.destination || "";
+    return o && d ? esc(o) + " ⇄ " + esc(d) : esc(d || o || "Trip");
+  }
+
+  function itemRow(c, simulated) {
+    var tag = simulated ? ' <span class="demo-tag">Sample</span>' : "";
+    var conf = c.confirmation ? '<span class="mono">' + esc(c.confirmation) + "</span>" : "";
+    return '<div class="item"><span class="idot"></span><div class="ibody">' +
+      '<div class="it1">' + esc(c.title || c.kind) + tag + "</div>" +
+      '<div class="it2">' + esc(c.kind) + " · " + money(c.amountUsd) + "</div>" +
+      (conf ? '<div class="iconf">' + conf + "</div>" : "") +
+      "</div><div class="side">" + esc(c.status || "") + "</div></div>";
+  }
+
+  function renderDetail(bk, actionRuns) {
+    var brief = bk.brief || {};
+    var dest = brief.destination || "Trip";
+    var sim = (bk.components || []).some(function (c) { return c.simulated; });
+    var flights = [], stays = [], other = [];
+    (bk.components || []).forEach(function (c) {
+      if (c.kind === "flight") flights.push(c);
+      else if (c.kind === "stay") stays.push(c);
+      else other.push(c);
+    });
+    var id = "trip-" + bk.id;
+    var imported = bk.source === "import";
+    var modeTag = imported ? ' <span class="demo-tag" style="background:var(--rain);color:#fff;border:none">Imported</span>' : "";
+    var html = '<section class="section tight" id="' + id + '" style="scroll-margin-top:var(--nav-h)">' +
+      '<div class="wrap"><div class="detail-hero">' +
+      '<div class="dh-initial">' + esc(initial(dest)) + "</div>" +
+      '<div class="dh-t"><span class="tag" style="margin-bottom:10px">' + esc(statusLabel(bk.status, bk)) + "</span>" + modeTag +
+      "<h2>" + esc(dest) + " · <em>your trip</em></h2>" +
+      '<div class="dh-meta"><span class="mono">' + route(brief) + "</span>" +
+      (fmtDates(brief) ? "<span>" + esc(fmtDates(brief)) + "</span>" : "") +
+      "<span>" + money(bk.totalUsd) + " all in</span></div></div></div>";
+
+    if (stays.length) {
+      html += '<div class="cat" id="' + id + '-lodging"><div class="cat-h"><span class="cn">Lodging</span></div>';
+      stays.forEach(function (c) { html += itemRow(c, sim); });
+      html += "</div>";
+    }
+    if (flights.length) {
+      html += '<div class="cat" id="' + id + '-flights"><div class="cat-h"><span class="cn">Flights &amp; transport</span></div>';
+      flights.forEach(function (c) { html += itemRow(c, sim); });
+      html += "</div>";
+    }
+    if (other.length) {
+      html += '<div class="cat" id="' + id + '-more"><div class="cat-h"><span class="cn">More</span></div>';
+      other.forEach(function (c) { html += itemRow(c, sim); });
+      html += "</div>";
+    }
+    if (bk.status === "booked" || bk.status === "booking") {
+      html += imported ? '<p style="font-size:14px;color:var(--muted);margin:12px 0 0;max-width:58ch"><b>Alert &amp; guide me</b> — Tures watches and walks you through fixes. Autonomous rebook applies when Tures books the trip.</p>' : "";
+      html += '<div class="trip-stream" id="stream-' + esc(bk.id) + '" data-trip-id="' + esc(bk.tripId || "") + '">' +
+        '<div class="ts-head"><span class="pulse"></span><span>Live watch</span><span class="demo-tag" style="margin-left:auto">Live</span></div>' +
+        '<div class="ts-feed"><div class="ts-empty">Connected — waiting for signals from the engine watcher.</div></div></div>' +
+        '<div class="watch-meter" id="watch-' + esc(bk.id) + '" data-booking-id="' + esc(bk.id) + '"></div>';
+    }
+    html += actionAuditHtml(actionRuns, bk.id);
+    html += "</div></section><hr class=\"rule\">";
+    return { id: id, html: html };
+  }
+
+  function renderCard(bk) {
+    var brief = bk.brief || {};
+    var dest = brief.destination || "Trip";
+    var dates = fmtDates(brief);
+    var href = "#trip-" + bk.id;
+    var imported = bk.source === "import";
+    return '<a href="' + href + '" class="card hover trip-card">' +
+      '<div class="trip-head" style="background:linear-gradient(135deg,var(--acc-2),var(--acc) 55%,var(--acc-deep))">' +
+      '<span class="initial">' + esc(initial(dest)) + '</span><span class="tag">' + esc(statusLabel(bk.status, bk)) + (imported ? ' · Imported' : '') + "</span></div>" +
+      '<div class="trip-body"><div class="tname">' + esc(dest) + "</div>" +
+      '<div class="tsub">' + route(brief) + "</div>" +
+      (dates ? '<div class="tdates">' + esc(dates.toUpperCase()) + "</div>" : "") +
+      '<span class="topen">Open trip <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>' +
+      "</div></a>";
+  }
+
+  function hydrateWatchMeters(list) {
+    if (!window.tures || !window.tures.getWatch) return;
+    list.forEach(function (bk) {
+      if (bk.status !== "booked" && bk.status !== "booking") return;
+      var el = document.getElementById("watch-" + bk.id);
+      if (!el) return;
+      window.tures.getWatch(bk.id).then(function (w) {
+        if (!w || !w.enabled) {
+          el.innerHTML = '<div class="ts-empty" style="padding:12px 0">Trip Watch off for this trip.</div>';
+          return;
+        }
+        var pr = w.pricing || {};
+        var settleHtml = "";
+        if (pr.settlement && pr.settlement.settledAt) {
+          var st = pr.settlement.status || "";
+          var stLabel = st === "succeeded" ? "Charged" : st === "mock" ? "Settled (simulated)" : st === "skipped" ? "No charge" : st === "failed" ? "Settlement failed" : "Settled";
+          settleHtml = '<div class="it2">' + esc(stLabel) +
+            (pr.settlement.usd ? " · $" + esc(String(pr.settlement.usd.toFixed(2))) : "") +
+            (st === "mock" ? ' <span class="demo-tag">Sample</span>' : "") + "</div>";
+        }
+        var capHtml = "";
+        if (pr.atCap && pr.pendingCapUsd && window.tures.approveWatchCap) {
+          capHtml = '<div class="it2" style="margin-top:8px"><button type="button" class="btn sm watch-cap-btn" data-id="' + esc(bk.id) + '">Approve $' + esc(String(pr.pendingCapUsd)) + ' more scans</button></div>';
+        }
+        el.innerHTML = '<div class="cat" style="margin-top:0"><div class="cat-h"><span class="cn">Trip Watch</span><span class="demo-tag">Live</span></div>' +
+          '<div class="item"><span class="idot"></span><div class="ibody"><div class="it1">Risk · ' + esc(w.riskLevel || "clear") + " (" + esc(String(w.riskScore || 0)) + ')</div>' +
+          '<div class="it2">Alerts on · ' + esc(String(w.scansToday || 0)) + "/" + esc(String(w.scansBudgetToday || 0)) + " scans today</div>" +
+          '<div class="it2">Spend · $" + esc(String((pr.billableUsd || 0).toFixed(2))) + " of $" + esc(String(pr.effectiveCapUsd || pr.capUsd || w.capUsd)) + " cap (pass-through +" + esc(String(pr.marginPercent || 20)) + "%)</div>" +
+          settleHtml +
+          capHtml + "</div></div></div>";
+        var capBtn = el.querySelector(".watch-cap-btn");
+        if (capBtn) {
+          capBtn.addEventListener("click", function () {
+            capBtn.disabled = true;
+            window.tures.approveWatchCap(bk.id, pr.pendingCapUsd || 5).then(function () { hydrateWatchMeters([bk]); }).catch(function () { capBtn.disabled = false; });
+          });
+        }
+      }).catch(function () {});
+    });
+  }
+
+  function boot() {
+    var wrap = document.getElementById("live-trips-wrap");
+    var details = document.getElementById("live-trips-details");
+    var examples = document.getElementById("example-trips-section");
+    var T = window.tures;
+    if (!wrap || !T || !T.configured) return;
+
+    function showExamples(show) {
+      if (examples) examples.style.display = show ? "" : "none";
+    }
+
+    if (!T.signedIn) {
+      wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted);margin-bottom:20px">Sign in to see trips you have held or booked. <a href="login.html" style="color:var(--acc-deep);font-weight:600">Sign in →</a></p>';
+      showExamples(true);
+      return;
+    }
+
+    wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted)">Loading your trips…</p>';
+
+    var sync = window.turesAccountSync ? window.turesAccountSync() : Promise.resolve();
+    sync.then(function () {
+      var jobs = [T.bookings()];
+      if (T.actions && T.actions.listRuns) jobs.push(T.actions.listRuns().catch(function () { return { runs: [] }; }));
+      else jobs.push(Promise.resolve({ runs: [] }));
+      return Promise.all(jobs);
+    }).then(function (res) {
+      var r = res[0];
+      var actionRuns = (res[1] && res[1].runs) || [];
+      var list = (r && r.bookings) || [];
+      if (!list.length) {
+        wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted);margin-bottom:20px">No held or booked trips yet — plan one and Tures will list it here. <a href="plan.html" style="color:var(--acc-deep);font-weight:600">Plan a trip →</a></p>';
+        showExamples(true);
+        return;
+      }
+      wrap.innerHTML = '<span class="eyebrow" style="margin-bottom:14px;display:block"><span class="dot"></span> Your trips</span>' +
+        '<div class="grid-3">' + list.map(renderCard).join("") + "</div>";
+      if (details) {
+        details.innerHTML = list.map(function (bk) { return renderDetail(bk, actionRuns).html; }).join("") +
+          actionAuditHtml(actionRuns, null);
+      }
+      if (window.turesTripStream) {
+        var bar = document.getElementById("trip-live-bar");
+        var barText = document.getElementById("trip-live-text");
+        var streamHub = turesTripStream.watchBookings(list, {
+          feedFor: function (bk) {
+            var el = document.getElementById("stream-" + bk.id);
+            return el ? el.querySelector(".ts-feed") : null;
+          },
+          onEvent: function (bk, ev) {
+            var feed = document.querySelector("#stream-" + bk.id + " .ts-feed");
+            if (feed && feed.querySelector(".ts-empty")) feed.innerHTML = "";
+            if (bar) {
+              bar.hidden = false;
+              if (ev.kind === "hiccup") bar.classList.add("warn");
+              if (barText) {
+                barText.textContent = ev.kind === "hiccup"
+                  ? "Hiccup flagged on " + (bk.brief && bk.brief.destination ? bk.brief.destination : "your trip")
+                  : "Watching " + list.filter(function (b) { return b.status === "booked"; }).length + " trip(s)";
+              }
+            }
+          },
+          onReady: function (n) {
+            if (bar && n > 0) {
+              bar.hidden = false;
+              if (barText) barText.textContent = "Watching " + n + " trip" + (n === 1 ? "" : "s") + " · live stream";
+            }
+          },
+        });
+        window.__turesTripsStream = streamHub;
+      }
+      hydrateWatchMeters(list);
+      showExamples(true);
+      if (examples) {
+        var ey = examples.querySelector(".examples-eyebrow");
+        if (!ey) {
+          var h = document.createElement("span");
+          h.className = "eyebrow examples-eyebrow";
+          h.style.cssText = "display:block;margin:32px 0 18px";
+          h.innerHTML = '<span class="dot"></span> Example trips <span class="demo-tag" style="margin-left:8px">Sample</span>';
+          examples.parentNode.insertBefore(h, examples);
+        }
+      }
+    }).catch(function () {
+      wrap.innerHTML = '<p class="lead" style="font-size:14px;color:var(--muted)">Could not load trips just now. <a href="plan.html" style="color:var(--acc-deep)">Plan a trip →</a></p>';
+      showExamples(true);
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();

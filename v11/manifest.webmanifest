@@ -1,0 +1,16 @@
+{
+  "name": "Tures — your travel concierge",
+  "short_name": "Tures",
+  "description": "Describe a trip. Tures books it, watches it, and proves it — confirmation numbers, not links.",
+  "start_url": "plan.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e0e12",
+  "theme_color": "#ff4929",
+  "categories": ["travel", "productivity"],
+  "icons": [
+    { "src": "assets/img/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/img/app-icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

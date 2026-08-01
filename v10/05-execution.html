@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — See Tures in Action</title>
+<meta name="description" content="Watch Tures execute a real trip live — booking each leg and verifying every confirmation against two sources before it counts." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/05-execution.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — See Tures in Action" />
+<meta property="og:description" content="Watch Tures execute a real trip live — booking each leg, verifying every confirmation against two sources." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/05-execution.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — See Tures in Action" />
+<meta name="twitter:description" content="Watch Tures execute a real trip live." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+  #execDash .font-display{ font-family:'Playfair Display',serif; }
+
+  /* progress track */
+  .ex-track2{ height:6px; border-radius:99px; background:rgba(255,255,255,0.1); overflow:hidden; }
+  .ex-track2 .fill{ height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); transition:width .8s cubic-bezier(.4,0,.2,1); }
+
+  /* booking rows */
+  .booking-row{ padding:16px 20px; display:grid; grid-template-columns:24px 1fr 168px 132px; gap:16px; align-items:center;
+    border-bottom:1px solid rgba(255,255,255,0.08); }
+  .booking-row:last-child{ border-bottom:0; }
+  .booking-row .b-name{ font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--gh-cream); }
+  .booking-row .b-hotel{ font-family:'Playfair Display',serif; font-size:18px; color:var(--gh-cream); line-height:1.1; }
+  .booking-row .b-when{ font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--gh-cream-dim); }
+  .booking-row .b-meta{ font-size:13px; color:var(--gh-cream-dim); margin-top:4px; }
+  .col-pnr{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gh-cream-dim); }
+  .booking-row summary{ font-size:12px; color:var(--gold); cursor:pointer; list-style:none; }
+  .booking-row summary::-webkit-details-marker{ display:none; }
+  .reasoning{ background:rgba(74,222,128,0.07); border-left:2px solid var(--gold); padding:11px 15px; font-size:13px;
+    color:var(--gh-cream-dim); line-height:1.6; border-radius:0 8px 8px 0; margin-top:8px; }
+  .reasoning strong{ color:var(--gh-cream); }
+  @media(max-width:760px){ .booking-row{ grid-template-columns:18px 1fr; } .booking-row .col-pnr,.booking-row .col-stat{ grid-column:2; text-align:left !important; } }
+
+  .dot{ width:8px; height:8px; border-radius:99px; display:inline-block; flex-shrink:0; }
+  .dot-green{ background:var(--gold); } .dot-amber{ background:var(--pending); } .dot-alert{ background:var(--alert); } .dot-gold{ background:var(--gold-bright); }
+  .pulse{ animation:exPulse 1.5s ease-in-out infinite; } @keyframes exPulse{ 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  /* agent stream console */
+  .ev{ opacity:0; transform:translateY(6px); transition:opacity .45s ease, transform .45s ease; }
+  .ev.in{ opacity:1; transform:none; }
+  .ev .text-ink{ color:var(--gh-cream); } .ev .text-ink-faint{ color:var(--gh-cream-dim); }
+  .skel{ background:linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    background-size:200% 100%; animation:exShimmer 1.4s infinite; border-radius:6px; display:block; }
+  @keyframes exShimmer{ to{ background-position:-200% 0; } }
+  .check-pop{ display:inline-grid; place-items:center; width:18px; height:18px; border-radius:99px;
+    background:var(--gold); color:#06120a; font-size:11px; transform:scale(0); animation:exPop .45s cubic-bezier(.34,1.56,.64,1) forwards; }
+  @keyframes exPop{ to{ transform:scale(1); } }
+  .row-confirmed{ animation:exFlash .8s ease; }
+  @keyframes exFlash{ 0%{background:rgba(74,222,128,0)} 35%{background:rgba(74,222,128,0.1)} 100%{background:rgba(74,222,128,0)} }
+
+  .dash-grid{ display:grid; grid-template-columns:1.7fr 1fr; gap:22px; align-items:start; }
+  @media(max-width:980px){ .dash-grid{ grid-template-columns:1fr; } }
+
+  .cta-bar{ position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px);
+    background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px); border-top:1px solid rgba(255,255,255,0.08); }
+</style>
+</head>
+<body class="min-h-screen" style="padding-bottom:84px;">
+
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<section id="execDash">
+
+  <!-- header -->
+  <div class="gh-wash-surface gh-tile" style="border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div class="gh-section-tight">
+      <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Tures Demo · live execution</span></div>
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-top:10px;">
+        <div>
+          <h1 class="gh-h2" style="font-size:clamp(28px,3.4vw,46px);">Paris · Saariselkä · Copenhagen</h1>
+          <p class="gh-lead" style="margin-top:8px; font-size:14px;">Dec 3 – 13, 2026 · <span style="font-family:'JetBrains Mono',monospace;">11d</span> · 1 traveler · Business</p>
+        </div>
+        <div style="display:flex; gap:34px;">
+          <div style="text-align:right;"><div class="gh-eyebrow" style="margin-bottom:4px;">Booked</div><div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:26px;"><span id="progNum">3</span> / 7</div></div>
+          <div style="text-align:right;"><div class="gh-eyebrow" style="margin-bottom:4px;">Authorized</div><div class="gh-display gh-accent" style="font-family:'JetBrains Mono',monospace; font-size:26px;">$<span data-countup="26114" data-countup-dur="1600">0</span></div></div>
+        </div>
+      </div>
+      <div class="ex-track2" style="margin-top:22px;"><div class="fill" id="progFill" style="width:43%"></div></div>
+    </div>
+  </div>
+
+  <div class="gh-section">
+    <div class="dash-grid">
+
+      <!-- LEFT — bookings -->
+      <div>
+        <div class="gh-card" style="overflow:hidden;">
+          <header style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.09); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <span class="gh-eyebrow">Bookings · execution order</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;" id="statChips">
+              <span class="pill pill-confirm" id="chipBooked">3 booked</span>
+              <span class="pill pill-pending" id="chipProg">2 in progress</span>
+              <span class="pill pill-alert">1 needs you</span>
+            </div>
+          </header>
+
+          <div class="booking-row"><span class="dot dot-green"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-name">AA 142 · SEA → CDG</span><span class="b-when">Thu Dec 3 · 18:45 → Fri 13:25</span></div>
+              <div class="b-meta">Business · seat 5A · AAdvantage · 25,200 EQM</div>
+              <details style="margin-top:8px;"><summary>▸ Tures' reasoning</summary><div class="reasoning">Only same-day non-stop SEA→CDG in business arriving the 4th without an overnight.</div></details>
+            </div>
+            <div class="col-pnr">PNR · LXJ7Q3</div>
+            <div class="col-stat" style="text-align:right;"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+          </div>
+
+          <div class="booking-row"><span class="dot dot-green"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-hotel">Real Christine, Paris</span><span class="b-when">Dec 4 → 7 · 3 nights</span></div>
+              <div class="b-meta">Junior Suite · garden view · breakfast · €1,640</div>
+              <details style="margin-top:8px;"><summary>▸ Tures' reasoning</summary><div class="reasoning">Booked direct. Junior Suite, Garden View — matches your Taste Print. Virtuoso: €100 F&amp;B credit + upgrade at check-in.</div></details>
+            </div>
+            <div class="col-pnr">CONF · 8849-RCP</div>
+            <div class="col-stat" style="text-align:right;"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+          </div>
+
+          <div class="booking-row" style="background:rgba(232,134,106,0.07);"><span class="dot dot-alert pulse"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-name">AY 1574 · CDG → HEL → IVL</span><span class="b-when">Sun Dec 7 · 10:25 → 21:00</span></div>
+              <div class="b-meta">Business · <strong style="color:var(--gh-cream)">your decision</strong> — non-stop doesn't exist</div>
+              <details style="margin-top:8px;" open><summary>▸ Reasoning &amp; options</summary><div class="reasoning">That route isn't flown non-stop in December. <strong>Strongest fit:</strong> AY 1574, 1h 50m HEL connection, Schengen-side transfer. Not booked yet.
+                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <button class="gh-btn" style="padding:8px 14px; font-size:11px;">Approve AY 1574</button>
+                  <button class="gh-btn gh-btn-ghost" style="padding:8px 14px; font-size:11px;">See AF + AY combo</button>
+                </div></div></details>
+            </div>
+            <div class="col-pnr">—</div>
+            <div class="col-stat" style="text-align:right;"><span class="pill pill-alert">Needs you</span></div>
+          </div>
+
+          <div class="booking-row"><span class="dot dot-green"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-hotel">Javri Lodge, Saariselkä</span><span class="b-when">Dec 7 → 10 · 3 nights</span></div>
+              <div class="b-meta">Aurora Suite · private terrace · half-board · transfer arranged</div>
+            </div>
+            <div class="col-pnr">CONF · JL-12041</div>
+            <div class="col-stat" style="text-align:right;"><span class="pill pill-confirm">Booked · verified ×2</span></div>
+          </div>
+
+          <div class="booking-row" id="rowAY945"><span class="dot dot-amber pulse" id="dotAY945"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-name">AY 945 · IVL → HEL → CPH</span><span class="b-when">Wed Dec 10 · 14:20 → 19:15</span></div>
+              <div class="b-meta" id="subAY945">Business · awaiting fare-class verification from AY</div>
+            </div>
+            <div class="col-pnr" id="pnrAY945">pending</div>
+            <div class="col-stat" id="statAY945" style="text-align:right;"><span class="pill pill-pending">Reserving</span></div>
+          </div>
+
+          <div class="booking-row" id="rowSanders"><span class="dot dot-amber pulse" id="dotSanders"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-hotel">Hotel Sanders, Copenhagen</span><span class="b-when">Dec 10 → 13 · 3 nights</span></div>
+              <div class="b-meta" id="subSanders">Junior Suite — checking property direct</div>
+            </div>
+            <div class="col-pnr" id="pnrSanders">checking</div>
+            <div class="col-stat" id="statSanders" style="text-align:right;"><span class="pill pill-pending">Reserving</span></div>
+          </div>
+
+          <div class="booking-row"><span class="dot dot-gold"></span>
+            <div>
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;"><span class="b-name">AF 1351 + AF 376 · CPH → CDG → SEA</span><span class="b-when">Sun Dec 13 · 10:35 → 17:10</span></div>
+              <div class="b-meta">Business · non-stop CDG→SEA · Flying Blue credited</div>
+            </div>
+            <div class="col-pnr">—</div>
+            <div class="col-stat" style="text-align:right;"><span class="pill pill-gold">Queued</span></div>
+          </div>
+        </div>
+
+        <!-- dinners -->
+        <div class="gh-card" style="padding:20px; margin-top:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div><div class="gh-eyebrow" style="margin-bottom:4px;">Dinners</div><h3 class="gh-h3" style="font-size:20px;">9 nights · matched to your palate</h3></div>
+            <a href="08-concierge.html" class="gh-caps" style="font-size:11px; color:var(--gold);">Edit →</a>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+            <div style="padding:14px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);"><div class="gh-eyebrow" style="margin-bottom:6px;">Paris · 3</div><div class="gh-display" style="font-size:15px; color:var(--gh-cream);">Septime · Paul Bert · Frenchie</div></div>
+            <div style="padding:14px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);"><div class="gh-eyebrow" style="margin-bottom:6px;">Saariselkä · 3</div><div class="gh-display" style="font-size:15px; color:var(--gh-cream);">Lodge half-board</div></div>
+            <div style="padding:14px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);"><div class="gh-eyebrow" style="margin-bottom:6px;">Copenhagen · 3</div><div class="gh-display" style="font-size:15px; color:var(--gh-cream);">Geranium · Apollo · Kadeau</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT — agent stream -->
+      <aside>
+        <div class="gh-glass-acc" style="overflow:hidden; position:sticky; top:24px; border-radius:14px;">
+          <header style="padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:9px;"><span class="dot dot-green pulse" id="liveDot"></span><span class="gh-eyebrow">Agent stream</span></div>
+            <button id="pauseBtn" style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gh-cream-dim); border:1px solid rgba(255,255,255,0.14); border-radius:99px; padding:5px 12px; background:none; cursor:pointer;">
+              <span id="pauseIcon">⏸</span><span id="pauseLbl">Pause</span>
+            </button>
+          </header>
+          <div style="padding:9px 18px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:11px; color:var(--gh-cream-dim);">↓ Latest as of <span id="refreshTime" style="font-family:'JetBrains Mono',monospace;">12:51</span></span>
+            <span style="font-size:10px; color:var(--gh-cream-dim); font-family:'JetBrains Mono',monospace;"><span id="evCount">0</span> events</span>
+          </div>
+          <div id="stream" style="padding:16px 16px; display:flex; flex-direction:column; gap:14px; max-height:420px; overflow-y:auto; font-size:13px;"></div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid rgba(255,255,255,0.08); padding:34px clamp(24px,6vw,80px); display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:center;">
+    <span style="font-size:12px; color:var(--gh-cream-dim);">Tures · trip #T-2087 · session <span style="font-family:'JetBrains Mono',monospace;">12:51 PT</span></span>
+    <a href="06-hiccup-handler.html" class="gh-caps" style="font-size:11px; color:var(--gold);">See what's watching this trip →</a>
+  </footer>
+</section>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="03-paste-trip.html" class="gh-caps shrink-0" style="font-size:11px; color:var(--gold);">Demo · Start free →</a>
+    <span class="flex-1"></span>
+    <a href="06-hiccup-handler.html" class="gh-btn">See what's watching →</a>
+  </div>
+</div>
+
+<script src="assets/engine.js"></script>
+<script>
+/* ---------- live agent stream: skeleton → typewriter fade-in ---------- */
+var SEED = [
+  ['12:46:33','Parsed trip from email. 7 legs · 9 dinners · 1 uncertainty flagged.',''],
+  ['12:47:02','User approved 7-leg plan. Executing in dependency order.',''],
+  ['12:47:55','Booked AA 142 · SEA→CDG · Business · seat 5A. AAdvantage applied.',''],
+  ['12:48:11','Booked Real Christine · Junior Suite · 3 nights. Email matches provider.',''],
+  ['12:49:38','Booked Javri Lodge · Aurora Suite · 3 nights. Provider + email match.','JL-12041 · €4,890 → AmEx ··1004'],
+];
+var QUEUE = [
+  ['12:50:11','Surfaced decision for CDG→IVL. Non-stop unavailable; two staged.','Confidence in stated preference: 0.84'],
+  ['12:50:42','Reserved AY 945 fare class D (Biz, refundable). Awaiting AY email…',''],
+  ['12:51:14','Verifying Hotel Sanders direct inventory, Junior Suite tier.','hotelsanders.com · session warmed · <40s'],
+  ['12:51:48','✓ AY 945 confirmed. Provider + email agree.','PNR 5RT2QK · €2,210', {confirm:'AY945'}],
+  ['12:52:30','✓ Hotel Sanders confirmed direct. Rate-protected −$351.','CONF SAN-3398 · €3,180', {confirm:'Sanders'}],
+];
+
+var stream = document.getElementById('stream');
+var evCount = document.getElementById('evCount');
+var n = 0;
+function lineHTML(e){
+  return '<span class="font-mono text-[11px] text-ink-faint mt-0.5" style="min-width:54px">'+e[0]+'</span>'+
+    '<div class="flex-1"><div class="text-ink">'+e[1]+'</div>'+
+    (e[2]?'<div class="text-xs text-ink-faint" style="margin-top:2px">'+e[2]+'</div>':'')+'</div>';
+}
+function pushEvent(e, prepend){
+  var el = document.createElement('div');
+  el.className = 'ev flex gap-3';
+  el.innerHTML = lineHTML(e);
+  if(prepend) stream.insertBefore(el, stream.firstChild); else stream.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('in'); });
+  n++; evCount.textContent = n;
+  if(e[3] && e[3].confirm) confirmRow(e[3].confirm);
+}
+function confirmRow(which){
+  var map = {
+    AY945:{row:'rowAY945',dot:'dotAY945',sub:'subAY945',pnr:'pnrAY945',stat:'statAY945',
+           subTxt:'Business · refundable fare D · verified ×2', pnrTxt:'PNR · 5RT2QK'},
+    Sanders:{row:'rowSanders',dot:'dotSanders',sub:'subSanders',pnr:'pnrSanders',stat:'statSanders',
+             subTxt:'Junior Suite · booked direct · rate-protected −$351', pnrTxt:'CONF · SAN-3398'}
+  }[which];
+  if(!map) return;
+  document.getElementById(map.dot).className='dot dot-green';
+  document.getElementById(map.sub).textContent=map.subTxt;
+  document.getElementById(map.pnr).textContent=map.pnrTxt;
+  document.getElementById(map.stat).innerHTML='<span class="pill pill-confirm inline-flex items-center gap-1.5"><span class="check-pop">✓</span> Booked · verified ×2</span>';
+  var row=document.getElementById(map.row); row.classList.add('row-confirmed');
+  bumpProgress();
+}
+var booked = 3, inProgress = 2;
+function bumpProgress(){
+  booked = Math.min(7, booked+1);
+  inProgress = Math.max(0, inProgress-1);
+  document.getElementById('progNum').textContent = booked;
+  document.getElementById('progFill').style.width = (booked/7*100)+'%';
+  document.getElementById('chipBooked').textContent = booked + ' booked';
+  var cp = document.getElementById('chipProg');
+  if(inProgress<=0) cp.style.display='none';
+  else cp.textContent = inProgress + ' in progress';
+}
+function skeleton(){
+  for(var i=0;i<4;i++){
+    var s=document.createElement('div'); s.className='flex gap-3';
+    s.innerHTML='<span class="skel" style="height:12px;width:40px;margin-top:4px"></span><div class="flex-1" style="display:flex;flex-direction:column;gap:6px"><span class="skel" style="height:12px;width:100%"></span><span class="skel" style="height:12px;width:66%"></span></div>';
+    stream.appendChild(s);
+  }
+}
+var paused=false, qi=0, timer=null;
+function drip(){
+  if(paused) return;
+  if(qi < QUEUE.length){
+    pushEvent(QUEUE[qi], true); qi++;
+    timer = setTimeout(drip, 950 + Math.random()*500);
+  } else {
+    document.getElementById('liveDot').className='dot dot-green';
+  }
+}
+function boot(){
+  skeleton();
+  setTimeout(function(){
+    stream.innerHTML='';
+    SEED.forEach(function(e){ pushEvent(e, true); });
+    timer = setTimeout(drip, 700);
+  }, 900);
+}
+function liveBoot(tripId){
+  document.getElementById('liveDot').className = 'dot dot-gold pulse';
+  skeleton();
+  setTimeout(function(){
+    stream.innerHTML = '';
+    var buffer = [];
+    function renderEv(ev){ pushEvent([ (ev.ts||'').slice(11,19), ev.label, ev.detail||'' ], true); }
+    window._turesFlush = function(){ while(buffer.length){ renderEv(buffer.shift()); } };
+    tures.stream(tripId, function(ev){
+      if(paused){ buffer.push(ev); return; }
+      renderEv(ev);
+      if(ev.kind === 'notify') document.getElementById('liveDot').className = 'dot dot-green';
+    });
+  }, 900);
+}
+
+document.getElementById('pauseBtn').addEventListener('click', function(){
+  paused=!paused;
+  document.getElementById('pauseIcon').textContent = paused?'▶':'⏸';
+  document.getElementById('pauseLbl').textContent = paused?'Resume':'Pause';
+  document.getElementById('liveDot').className = paused?'dot dot-amber':'dot dot-gold pulse';
+  if(!paused){ drip(); if(window._turesFlush) window._turesFlush(); }
+});
+
+/* Live engine stream when ?trip=… and an engine is configured; scripted demo otherwise. */
+var _tripParam = new URLSearchParams(location.search).get('trip');
+if (window.tures && tures.configured && _tripParam) { liveBoot(_tripParam); } else { boot(); }
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

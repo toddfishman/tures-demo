@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tures — Taste clusters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --space:#05080F;--space-2:#070C18;
+    --acc:#5EEAD4;--acc-soft:#7af3e0;--blue:#5B8DEF;
+    --ink:#EAF1F5;--ink-dim:#9FB2BE;--ink-faint:#65788A;
+    --line:rgba(94,234,212,.14);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'DM Sans',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--space);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(94,234,212,.25);color:#fff}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+
+  header.bar{display:flex;align-items:center;justify-content:space-between;padding:24px clamp(20px,5vw,56px)}
+  .mark{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--ink)}
+  .spark{color:var(--acc)}
+  nav.top{display:flex;align-items:center;gap:26px;font-size:14px;color:var(--ink-dim)}
+  nav.top a:hover{color:var(--ink)}
+  .signin{border:1px solid var(--line);padding:9px 18px;border-radius:999px;color:var(--ink);font-weight:500}
+  .signin:hover{border-color:rgba(94,234,212,.45)}
+
+  .lead{padding:6px clamp(20px,5vw,56px) 4px;max-width:760px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:flex;align-items:center;gap:11px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--acc);opacity:.6}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,3.6vw,44px);line-height:1.08;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--acc-soft)}
+  .lead p{color:var(--ink-dim);font-weight:300;font-size:16px;margin-top:12px;max-width:560px}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1.35fr .9fr;gap:clamp(20px,3vw,42px);
+        padding:24px clamp(20px,5vw,56px) 40px;align-items:stretch}
+
+  /* map panel */
+  .map-card{position:relative;border:1px solid var(--line);border-radius:20px;overflow:hidden;
+            background:radial-gradient(circle at 30% 20%, #0a1622, #05080f 70%);min-height:480px}
+  .map-head{position:absolute;top:18px;left:20px;z-index:3;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim)}
+  .map-head b{color:var(--acc)}
+  .map-card svg{width:100%;height:100%;display:block}
+  .coast{fill:rgba(58,84,98,.34);stroke:rgba(94,234,212,.22);stroke-width:.8}
+  .grat{fill:none;stroke:rgba(120,160,180,.10);stroke-width:.7}
+
+  .visited{fill:var(--acc)}
+  .v-ring{fill:none;stroke:var(--acc);stroke-width:1;transform-origin:center;transform-box:fill-box;animation:vp 3.4s ease-out infinite}
+  @keyframes vp{0%{transform:scale(.5);opacity:.7}70%{opacity:0}100%{transform:scale(3);opacity:0}}
+
+  .target{fill:none;stroke:var(--acc-soft);stroke-width:1.6}
+  .target-core{fill:var(--acc-soft)}
+  .target-pulse{fill:none;stroke:var(--acc-soft);stroke-width:1.4;transform-origin:center;transform-box:fill-box;animation:tp 2.6s ease-out infinite}
+  @keyframes tp{0%{transform:scale(.8);opacity:.95}80%{opacity:0}100%{transform:scale(4.2);opacity:0}}
+  .lbl{font-family:var(--mono);font-size:9px;fill:var(--ink-dim);letter-spacing:.05em}
+  .lbl.next{fill:var(--acc-soft)}
+  .link{stroke:rgba(94,234,212,.4);stroke-width:1;stroke-dasharray:3 5;fill:none;animation:flow 5s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-40}}
+
+  .legend{position:absolute;bottom:16px;left:20px;display:flex;gap:18px;font-size:11px;color:var(--ink-dim);z-index:3}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .legend .v i{background:var(--acc)}
+  .legend .n i{background:transparent;border:1.5px solid var(--acc-soft)}
+
+  /* side panel */
+  .panel{display:flex;flex-direction:column;gap:16px}
+  .card{border:1px solid var(--line);border-radius:18px;padding:22px 22px;background:linear-gradient(180deg,#0a111f,#070c18)}
+  .card h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .card h3::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}
+
+  .loves{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--ink);border:1px solid rgba(94,234,212,.28);background:rgba(94,234,212,.05);border-radius:999px;padding:7px 15px}
+
+  .nextlist{display:flex;flex-direction:column;gap:2px}
+  .nx{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 4px;border-bottom:1px solid rgba(94,234,212,.08)}
+  .nx:last-child{border-bottom:none}
+  .nx .name{font-family:var(--serif);font-size:19px;color:var(--ink)}
+  .nx .why{font-size:12px;color:var(--ink-dim);margin-top:2px}
+  .nx .score{font-family:var(--mono);font-size:13px;color:var(--acc);font-weight:700;white-space:nowrap}
+  .nx .l{display:flex;flex-direction:column}
+
+  .sendbtn{margin-top:18px;width:100%;background:var(--acc);color:#04201C;font-weight:600;font-size:14.5px;border:none;border-radius:999px;padding:14px;cursor:pointer;font-family:var(--sans);transition:transform .2s,box-shadow .2s}
+  .sendbtn:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(94,234,212,.5)}
+  .demo{font-size:10.5px;color:var(--ink-faint);letter-spacing:.04em;margin-top:13px;display:flex;align-items:center;gap:7px}
+  .tag{font-family:var(--sans);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);border:1px solid rgba(94,234,212,.4);border-radius:4px;padding:2px 6px;line-height:1}
+
+  @media (prefers-reduced-motion:reduce){
+    .v-ring,.target-pulse,.link{animation:none}
+    .v-ring,.target-pulse{opacity:.4}
+    .sendbtn{transition:none}
+  }
+
+  footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:22px clamp(20px,5vw,56px);border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-faint)}
+  footer .mark{font-size:17px}
+
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr}
+    .map-card{min-height:380px}
+    nav.top a:not(.signin){display:none}
+  }
+</style>
+</head>
+<body>
+  <header class="bar">
+    <a class="mark" href="#" aria-label="tures home">t<span class="spark">✦</span>ures</a>
+    <nav class="top">
+      <a href="#">Map</a><a href="#">Taste</a><a href="#">Trips</a>
+      <a class="signin" href="#">Sign in</a>
+    </nav>
+  </header>
+
+  <section class="lead">
+    <p class="eyebrow">Mediterranean · taste map</p>
+    <h1>Where you've been, and where <em>we'd send you next.</em></h1>
+    <p>Solid dots are places you've loved. The glowing targets are recommendations Tures has been holding for you.</p>
+  </section>
+
+  <div class="grid">
+    <!-- ===== MAP ===== -->
+    <div class="map-card">
+      <div class="map-head">Region <b>· Western Mediterranean &amp; Iberia</b></div>
+      <svg viewBox="0 0 640 520" role="img" aria-label="Stylized regional map showing visited cities and recommended destinations">
+        <!-- graticule -->
+        <g class="grat">
+          <line x1="0" y1="120" x2="640" y2="120"/><line x1="0" y1="240" x2="640" y2="240"/>
+          <line x1="0" y1="360" x2="640" y2="360"/>
+          <line x1="160" y1="0" x2="160" y2="520"/><line x1="320" y1="0" x2="320" y2="520"/>
+          <line x1="480" y1="0" x2="480" y2="520"/>
+        </g>
+
+        <!-- abstract Iberia / France / Italy / N.Africa landmasses -->
+        <path class="coast" d="M70 150 Q150 110 230 150 Q280 175 250 250 Q230 320 150 330 Q90 320 70 250 Z"/>
+        <path class="coast" d="M250 90 Q360 70 430 120 Q400 170 360 200 Q300 200 250 250 Q235 175 250 90 Z"/>
+        <path class="coast" d="M430 130 Q500 150 500 250 Q480 330 430 330 Q420 250 420 200 Q420 165 430 130 Z"/>
+        <path class="coast" d="M120 400 Q300 370 520 400 Q540 470 520 500 Q300 470 120 500 Q100 450 120 400 Z"/>
+
+        <!-- connective links between visited cluster -->
+        <path class="link" d="M150 250 Q220 200 300 235"/>
+        <path class="link" d="M300 235 Q380 220 415 250"/>
+        <path class="link" d="M150 250 Q200 360 250 430"/>
+
+        <!-- VISITED (solid) -->
+        <g>
+          <circle class="v-ring" cx="300" cy="235" r="4"/><circle class="visited" cx="300" cy="235" r="3.6"/>
+          <text class="lbl" x="308" y="231">Barcelona</text>
+
+          <circle class="v-ring" cx="415" cy="250" r="4" style="animation-delay:1s"/><circle class="visited" cx="415" cy="250" r="3.6"/>
+          <text class="lbl" x="423" y="246">Nice</text>
+
+          <circle class="v-ring" cx="470" cy="300" r="4" style="animation-delay:1.8s"/><circle class="visited" cx="470" cy="300" r="3.6"/>
+          <text class="lbl" x="478" y="296">Florence</text>
+
+          <circle class="v-ring" cx="150" cy="250" r="4" style="animation-delay:.6s"/><circle class="visited" cx="150" cy="250" r="3.6"/>
+          <text class="lbl" x="92" y="246">Porto</text>
+        </g>
+
+        <!-- RECOMMENDATIONS (glowing targets) -->
+        <g>
+          <circle class="target-pulse" cx="120" cy="300" r="6"/>
+          <circle class="target" cx="120" cy="300" r="7"/><circle class="target-core" cx="120" cy="300" r="2.6"/>
+          <text class="lbl next" x="60" y="296">Lisbon</text>
+
+          <circle class="target-pulse" cx="200" cy="200" r="6" style="animation-delay:.9s"/>
+          <circle class="target" cx="200" cy="200" r="7"/><circle class="target-core" cx="200" cy="200" r="2.6"/>
+          <text class="lbl next" x="118" y="190">San Sebastián</text>
+
+          <circle class="target-pulse" cx="250" cy="430" r="6" style="animation-delay:1.6s"/>
+          <circle class="target" cx="250" cy="430" r="7"/><circle class="target-core" cx="250" cy="430" r="2.6"/>
+          <text class="lbl next" x="258" y="434">Tangier</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span class="v"><i></i>Visited &amp; loved</span>
+        <span class="n"><i></i>We'd send you next</span>
+      </div>
+    </div>
+
+    <!-- ===== SIDE PANEL ===== -->
+    <aside class="panel">
+      <div class="card">
+        <h3>Your taste clusters</h3>
+        <div class="loves">
+          <span class="chip">coastal towns</span>
+          <span class="chip">design hotels</span>
+          <span class="chip">tasting menus</span>
+          <span class="chip">walkable old quarters</span>
+          <span class="chip">shoulder season</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>We'd send you next</h3>
+        <div class="nextlist">
+          <div class="nx">
+            <span class="l"><span class="name">Lisbon</span><span class="why">Coastal · design hotels · river light</span></span>
+            <span class="score">96%</span>
+          </div>
+          <div class="nx">
+            <span class="l"><span class="name">San Sebastián</span><span class="why">Tasting menus · walkable · off-season</span></span>
+            <span class="score">94%</span>
+          </div>
+          <div class="nx">
+            <span class="l"><span class="name">Kanazawa</span><span class="why">Craft · quiet · coastal Japan</span></span>
+            <span class="score">91%</span>
+          </div>
+        </div>
+        <button class="sendbtn">Plan one of these →</button>
+        <p class="demo"><span class="tag">Sample</span> Match scores are illustrative, drawn from a sample profile.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <a class="mark" href="#" aria-label="tures home">t<span class="spark">✦</span>ures</a>
+    <span>It learns what you love — then it goes and books it.</span>
+    <span>© 2026 Tures</span>
+  </footer>
+<script src="_devkit.js"></script>
+</body>
+</html>

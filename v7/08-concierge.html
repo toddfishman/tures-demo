@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — In-trip concierge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .bubble-me{ background:#1f6e5a; color:#eafff5; }
+  .bubble-t{ background:#14201a; color:#dfe9e2; border:1px solid rgba(200,162,74,0.12); }
+  /* bubble entrance physics */
+  .msg{ opacity:0; transform:translateY(10px) scale(.97); transition:opacity .3s ease, transform .34s cubic-bezier(.34,1.5,.64,1); }
+  .msg.in{ opacity:1; transform:none; }
+  .typing span{ display:inline-block; width:5px; height:5px; border-radius:99px; background:#9fb3a6; margin:0 1px; animation:blink 1.2s infinite; }
+  .typing span:nth-child(2){ animation-delay:.2s } .typing span:nth-child(3){ animation-delay:.4s }
+  @keyframes blink{ 0%,60%,100%{opacity:.3} 30%{opacity:1} }
+  .acting{ display:inline-flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:#e6c873; background:rgba(200,162,74,0.12); border:1px solid rgba(200,162,74,0.28); padding:4px 10px; border-radius:99px; }
+  .qr{ padding:7px 13px; border-radius:99px; font-size:12px; cursor:pointer; white-space:nowrap;
+    border:1px solid rgba(200,162,74,0.3); color:var(--gold-bright); background:transparent; transition:all .14s; }
+  .qr:hover{ background:rgba(200,162,74,0.1); } .qr:active{ transform:scale(.96); }
+  .composer-input{ background:#10171c; color:var(--canvas-warm); border:0; outline:none; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="05-execution.html">In flight</a>
+      <a href="07-itinerary.html">Itinerary</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="08-concierge.html" class="active">Concierge</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-10 right-2 text-[24vw] sm:text-[15vw] z-0" data-parallax="0.14">VIII</div>
+ <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9">
+  <div class="caps text-[11px] text-gold/70 mb-3 flex items-center gap-2">Chapter VIII · Text us <span class="pill pill-d-gold normal-case tracking-normal">Sample trip</span></div>
+  <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Text Tures from Paris.<br><span class="foil">Done before the apéritif.</span></h1>
+  <p class="mt-4 max-w-md text-canvas/70 leading-relaxed">Same agent, same memory, same permissions — WhatsApp, Telegram, or the app. Tap a message to watch it work.</p>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8 items-start">
+
+  <!-- chat -->
+  <div class="lg:col-span-7">
+    <div class="seg dark mb-4" id="chanSeg">
+      <button class="on" data-v="WhatsApp">WhatsApp</button>
+      <button data-v="Telegram">Telegram</button>
+      <button data-v="App">In-app</button>
+    </div>
+
+    <div class="leather-surface grain rounded-2xl p-3 relative">
+     <div class="relative z-10 rounded-xl overflow-hidden" style="background:#0c1116;">
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-white/5">
+        <div class="w-9 h-9 rounded-full grid place-items-center font-display text-base" style="background:var(--leather);color:var(--gold-bright);border:1px solid rgba(200,162,74,.4)">t</div>
+        <div class="flex-1"><div class="text-sm text-canvas">Tures Concierge</div><div class="text-[11px]" style="color:rgba(242,234,216,.6)" id="chanLine">WhatsApp · online · typically &lt;1 min</div></div>
+        <span class="dot dot-green beat" style="color:var(--confirm)"></span>
+      </div>
+      <div id="chat" class="px-3 py-4 space-y-2.5 text-[13px] min-h-[320px] max-h-[420px] overflow-y-auto" data-noswipe></div>
+      <!-- quick replies -->
+      <div class="px-3 pt-2 flex gap-2 overflow-x-auto pb-1" id="suggestions" data-noswipe></div>
+      <!-- composer -->
+      <div class="px-3 py-2.5 flex items-center gap-2 border-t border-white/5">
+        <input id="composer" class="composer-input flex-1 rounded-full px-3.5 py-2 text-[13px]" placeholder="Message Tures…" data-noswipe />
+        <button id="sendBtn" class="w-9 h-9 rounded-full btn-gold grid place-items-center text-sm shrink-0">↑</button>
+      </div>
+     </div>
+    </div>
+  </div>
+
+  <!-- side -->
+  <aside class="lg:col-span-5 space-y-4">
+    <div class="leaf p-6">
+      <div class="caps text-[11px] text-ink-faint mb-2">Why a thread</div>
+      <h3 class="font-display text-2xl text-ink leading-tight">The best interface is the one you never have to open.</h3>
+      <p class="text-sm text-ink-soft mt-3 leading-relaxed">Text it like a fixer who already has your card, calendar, and taste loaded.</p>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-3">Carries across every channel</div>
+      <ul class="space-y-2.5 text-sm text-ink/85">
+        <li class="flex gap-2.5"><span class="text-gold">✦</span> Your Taste Print — "somewhere for dinner" means the right place.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✦</span> Live trip state — it knows you land in Ivalo at 9pm.</li>
+        <li class="flex gap-2.5"><span class="text-gold">✦</span> The Hiccup Handler — texts first when something's fixed.</li>
+      </ul>
+    </div>
+    <a href="signup.html" class="btn-gold w-full text-center px-5 py-3 rounded-xl block quiet font-semibold">Start free →</a>
+    <a href="index.html" class="block text-center text-xs text-gold/70 hover:text-gold-bright quiet mt-3">← Back to the edition</a>
+  </aside>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter VIII · In-trip concierge</div>
+</footer>
+
+<script>
+const chat = document.getElementById('chat');
+const sugEl = document.getElementById('suggestions');
+
+/* each scripted reply can carry an "acting" status that shows while Tures works */
+const SCRIPT = {
+  "Push my Friday dinner to 9pm": {
+    acting:"Acting · moving your reservation",
+    replies:[
+      "On it. Le Bistrot Paul Bert has you at 8:00 Fri — moving to 21:00.",
+      "Done. 21:00 confirmed (R-8212-B). They'll hold a quieter corner per your Taste Print. ✦"
+    ]},
+  "Find me somewhere for dinner tonight": {
+    acting:"Acting · checking tables nearby",
+    replies:[
+      "You're in Paris tonight, nothing booked. Reading your Taste Print: hidden-gem, adventurous, quiet corner.",
+      "Three I can get you into within 30 min: Clamato (runner sent), Le Servan (21:15), Septime La Cave. Want Le Servan?"
+    ]},
+  "I'm running 40 min late to the airport": {
+    acting:"Acting · re-checking AY 1574",
+    replies:[
+      "Noted — checking AY 1574.",
+      "You're fine: 1h 50m buffer at HEL absorbs it, bag drop open until T-60. I alerted your driver and re-timed the Javri transfer. Nothing to do. 🙂"
+    ]},
+  "Add a spa afternoon in Copenhagen": {
+    acting:"Acting · finding a slot Dec 11",
+    replies:[
+      "Looking at Dec 11, your open afternoon in CPH.",
+      "Held 15:00 at La Banchina's sauna + harbor bath — small, design-forward, your kind of place. Confirm and I'll add it to your itinerary + calendar."
+    ]},
+};
+
+function addMsg(text, who){
+  const el = document.createElement('div');
+  el.className = 'msg ' + (who==='me'
+    ? 'max-w-[82%] ml-auto rounded-2xl rounded-tr-sm px-3 py-2 bubble-me'
+    : 'max-w-[88%] rounded-2xl rounded-tl-sm px-3 py-2 bubble-t');
+  el.innerHTML = text;
+  chat.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('in'));
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+function actingPill(label){
+  const el=document.createElement('div');
+  el.className='msg flex';
+  el.innerHTML='<span class="acting"><span class="dot dot-amber pulse"></span>'+label+'</span>';
+  chat.appendChild(el); requestAnimationFrame(()=>el.classList.add('in')); chat.scrollTop=chat.scrollHeight;
+  return el;
+}
+function typing(){
+  const el = document.createElement('div');
+  el.className='msg max-w-[60%] rounded-2xl rounded-tl-sm px-3 py-2.5 bubble-t typing';
+  el.innerHTML='<span></span><span></span><span></span>';
+  chat.appendChild(el); requestAnimationFrame(()=>el.classList.add('in')); chat.scrollTop=chat.scrollHeight;
+  return el;
+}
+function send(q){
+  addMsg(q,'me');
+  renderSuggestions(q);
+  const entry = SCRIPT[q] || {replies:["Got it — handling that now.","Done. ✦"]};
+  const replies = entry.replies;
+  let actingEl = entry.acting ? null : undefined;
+  if(entry.acting){ setTimeout(()=>{ actingEl = actingPill(entry.acting); }, 350); }
+  let i=0;
+  const step=()=>{
+    if(i>=replies.length){ if(actingEl){ actingEl.remove(); } return; }
+    const t=typing();
+    setTimeout(()=>{
+      t.remove();
+      if(i===0 && actingEl){ actingEl.remove(); actingEl=null; }
+      addMsg(replies[i],'t'); i++; setTimeout(step, 550);
+    }, 1000+i*200);
+  };
+  setTimeout(step, entry.acting ? 900 : 400);
+}
+function renderSuggestions(used){
+  sugEl.innerHTML='';
+  Object.keys(SCRIPT).forEach(q=>{
+    if(q===used) return;
+    const b=document.createElement('button'); b.className='qr'; b.textContent=q; b.onclick=()=>send(q);
+    sugEl.appendChild(b);
+  });
+}
+
+/* composer */
+function sendTyped(){
+  const v=document.getElementById('composer').value.trim();
+  if(!v) return;
+  document.getElementById('composer').value='';
+  send(v);
+}
+document.getElementById('sendBtn').addEventListener('click', sendTyped);
+document.getElementById('composer').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendTyped(); } });
+
+/* channel segmented control */
+document.getElementById('chanSeg').addEventListener('segchange', function(e){
+  const name=e.detail.value;
+  const lines={WhatsApp:'WhatsApp · online · typically <1 min', Telegram:'Telegram · @tures_concierge · online', App:'Tures app · secure thread'};
+  document.getElementById('chanLine').innerHTML = lines[name];
+});
+
+// seed
+addMsg("Evening, Andy. You're in Paris through Saturday — everything's confirmed. What can I do?", 't');
+renderSuggestions();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,979 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Have a conversation with Tures — bring every detail or just a vibe. It plans, books every leg, and hands back confirmation numbers, then keeps watching the trip for you.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="Plan a trip with Tures">
+<meta property="og:description" content="Have a conversation with Tures — bring every detail or just a vibe. It plans, books every leg, and hands back confirmation numbers, then keeps watching the trip for you.">
+<meta property="og:url" content="https://tures.app/plan.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Plan a trip with Tures">
+<meta name="twitter:description" content="Have a conversation with Tures — bring every detail or just a vibe. It plans, books every leg, and hands back confirmation numbers, then keeps watching the trip for you.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — Plan a trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<style>
+  /* ---- page-specific: the plan console ---- */
+  .console-wrap{max-width:1000px;margin:0 auto}
+  .browser .body{display:grid;grid-template-columns:1fr;background:var(--bg)}
+  .conv{display:flex;flex-direction:column;min-height:560px}
+  .conv-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .conv-head .ch{flex:1;line-height:1.25}
+  .conv-head .ch .n{font-family:'Inter',system-ui,sans-serif;font-size:16px;font-weight:700;letter-spacing:-.02em}
+  .conv-head .ch .s{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .conv-head .ch .s::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .conv-head .route{font-family:'Space Mono',monospace;font-size:12px;color:var(--faint);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+
+  .thread{flex:1;padding:22px 22px 8px;overflow:hidden}
+  .msg{opacity:0;transform:translateY(10px)}
+  .msg.show{animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* typing indicator */
+  .typing .bubble{display:inline-flex;gap:5px;align-items:center;padding:13px 16px}
+  .typing .d{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;animation:blink 1.4s infinite}
+  .typing .d:nth-child(2){animation-delay:.2s}.typing .d:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+  /* option card inside the thread */
+  .opt{align-self:flex-start;max-width:92%;background:linear-gradient(180deg,var(--acc-dim),transparent 70%),var(--bg);
+    border:1px solid var(--acc-line);border-radius:var(--radius);overflow:hidden;margin-top:2px}
+  .opt .pick{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .opt .pick .star{font-size:14px;letter-spacing:0}
+  .opt .pick .demo-tag{margin-left:auto}
+  .opt .ob{padding:16px}
+  .opt .oname{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:21px;line-height:1.15;letter-spacing:-.02em}
+  .opt .ometa{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  .opt .ometa .mono{color:var(--acc-deep)}
+  .opt .reason{margin-top:12px;padding:11px 13px;background:var(--surface);border-radius:12px;font-size:13.5px;color:var(--text);line-height:1.5}
+  .opt .reason b{font-weight:600}
+  .opt .reason .tp{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--acc-deep);margin-right:7px;vertical-align:middle}
+  .opt .oact{display:flex;gap:10px;padding:0 16px 16px;flex-wrap:wrap}
+
+  /* composer */
+  .composer{display:flex;gap:10px;align-items:center;padding:16px 20px;border-top:1px solid var(--line);background:var(--surface)}
+  .composer .field{flex:1;border-radius:999px}
+  .composer .send{width:42px;height:42px;border-radius:50%;flex:0 0 auto;background:var(--acc);display:grid;place-items:center;
+    cursor:pointer;border:none;box-shadow:0 8px 22px -10px var(--acc);transition:transform .15s}
+  .composer .send:hover{transform:translateY(-1px)}
+  .composer .send svg{stroke:#fff}
+  .composer .send:disabled{opacity:.5;cursor:default;transform:none}
+
+  /* toolbar above the console */
+  .plan-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .plan-bar .spacer{flex:1}
+  .chip-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text);border:1px solid var(--line-2);border-radius:10px;padding:7px 12px;cursor:pointer;transition:border-color .15s,color .15s}
+  .chip-link:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .chip-link svg{stroke:currentColor}
+
+  /* action button rows + confirmation cards in-thread */
+  .actions{margin-top:2px}
+  .actions .row{display:flex;gap:10px;flex-wrap:wrap}
+  .conf{align-self:flex-start;max-width:94%;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;margin-top:2px}
+  .conf .ch{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}
+  .conf .ch .ok{color:var(--good)}
+  .conf .ch .demo-tag{margin-left:auto}
+  .conf .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+  .conf .ln:last-child{border-bottom:none}
+  .conf .ln .mono{color:var(--acc-deep);white-space:nowrap}
+  .nudge{align-self:flex-start;max-width:92%;display:flex;gap:10px;align-items:flex-start;background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:14px;padding:12px 14px;margin-top:2px;font-size:13.5px;line-height:1.5}
+  .nudge svg{stroke:var(--acc-deep);flex:0 0 auto;margin-top:2px}
+
+  /* "what Tures asks" rail */
+  .asks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ask{display:flex;gap:11px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+  .ask .tick{width:24px;height:24px;flex:0 0 auto;border-radius:50%;background:var(--acc-dim);display:grid;place-items:center;margin-top:1px}
+  .ask .tick svg{stroke:var(--acc-deep)}
+  .ask .ad .at{font-size:13.5px;font-weight:600}
+  .ask .ad .as{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .asks-note{display:flex;align-items:center;gap:9px;margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .asks-note svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .asks-note b{color:var(--text);font-weight:600}
+
+  /* trip extras — real discovery (where to eat / things to do / getting around) */
+  .xwrap{align-self:flex-start;max-width:96%;margin-top:2px;display:flex;flex-direction:column;gap:12px}
+  .xgroup{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .xgroup .xh{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--acc-deep)}
+  .xgroup .xh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .xgroup .xh .demo-tag{margin-left:auto}
+  .xrow{display:flex;align-items:center;gap:12px;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .xrow:last-child{border-bottom:none}
+  .xrow .xinfo{flex:1;min-width:0}
+  .xrow .xname{font-size:14px;font-weight:600;line-height:1.25}
+  .xrow .xmeta{font-size:12px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .xrow .xbtn{flex:0 0 auto;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);cursor:pointer;transition:border-color .15s,color .15s}
+  .xrow .xbtn:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .xrow .xbtn:disabled{opacity:.6;cursor:default}
+  .xrow .xdone{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:12px;color:var(--good);white-space:nowrap}
+
+  /* trip radar — situational awareness (the always-on watch, made visible) */
+  .radar{align-self:flex-start;max-width:96%;margin-top:2px;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--bg)}
+  .radar .rh{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--acc-deep)}
+  .radar .rh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .radar .rh .pulse{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2.6s infinite}
+  .radar .rh .demo-tag{margin-left:auto}
+  .radar .ritem{display:flex;gap:11px;align-items:flex-start;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .radar .ritem:last-child{border-bottom:none}
+  .radar .ritem .sev{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:5px;background:var(--muted)}
+  .radar .ritem .sev.info{background:var(--muted)}
+  .radar .ritem .sev.watch{background:#d9a514}
+  .radar .ritem .sev.warning{background:var(--acc)}
+  .radar .ritem .sev.critical{background:var(--acc-deep);box-shadow:0 0 8px var(--acc)}
+  .radar .ritem .rinfo{flex:1;min-width:0}
+  .radar .ritem .rt{font-size:13.5px;font-weight:600;line-height:1.3}
+  .radar .ritem .rt .cat{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-left:7px;font-weight:400}
+  .radar .ritem .rd{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .radar .ritem .rd a{color:var(--acc-deep);border-bottom:1px solid var(--acc-line)}
+  .radar .rclear{padding:13px 15px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .radar .rclear svg{stroke:var(--good);flex:0 0 auto}
+  .radar .rfoot{padding:10px 15px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .radar .rscan{font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);cursor:pointer;transition:border-color .15s,color .15s}
+  .radar .rscan:hover{border-color:var(--acc);color:var(--acc-deep)}
+  .radar .rscan:disabled{opacity:.6;cursor:default}
+  .radar .rnote{font-size:11.5px;color:var(--faint)}
+
+  /* demo homecoming "proof" card (Books → Protects → Proves, in-product) */
+  .dhome{align-self:stretch;max-width:96%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:var(--bg);margin-top:2px}
+  .dhome .hh{padding:12px 15px;border-bottom:1px solid var(--line);background:var(--acc-dim);display:flex;align-items:center;gap:8px}
+  .dhome .hh .t{font-family:'Playfair Display',Georgia,serif;font-size:16px}
+  .dhome .hh .demo-tag{margin-left:auto}
+  .dhome .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .dhome .cell{background:var(--bg);padding:12px 14px}
+  .dhome .cell .n{font-family:'Space Mono',monospace;font-size:19px;color:var(--acc-deep);line-height:1.1}
+  .dhome .cell .l{font-size:11px;color:var(--muted);margin-top:3px}
+  .dhome .foot{padding:11px 15px;font-size:12.5px;color:var(--muted);line-height:1.45;border-top:1px solid var(--line)}
+  .dhome .foot b{color:var(--text);font-weight:600}
+
+  /* structured plan cards (flight + hotel from /plan) */
+  .plan-cards{align-self:flex-start;max-width:96%;display:flex;flex-direction:column;gap:12px;margin-top:2px}
+  .plan-cards .opt{margin:0;max-width:100%}
+  .plan-total{font-size:13.5px;line-height:1.45;padding:11px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface)}
+  .plan-total b{color:var(--acc-deep)}
+
+  /* Trip Watch opt-in — pass-through monitoring add-on */
+  .watch-opt{align-self:flex-start;max-width:96%;margin-top:2px;border:1px solid var(--acc-line);border-radius:14px;background:var(--bg);padding:14px 16px}
+  .watch-opt .wh{display:flex;align-items:flex-start;gap:10px}
+  .watch-opt .wh input{margin-top:4px;accent-color:var(--acc-deep)}
+  .watch-opt .wt{font-size:14px;font-weight:600;line-height:1.35}
+  .watch-opt .ws{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .watch-opt .wc{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .watch-opt select{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface)}
+  .watch-status{font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .watch-status b{color:var(--text)}
+
+  /* silver outline around the chat console */
+  .browser{border:1.5px solid var(--silver)}
+  /* sender name ABOVE the bubble; Tures speaks in vermilion */
+  .msg .who{font-size:11px;font-weight:600;color:var(--faint);margin:0 4px 5px;letter-spacing:.02em}
+  .from-me .who{text-align:right}
+  .from-ai .who{color:var(--acc-deep)}
+  .from-ai .bubble{color:var(--bubble-ai-text)}
+
+  /* one-time "set up to book" card (in-chat Vault hand-off) */
+  .vaultset{align-self:flex-start;max-width:96%;border:1px solid var(--acc-line);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--acc-dim),transparent 58%),var(--bg);margin-top:2px}
+  .vaultset .vh{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-deep);font-weight:600}
+  .vaultset .vh svg{stroke:var(--acc-deep);flex:0 0 auto}
+  .vaultset .vh .demo-tag{margin-left:auto}
+  .vaultset .vbody{padding:13px 14px;display:flex;flex-direction:column;gap:11px}
+  .vaultset .vsafe{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--silver-deep);background:var(--surface);border:1px solid var(--silver-2);border-radius:9px;padding:8px 11px;line-height:1.4}
+  .vaultset .vsafe svg{stroke:var(--silver-deep);flex:0 0 auto}
+  .vaultset .vgrp{display:flex;flex-direction:column;gap:5px}
+  .vaultset .gl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  .vaultset .vfield{display:flex;gap:8px;flex-wrap:wrap}
+  .vaultset input{flex:1;min-width:110px;background:var(--bg);border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font:14px 'Inter',system-ui,sans-serif;color:var(--text);outline:none}
+  .vaultset input:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-dim)}
+  .vaultset .vact{display:flex;gap:10px;flex-wrap:wrap;padding:2px 14px 14px}
+
+  @media (max-width:860px){.asks{grid-template-columns:1fr}.conv{min-height:0}.thread{max-height:none}}
+
+  /* ───────── DESKTOP: keep the full chat console in view ───────── */
+  @media (min-width:621px){
+    main{
+      min-height:calc(100dvh - var(--nav-h,56px));
+      display:flex;flex-direction:column;
+    }
+    #intro-sec{flex:0 0 auto;padding:22px 0 6px}
+    #intro-sec h1{margin-top:12px!important;font-size:clamp(24px,3vw,34px)}
+    #intro-sec .lead{margin:8px auto 0!important;font-size:15px;max-width:36ch}
+    #console-sec{
+      flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+      padding-top:0;padding-bottom:20px;
+    }
+    #console-sec .wrap{flex:1;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
+    .console-wrap{display:flex;flex-direction:column;flex:1;min-height:0;max-height:none}
+    .browser{flex:1;display:flex;flex-direction:column;min-height:0}
+    .browser .body{flex:1;min-height:0;display:flex}
+    .conv{flex:1;min-height:0;max-height:100%}
+    .thread{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+  }
+
+  @media (max-width:560px){.opt .oact .btn{flex:1}.xrow .xmeta{white-space:normal}}
+
+  /* ───────── APP MODE (mobile): the chat fills the screen like a native app ───────── */
+  @media (max-width:620px){
+    /* hide the marketing chrome so the page reads as an app, not a webpage */
+    #intro-sec, #asks-sec{display:none}
+    main{padding:0}
+    /* the console section becomes a full-height flex column under the nav */
+    #console-sec{padding:0;display:flex;flex-direction:column;height:calc(100dvh - 56px - env(safe-area-inset-top))}
+    #console-sec .wrap{padding:0;display:flex;flex-direction:column;flex:1;min-height:0}
+    .console-wrap{max-width:none;display:flex;flex-direction:column;flex:1;min-height:0}
+    .plan-bar{flex:0 0 auto;margin:0;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--surface)}
+    .browser{flex:1;min-height:0;display:flex;flex-direction:column;border-radius:0;border-left:0;border-right:0;border-bottom:0;box-shadow:none}
+    .browser .titlebar{display:none}
+    .browser .body{flex:1;min-height:0;display:flex}
+    .conv{flex:1;min-height:0;height:auto;display:flex;flex-direction:column}
+    .thread{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .composer{flex:0 0 auto;position:static;padding:11px 13px calc(11px + env(safe-area-inset-bottom))}
+    .composer .field{font-size:16px} /* ≥16px stops iOS Safari from zooming on focus */
+  }
+</style>
+</head>
+<body data-page="plan" data-voice-inline="1">
+<main>
+
+  <!-- ── intro ── -->
+  <section class="section tight" id="intro-sec">
+    <div class="wrap center">
+      <span class="eyebrow"><span class="dot"></span> Plan a trip</span>
+      <h1 style="margin-top:22px">Just have a <em>conversation.</em></h1>
+      <p class="lead" style="margin:18px auto 0">Bring every detail, or just a vibe — Tures takes it from there.</p>
+    </div>
+  </section>
+
+  <!-- ── the console ── -->
+  <section class="section tight" id="console-sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="console-wrap">
+        <div class="plan-bar">
+          <span data-voice-mount></span>
+          <a class="chip-link" id="text-tures" href="#" title="Text Tures on Telegram — same account">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 1 1 16.1-3.8z"/></svg> Text Tures</a>
+          <span class="spacer"></span>
+          <button id="btn-demo" class="btn ghost sm" type="button">▷ Watch the example</button>
+        </div>
+        <div class="browser">
+          <div class="titlebar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="addr">app.tures.com / plan</span>
+          </div>
+          <div class="body">
+            <div class="conv">
+              <div class="conv-head">
+                <div class="avatar serif" style="position:relative">T<img src="assets/img/concierge.png" alt="Tures" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+                <div class="ch"><div class="n">New trip</div><div class="s">Tures · online</div></div>
+                <span class="route" id="route">Seattle ⇄ ?</span>
+              </div>
+              <div class="thread" id="thread" aria-label="Conversation with Tures"></div>
+              <form class="composer" id="composer" onsubmit="return false">
+                <input class="field" id="composer-input" placeholder="Message Tures…" aria-label="Message Tures" autocomplete="off">
+                <button class="send" id="send" type="submit" aria-label="Send message">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── what Tures asks ── -->
+  <section class="section tight" id="asks-sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="center" style="margin-bottom:26px">
+        <span class="eyebrow"><span class="dot"></span> What Tures asks</span>
+        <h2 style="margin-top:18px">Six things, then it <em>goes to work.</em></h2>
+      </div>
+      <div class="asks">
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Origin</div><div class="as">Your departure city — never guessed.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Destination</div><div class="as">A city, a coast, a country.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Dates</div><div class="as">Exact days, or a window to price around.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Travelers</div><div class="as">Just you two, or the whole family.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Style</div><div class="as">Oceanfront and design-led, or quiet by the trail.</div></div></div>
+        <div class="ask"><span class="tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div class="ad"><div class="at">Budget</div><div class="as">A posture, or a hard cap.</div></div></div>
+      </div>
+      <div class="asks-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Nothing is booked or charged until you confirm — <b>everything is held first</b>.</span>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<script>
+(function(){
+  var thread = document.getElementById('thread');
+  var route  = document.getElementById('route');
+  var input  = document.getElementById('composer-input');
+  var sendBtn= document.getElementById('send');
+  var form   = document.getElementById('composer');
+  var live   = !!(window.tures && window.tures.configured);
+  var history = [];
+  var sessionCtx = '';
+  var sessionId = window.tures && window.tures.sessionId ? window.tures.sessionId() : ('sess-' + Date.now().toString(36));
+  var planShown = false;
+  var busy = false;
+  var typingEl = null;
+  var watchCap = 10;
+  var watchOn = true;
+  var watchMeta = { marginPercent: 20, defaultCapUsd: 10 };
+  var pendingBookingId = null;
+  var bookingIdemKey = null;
+  var bookingSimulated = true;
+
+  if (live && window.tures.health) {
+    window.tures.health().then(function(h){
+      bookingSimulated = !!(h && h.capabilities && h.capabilities.bookingSimulated);
+    }).catch(function(){});
+  }
+
+  if (live && window.tures.watchCapabilities) {
+    window.tures.watchCapabilities().then(function(c){
+      if (c) {
+        watchMeta = c;
+        watchCap = c.defaultCapUsd || 10;
+      }
+    }).catch(function(){});
+  }
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function short(s){ s=String(s||''); return s.length>16 ? s.slice(0,15)+'…' : s; }
+  function reveal(el){ requestAnimationFrame(function(){ el.classList.add('show'); }); }
+  function scroll(){ thread.scrollTop = thread.scrollHeight; }
+  function setRoute(o,d){ if(o&&d) route.textContent = short(o)+' ⇄ '+short(d); }
+
+  function bubble(html, who){
+    var me = who==='me';
+    var w=document.createElement('div'); w.className='msg '+(me?'from-me':'from-ai');
+    w.innerHTML='<div class="who">'+(me?'You':'Tures')+'</div><div class="bubble">'+html+'</div>';
+    thread.appendChild(w); reveal(w); scroll(); return w;
+  }
+  function assistantSay(text){
+    bubble(esc(text),'t');
+    history.push({role:'assistant',content:String(text||'').replace(/<[^>]+>/g,'')});
+  }
+  function convoContext(){
+    var base = window.turesFunnel ? window.turesFunnel.context() : undefined;
+    if(!sessionCtx) return base;
+    return base ? base+' · '+sessionCtx : sessionCtx;
+  }
+  function noteSession(slots){
+    if(!slots) return;
+    sessionCtx = [
+      slots.origin && ('Origin: '+slots.origin),
+      slots.destination && ('Fly into: '+slots.destination),
+      slots.lodgingArea && ('Final destination: '+slots.lodgingArea),
+      slots.scope && ('Scope: '+slots.scope),
+      slots.brief && ('Trip: '+slots.brief)
+    ].filter(Boolean).join(' · ');
+  }
+  function enrichBriefText(brief, slots){
+    var parts = [String(brief||'')];
+    if(!slots) return parts[0];
+    if(slots.lodgingArea) parts.push('Lodging area / final destination: '+slots.lodgingArea);
+    if(slots.destination) parts.push('Arrival airport or city: '+slots.destination);
+    if(slots.scope) parts.push('Trip scope: '+slots.scope);
+    if(slots.mustHaves) parts.push('Must haves: '+slots.mustHaves);
+    if(slots.origin) parts.push('Origin: '+slots.origin);
+    if(slots.timing) parts.push('Timing: '+slots.timing);
+    if(slots.travelers) parts.push('Travelers: '+slots.travelers);
+    if(slots.style) parts.push('Style: '+slots.style);
+    if(slots.budget) parts.push('Budget: '+slots.budget);
+    return parts.join('. ');
+  }
+  function scopeOf(brief){ return (brief && brief.tripScope) || 'full'; }
+  function transportOnly(brief){
+    var s = scopeOf(brief);
+    return s === 'flights_transport' || s === 'flights_only';
+  }
+  window.bubble = bubble;
+  function typing(on){
+    if(on){ if(typingEl) return; typingEl=document.createElement('div'); typingEl.className='msg typing from-ai';
+      typingEl.innerHTML='<div class="bubble"><span class="d"></span><span class="d"></span><span class="d"></span></div>';
+      thread.appendChild(typingEl); reveal(typingEl); scroll(); }
+    else if(typingEl){ typingEl.remove(); typingEl=null; }
+  }
+  function actions(btns){
+    var w=document.createElement('div'); w.className='msg from-ai actions';
+    var row=document.createElement('div'); row.className='row';
+    btns.forEach(function(b){ var el=document.createElement('button'); el.type='button'; el.className='btn '+(b.cls||''); el.innerHTML=b.label; el.onclick=function(){ w.remove(); b.on(); }; row.appendChild(el); });
+    w.appendChild(row); thread.appendChild(w); reveal(w); scroll(); return w;
+  }
+
+  // ── Memory 2.0: offer to remember the people a traveler mentions (confirm-first, never silent) ──
+  var offeredRemember = {};
+  function ageLabel(age){
+    // "an" before ages that start with a vowel sound (8, 11, 18, 80–89), else "a"
+    var an = age===8 || age===11 || age===18 || (age>=80 && age<=89);
+    return (an?'an ':'a ')+age+'-year-old';
+  }
+  function humanCrew(props){
+    var names = props.map(function(p){
+      if(p.relationship==='child') return p.age!=null ? ageLabel(p.age) : 'a child';
+      return 'your '+p.relationship;
+    });
+    return names.length>1 ? (names.slice(0,-1).join(', ')+' and '+names[names.length-1]) : (names[0]||'them');
+  }
+  function maybeOfferRemember(text){
+    try{
+      if(!(window.tures && window.tures.household && window.tures.signedIn)) return; // account-scoped; sign in to save
+      window.tures.household.extract(text).then(function(r){
+        var props=(r&&r.proposals)||[]; if(!props.length) return;
+        var human=humanCrew(props);
+        if(offeredRemember[human]) return; offeredRemember[human]=1;      // don't re-offer the same crew this session
+        var chip=bubble('Want me to remember <b>'+esc(human)+'</b> for future trips? <span style="color:var(--muted)">You can edit anytime in your Vault.</span>','t');
+        actions([
+          {label:'Yes, remember', on:function(){
+            window.tures.household.remember(props).then(function(){
+              bubble('Got it — I’ll remember '+esc(human)+', plan around them, and ask “same crew?” next time.','t');
+            }).catch(function(){ bubble('Could not save that just now — no harm done.','t'); });
+          }},
+          {label:'Not now', cls:'ghost', on:function(){ /* dismissed; chip stays as context */ }}
+        ]);
+        void chip;
+      }).catch(function(){});
+    }catch(_){}
+  }
+
+  // ── live conversation ──
+  // Warm the engine on load so the first message isn't a cold-start.
+  try{ if(window.tures && window.tures.health) window.tures.health(); }catch(_){}
+  function send(text){
+    if(busy || !text) return;
+    bubble(esc(text),'me'); history.push({role:'user',content:text});
+    maybeOfferRemember(text);
+    input.value=''; busy=true; sendBtn.disabled=true; typing(true);
+    var ctx = convoContext();
+    var uid = window.turesFunnel ? window.turesFunnel.uid() : undefined;
+    function attempt(n){
+      return window.tures.converse(history, undefined, ctx, uid, sessionId).catch(function(e){
+        if(n>0) return new Promise(function(res,rej){ setTimeout(function(){ attempt(n-1).then(res,rej); }, 1800); });
+        throw e;
+      });
+    }
+    attempt(1).then(function(c){
+      typing(false); busy=false; sendBtn.disabled=false;
+      if(c && c.slots && c.slots.origin && c.slots.destination) setRoute(c.slots.origin, c.slots.destination);
+      if(c && c.slots) noteSession(c.slots);
+      if(c && c.ready && c.brief){
+        if(c.reply) assistantSay(c.reply);
+        resolveBrief(c.brief, c.slots);
+      } else {
+        var reply=(c && c.reply) || 'Tell me a little more.';
+        assistantSay(reply);
+      }
+    }).catch(function(e){ typing(false); busy=false; sendBtn.disabled=false; offline(e); });
+  }
+
+  // converse returns the brief as a sentence; /plan and /book need a structured brief → parse it first.
+  function resolveBrief(b, slots){
+    if(b && typeof b==='object' && b.destination){ window.__brief=b; proposePlan(b); return; }
+    var prose = enrichBriefText(b, slots);
+    typing(true);
+    window.tures.parse(prose).then(function(pr){
+      typing(false);
+      if(pr && pr.brief){
+        if(slots && slots.scope && !pr.brief.tripScope){
+          var scopeMap = { full:'full', 'flights_stay':'flights_stay', 'flights_transport':'flights_transport', 'flights_only':'flights_only' };
+          var sk = String(slots.scope).toLowerCase().replace(/\s+/g,'_');
+          if(scopeMap[sk]) pr.brief.tripScope = scopeMap[sk];
+          else if(/transport|car|transfer|ground/i.test(String(slots.scope))) pr.brief.tripScope = 'flights_transport';
+        }
+        if(slots && slots.lodgingArea && !pr.brief.lodgingArea) pr.brief.lodgingArea = slots.lodgingArea;
+        window.__brief=pr.brief; proposePlan(pr.brief);
+      }
+      else offline();
+    }).catch(function(){ typing(false); offline(); });
+  }
+
+  function fmtTripDates(brief){
+    if(!brief) return '';
+    if(brief.departDate && brief.returnDate) return esc(brief.departDate)+' – '+esc(brief.returnDate);
+    if(brief.departDate) return 'from '+esc(brief.departDate);
+    if(brief.timing) return esc(String(brief.timing));
+    return '';
+  }
+
+  function synthFlightTimes(offer){
+    if(!offer || !offer.id) return '';
+    var h = 0;
+    for(var i=0;i<offer.id.length;i++) h = (h + offer.id.charCodeAt(i)*17) % 720;
+    var depH = 6 + (h % 12), depM = (h*3) % 60;
+    var arrH = depH + 2 + (h % 5), arrM = (depM + 17) % 60;
+    function t(hh,mm){ var ap = hh>=12?'p':'a'; var h12 = hh%12||12; return h12+':'+(mm<10?'0':'')+mm+ap; }
+    return t(depH, depM)+' depart · '+t(arrH, arrM)+' arrive';
+  }
+
+  function legCard(label, offer, brief, kind, plan){
+    if(!offer) return '';
+    var dates = fmtTripDates(brief);
+    var meta = (offer.summary||[]).slice();
+    if(kind==='flight' && dates) meta.unshift(dates);
+    if(kind==='flight') meta.push(synthFlightTimes(offer));
+    if(kind==='stay' && offer.raw && offer.raw.nights) meta.unshift(String(offer.raw.nights)+' nights');
+    var reason;
+    if(kind==='stay' && plan && plan.memories && plan.memories.length){
+      reason = plan.memories[0];
+    } else if(offer.scoreReasons && offer.scoreReasons.length){
+      reason = offer.scoreReasons.slice(0,2).join(' · ');
+    } else {
+      reason = (kind==='flight' ? 'Best fit for your route and cabin' : 'Matches your style and budget');
+    }
+    var memTag = (kind==='stay' && plan && plan.memories && plan.memories.length) ? ' <span class="demo-tag">From memory</span>' : '';
+    return '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> '+esc(label)+' <span class="demo-tag">Proposed</span></div>'+
+      '<div class="ob"><div class="oname">'+esc(offer.title)+'</div>'+
+      '<div class="ometa">'+meta.map(function(m){ return '<span>'+esc(String(m))+'</span>'; }).join('')+
+      (offer.priceUsd!=null ? '<span class="mono">$'+Number(offer.priceUsd).toLocaleString()+'</span>' : '')+'</div>'+
+      '<div class="reason"><span class="tp"><span class="spark">✦</span> Why this one'+memTag+'</span> '+esc(reason)+'</div></div></div>';
+  }
+
+  function presentPlanCards(plan, brief){
+    var parts = [];
+    if(plan && plan.flight) parts.push(legCard('Flight', plan.flight, brief, 'flight', plan));
+    if(plan && plan.stay && !transportOnly(brief)) parts.push(legCard('Hotel', plan.stay, brief, 'stay', plan));
+    if(!parts.length) return;
+    planShown = true;
+    var wrap=document.createElement('div'); wrap.className='msg from-ai plan-cards show';
+    parts.forEach(function(html){ var d=document.createElement('div'); d.innerHTML=html; wrap.appendChild(d.firstChild); });
+    if(plan.totalUsd!=null && !transportOnly(brief)){
+      var tot=document.createElement('div'); tot.className='plan-total';
+      tot.innerHTML='About <b>$'+Number(plan.totalUsd).toLocaleString()+'</b> all in — nothing held or charged yet.';
+      wrap.appendChild(tot);
+    }
+    thread.appendChild(wrap); reveal(wrap); scroll();
+  }
+
+  function proposePlan(brief){
+    window.__brief = brief; planShown = false; typing(true);
+    window.tures.plan(brief).then(function(p){
+      typing(false);
+      var msg = transportOnly(brief)
+        ? 'Here is the flight plus ground transfer — review it here; I can adjust anything.'
+        : 'Here is what I would book — flight, hotel, dates, and the total. Review it here; I can adjust anything.';
+      assistantSay(msg);
+      presentPlanCards(p, brief);
+      presentRadar(brief, function(){
+        presentExtras(brief, function(){
+          var bookMsg = transportOnly(brief)
+            ? 'That covers the flight and car service. Shall I book it.'
+            : 'That is the trip, end to end. Shall I book the flights and hotel.';
+          assistantSay(bookMsg);
+          offerBook(brief);
+        });
+      });
+    }).catch(function(){
+      typing(false);
+      assistantSay('That is everything I need. Shall I hold it and book.');
+      offerBook(brief);
+    });
+  }
+  function offerBook(brief){
+    var wrap=document.createElement('div'); wrap.className='msg from-ai watch-opt show';
+    wrap.innerHTML=
+      '<label class="wh"><input type="checkbox" id="watch-on" checked aria-label="Enable Trip Watch">'+
+      '<span><div class="wt">Trip Watch — always-on alerts + smart daily scans</div>'+
+      '<div class="ws">Alerts stay on for weather and disruptions. Scans adapt to risk — usually $0–3 per trip. Pass-through API cost + '+watchMeta.marginPercent+'% · capped.</div></span></label>'+
+      '<div class="wc"><span>Spend cap</span><select id="watch-cap" aria-label="Watch spend cap">'+
+      [5,10,15,25].map(function(n){ return '<option value="'+n+'"'+(n===watchCap?' selected':'')+'>'+n+' USD</option>'; }).join('')+
+      '</select><span>without asking</span></div>';
+    thread.appendChild(wrap); reveal(wrap); scroll();
+    var chk=wrap.querySelector('#watch-on');
+    var capSel=wrap.querySelector('#watch-cap');
+    if(chk) chk.onchange=function(){ watchOn=chk.checked; };
+    if(capSel) capSel.onchange=function(){ watchCap=Number(capSel.value)||10; };
+    actions([
+      {label:'✦ Book with Trip Watch', on:function(){ executeBooking(brief, false, watchOn, watchCap); }},
+      {label:'Book without watch', cls:'ghost', on:function(){ executeBooking(brief, false, false, 0); }},
+      {label:'Adjust trip', cls:'ghost', on:function(){ bubble('Of course — tell me what to change (dates, budget, a different hotel) and I will re-shape it.','t'); input.focus(); }}
+    ]);
+  }
+
+  function executeBooking(brief, fromSetup, tripWatchEnabled, capUsd){
+    typing(true);
+    var body={brief:brief};
+    if(tripWatchEnabled) body.tripWatch={enabled:true, capUsd:capUsd||watchCap};
+    if(!bookingIdemKey){
+      var uid = (window.turesFunnel && window.turesFunnel.uid) ? window.turesFunnel.uid() : 'guest';
+      bookingIdemKey = 'book-' + uid + '-' + Date.now().toString(36);
+    }
+    body.idempotencyKey = bookingIdemKey;
+    var chain;
+    if(pendingBookingId){
+      chain = window.tures.confirm(pendingBookingId).then(function(conf){ return {bk:conf, conf:conf}; });
+    } else {
+      chain = window.tures.book(body).then(function(bk){
+        pendingBookingId = bk.id || bk.tripId;
+        return window.tures.confirm(pendingBookingId).then(function(conf){ return {bk:bk, conf:conf}; });
+      });
+    }
+    chain.then(function(r){
+      var bk=r.conf||r.bk;
+      typing(false);
+      var comps=(bk && bk.components)||[];
+      var anySim = bookingSimulated || comps.some(function(c){ return c.simulated; });
+      var rows = comps.map(function(c){
+        var code=c.confirmation||c.pnr||c.ref||c.status||'';
+        return '<div class="ln"><span>'+esc(c.title||c.label||'Booked')+'</span><span class="mono">'+esc(code)+'</span></div>';
+      }).join('') || '<div class="ln"><span>Trip held</span><span class="mono">'+esc(bk.tripId||bk.id||'')+'</span></div>';
+      var card=document.createElement('div'); card.className='conf msg';
+      card.innerHTML='<div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice'+(anySim?' <span class="demo-tag">Sample</span>':'')+'</div>'+rows;
+      thread.appendChild(card); reveal(card);
+      var doneMsg = anySim
+        ? 'Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here. <span style="color:var(--muted)">This is a safe simulation; no card was charged.</span>'
+        : 'Done — booked and double-checked. You will get one calm summary, and I will watch every leg from here.';
+      bubble(doneMsg,'t');
+      if(tripWatchEnabled && bk.id && window.tures.getWatch){
+        window.tures.getWatch(bk.id).then(function(w){
+          if(!w||!w.enabled) return;
+          var st=document.createElement('div'); st.className='watch-status';
+          var pr=w.pricing||{};
+          st.innerHTML='Trip Watch on · risk <b>'+esc(w.riskLevel||'clear')+'</b> · cap <b>$'+esc(String(pr.capUsd||capUsd))+'</b> · alerts always on';
+          card.appendChild(st);
+          scroll();
+        }).catch(function(){});
+      }
+      maybeNudge(); scroll();
+    }).catch(function(e){
+      typing(false);
+      if(e && e.status===409){
+        if(fromSetup){ bubble('Hm — that did not go through. Your trip is still held; want me to try the booking once more.','t'); actions([{label:'Try booking again', on:function(){ executeBooking(brief, true, tripWatchEnabled, capUsd); }}]); }
+        else { vaultSetup(brief); }
+      }
+      else { bubble('Something hiccuped booking that, and nothing was charged. Want me to try once more.','t'); actions([{label:'Try again', on:function(){ executeBooking(brief, false, tripWatchEnabled, capUsd); }}]); }
+    });
+  }
+
+  // ── trip extras: real where-to-eat / things-to-do / getting-around (Google Places) ──
+  function xIcon(kind){
+    if(kind==='dining') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a2 2 0 0 0 2 2v9"/><path d="M9 3v18M9 3v7"/><path d="M16 3c-1.6 0-3 1.8-3 4s1.4 4 3 4v9"/></svg>';
+    if(kind==='activity') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>';
+  }
+  function xRow(item, kind, memoryNote){
+    var row=document.createElement('div'); row.className='xrow';
+    var meta=(item.summary||[]).join(' · ');
+    if(memoryNote) meta = memoryNote + (meta ? ' · ' + meta : '');
+    var memTag = memoryNote ? ' <span class="demo-tag">From memory</span>' : '';
+    row.innerHTML='<div class="xinfo"><div class="xname">'+esc(item.title)+memTag+'</div><div class="xmeta">'+esc(meta)+'</div></div>';
+    var btn=document.createElement('button'); btn.type='button'; btn.className='xbtn';
+    btn.textContent = kind==='transport' ? 'Arrange' : (kind==='dining' ? 'Reserve' : 'Add');
+    btn.onclick=function(){
+      btn.disabled=true; btn.textContent='…';
+      window.tures.reserve({kind:kind, id:item.id, title:item.title}).then(function(r){
+        var done=document.createElement('span'); done.className='xdone';
+        done.textContent='✓ '+(r&&r.confirmation ? r.confirmation : 'reserved');
+        btn.replaceWith(done);
+      }).catch(function(){ btn.disabled=false; btn.textContent='Try again'; });
+    };
+    row.appendChild(btn); return row;
+  }
+  function xGroup(title, kind, items, memoryNote){
+    if(!items || !items.length) return null;
+    var g=document.createElement('div'); g.className='xgroup';
+    var h=document.createElement('div'); h.className='xh';
+    h.innerHTML=xIcon(kind)+'<span>'+esc(title)+'</span><span class="demo-tag">Sample</span>';
+    g.appendChild(h);
+    items.slice(0,4).forEach(function(it, i){ g.appendChild(xRow(it, kind, i === 0 && memoryNote ? memoryNote : null)); });
+    return g;
+  }
+  function presentExtras(brief, done){
+    done = done || function(){};
+    if(!live || !brief){ done(); return; }
+    if(transportOnly(brief)){
+      assistantSay('Ground transfer from the airport — private car or rideshare, priced for the actual drive.');
+      typing(true);
+      window.tures.discover(brief).then(function(d){
+        typing(false);
+        var groups=[ xGroup('Getting there from the airport','transport',d&&d.transport) ].filter(Boolean);
+        if(groups.length){
+          var wrap=document.createElement('div'); wrap.className='msg from-ai xwrap';
+          groups.forEach(function(g){ wrap.appendChild(g); });
+          thread.appendChild(wrap); reveal(wrap); scroll();
+        } else bubble('Could not load transfer estimates just now — the flight is still ready to book.','t');
+        done();
+      }).catch(function(){ typing(false); bubble('Could not load transfer estimates just now — the flight is still ready to book.','t'); done(); });
+      return;
+    }
+    assistantSay('And while you are there — here is where I would eat, what I would do, and how to get around. Real spots; tap and I will handle the reservation.');
+    typing(true);
+    window.tures.discover(brief).then(function(d){
+      typing(false);
+      var mems = (d && d.memories) || [];
+      var groups=[
+        xGroup('Where to eat','dining',d&&d.dining, mems[0]),
+        xGroup('Things to do','activity',d&&d.activities, mems[1] || mems[0]),
+        xGroup('Getting around','transport',d&&d.transport)
+      ].filter(Boolean);
+      if(groups.length){
+        var wrap=document.createElement('div'); wrap.className='msg from-ai xwrap';
+        groups.forEach(function(g){ wrap.appendChild(g); });
+        thread.appendChild(wrap); reveal(wrap); scroll();
+      } else {
+        var msg = (d && d.googlePlaces === false)
+          ? 'Restaurant and activity picks need Google Places on the engine — your core flight and hotel are still ready to book.'
+          : 'No local picks came back just now — the core trip is still ready to book.';
+        bubble(msg,'t');
+      }
+      done();
+    }).catch(function(){ typing(false); bubble('Could not load local picks just now — the core trip is still ready to book.','t'); done(); });
+  }
+
+  // ── trip radar: situational awareness (the always-on watch, made visible) ──
+  function sevDot(sev){ return '<span class="sev '+esc(sev||'info')+'"></span>'; }
+  function radarItem(s){
+    var cat = s.category ? '<span class="cat">'+esc(s.category)+'</span>' : '';
+    var url = s.url ? ' · <a href="'+esc(s.url)+'" target="_blank" rel="noopener">source</a>' : '';
+    var detail = s.detail ? '<div class="rd">'+esc(s.detail)+url+'</div>' : (url ? '<div class="rd">'+url+'</div>' : '');
+    return '<div class="ritem">'+sevDot(s.severity)+'<div class="rinfo"><div class="rt">'+esc(s.title)+cat+'</div>'+detail+'</div></div>';
+  }
+  function presentRadar(brief, done){
+    done = done || function(){};
+    if(!live || !brief || !window.tures.signals){ done(); return; }
+    bubble('And I have already started watching this trip — weather, air, events, anything that could get in the way. This is the part that never sleeps.','t');
+    typing(true);
+    window.tures.signals(brief, false).then(function(d){
+      typing(false);
+      var sigs = (d && d.signals) || [];
+      var card=document.createElement('div'); card.className='radar msg';
+      var head='<div class="rh"><span class="pulse"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>Trip radar · watching</span><span class="demo-tag">Live</span></div>';
+      var bodyHtml = sigs.length ? sigs.slice(0,5).map(radarItem).join('')
+        : '<div class="rclear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> All clear right now — I will keep watching and tell you the moment something changes.</div>';
+      var foot='<div class="rfoot"><button type="button" class="rscan">Scan live sources &rarr;</button><span class="rnote">strikes · events · advisories · traffic</span></div>';
+      card.innerHTML=head+bodyHtml+foot;
+      thread.appendChild(card); reveal(card); scroll();
+      var scan=card.querySelector('.rscan');
+      scan.onclick=function(){
+        scan.disabled=true; scan.textContent='Scanning the live web…';
+        window.tures.signals(brief, true).then(function(dd){
+          var deep=((dd&&dd.signals)||[]).filter(function(s){ return s.source==='web'; });
+          if(deep.length){
+            var rc=card.querySelector('.rclear'); if(rc) rc.parentNode.removeChild(rc);
+            card.querySelector('.rfoot').insertAdjacentHTML('beforebegin', deep.slice(0,5).map(radarItem).join(''));
+            if(scan.parentNode) scan.parentNode.removeChild(scan);
+            card.querySelector('.rnote').textContent='Live web scan complete';
+          } else {
+            scan.textContent='Nothing new on the live web';
+          }
+          scroll();
+        }).catch(function(){ scan.disabled=false; scan.textContent='Scan live sources →'; });
+      };
+      done();
+    }).catch(function(){ typing(false); done(); });
+  }
+
+  // First-booking hand-off — collected ONCE, in-chat, into the Vault, then reused forever.
+  // Because Tures books as your agent (not by logging into your airline), it needs DATA, not
+  // passwords: where to send confirmations, a card, and who's traveling. Demo = sample details.
+  function vaultSetup(brief){
+    if(window.turesFunnel) window.turesFunnel.pendingTrip.set({brief:brief, total:null});
+    bubble('Your trip is built and held. To book it in your name I need three things — just once, sealed in your Vault. I book as your agent, so I never need your airline logins.','t');
+    var c=document.createElement('div'); c.className='vaultset msg';
+    c.innerHTML=
+      '<div class="vh"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> One-time setup <span class="demo-tag">Safe demo</span></div>'+
+      '<div class="vbody">'+
+        '<div class="vsafe"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Sample details — nothing real is stored or charged. Edit them or just seal. <a href="setup.html" style="color:var(--acc-deep);font-weight:600;margin-left:6px">Prefer forms →</a></div>'+
+        '<div class="vgrp"><span class="gl">Where to send confirmations</span><div class="vfield"><input id="vs-email" value="you@example.com" aria-label="Email"></div></div>'+
+        '<div class="vgrp"><span class="gl">Payment</span><div class="vfield"><input id="vs-card" value="Visa •••• 4242" aria-label="Card"><input id="vs-exp" value="08 / 29" aria-label="Expiry" style="flex:0 0 92px;min-width:0"></div></div>'+
+        '<div class="vgrp"><span class="gl">Traveler (as on ID)</span><div class="vfield"><input id="vs-name" value="Andy Rockwell" aria-label="Full legal name"><input id="vs-dob" value="1979-04-12" aria-label="Date of birth" style="flex:0 0 130px;min-width:0"></div></div>'+
+      '</div>'+
+      '<div class="vact"></div>';
+    thread.appendChild(c); reveal(c);
+    var act=c.querySelector('.vact');
+    var seal=document.createElement('button'); seal.type='button'; seal.className='btn'; seal.innerHTML='✦ Seal &amp; book &rarr;';
+    var later=document.createElement('button'); later.type='button'; later.className='btn ghost'; later.textContent='Not now';
+    act.appendChild(seal); act.appendChild(later); scroll();
+    later.onclick=function(){ c.remove(); bubble('No rush — your trip is held. Pick it up whenever you like.','t'); };
+    seal.onclick=function(){
+      seal.disabled=true; later.disabled=true; seal.innerHTML='Sealing…';
+      var v=function(id){ var el=c.querySelector(id); return el? String(el.value||'').trim() : ''; };
+      var email=v('#vs-email'), name=v('#vs-name'), dob=v('#vs-dob');
+      var last4='4242'; var m=v('#vs-card').match(/(\d{4})\s*$/); if(m) last4=m[1]; // only a display last4 — never a full card number
+      var jobs=[];
+      // secret is a mock demo token (never a real card number); the engine stores it tokenized.
+      if(window.tures.connections) jobs.push(window.tures.connections.connect({kind:'payment', label:'Visa •••• '+last4, scopes:['payment:charge'], secret:{token:'tok_demo_'+last4, last4:last4}, meta:{cardKey:'visa_platinum', last4:last4}}).catch(function(){}));
+      if(window.tures.profile) jobs.push(window.tures.profile.set({fullName:name, dob:dob, email:email}).catch(function(){}));
+      Promise.all(jobs).then(function(){
+        c.remove();
+        bubble('Sealed in your Vault — and that is the last time I will ask. Booking now.','t');
+        executeBooking(brief, true, watchOn, watchCap);
+      });
+    };
+  }
+
+  function maybeNudge(){
+    if(!window.turesFunnel) return;
+    var nx=window.turesFunnel.nextStep(); if(!nx) return;
+    var n=document.createElement('div'); n.className='nudge msg';
+    n.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg><div>To make the next one instant: <b>'+esc(nx.label)+'</b> — '+esc(nx.why)+'. <a href="'+nx.href+'" style="color:var(--acc-deep);font-weight:600">Set it up →</a></div>';
+    thread.appendChild(n); reveal(n); scroll();
+  }
+
+  function offline(e){
+    bubble('I could not reach the planner just now — nothing was lost. Watch the example to see how a trip comes together, and try again in a moment.','t');
+    actions([{label:'▷ Watch the example', on:runDemo}]);
+  }
+
+  // ── greeting ──
+  function greet(){
+    var fromProactive = /[?&]from=proactive\b/.test(location.search);
+    if(live){
+      if(fromProactive){
+        assistantSay("You're in the right place — I watch every leg while you're away, and I book the trip before you go. Tell me what you're planning, or tap Talk to me.");
+      } else {
+        assistantSay("Hey — I'm Tures. Tell me a trip in your own words, type below or tap Talk to me — same thread, same memory.");
+      }
+    } else {
+      bubble('Tures is offline in this preview — watch the example to see a trip come together.','t');
+      actions([{label:'▷ Watch the example', on:runDemo}]);
+    }
+  }
+
+  // ── demo replay (the scripted example) ──
+  var optCard =
+    '<div class="opt msg show"><div class="pick"><span class="star spark">✦</span> Tures&rsquo; pick <span class="demo-tag">Sample</span></div>'+
+    '<div class="ob"><div class="oname">Montage Kapalua Bay</div>'+
+    '<div class="ometa"><span>Oceanfront · Maui</span><span>5 nights · Jun 12&ndash;19</span><span class="mono">est. from $1,350 / night</span></div>'+
+    '<div class="reason"><span class="tp"><span class="spark">✦</span> Taste-Print</span> Chosen <b>in the design-forward vein you loved last year</b> &mdash; wide ocean suites, a quiet pool, and Cane &amp; Canoe a short walk down.</div></div>'+
+    '<div class="oact"><button class="btn" type="button">Hold this</button><button class="btn ghost" type="button">See alternatives</button></div></div>';
+
+  // Scripted confirmation, radar, and homecoming cards — the demo tells the whole Books→Protects→
+  // Proves arc, all clearly Sample-labeled (no fake success: this is the example, not a real booking).
+  var demoConf =
+    '<div class="conf msg show"><div class="ch"><span class="ok">✓</span> Confirmed — each leg verified twice <span class="demo-tag">Sample</span></div>'+
+    '<div class="ln"><span>Hawaiian · business · SEA→OGG</span><span class="mono">HA · QK7T2P</span></div>'+
+    '<div class="ln"><span>Return · OGG→SEA · Jun 19</span><span class="mono">HA · QK7T2P</span></div>'+
+    '<div class="ln"><span>Montage Kapalua Bay · 5 nights</span><span class="mono">MNT · 4471-LX</span></div>'+
+    '<div class="ln"><span>Total · all in</span><span class="mono">$9,840</span></div></div>';
+  var radarSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+  var demoRadar =
+    '<div class="radar msg show"><div class="rh"><span class="pulse"></span>'+radarSvg+'<span>Trip radar · watching</span><span class="demo-tag">Sample</span></div>'+
+    '<div class="ritem"><span class="sev warning"></span><div class="rinfo"><div class="rt">Thunderstorms Thursday afternoon<span class="cat">weather</span></div><div class="rd">Maui, HI: storms rolling into your snorkeling window — I have a fix staged.</div></div></div>'+
+    '<div class="ritem"><span class="sev watch"></span><div class="rinfo"><div class="rt">Lane work on Honoapiilani Hwy<span class="cat">traffic</span></div><div class="rd">Mornings near Kapalua — I will route your transfers around it.</div></div></div>'+
+    '<div class="ritem"><span class="sev info"></span><div class="rinfo"><div class="rt">Whale-watch season opens<span class="cat">event</span></div><div class="rd">First boats run your second morning — want two seats held?</div></div></div></div>';
+  var demoHome =
+    '<div class="dhome msg show"><div class="hh"><div class="t serif">Welcome home — Maui, handled.</div><span class="demo-tag">Sample</span></div>'+
+    '<div class="grid">'+
+      '<div class="cell"><div class="n">$612</div><div class="l">saved vs published</div></div>'+
+      '<div class="cell"><div class="n">42,000</div><div class="l">miles credited</div></div>'+
+      '<div class="cell"><div class="n">14 hrs</div><div class="l">you never spent</div></div>'+
+      '<div class="cell"><div class="n">1</div><div class="l">disruption dodged</div></div>'+
+    '</div>'+
+    '<div class="foot"><b>Expense report ready.</b> And you loved the oceanfront table at Mama&rsquo;s Fish House — <span style="color:var(--acc-deep)">noted for next time</span>.</div></div>';
+
+  var demoSteps = [
+    {t:'t',h:'Good to see you. Tell me the shape of the trip in your own words.'},
+    {t:'me',h:'My wife and I want 5 days on Maui in June — oceanfront, great food, business class if it is reasonable.'},
+    {typing:1},
+    {t:'t',h:'Lovely — two of you, oceanfront Maui in June. Two things I never guess: your <b>origin city</b> and the <b>exact dates</b>. Where from, and which days.'},
+    {t:'me',h:'From Seattle, June 12 to 19.', route:['Seattle','Maui']},
+    {typing:1},
+    {t:'t',h:'That is everything I need. Here is where I would put you — and why.'},
+    {card:1},
+    {t:'me',h:'Perfect. Hold it, and book the flights too.'},
+    {typing:1},
+    {t:'t',h:'Done — both flights and the suite, in your name, each leg verified twice. Nothing for you to chase.'},
+    {conf:1},
+    {typing:1},
+    {t:'t',h:'And from here I am watching the whole trip. This is the part that never sleeps.'},
+    {radar:1},
+    {typing:1},
+    {t:'t',h:'Heads up — your flight home Thursday shifted two hours. I already moved you to the 4:55, same cabin, no change fee.'},
+    {t:'t',h:'And with those storms over your snorkeling morning, I shifted Molokini to Wednesday — clear water, same operator. Nothing for you to do.'},
+    {typing:1},
+    {t:'t',h:'Welcome home. Here is how it went.'},
+    {home:1},
+    {t:'t',h:'Booked, watched, and accounted for — the whole loop. Want to plan yours? Type below, or talk to me up top.'}
+  ];
+  var demoRunning=false;
+  function runDemo(){
+    demoRunning=true; typing(false); thread.innerHTML=''; route.textContent='Seattle ⇄ ?';
+    var i=0;
+    (function tick(){
+      if(!demoRunning || i>=demoSteps.length){ return; }
+      var s=demoSteps[i++];
+      if(s.typing){ typing(true); setTimeout(function(){ typing(false); tick(); },1100); return; }
+      typing(false);
+      var bigCard = false;
+      if(s.card){ thread.insertAdjacentHTML('beforeend', optCard); bigCard=true; }
+      else if(s.conf){ thread.insertAdjacentHTML('beforeend', demoConf); bigCard=true; }
+      else if(s.radar){ thread.insertAdjacentHTML('beforeend', demoRadar); bigCard=true; }
+      else if(s.home){ thread.insertAdjacentHTML('beforeend', demoHome); bigCard=true; }
+      else bubble(s.h, s.t==='me'?'me':'t');
+      if(s.route) setRoute(s.route[0], s.route[1]);
+      scroll();
+      setTimeout(tick, s.t==='me' ? 750 : (bigCard ? 2100 : 1400));
+    })();
+  }
+
+  // ── wire ──
+  form.addEventListener('submit', function(ev){ ev.preventDefault(); demoRunning=false; send(input.value.trim()); });
+  document.getElementById('btn-demo').addEventListener('click', runDemo);
+
+  // "Text Tures" → Telegram deep link (signed-in) or login prompt.
+  if (window.turesWirePlanTextTures) turesWirePlanTextTures();
+  // voice.js sets #composer.value = brief then calls sendBrief() with no arg
+  window.sendBrief = function(b){
+    if(b==null){ try{ b = form.value; }catch(_){} }
+    if(!b) return;
+    demoRunning=false;
+    resolveBrief(b);
+  };
+
+  // nav "plan a trip" input → seed the chat (same page) ; or arriving with ?q= / stored seed
+  window.turesPlanSeed = function(t){ t=(t||'').trim(); if(!t || !live) return; demoRunning=false; send(t); };
+
+  // Skip the fresh greeting when we're continuing a conversation handed over from the concierge or
+  // voice (readyBrief) — greeting then would read as starting over.
+  var __ready=''; try{ __ready = localStorage.getItem('tures.readyBrief')||''; }catch(_){}
+  if(!(__ready && live)) greet();
+
+  // Voice runs in this same thread — bubbles + history stay unified.
+  window.turesVoiceBridge = {
+    bubble: function(html, who){ return bubble(html, who==='me'?'me':'t'); },
+    pushHistory: function(m){ history.push(m); },
+    hasMessages: function(){ return history.length > 0; },
+    setStatus: function(text){
+      var s=document.querySelector('.conv-head .s');
+      if(s) s.textContent = text || 'Tures · online';
+    },
+    onReady: function(brief){
+      resolveBrief(brief);
+    }
+  };
+
+  (function(){
+    // A READY brief handed over from the concierge bubble — plan directly, no re-converse.
+    var ready='';
+    try{ ready = localStorage.getItem('tures.readyBrief')||''; if(ready) localStorage.removeItem('tures.readyBrief'); }catch(_){}
+    if(ready && live){
+      setTimeout(function(){
+        bubble('Picking up right where we left off — building the trip you described. <span style="color:var(--muted)">No need to start over.</span>','t');
+        resolveBrief(ready);
+      }, 480);
+      return;
+    }
+    // A loose seed (nav "plan a trip" box, ?q=) — start the conversation from it.
+    var seed='';
+    try{ seed = new URLSearchParams(location.search).get('q') || ''; }catch(_){}
+    if(!seed){ try{ seed = localStorage.getItem('tures.seed') || ''; if(seed) localStorage.removeItem('tures.seed'); }catch(_){} }
+    if(seed && live){ setTimeout(function(){ send(seed); }, 520); }
+  })();
+})();
+</script>
+<script src="assets/voice.js"></script>
+<script src="assets/channels-ui.js"></script>
+<script src="assets/site.js" defer></script>
+</body></html>

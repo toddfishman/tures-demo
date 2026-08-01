@@ -1,0 +1,90 @@
+# Render Blueprint — Tures engine.
+# Moved off Fly.io (its egress to api.anthropic.com was dropping connections, "Premature close").
+# Render builds the existing engine/Dockerfile. Connect this repo in Render → it reads this file.
+# Set the three secret keys (sync:false) in the Render dashboard when prompted.
+services:
+  - type: web
+    name: tures-engine
+    runtime: docker
+    rootDir: engine
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter            # always-on (no cold starts). Switch to "free" for $0 (sleeps when idle).
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY      # required — the planner/agent
+        sync: false
+      - key: MEM0_API_KEY           # personalization memory
+        sync: false
+      - key: DEEPGRAM_API_KEY       # voice (STT/TTS)
+        sync: false
+      # Real flight inventory via Duffel. SET THIS to make /search + /plan return real flights.
+      # A test token (duffel_test_…) returns synthetic offers; a live token returns real
+      # airlines/prices. Either way booking stays SIMULATED — no order is placed, no money moves,
+      # because ALLOW_LIVE_BOOKING is left unset (false). Search/offer-requests cost nothing.
+      - key: DUFFEL_API_TOKEN       # optional — unset = mock flights/hotels
+        sync: false
+      # Google Maps Platform key — Geocoding API (New) + Places API (New). Powers IATA/city →
+      # coordinates (Duffel Stays needs them) and real restaurant / things-to-do discovery.
+      # Unset → built-in airport table for geocoding, discovery skipped/mock.
+      - key: GOOGLE_MAPS_API_KEY    # optional — Geocoding + Places discover
+        sync: false
+      # Stripe (Concierge subscriptions + future card-on-file). Test keys OK for beta.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY   # pk_test_… — shown on /health for Stripe.js
+        sync: false
+      - key: STRIPE_PRICE_SUBSCRIPTION  # monthly Concierge price_…
+        sync: false
+      - key: STRIPE_PRICE_SUBSCRIPTION_YEARLY  # yearly Concierge price_… (20% off)
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PUBLIC_BASE_URL
+        value: https://tures.app
+      # Trip Watch premium feeds (all optional)
+      - key: X_BEARER_TOKEN           # X API app-only bearer — recent search for disruptions
+        sync: false
+      - key: NEWS_API_KEY             # newsapi.org — headlines on elevated-risk scan days
+        sync: false
+      # TRAFFIC_API_KEY reserved — no provider wired yet; leave unset
+      - key: ENGINE_API_KEY           # optional ops lock-down; public plan/book routes stay open
+        sync: false
+      - key: AGENT_MODEL
+        value: claude-opus-4-8
+      # Sakana Fugu — experimental PRIMARY chat brain for /converse (OpenAI-compatible). The key is
+      # a dashboard secret; the URL + model are non-secret config, pinned here. Confirmed against
+      # Sakana's docs: base https://api.sakana.ai/v1, models "fugu" (standard) / "fugu-ultra-20260615".
+      # On ANY Fugu error the chat auto-falls-back to Anthropic, so this can never break chat.
+      - key: SAKANA_API_KEY         # set in dashboard — presence flips Fugu on as the chat brain
+        sync: false
+      - key: SAKANA_API_URL
+        value: https://api.sakana.ai/v1
+      - key: SAKANA_MODEL
+        value: fugu
+      # Telegram channel — the same Tures, reachable on Telegram (cross-channel memory). OFF until
+      # TELEGRAM_BOT_TOKEN is set. Steps: create a bot via @BotFather → set the 3 secrets below →
+      # register the webhook once:
+      #   curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://tures-engine.onrender.com/telegram/webhook&secret_token=<SECRET>"
+      - key: TELEGRAM_BOT_TOKEN        # from @BotFather — presence turns the channel on
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET   # any random string; checked on the webhook
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME     # public @handle (no @), for t.me deep links
+        value: Tures_Travel_Bot
+      - key: CORS_ORIGINS
+        value: https://toddfishman.github.io,https://tures.app,http://localhost:8123,http://localhost:8765
+      # Durable store — accounts, vault connections, bookings survive deploys/restarts.
+      # Requires the disk below. Without DATA_DIR the engine stays in-memory (fine for demos).
+      - key: DATA_DIR
+        value: /data
+      # Background trip watcher — sweeps booked trips for weather/air/web signals (0 = off).
+      - key: SIGNAL_WATCH_INTERVAL_MIN
+        value: "0"
+    disk:
+      name: tures-data
+      mountPath: /data
+      sizeGB: 1
+      # Optional later (security hardening): VAULT_KEY, AUTH_SECRET, STRIPE_* .

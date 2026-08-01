@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The finished itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+  .mapthumb{ width:56px; height:56px; border-radius:11px; flex-shrink:0; background:rgba(43,33,20,0.06);
+    border:1px solid var(--canvas-line); overflow:hidden; object-fit:cover; }
+  .legcard{ opacity:0; transform:translateY(10px); transition:opacity .45s ease, transform .45s ease; }
+  .legcard.in{ opacity:1; transform:none; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="05-execution.html">In flight</a>
+      <a href="07-itinerary.html" class="active">Itinerary</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="08-concierge.html">Concierge</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-10 right-2 text-[26vw] sm:text-[16vw] z-0" data-parallax="0.14">VII</div>
+ <div class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-9 flex items-end justify-between flex-wrap gap-5">
+  <div>
+   <div class="caps text-[11px] text-gold/70 mb-3 flex items-center gap-2">Chapter VII · Confirmed <span class="pill pill-d-gold normal-case tracking-normal">Sample trip</span></div>
+   <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">Eleven days, booked.</h1>
+   <div class="text-canvas/70 mt-2">Paris · Saariselkä · Copenhagen · Dec 3 – 13</div>
+  </div>
+  <div class="flex gap-2">
+    <span class="pill pill-d-confirm">7 legs verified ×2</span>
+    <span class="pill pill-d-gold">9 dinners</span>
+  </div>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8">
+
+  <!-- LEG CARDS -->
+  <div class="lg:col-span-8">
+   <div class="flex items-center justify-between mb-4">
+     <div class="caps text-[11px] text-ink-faint">Your trip · tap any leg for the receipt</div>
+     <span class="refresh-hint"><span class="rh-chev">↓</span> All current</span>
+   </div>
+   <div class="space-y-2.5" id="legs"></div>
+  </div>
+
+  <!-- RECEIPTS -->
+  <aside class="lg:col-span-4 space-y-4">
+    <div class="leaf p-6">
+      <div class="caps text-[11px] text-ink-faint mb-2">Authorized total</div>
+      <div class="font-display text-4xl text-ink">$<span data-countup="25763" data-countup-dur="1600">0</span></div>
+      <div class="text-sm text-ink-soft mt-1">AmEx ··1004 · itemized</div>
+      <div class="rule-ink my-4"></div>
+      <ul class="space-y-2 text-sm text-ink/85">
+        <li class="flex justify-between"><span>Flights (4 segments)</span><span class="font-mono">$14,980</span></li>
+        <li class="flex justify-between"><span>Hotels (9 nights)</span><span class="font-mono">$9,491</span></li>
+        <li class="flex justify-between"><span>Dinners &amp; deposits</span><span class="font-mono">$1,643</span></li>
+        <li class="flex justify-between" style="color:var(--confirm-ink)"><span>Rate-protect credit</span><span class="font-mono">−$351</span></li>
+        <li class="flex justify-between" style="color:var(--confirm-ink)"><span>ATC reroute fee</span><span class="font-mono">$0</span></li>
+      </ul>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-2">Handled while you traveled</div>
+      <div class="flex items-baseline gap-2"><span class="font-display text-3xl text-ink" data-countup="3" data-countup-dur="1000">0</span><span class="text-sm text-ink-soft">disruptions pre-empted</span></div>
+      <a href="06-hiccup-handler.html" class="text-xs text-gold-deep hover:underline quiet">See the watch log →</a>
+    </div>
+    <div class="leaf p-5">
+      <div class="caps text-[11px] text-ink-faint mb-2">Loyalty earned</div>
+      <div class="text-sm text-ink/85">OneWorld <strong>Emerald</strong> mid-trip · 86,200 tier pts.</div>
+    </div>
+  </aside>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter VII · The finished itinerary</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-6xl mx-auto w-full flex items-center gap-3">
+    <a href="08-concierge.html" class="text-xs text-gold/70 hover:text-gold-bright quiet shrink-0">Demo · Text the concierge →</a>
+    <span class="flex-1"></span>
+    <a href="signup.html" class="btn-gold sm:px-8 text-center px-6 py-3 rounded-xl quiet font-semibold">Start free →</a>
+  </div>
+</div>
+
+<script>
+/* stylized, self-contained SVG "map" thumbnails (no external tiles) */
+function mapThumb(seed){
+  var r=(n)=>{ var x=Math.sin(seed*99+n*37)*10000; return x-Math.floor(x); };
+  var px=8+r(1)*40, py=8+r(2)*40;
+  var ax=8+r(3)*48, ay=44+r(4)*12;
+  var grid='';
+  for(var i=1;i<4;i++){ grid+='<line x1="'+(i*16)+'" y1="0" x2="'+(i*16)+'" y2="64" stroke="rgba(43,33,20,0.07)"/>'; grid+='<line x1="0" y1="'+(i*16)+'" x2="64" y2="'+(i*16)+'" stroke="rgba(43,33,20,0.07)"/>'; }
+  return '<svg class="mapthumb" viewBox="0 0 64 64" width="56" height="56">'+grid+
+    '<path d="M'+ax+' '+ay+' Q '+((ax+px)/2)+' '+(ay-18)+' '+px+' '+py+'" fill="none" stroke="#c8a24a" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7"/>'+
+    '<circle cx="'+ax+'" cy="'+ay+'" r="2.2" fill="#97886f"/>'+
+    '<circle cx="'+px+'" cy="'+py+'" r="3.4" fill="#c8a24a"/><circle cx="'+px+'" cy="'+py+'" r="6" fill="none" stroke="#c8a24a" opacity="0.4"/>'+
+    '</svg>';
+}
+
+var IMG = function(id){ return 'https://images.unsplash.com/photo-'+id+'?w=160&q=80&auto=format&fit=crop'; };
+var STOPS = [
+  {kind:'fly', photo:IMG('1502602898657-3e91760cbb34'), place:'Paris', status:['pill-confirm','Verified'], title:'AA 142 · SEA → CDG', dates:'Dec 3 → 4 · non-stop',
+   detail:'Business · seat 5A · non-stop · <span class="font-mono">PNR LXJ7Q3</span><br>AAdvantage credited · 25,200 EQM.'},
+  {kind:'stay', photo:IMG('1431274172761-fca41d930114'), place:'Paris', status:['pill-confirm','Verified'], title:'Real Christine, Paris', dates:'Dec 4 → 7 · 3 nights',
+   detail:'Junior Suite · garden view · breakfast · <span class="font-mono">CONF 8849-RCP</span><br>Virtuoso: €100 F&amp;B credit + upgrade at check-in.'},
+  {kind:'fly', photo:IMG('1483347756197-71ef80e95f73'), place:'Finnish Lapland', status:['pill-gold','Approved alt'], title:'AY 1574 · CDG → HEL → IVL', dates:'Dec 7 · 10:25 → 21:00',
+   detail:'Business · 1h 50m HEL connection · approved alternative to the non-existent non-stop · 4,300 tier pts.'},
+  {kind:'stay', photo:IMG('1538970272646-f61fabb3a8a2'), place:'Saariselkä', status:['pill-confirm','Verified'], title:'Javri Lodge, Saariselkä', dates:'Dec 7 → 10 · 3 nights',
+   detail:'Aurora Suite · private terrace · half-board · airport transfer · <span class="font-mono">CONF JL-12041</span>.'},
+  {kind:'fly', photo:IMG('1513622470522-26c3c8a854bc'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'AY 945 · IVL → HEL → CPH', dates:'Dec 10 · 14:20 → 19:15',
+   detail:'Business · refundable fare D · <span class="font-mono">PNR 5RT2QK</span>.'},
+  {kind:'stay', photo:IMG('1552410260-0fd9b577afa6'), place:'Copenhagen', status:['pill-confirm','Verified'], title:'Hotel Sanders, Copenhagen', dates:'Dec 10 → 13 · 3 nights',
+   detail:'Junior Suite · booked direct · <span class="font-mono" style="color:var(--confirm-ink)">rate-protected −$351</span> · <span class="font-mono">CONF SAN-3398</span>.'},
+  {kind:'flag', photo:IMG('1502175353174-a7a70e73b362'), place:'Seattle', status:['pill-confirm','Rerouted'], title:'KL 1130 + DL 9302 · CPH → AMS → SEA', dates:'Dec 13 · 11:05 → 17:40',
+   detail:'Business · <strong>re-routed around the CDG ATC strike</strong> by the Hiccup Handler · fare protected · $0 change fee · <span class="font-mono">PNR 7QZ2RB</span>.'},
+];
+
+var legsEl = document.getElementById('legs');
+STOPS.forEach(function(s, i){
+  var icon = s.kind==='stay'?'⌂':s.kind==='flag'?'⚑':'✈';
+  var titleCls = s.kind==='stay' ? 'font-display text-lg' : 'font-mono text-[15px]';
+  var flagStyle = s.kind==='flag' ? ' style="border-color:rgba(95,125,79,0.4)"' : '';
+  var html = '<div class="exp legcard leaf"'+flagStyle+' style="transition-delay:'+(i*55)+'ms">'+
+    '<div class="exp-head flex items-center gap-3 p-3 cursor-pointer">'+
+      '<img class="mapthumb" src="'+s.photo+'" alt="'+s.place+'" loading="lazy">'+
+      '<div class="flex-1 min-w-0">'+
+        '<div class="'+titleCls+' text-ink leading-tight truncate">'+s.title+'</div>'+
+        '<div class="text-xs text-ink-faint mt-0.5">'+s.dates+'</div>'+
+      '</div>'+
+      '<span class="pill '+s.status[0]+' shrink-0 hidden sm:inline-flex">'+s.status[1]+'</span>'+
+      '<span class="exp-chev text-gold-deep">›</span>'+
+    '</div>'+
+    '<div class="exp-body"><div class="px-3 pb-3"><div class="rule-ink mb-3"></div>'+
+      '<p class="text-[13px] text-ink-soft leading-relaxed pl-1">'+s.detail+'</p></div></div>'+
+  '</div>';
+  legsEl.insertAdjacentHTML('beforeend', html);
+});
+[].forEach.call(legsEl.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); if(window.turesWatch) window.turesWatch(c); });
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

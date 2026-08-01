@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — The Bound Edition</title>
+<meta name="description" content="Tures — the AI travel concierge. Books the impossible. Watches everything. Rebooks before you notice." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  html,body{ background:#0b0907; min-height:100%; }
+  body{ overflow:hidden; }
+  .vol{ position:fixed; inset:0; perspective:2200px; }
+
+  /* ===== full-bleed leather cover ===== */
+  .cover{
+    position:absolute; inset:0; z-index:20; cursor:pointer;
+    transform-origin:left center; backface-visibility:hidden;
+    transition:transform 1000ms cubic-bezier(.7,.02,.27,1), opacity 650ms ease;
+  }
+  .cover::before{ /* binding / spine shadow on the left edge */
+    content:""; position:absolute; top:0; bottom:0; left:0; width:46px; z-index:2;
+    background:linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0) 75%);
+    border-right:1px solid rgba(255,220,150,0.06);
+  }
+  .opened .cover{ transform:rotateY(-128deg); opacity:0; pointer-events:none; }
+
+  .frame{ position:absolute; inset:28px; border:1px solid rgba(200,162,74,0.42);
+    border-radius:3px; box-shadow:inset 0 0 0 5px rgba(0,0,0,0.22), 0 1px 0 rgba(255,230,160,0.07); z-index:3; }
+  .frame.dashed{ inset:38px; border-style:dashed; opacity:0.5; }
+
+  /* ===== canvas contents PAGE beneath ===== */
+  .toc{
+    position:absolute; inset:0; z-index:10; overflow-y:auto;
+    opacity:0; pointer-events:none; transition:opacity 650ms ease 250ms;
+  }
+  .opened .toc{ opacity:1; pointer-events:auto; }
+  /* arriving via a "Contents" link → show the contents page immediately, no cover flip */
+  .skip-cover .cover{ transition:none !important; }
+  .skip-cover .toc{ transition:none !important; }
+  .chapter{ display:flex; align-items:baseline; gap:14px; padding:10px 2px; text-decoration:none; }
+  .chapter:hover .ch-title{ color:var(--gold-deep); }
+  .swipe-arrow{ animation:swipeHint 1.8s ease-in-out infinite; }
+  @keyframes swipeHint{ 0%,100%{transform:translateX(0);opacity:.55} 50%{transform:translateX(-9px);opacity:1} }
+  /* keep the contents on one screenful on phones */
+  @media (max-width:640px){
+    .toc .ch-title{ font-size:1.15rem; line-height:1.2; }
+    .chapter{ padding:7px 2px; gap:10px; }
+    .chapter > span:last-child{ display:none; }   /* hide decorative action labels */
+    #tocHeading{ font-size:2rem; }
+  }
+</style>
+</head>
+<body class="text-canvas">
+ <div class="vol">
+
+  <!-- ============ FULL-BLEED COVER ============ -->
+  <div class="cover leather-surface grain" id="cover" onclick="openBook()">
+    <div class="frame"></div>
+    <div class="frame dashed"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-8">
+      <div class="caps text-[11px] text-gold/70 mb-8">The AI Travel Concierge</div>
+      <div class="wordmark foil text-[76px] sm:text-[96px] leading-none">t<span class="spark">✦</span>ures</div>
+      <div class="foil-line w-28 my-8"></div>
+      <p class="font-display italic text-2xl text-canvas/80 leading-snug">
+        Books the impossible.<br>Watches everything.<br>Rebooks before you notice.
+      </p>
+      <div class="mt-14 flex items-center gap-3 text-gold/80">
+        <span class="swipe-arrow text-2xl">←</span>
+        <span class="caps text-[10px]">Swipe to open</span>
+      </div>
+    </div>
+    <div class="absolute bottom-7 inset-x-0 text-center caps text-[9px] text-gold/40 z-10">First Edition · MMXXVI</div>
+  </div>
+
+  <!-- ============ CONTENTS PAGE (canvas) ============ -->
+  <div class="toc canvas-surface" id="toc">
+    <div class="relative z-10 max-w-xl mx-auto px-7" style="padding-top:4.5vh; padding-bottom:3vh;">
+      <div class="text-center mb-5">
+        <a class="wordmark text-2xl quiet" style="color:var(--gold-deep)" href="#" onclick="closeBook();return false;">t<span class="spark">✦</span>ures</a>
+        <div id="tocHeading" class="font-display text-4xl text-ink leading-none mt-1">Table of Contents</div>
+      </div>
+      <a class="chapter" href="01-landing.html">
+        <span class="font-mono text-gold-deep text-sm w-7">I</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Pitch</span>
+        <span class="text-ink-faint text-[10px] caps">Open</span></a>
+      <a class="chapter" href="02-taste-engine.html">
+        <span class="font-mono text-gold-deep text-sm w-7">II</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Taste Engine</span>
+        <span class="text-ink-faint text-[10px] caps">Calibrate</span></a>
+      <a class="chapter" href="03-paste-trip.html">
+        <span class="font-mono text-gold-deep text-sm w-7">III</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Describe &amp; Book a Trip</span>
+        <span class="text-ink-faint text-[10px] caps">Parse</span></a>
+      <a class="chapter" href="04-connections.html">
+        <span class="font-mono text-gold-deep text-sm w-7">IV</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Grant Permissions</span>
+        <span class="text-ink-faint text-[10px] caps">Connect</span></a>
+      <a class="chapter" href="05-execution.html">
+        <span class="font-mono text-gold-deep text-sm w-7">V</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Watch It Execute</span>
+        <span class="text-ink-faint text-[10px] caps">Live</span></a>
+      <a class="chapter" href="06-hiccup-handler.html">
+        <span class="font-mono text-gold-deep text-sm w-7">VI</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Hiccup Handler</span>
+        <span class="text-ink-faint text-[10px] caps">Monitor</span></a>
+      <a class="chapter" href="07-itinerary.html">
+        <span class="font-mono text-gold-deep text-sm w-7">VII</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">The Finished Itinerary</span>
+        <span class="text-ink-faint text-[10px] caps">Review</span></a>
+      <a class="chapter" href="08-concierge.html">
+        <span class="font-mono text-gold-deep text-sm w-7">VIII</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">In-Trip Concierge</span>
+        <span class="text-ink-faint text-[10px] caps">Text us</span></a>
+      <a class="chapter" href="about.html">
+        <span class="text-gold-deep text-sm w-7">✦</span>
+        <span class="ch-title font-display text-2xl text-ink flex-1">Colophon — About Tures</span>
+        <span class="text-ink-faint text-[10px] caps">Brief</span></a>
+
+      <div class="mt-5 flex items-center justify-center gap-2 text-[11px] text-ink-faint">
+        <span class="caps">Reach us on</span>
+        <span class="pill pill-gold">WhatsApp</span><span class="pill pill-gold">Telegram</span><span class="pill pill-gold">Web · App</span>
+      </div>
+    </div>
+  </div>
+
+ </div>
+
+<script>
+  function openBook(){ document.body.classList.add('opened'); }
+  function closeBook(){ document.body.classList.remove('opened'); document.documentElement.classList.remove('skip-cover'); history.replaceState(null,'','index.html'); }
+  // swipe-left on the cover also opens
+  window.__turesOnSwipe = function(dir){ if(dir==='next' && !document.body.classList.contains('opened')){ openBook(); return true; } return false; };
+  // arriving from a "Contents" link → open straight to the table of contents
+  if(location.hash === '#contents'){ document.documentElement.classList.add('skip-cover'); openBook(); }
+</script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>

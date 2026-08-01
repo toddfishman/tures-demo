@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — Direction explorations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0A0C0F; --surface:#0F1216; --line:rgba(255,255,255,.10); --cream:#F2EEE4; --dim:#9A9486; --acc:#E6C873; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--cream); font-family:'DM Sans',sans-serif; min-height:100vh; }
+  a{ color:inherit; text-decoration:none; }
+  .wm{ font-family:'Playfair Display',serif; }
+  .spark{ color:var(--acc); }
+  header{ padding:40px 48px 20px; display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:12px; }
+  header .mark{ font-family:'Playfair Display',serif; font-size:30px; }
+  header .note{ font-size:12px; color:var(--dim); letter-spacing:.04em; max-width:420px; text-align:right; }
+  .lede{ padding:8px 48px 44px; max-width:760px; }
+  .lede h1{ font-family:'Playfair Display',serif; font-weight:400; font-size:clamp(28px,4vw,46px); line-height:1.12; margin:0 0 16px; }
+  .lede p{ color:var(--dim); font-size:15px; line-height:1.7; margin:0; }
+  .wrap{ padding:0 48px 80px; max-width:1180px; }
+  .group{ margin-bottom:56px; }
+  .ghead{ display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:24px; }
+  .ghead .n{ font-family:'Space Mono',monospace; font-size:12px; color:var(--acc); }
+  .ghead h2{ font-family:'Playfair Display',serif; font-weight:400; font-size:24px; margin:0; }
+  .ghead .src{ font-size:11px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-left:auto; }
+  .ghead .blurb{ flex-basis:100%; font-size:13.5px; color:var(--dim); line-height:1.6; margin-top:6px; }
+  .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:22px 22px 20px; transition:border-color .2s, transform .2s; display:flex; flex-direction:column; gap:8px; min-height:150px; }
+  .card:hover{ border-color:var(--acc); transform:translateY(-2px); }
+  .card .pg{ font-family:'Space Mono',monospace; font-size:11px; color:var(--acc); }
+  .card h3{ font-family:'Playfair Display',serif; font-weight:400; font-size:19px; margin:0; }
+  .card p{ font-size:13px; color:var(--dim); line-height:1.55; margin:0; flex:1; }
+  .card .go{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--acc); }
+  footer{ border-top:1px solid var(--line); padding:28px 48px; font-size:12px; color:var(--dim); display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  @media (max-width:820px){ .cards{ grid-template-columns:1fr; } header,.lede,.wrap,footer{ padding-left:24px; padding-right:24px; } header .note{ text-align:left; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">t<span class="spark">✦</span>ures</div>
+  <div class="note">Direction explorations — selling the technology, not the scenery. Open each in a real foreground tab to feel the motion.</div>
+</header>
+<div class="lede">
+  <h1>Four directions for the next Tures.</h1>
+  <p>Each one leads with the agent doing the work — booking, monitoring, rebooking, optimizing — instead of destination photography. Same brand DNA throughout: the t<span class="spark">✦</span>ures mark, discreet luxury, serif nouns over sans verbs. Two to three screens per direction so the feel carries beyond a single hero.</p>
+</div>
+<div class="wrap">
+
+  <div class="group">
+    <div class="ghead">
+      <span class="n">A</span><h2>Concierge Chat</h2><span class="src">Claude</span>
+      <div class="blurb">The product is the hero — a live, premium AI message thread. Near-black + warm gold. The agent proves itself by working in front of you.</div>
+    </div>
+    <div class="cards">
+      <a class="card" href="chat-1.html"><span class="pg">A · 1</span><h3>Hero — the live thread</h3><p>A phone-framed conversation: the Maui request, a typing indicator, then a held flights + hotel result card.</p><span class="go">Open →</span></a>
+      <a class="card" href="chat-2.html"><span class="pg">A · 2</span><h3>Proactive moment</h3><p>Tures catches a flight delay and rebuilds the leg — same cabin, no change fee — plus a weather-watch reroute.</p><span class="go">Open →</span></a>
+      <a class="card" href="chat-3.html"><span class="pg">A · 3</span><h3>Product as app</h3><p>Full window: trip threads rail, active conversation, and a live trip-status panel. The operating system for travel.</p><span class="go">Open →</span></a>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="ghead">
+      <span class="n">B</span><h2>The Concierge</h2><span class="src">ChatGPT</span>
+      <div class="blurb">The hero is the AI itself — one question, one prose input, nothing else. Amex Centurion × Four Seasons × OpenAI: obsidian and gold, heavy negative space.</div>
+    </div>
+    <div class="cards">
+      <a class="card" href="concierge-1.html"><span class="pg">B · 1</span><h3>Hero — “Where would you like to go”</h3><p>A massive centered question and a calm prose field. The conversation is the interface.</p><span class="go">Open →</span></a>
+      <a class="card" href="concierge-2.html"><span class="pg">B · 2</span><h3>The response</h3><p>Tures replies graciously and a quiet itinerary forms — like a private concierge’s note, not a dashboard.</p><span class="go">Open →</span></a>
+      <a class="card" href="concierge-3.html"><span class="pg">B · 3</span><h3>Membership / positioning</h3><p>Centurion-style black-and-gold cards: always on, proactive, a real person in the loop, it learns your taste.</p><span class="go">Open →</span></a>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="ghead">
+      <span class="n">C</span><h2>The Timeline</h2><span class="src">ChatGPT</span>
+      <div class="blurb">An Apple-launch vertical scroll that sells outcomes: one request unfolding into thousands of decisions. Near-black with an electric accent.</div>
+    </div>
+    <div class="cards">
+      <a class="card" href="timeline-1.html"><span class="pg">C · 1</span><h3>The scroll narrative</h3><p>“One request. Thousands of decisions.” A connected timeline reveals each step from the ask to the trip.</p><span class="go">Open →</span></a>
+      <a class="card" href="timeline-2.html"><span class="pg">C · 2</span><h3>Outcomes / magnitude</h3><p>An animated counter to 1,284 decisions and an itemized ledger of the invisible work you never had to do.</p><span class="go">Open →</span></a>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="ghead">
+      <span class="n">D</span><h2>The World Map / Globe</h2><span class="src">ChatGPT</span>
+      <div class="blurb">Travel as an intelligence platform that learns. A rotating globe with glowing flight arcs; the benefit is “it gets smarter every time you go.”</div>
+    </div>
+    <div class="cards">
+      <a class="card" href="globe-1.html"><span class="pg">D · 1</span><h3>Hero — the living globe</h3><p>A rotating sphere with flight arcs and your travel-memory stats. “Travel gets smarter every time you go.”</p><span class="go">Open →</span></a>
+      <a class="card" href="globe-2.html"><span class="pg">D · 2</span><h3>Taste clusters</h3><p>A zoomed region: visited places, glowing recommendations, and the taste clusters that drive “where next.”</p><span class="go">Open →</span></a>
+      <a class="card" href="globe-3.html"><span class="pg">D · 3</span><h3>It learns — the Taste Print</h3><p>A readable picture of what Tures knows about you, and how that becomes the next recommendation.</p><span class="go">Open →</span></a>
+    </div>
+  </div>
+
+</div>
+<footer>
+  <div class="wm">t<span class="spark">✦</span>ures</div>
+  <span>Explorations · not the live site · sample data throughout</span>
+</footer>
+<script src="_devkit.js"></script>
+</body>
+</html>

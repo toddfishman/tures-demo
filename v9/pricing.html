@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Pricing</title>
+<meta name="description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v8/pricing.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Pricing" />
+<meta property="og:description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v8/pricing.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Pricing" />
+<meta name="twitter:description" content="Plan free. Pay only when Tures actually books — per trip, or go unlimited with Concierge." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  body{ background:var(--obsidian); }
+  .tier{ display:flex; flex-direction:column; }
+  .tier.feature{ border-color:rgba(200,162,74,0.55); box-shadow:0 10px 40px rgba(0,0,0,0.25); }
+  .ck{ color:var(--gold-deep); }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="pricing.html" class="active">Pricing</a>
+      <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
+    </div>
+    <a href="03-paste-trip.html" class="md:hidden text-gold text-sm quiet">Start free</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+ <div class="ghost-num absolute -top-8 right-2 text-[22vw] z-0" data-parallax="0.14">✦</div>
+ <div class="relative z-10 max-w-3xl mx-auto px-6 pt-16 pb-8 text-center">
+  <div class="caps text-[11px] text-gold/80 mb-3">Pricing</div>
+  <h1 class="font-display text-5xl sm:text-6xl leading-[1.02]">Plan free. Pay when it books.</h1>
+  <p class="mt-4 text-canvas/70 leading-relaxed max-w-xl mx-auto">Planning, itineraries, and your Taste Print are always free. You only pay the moment Tures actually books — per trip, or go unlimited.</p>
+ </div>
+</section>
+
+<section class="canvas-surface text-ink">
+ <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-3 gap-5 items-stretch">
+
+  <!-- FREE -->
+  <div class="tier leaf p-7">
+    <div class="caps text-[11px] text-ink-faint mb-2">Explore</div>
+    <div class="font-display text-2xl text-ink mb-1">Free</div>
+    <div class="flex items-baseline gap-1 mb-4"><span class="font-display text-5xl text-ink">$0</span></div>
+    <p class="text-sm text-ink-soft mb-5">Plan as much as you like. Pay nothing until you book.</p>
+    <ul class="space-y-2.5 text-sm text-ink/85 flex-1">
+      <li class="flex gap-2.5"><span class="ck">✓</span> Unlimited trip planning &amp; itineraries</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Your Taste Print</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Wallet &amp; traveler profile</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> See exactly what it would book</li>
+    </ul>
+    <a href="03-paste-trip.html" class="btn-ink w-full text-center px-5 py-3 rounded-xl quiet mt-6">Start planning free</a>
+  </div>
+
+  <!-- PER TRIP (featured) -->
+  <div class="tier feature leaf p-7 relative">
+    <span class="pill pill-gold absolute -top-3 left-1/2 -translate-x-1/2">Most popular</span>
+    <div class="caps text-[11px] text-ink-faint mb-2">Pay as you go</div>
+    <div class="font-display text-2xl text-ink mb-1">Per trip</div>
+    <div class="flex items-baseline gap-1 mb-4"><span class="font-display text-5xl text-ink">$99</span><span class="text-ink-soft text-sm">/ booked trip</span></div>
+    <p class="text-sm text-ink-soft mb-5">Best for the occasional trip — charged only when one actually books. No commitment.</p>
+    <ul class="space-y-2.5 text-sm text-ink/85 flex-1">
+      <li class="flex gap-2.5"><span class="ck">✓</span> Everything in Free</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Real booking, verified twice</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Best-card-per-charge from your wallet</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Thorough taste-profile questions</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> AI text assistant while you plan</li>
+    </ul>
+    <a href="03-paste-trip.html" class="btn-gold w-full text-center px-5 py-3 rounded-xl quiet mt-6 font-semibold">Start free → pay at booking</a>
+  </div>
+
+  <!-- SUBSCRIBE -->
+  <div class="tier leaf p-7">
+    <div class="caps text-[11px] text-ink-faint mb-2">Unlimited</div>
+    <div class="font-display text-2xl text-ink mb-1">Concierge</div>
+    <div class="flex items-baseline gap-1 mb-4"><span class="font-display text-5xl text-ink">$99</span><span class="text-ink-soft text-sm">/ month · unlimited</span></div>
+    <p class="text-sm text-ink-soft mb-5">Same price as a single trip — but always on. The proactive layer that only makes sense running every day. <span class="text-ink-faint">Booking more than once a month? This is the better deal.</span></p>
+    <ul class="space-y-2.5 text-sm text-ink/85 flex-1">
+      <li class="flex gap-2.5"><span class="ck">✓</span> Everything in Per trip</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> Hiccup Handler always on — proactive, every trip</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> A real person in a triage situation</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> &ldquo;Where you've been,&rdquo; remembered</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> The Taste Engine — learns your taste, recommends</li>
+      <li class="flex gap-2.5"><span class="ck">✓</span> No per-booking fee, ever</li>
+    </ul>
+    <a href="signup.html" id="subscribeBtn" class="btn-ink w-full text-center px-5 py-3 rounded-xl quiet mt-6">Subscribe</a>
+  </div>
+
+ </div>
+
+ <div class="max-w-2xl mx-auto px-6 pt-2 text-center">
+   <p class="text-ink-soft text-sm leading-relaxed">Per trip and Concierge cost the same on purpose. <span class="text-ink">Per trip</span> covers booking one journey — the thorough taste profile and an AI text assistant included. <span class="text-ink">Concierge</span> adds the always-on layer: a proactive Hiccup Handler, a real person when plans go sideways, your travel history, and the Taste Engine that learns what you like. The difference is what it does, not what it costs.</p>
+ </div>
+
+ <div class="max-w-2xl mx-auto px-6 pb-16 text-center">
+   <div class="rule-gold my-5" style="max-width:120px;margin-inline:auto"></div>
+   <p class="text-ink-soft text-sm leading-relaxed">Travel charges (flights, hotels) always pass through at cost to your own card — Tures' fee is only the concierge service above. Nothing is ever charged without your approval, and you can cancel anytime.</p>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2">Plan free. Pay when it books.</div>
+</footer>
+
+<script src="assets/ui.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+// Subscribe: signed-in → start checkout (Stripe live, or mock activation); else → sign up first.
+document.getElementById('subscribeBtn').addEventListener('click', function(e){
+  if(!(window.tures && tures.signedIn)){ return; } // fall through to signup.html
+  e.preventDefault();
+  var b=this; b.textContent='Starting…';
+  tures.billing.checkout().then(function(r){ location.href = r.url; }).catch(function(){ b.textContent='Subscribe'; });
+});
+</script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

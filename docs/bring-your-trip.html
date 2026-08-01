@@ -1,0 +1,320 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Already booked? Upload confirmations, screenshots, or paste your itinerary — Tures watches 24/7 and guides you through trouble. Same pricing as booking with us.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ff4929">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tures">
+<meta property="og:title" content="Bring your trip — Tures">
+<meta property="og:description" content="Booked elsewhere? Give Tures your itinerary and turn on 24/7 monitoring — alerts and step-by-step help when something slips.">
+<meta property="og:url" content="https://tures.app/bring-your-trip.html">
+<meta property="og:image" content="https://tures.app/assets/img/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bring your trip — Tures">
+<meta name="twitter:description" content="Booked elsewhere? Give Tures your itinerary and turn on 24/7 monitoring — alerts and step-by-step help when something slips.">
+<meta name="twitter:image" content="https://tures.app/assets/img/og.svg">
+<title>t✦ures — Bring your trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/v12.css">
+<script src="assets/engine.js"></script>
+<script src="assets/funnel.js"></script>
+<script src="assets/account-sync.js"></script>
+<style>
+  .byt-hero{padding:84px 0 36px;text-align:center}
+  .byt-hero .lead{margin:22px auto 0;max-width:58ch}
+  .byt-hero .cta{margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  .byt-grid{max-width:920px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.byt-grid{grid-template-columns:1fr}}
+
+  .byt-card{padding:22px 24px;height:100%;display:flex;flex-direction:column}
+  .byt-card h3{margin:10px 0 6px}
+  .byt-card .sub{font-size:14px;color:var(--muted);line-height:1.5;flex:1}
+  .byt-card .tag{margin-bottom:0}
+  .byt-card ul{list-style:none;margin:16px 0 0;display:flex;flex-direction:column;gap:10px}
+  .byt-card li{font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+  .byt-card li svg{flex:0 0 auto;margin-top:3px;stroke:var(--good)}
+  .byt-card li b{color:var(--text);font-weight:600}
+  .byt-card.flag{border-color:var(--acc);box-shadow:0 24px 60px -36px var(--acc)}
+
+  .byt-honest{margin:32px auto 0;max-width:880px;border:1px solid var(--rain);border-radius:var(--radius);
+    background:linear-gradient(180deg,rgba(59,111,176,.08),transparent);padding:22px 24px}
+  .byt-honest h3{margin:0 0 8px;font-size:18px}
+  .byt-honest p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0;max-width:68ch}
+  .byt-honest p b{color:var(--text);font-weight:500}
+
+  .byt-intake{max-width:720px;margin:0 auto}
+  .byt-drop{border:2px dashed var(--line-2);border-radius:var(--radius);padding:28px 22px;text-align:center;
+    background:var(--surface);transition:border-color .2s,background .2s;cursor:pointer}
+  .byt-drop.drag{border-color:var(--acc);background:var(--acc-dim)}
+  .byt-drop .ic{width:44px;height:44px;border-radius:12px;margin:0 auto 12px;display:grid;place-items:center;background:var(--acc-dim);color:var(--acc-deep)}
+  .byt-drop .t{font-size:15px;font-weight:500}
+  .byt-drop .s{font-size:13px;color:var(--muted);margin-top:6px}
+  .byt-drop input[type=file]{display:none}
+  .byt-paste{margin-top:16px}
+  .byt-paste label{display:block;font-size:12.5px;font-weight:500;margin-bottom:8px}
+  .byt-paste textarea.field{min-height:140px;resize:vertical;font-size:14px;line-height:1.5}
+  .byt-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .byt-thumbs .th{width:72px;height:72px;border-radius:10px;border:1px solid var(--line);object-fit:cover;background:var(--surface-2)}
+  .byt-act{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;align-items:center}
+  .byt-act .hint{font-size:13px;color:var(--muted);flex:1;min-width:200px}
+
+  .byt-price{max-width:780px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.byt-price{grid-template-columns:1fr}}
+  .byt-price .amt{font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:clamp(32px,4vw,44px);letter-spacing:-.02em}
+  .byt-price .per{font-size:14px;color:var(--muted)}
+  .byt-price .feats{list-style:none;margin:16px 0 20px;display:flex;flex-direction:column;gap:9px}
+  .byt-price .feats li{font-size:14px;color:var(--muted);display:flex;gap:9px}
+  .byt-price .feats li svg{stroke:var(--good);flex:0 0 auto;margin-top:2px}
+
+  .byt-steps{max-width:880px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:720px){.byt-steps{grid-template-columns:1fr}}
+  .byt-steps .step{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+  .byt-steps .n{font-family:'Space Mono',monospace;font-size:11px;color:var(--acc-deep);letter-spacing:.08em}
+  .byt-steps .t{font-size:15px;font-weight:600;margin-top:6px}
+  .byt-steps .d{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+  .byt-flow-progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+  .byt-flow-progress span{font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--faint)}
+  .byt-flow-progress span.done{background:var(--good);border-color:var(--good);color:#fff}
+  .byt-flow-progress span.cur{border-color:var(--acc);background:var(--acc-dim);color:var(--text);font-weight:600}
+
+  .leg{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--bg);margin-bottom:12px}
+  .leg.warn{border-color:var(--warn);background:rgba(199,122,0,.06)}
+  .leg .conf-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:7px;background:var(--good)}
+  .leg.warn .conf-dot{background:var(--warn)}
+  .leg .lb{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .leg .sub{font-size:13.5px;color:var(--muted);margin-top:3px}
+  .leg .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .leg .meta .mono{color:var(--acc-deep);font-family:'Space Mono',monospace;font-size:12px}
+  .leg .side{flex:0 0 auto;text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);line-height:1.5}
+  .leg .fix{font-size:12.5px;font-weight:600;color:var(--acc-deep);margin-top:8px;background:none;border:none;cursor:pointer;padding:0}
+  .byt-cat{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:18px 0 10px}
+  .conf-pill{font-size:10px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:6px;text-transform:uppercase}
+  .conf-pill.high{background:rgba(46,158,91,.12);color:var(--good)}
+  .conf-pill.med{background:rgba(199,122,0,.12);color:var(--warn)}
+  .conf-pill.low{background:rgba(255,73,41,.12);color:var(--acc-deep)}
+  .byt-parse{padding:40px 20px;text-align:center}
+  .byt-parse .spin{width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;margin:0 auto 16px;animation:bytspin .8s linear infinite}
+  @keyframes bytspin{to{transform:rotate(360deg)}}
+  .byt-pay-box{border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:16px;background:var(--surface)}
+  .byt-pay-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px}
+  .byt-pay-row.tot{border-top:1px solid var(--line);margin-top:8px;padding-top:14px;font-weight:600}
+  .byt-done-check{width:48px;height:48px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;margin:0 auto 14px;font-size:22px}
+</style>
+</head>
+<body data-page="bring-trip">
+<main>
+
+  <section class="wrap byt-hero">
+    <span class="eyebrow"><span class="dot"></span> Already booked?</span>
+    <h1 class="serif">Bring your <em>trip.</em></h1>
+    <p class="lead center">Booked on your own, through an agent, or on another site? Upload confirmations, paste your itinerary, or drop screenshots — Tures structures it, watches every leg, and guides you when something slips.</p>
+    <div class="cta">
+      <a class="btn" href="#intake">Add your trip</a>
+      <a class="btn ghost" href="pricing.html#bring-your-trip">See pricing</a>
+    </div>
+  </section>
+
+  <section class="wrap section tight" style="padding-top:0">
+    <div class="byt-steps">
+      <div class="step"><div class="n">01</div><div class="t">Drop what you have</div><div class="d">Emails, PDFs, airline app screenshots, a Notes doc — messy is fine.</div></div>
+      <div class="step"><div class="n">02</div><div class="t">Confirm the legs</div><div class="d">We show what we understood — flights, hotels, dates, confirmation numbers — and you fix gaps.</div></div>
+      <div class="step"><div class="n">03</div><div class="t">Watch turns on</div><div class="d">Alerts, weather checks, and a concierge who answers at 3am. Same price as if we'd booked it for you.</div></div>
+    </div>
+  </section>
+
+  <section class="wrap section tight">
+    <h2 class="serif center" style="margin-bottom:22px">What you get — and what is <em>different.</em></h2>
+    <div class="byt-grid">
+      <article class="card byt-card flag">
+        <span class="tag">Bring your trip</span>
+        <h3 class="serif">Alert &amp; guide me</h3>
+        <p class="sub">24/7 monitoring, disruption alerts, researched answers, and step-by-step help — call the airline, find alternates, fix a missed connection.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Trip Watch</b> — weather, delays, and disruption signals.</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Concierge chat</b> — lost passport, tight layover, refund rules.</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Telegram</b> — same concierge on your phone.</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> <span><b>No autonomous rebook</b> — we did not place the original booking.</span></li>
+        </ul>
+      </article>
+      <article class="card byt-card">
+        <span class="tag">Book with Tures</span>
+        <h3 class="serif">We rebook for you</h3>
+        <p class="sub">When Tures books the trip, the Hiccup Handler can move legs automatically — same cabin when possible, held on your yes.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span>Everything in Bring your trip, <b>plus</b></span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Autonomous rebook</b> — delays and cancellations handled before you notice.</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Best card per charge</b> — points and protection chosen for you.</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> <span><b>Real confirmation numbers</b> — we are the agent of record.</span></li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="byt-honest" role="note">
+      <h3 class="serif">Straight talk</h3>
+      <p>On an imported trip, Tures <b>alerts you and walks you through what to do</b> — researched steps, not a wall of links. If we had booked this trip originally, the Hiccup Handler could <b>rebook autonomously</b>: find the alternate, hold it, and ask for your yes. That requires us to hold the booking — which is why we are upfront about the difference.</p>
+    </div>
+  </section>
+
+  <section class="wrap section tight" id="intake">
+    <h2 class="serif center" style="margin-bottom:8px">Add your <em>trip</em></h2>
+    <p class="lead center" style="margin:0 auto 16px;max-width:52ch">Paste confirmation emails, drop screenshots, or describe the legs in plain English.</p>
+    <div class="byt-flow-progress" id="byt-progress" aria-hidden="true">
+      <span class="cur">1 Drop</span><span>2 Confirm</span><span>3 Watch</span>
+    </div>
+    <div class="byt-intake card" style="padding:22px 24px">
+
+      <div id="byt-step-intake">
+        <div class="byt-drop" id="byt-drop" tabindex="0" role="button" aria-label="Upload screenshots or PDFs">
+          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 20h16"/></svg></div>
+          <div class="t">Drop screenshots, PDFs, or images</div>
+          <div class="s">Airline app, hotel confirmation, agent itinerary — up to 10 files</div>
+          <input type="file" id="byt-files" accept="image/*,.pdf" multiple>
+        </div>
+        <div class="byt-thumbs" id="byt-thumbs" hidden></div>
+        <div class="byt-paste">
+          <label for="byt-text">Or paste text — emails, Notes, spreadsheet rows</label>
+          <textarea class="field" id="byt-text" placeholder="Example: NH 105 SEA→HND Mar 8 1:20pm conf 7XK2M9. Okura Tokyo Mar 8–15 conf OKU-8841. Dinner at Den Mar 10 7pm…"></textarea>
+        </div>
+        <div class="byt-act">
+          <button class="btn" id="byt-submit" type="button">Continue — review what we understood</button>
+          <p class="hint" id="byt-hint">You'll confirm every leg before watch turns on. Nothing is charged until you approve.</p>
+        </div>
+      </div>
+
+      <div id="byt-step-parse" hidden>
+        <div class="byt-parse">
+          <div class="spin"></div>
+          <h3 class="serif" style="margin:0;font-size:22px">Reading your trip…</h3>
+          <p style="color:var(--muted);font-size:14px;margin-top:8px">Turning confirmations into legs we can watch.</p>
+        </div>
+      </div>
+
+      <div id="byt-step-review" hidden>
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <div>
+            <span class="tag" style="background:var(--rain);color:#fff;border:none">Imported</span>
+            <h3 class="serif" style="margin:10px 0 4px;font-size:24px" id="byt-review-title">Trip</h3>
+            <p style="color:var(--muted);font-size:14px;margin:0" id="byt-review-meta"></p>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin:0" id="byt-review-gaps"></p>
+        </div>
+        <div class="byt-honest" style="margin:0 0 16px">
+          <p style="margin:0;font-size:13.5px"><b>Alert &amp; guide me</b> on this trip — not autonomous rebook. If Tures had booked it, the Hiccup Handler could rebook for you automatically.</p>
+        </div>
+        <div id="byt-legs"></div>
+        <div class="byt-act" style="margin-top:18px">
+          <button class="btn" id="byt-review-fix" type="button">Fix gaps</button>
+          <button class="btn" id="byt-review-continue" type="button">Looks right — continue</button>
+        </div>
+      </div>
+
+      <div id="byt-step-fix" hidden>
+        <h3 class="serif" style="margin:0 0 8px;font-size:22px" id="byt-fix-title">Fix leg</h3>
+        <p style="color:var(--muted);font-size:14px;margin:0 0 16px">Fill in what you know — skip fields you don't have.</p>
+        <label style="font-size:12.5px;font-weight:500">Title / venue</label>
+        <input class="field" id="byt-fix-venue" style="margin-bottom:12px">
+        <label style="font-size:12.5px;font-weight:500">Confirmation (optional)</label>
+        <input class="field" id="byt-fix-conf" style="margin-bottom:12px">
+        <label style="font-size:12.5px;font-weight:500">Schedule (optional)</label>
+        <input class="field" id="byt-fix-schedule" placeholder="Mar 10 · 7:00 PM" style="margin-bottom:12px">
+        <label style="font-size:12.5px;font-weight:500">Notes</label>
+        <input class="field" id="byt-fix-detail" style="margin-bottom:16px">
+        <div class="byt-act">
+          <button class="btn" id="byt-fix-save" type="button">Save &amp; continue</button>
+          <button class="btn ghost" id="byt-fix-skip" type="button">Skip this leg</button>
+        </div>
+      </div>
+
+      <div id="byt-step-pay" hidden>
+        <h3 class="serif" style="margin:0 0 6px;font-size:24px">Turn on the <em>watch</em></h3>
+        <p style="color:var(--muted);font-size:14px;margin:0 0 12px" id="byt-pay-trip"></p>
+        <div class="byt-honest" style="margin:0 0 16px">
+          <p style="margin:0;font-size:13.5px">You get <b>24/7 alerts and step-by-step guidance</b>. Autonomous rebook applies when Tures books the trip.</p>
+        </div>
+        <div class="byt-pay-box">
+          <div class="byt-pay-row" id="byt-pay-fee-row"><span>Tures concierge fee</span><span id="byt-pay-fee" style="font-family:'Space Mono',monospace">$99.00</span></div>
+          <div class="byt-pay-row tot"><span>Due now</span><span id="byt-pay-due" style="font-family:'Space Mono',monospace">$99.00</span></div>
+          <p id="byt-pay-sub" style="display:none;font-size:13px;color:var(--good);margin:12px 0 0"><b>Concierge member</b> — no per-trip fee.</p>
+        </div>
+        <div style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px">
+          <label style="font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" id="byt-watch-enable" checked> Enable Trip Watch for this trip
+          </label>
+          <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0 28px">Smart scan cap:
+            <select class="field" id="byt-watch-cap" style="display:inline;width:auto;padding:4px 8px;font-size:12px"><option value="10">$10</option><option value="25" selected>$25</option></select>
+          </p>
+        </div>
+        <p class="hint" id="byt-pay-err" style="color:var(--acc-deep);margin-top:10px"></p>
+        <div class="byt-act" style="margin-top:16px">
+          <button class="btn" id="byt-pay-btn" type="button">Pay $99 &amp; start watching</button>
+        </div>
+      </div>
+
+      <div id="byt-step-done" hidden style="text-align:center;padding:20px 0">
+        <div class="byt-done-check">✓</div>
+        <h3 class="serif" style="margin:0;font-size:26px" id="byt-done-title">Your trip is being watched.</h3>
+        <p style="color:var(--muted);margin-top:8px">Alerts on · concierge ready</p>
+        <div class="byt-act" style="justify-content:center;margin-top:22px">
+          <a class="btn" id="byt-done-link" href="trips.html">Open in My Trips</a>
+          <a class="btn ghost" href="telegram.html">Connect Telegram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section tight" id="bring-your-trip-pricing">
+    <h2 class="serif center" style="margin-bottom:8px">Same price as <em>booking with us.</em></h2>
+    <p class="lead center" style="margin:0 auto 28px;max-width:54ch">No discount for importing — and no markup either. One trip or always on.</p>
+    <div class="byt-price">
+      <article class="card" style="padding:22px 24px;display:flex;flex-direction:column">
+        <h3 class="serif" style="margin:0">Per trip</h3>
+        <div style="margin:14px 0 4px"><span class="amt">$99</span> <span class="per">per imported trip</span></div>
+        <p style="font-size:13.5px;color:var(--muted);min-height:20px">Charged when you turn on watch for that trip.</p>
+        <ul class="feats">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Alert &amp; guide me for this trip</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Trip Watch optional add-on (pass-through scans)</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Concierge chat through the trip</li>
+        </ul>
+        <a class="btn ghost" href="#intake" style="margin-top:auto;width:100%">Add one trip — $99</a>
+      </article>
+      <article class="card flag" style="padding:22px 24px;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h3 class="serif" style="margin:0">Concierge</h3><span class="tag">Unlimited imports</span></div>
+        <div style="margin:14px 0 4px"><span class="amt">$129</span> <span class="per">/ month</span></div>
+        <p style="font-size:13.5px;color:var(--muted);min-height:20px">Bring every trip. Trip Watch included. No per-trip fee.</p>
+        <ul class="feats">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Unlimited imported + Tures-booked trips</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Trip Watch + Hiccup Handler on Tures bookings</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Alert &amp; guide me on imported trips</li>
+        </ul>
+        <a class="btn" href="signup.html" id="byt-subscribe" style="margin-top:auto;width:100%">Go Concierge</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section tight center">
+    <div class="rule" style="margin-bottom:32px"></div>
+    <h2 class="serif">Rather we <em>book it?</em></h2>
+    <p class="lead center" style="margin:14px auto 22px;max-width:48ch">Next time, start with a conversation — autonomous rebook included.</p>
+    <a class="btn" href="plan.html">Plan a trip</a>
+  </section>
+
+</main>
+<script src="assets/bring-your-trip-flow.js"></script>
+<script>
+(function(){
+  var sub=document.getElementById('byt-subscribe');
+  if(sub&&window.tures){
+    sub.addEventListener('click', function(e){
+      if(!window.tures.signedIn) return;
+      e.preventDefault();
+      sub.textContent='Starting…';
+      window.tures.billing.checkout('monthly').then(function(r){ location.href=r.url; }).catch(function(){ sub.textContent='Go Concierge'; });
+    });
+  }
+})();
+</script>
+<script src="assets/site.js" defer></script>
+</body></html>

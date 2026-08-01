@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — What is Tures?</title>
+<meta name="description" content="Tures is an AI travel concierge that books, not just researches. Describe a trip in plain English — it plans, books, monitors, and handles every leg, ending in confirmation numbers." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/01-landing.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — What is Tures?" />
+<meta property="og:description" content="An AI travel concierge that books, not just researches. It plans, books, monitors, and handles every leg — ending in confirmation numbers, not a pile of tabs." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/01-landing.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — What is Tures?" />
+<meta name="twitter:description" content="An AI travel concierge that books, not just researches — it plans, books, monitors, and handles every leg." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; padding-bottom:84px; }
+
+  /* capability grid */
+  .cap-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media(max-width:900px){ .cap-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:560px){ .cap-grid{ grid-template-columns:1fr; } }
+  .cap{ padding:26px 24px; border-radius:14px; }
+  .cap .ic{ width:40px; height:40px; border-radius:11px; display:grid; place-items:center; font-size:18px;
+    background:rgba(255,255,255,0.05); border:1px solid var(--gold); color:var(--gold); margin-bottom:16px; }
+  .cap h3{ font-family:'Playfair Display',serif; font-size:20px; color:var(--gh-cream); margin:0 0 8px; line-height:1.2; }
+  .cap p{ font-size:14px; line-height:1.7; color:var(--gh-cream-dim); margin:0; }
+
+  /* difference grid */
+  .diff-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:760px){ .diff-grid{ grid-template-columns:1fr; } }
+
+  /* benefits */
+  .ben-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  @media(max-width:860px){ .ben-grid{ grid-template-columns:repeat(2,1fr); } }
+  .ben{ padding:24px 20px; text-align:center; border-radius:14px; }
+  .ben .big{ font-family:'Playfair Display',serif; font-size:30px; color:var(--gold); line-height:1; }
+  .ben .lbl{ font-size:13px; color:var(--gh-cream); margin-top:10px; font-weight:500; }
+  .ben .sub{ font-size:12px; color:var(--gh-cream-dim); margin-top:4px; line-height:1.5; }
+
+  .cta-bar{ position:fixed; left:0; right:0; bottom:0; z-index:60; padding:14px clamp(16px,5vw,40px);
+    background:linear-gradient(to top, rgba(8,10,7,0.96), rgba(8,10,7,0.6)); backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08); transition:transform .35s ease; }
+  .cta-bar.tuck{ transform:translateY(120%); }
+</style>
+</head>
+<body>
+
+<header class="chrome"><nav><a href="01-landing.html">Tures</a></nav></header>
+
+<!-- ════════ HERO — what is Tures ════════ -->
+<section class="gh-hero" style="min-height:auto;">
+  <div class="gh-hero-bg">
+    <img src="assets/img/amalfi-1920.webp" alt="" aria-hidden="true">
+    <div class="gh-fade"></div>
+  </div>
+  <div class="gh-hero-inner" style="padding-top:clamp(56px,8vw,104px);">
+    <div class="gh-split-narrow">
+      <div>
+        <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">What is Tures</span></div>
+        <h1 class="gh-h1" style="font-size:clamp(32px,4.4vw,62px);">It books the trip.<br><span class="gh-accent gh-italic">Not just the tabs.</span></h1>
+        <p class="gh-lead" style="margin-top:20px; color:var(--gh-cream); font-size:clamp(16px,1.5vw,20px); max-width:40ch;">
+          Tures is an AI travel concierge that <span class="gh-accent">executes</span>. Describe a trip in plain English — it plans every leg, books it, watches it around the clock, and hands you <span class="gh-accent">confirmation numbers, not a pile of links</span>.
+        </p>
+        <div style="margin-top:30px; display:flex; flex-wrap:wrap; gap:14px;">
+          <a href="03-paste-trip.html" class="gh-btn gh-btn-lg">Start planning — free →</a>
+          <a href="05-execution.html" class="gh-btn gh-btn-ghost gh-btn-lg">Watch it work</a>
+        </div>
+      </div>
+
+      <!-- phone: describe → confirmation -->
+      <div style="display:flex; justify-content:center;">
+        <div class="gh-phone">
+          <div class="gh-phone-screen">
+            <div class="gh-phone-notch"></div>
+            <div class="gh-phone-bar"><span>9:41</span><span>Tures</span><span>▮▮▮</span></div>
+            <div class="gh-phone-head">
+              <div class="gh-phone-av"><svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#5C2E18"/><ellipse cx="24" cy="14" rx="12" ry="8" fill="#1A0A04"/><rect x="12" y="14" width="24" height="10" fill="#1A0A04"/><ellipse cx="24" cy="24" rx="10" ry="11" fill="#C4784A"/><ellipse cx="20.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><ellipse cx="27.5" cy="22" rx="1.6" ry="1.8" fill="#1A0800"/><path d="M20.5 28.5 Q24 30.5 27.5 28.5" stroke="#8B3A1A" stroke-width="1.2" stroke-linecap="round" fill="none"/><ellipse cx="24" cy="44" rx="14" ry="6" fill="#1E3A2A"/></svg></div>
+              <div class="gh-phone-meta"><div class="gh-phone-name">Tures <span class="live"></span></div><div class="gh-phone-sub">Concierge · Live</div></div>
+            </div>
+            <div class="gh-thread">
+              <div class="gh-bub gh-bub-u">Paris in May, 4 nights, somewhere quiet near the Marais. Business class.</div>
+              <div class="gh-bub gh-bub-c">Booked. Real Christine — garden-side junior suite, your usual register. AF 142 in business, seat 5A.</div>
+              <div class="gh-status-chip"><span class="dot"></span>Confirmed · <span style="font-family:'JetBrains Mono',monospace;">8849-RCP</span></div>
+              <div class="gh-bub gh-bub-c">Two dinners held to your taste. I'll watch the flight and handle anything that moves.</div>
+            </div>
+            <div class="gh-phone-input"><div class="field">Message Tures…</div><div class="send">↑</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gh-rule"></div>
+
+<!-- ════════ WHAT IT DOES ════════ -->
+<section class="gh-wash">
+  <div class="gh-section" data-reveal>
+    <div style="max-width:50ch; margin-bottom:48px;">
+      <p class="gh-eyebrow" style="margin-bottom:12px;">Built to handle it all</p>
+      <h2 class="gh-h2">One partner for every<br>part of your trip.</h2>
+      <p class="gh-lead" style="margin-top:16px;">Planning, booking, monitoring, and the thousand small details — Tures does the work a great human concierge would, end to end.</p>
+    </div>
+
+    <div class="cap-grid">
+      <div class="cap gh-glass">
+        <div class="ic">✶</div>
+        <h3>Plans the whole trip</h3>
+        <p>Flights, hotels, transfers, dinners, excursions — assembled in the right order from a plain-English brief, matched to how you travel.</p>
+      </div>
+      <div class="cap gh-glass">
+        <div class="ic">✔</div>
+        <h3>Books &amp; verifies</h3>
+        <p>It actually books — then checks every reservation against the provider receipt and your inbox. You get confirmation numbers, not links.</p>
+      </div>
+      <div class="cap gh-glass">
+        <div class="ic">◎</div>
+        <h3>Monitors 24/7</h3>
+        <p>The Hiccup Handler watches every leg as a live position in a moving world and pre-stages the fix before a disruption reaches you.</p>
+      </div>
+      <div class="cap gh-glass">
+        <div class="ic">♥</div>
+        <h3>Learns your taste</h3>
+        <p>The Taste Engine turns a few choices into a working model of how you travel — and sharpens it after every trip.</p>
+      </div>
+      <div class="cap gh-glass">
+        <div class="ic">▭</div>
+        <h3>Captures the value</h3>
+        <p>Best-card-per-charge from your wallet, loyalty and elite perks applied, rates re-checked and protected — automatically.</p>
+      </div>
+      <div class="cap gh-glass">
+        <div class="ic">❑</div>
+        <h3>Keeps it all organized</h3>
+        <p>One living itinerary, every confirmation, and tidy expense summaries — delivered and kept, so nothing slips.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ THE DIFFERENCE ════════ -->
+<section class="gh-wash-surface gh-tile">
+  <div class="gh-section" data-reveal>
+    <div style="max-width:50ch; margin-bottom:44px;">
+      <p class="gh-eyebrow" style="margin-bottom:8px;">Why it's different</p>
+      <h2 class="gh-h2">Other AI travel tools end with links.</h2>
+      <p class="gh-display gh-accent" style="font-size:clamp(22px,2.8vw,38px); line-height:1.15; margin-top:8px;">Tures ends with confirmation numbers.</p>
+    </div>
+    <div class="diff-grid">
+      <div class="gh-glass" style="padding:26px 24px;">
+        <p class="gh-eyebrow" style="margin-bottom:12px;">Spec-match, not price-shop</p>
+        <p class="gh-lead" style="font-size:15px;">You named Real Christine. Tures books Real Christine — not the comparable boutique because it's $40 cheaper.</p>
+      </div>
+      <div class="gh-glass" style="padding:26px 24px;">
+        <p class="gh-eyebrow" style="margin-bottom:12px;">Never autonomous on uncertainty</p>
+        <p class="gh-lead" style="font-size:15px;">When the non-stop doesn't exist, it surfaces the two cleanest alternatives and their trade-offs — and never rebooks into something you didn't approve.</p>
+      </div>
+      <div class="gh-glass" style="padding:26px 24px;">
+        <p class="gh-eyebrow" style="margin-bottom:12px;">Verified twice before "Booked"</p>
+        <p class="gh-lead" style="font-size:15px;">Every booking is checked against both the provider receipt and the email in your inbox. It doesn't say "Booked" until both agree.</p>
+      </div>
+      <div class="gh-glass" style="padding:26px 24px;">
+        <p class="gh-eyebrow" style="margin-bottom:12px;">A real concierge, always on</p>
+        <p class="gh-lead" style="font-size:15px;">Reachable like a text message, awake at 3 a.m., and proactive — it reaches out the moment something needs handling.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ THE COMPARISON ════════ -->
+<style>
+  .cmp{ max-width:1020px; margin:0 auto; overflow-x:auto; padding-bottom:6px; }
+  .cmp-table{ display:grid; grid-template-columns:1.7fr 1fr 1fr 1.15fr; min-width:680px;
+    border:1px solid rgba(255,255,255,0.1); border-radius:16px; overflow:hidden; }
+  .cmp-table > div{ padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:8px; font-size:14px; }
+  .cmp-table > div:nth-last-child(-n+4){ border-bottom:none; }
+  .cmp-table > div:nth-child(4n){ background:rgba(255,255,255,0.05); }
+  .cmp-h{ font-family:'Playfair Display',serif; font-size:17px; color:var(--gh-cream); border-bottom:1px solid rgba(255,255,255,0.16) !important; }
+  .cmp-h.t{ color:var(--gold); border-bottom:2px solid var(--gold) !important; }
+  .cmp-cap{ color:var(--gh-cream); font-weight:500; }
+  .cmp-sym{ justify-content:center; }
+  .cmp .yes{ color:var(--gold); font-size:18px; line-height:1; }
+  .cmp .part{ color:var(--gh-cream-dim); font-size:13px; opacity:.85; }
+  .cmp .no{ color:var(--gh-cream-dim); opacity:.4; font-size:15px; }
+</style>
+<section class="gh-wash-surface gh-tile">
+  <div class="gh-section" data-reveal>
+    <div style="max-width:50ch; margin:0 auto 40px; text-align:center;">
+      <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">The comparison</span><span class="ln"></span></div>
+      <h2 class="gh-h2" style="margin-top:8px;">What only Tures does.</h2>
+      <p class="gh-lead" style="margin-top:14px;">A travel agent helps. Doing it yourself is free. Tures does the whole job — and the parts nobody else even tries.</p>
+    </div>
+
+    <div class="cmp">
+      <div class="cmp-table">
+        <div class="cmp-h"></div>
+        <div class="cmp-h">Yourself</div>
+        <div class="cmp-h">A travel agent</div>
+        <div class="cmp-h t">t<span style="color:var(--gold)">✦</span>ures</div>
+
+        <div class="cmp-cap">Always on — instant, 24/7</div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Proactive — fixes it before you feel it</div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="part">limited</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Monitors everything — flights, weather, prices</div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="part">limited</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Learns &amp; sharpens your taste</div>
+        <div class="cmp-sym"><span class="part">on you</span></div>
+        <div class="cmp-sym"><span class="part">limited</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Books every leg — end to end</div>
+        <div class="cmp-sym"><span class="part">hours of tabs</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Best card per charge · perks captured</div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Expenses tracked · trip recaps</div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Your data tokenized &amp; encrypted</div>
+        <div class="cmp-sym"><span class="part">on you</span></div>
+        <div class="cmp-sym"><span class="part">limited</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">No hourly fees or markups</div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+        <div class="cmp-sym"><span class="no">✕</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+
+        <div class="cmp-cap">Confirmation numbers, not links</div>
+        <div class="cmp-sym"><span class="part">eventually</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+        <div class="cmp-sym"><span class="yes">✓</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ THE BENEFITS ════════ -->
+<section class="gh-wash">
+  <div class="gh-section" data-reveal>
+    <div style="text-align:center; max-width:46ch; margin:0 auto 44px;">
+      <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">More than a tool</span><span class="ln"></span></div>
+      <h2 class="gh-h2" style="margin-top:8px;">A travel partner that<br><span class="gh-accent gh-italic">gives you more.</span></h2>
+    </div>
+    <div class="ben-grid">
+      <div class="ben gh-glass"><div class="big">Hours</div><div class="lbl">Time back</div><div class="sub">The planning, booking, and reshuffling — off your plate entirely.</div></div>
+      <div class="ben gh-glass"><div class="big">Calm</div><div class="lbl">Less stress</div><div class="sub">Disruptions handled before you feel them. You travel; Tures worries.</div></div>
+      <div class="ben gh-glass"><div class="big">Value</div><div class="lbl">More for the money</div><div class="sub">Best card, every perk, rates protected — captured without you asking.</div></div>
+      <div class="ben gh-glass"><div class="big">Taste</div><div class="lbl">Trips that fit you</div><div class="sub">Every choice routed through how you actually like to travel.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA ════════ -->
+<section class="gh-wash-surface">
+  <div class="gh-section" style="text-align:center;">
+    <div class="gh-eyebrow-rule" style="justify-content:center;"><span class="ln"></span><span class="gh-eyebrow">Get started</span><span class="ln"></span></div>
+    <h2 class="gh-h2" style="margin-top:8px;">Describe a trip.<br><span class="gh-accent gh-italic">We'll handle the rest.</span></h2>
+    <p class="gh-lead" style="margin:16px auto 0; max-width:40ch;">Free to start. Pay only when something actually books.</p>
+    <form class="gh-field" style="margin:28px auto 0;" onsubmit="location.href='03-paste-trip.html';return false;">
+      <input placeholder="Where are you going?" aria-label="Where are you going?">
+      <button type="submit">Plan it →</button>
+    </form>
+  </div>
+</section>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.08); padding:40px clamp(24px,6vw,80px); text-align:center;">
+  <a href="index.html" class="gh-display" style="font-size:24px; color:#fff; text-decoration:none;">t<span class="gh-accent">✦</span>ures</a>
+  <div class="gh-lead" style="font-size:13px; margin-top:8px;">A trip booked is the only thing we ship.</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar tuck" id="ctaBar">
+  <div style="max-width:1240px; margin:0 auto; display:flex; align-items:center; gap:12px;">
+    <a href="03-paste-trip.html" class="gh-btn" style="flex:1; max-width:340px;">Start planning — free →</a>
+    <a href="pricing.html" class="gh-btn gh-btn-ghost" style="white-space:nowrap;">See pricing</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var bar = document.getElementById('ctaBar');
+  var heroCta = document.querySelector('.gh-hero .gh-btn');
+  if(!bar || !heroCta || !('IntersectionObserver' in window)){ bar && bar.classList.remove('tuck'); return; }
+  new IntersectionObserver(function(ents){
+    bar.classList.toggle('tuck', ents[0].isIntersecting);
+  }, { threshold: 0.1 }).observe(heroCta);
+})();
+</script>
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

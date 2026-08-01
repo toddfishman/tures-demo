@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — The AI Travel Concierge</title>
+<meta name="description" content="Tures is the AI travel concierge that books, not just researches. Describe a trip in plain English and it handles every leg — ending with confirmation numbers, not links." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v10/index.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — The AI Travel Concierge" />
+<meta property="og:description" content="Tures is the AI travel concierge that books, not just researches. Describe a trip in plain English and it handles every leg — ending with confirmation numbers, not links." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v10/index.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — The AI Travel Concierge" />
+<meta name="twitter:description" content="Tures is the AI travel concierge that books, not just researches. Describe a trip in plain English and it handles every leg — ending with confirmation numbers, not links." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v10/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     TURES — "Greenhouse" cover
+     Dark botanical · cream type · per-scene accent shift
+     Ported from the Figma Make direction. Self-contained.
+     ============================================================ */
+  :root{
+    --bg:#0A0D08; --surface:#0F1410; --card:#141C13; --cardAlt:#1A2418;
+    --cream:#F0EAD8; --creamDim:#B8AD96; --moss:#3D5238;
+    /* accent — overwritten per scene by JS; defaults to Rainforest */
+    --acc:#4ADE80; --acc-light:#86EFAC; --acc-dim:rgba(74,222,128,0.12);
+    --acc-border:rgba(74,222,128,0.24); --acc-thick:rgba(74,222,128,0.7); --acc-text:#050805;
+    --tile:none;
+  }
+  *{ box-sizing:border-box; }
+  html{ scrollbar-width:thin; scrollbar-color:var(--acc-thick) transparent; }
+  ::-webkit-scrollbar{ width:11px; height:11px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:var(--acc-border); border-radius:99px; border:3px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--acc-thick); }
+  html,body{ margin:0; }
+  body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--cream); min-height:100vh; }
+  a{ color:inherit; text-decoration:none; }
+  .wm{ font-family:'Playfair Display',serif; }
+  .spark{ color:var(--acc); transition:color .5s; }
+  .tile-bg{ background-image:var(--tile); background-size:40px 40px; }
+  .caps{ text-transform:uppercase; letter-spacing:.2em; }
+
+  /* ── HERO ── */
+  .hero{ position:relative; min-height:100vh; display:flex; flex-direction:column; }
+  .hero-bg{ position:absolute; inset:0; }
+  .hero-bg .hero-layer{ position:absolute; inset:0; opacity:0; transition:opacity 1.4s ease; }
+  .hero-bg .hero-layer.on{ opacity:1; }
+  .hero-bg .hero-layer img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .hero-bg .fade-l{ position:absolute; inset:0; z-index:2; background:linear-gradient(to right, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.2) 35%, transparent 62%); }
+  .hero-bg .fade-b{ position:absolute; inset:0; z-index:2; background:linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.4) 100%); }
+
+  /* nav */
+  .nav{ position:relative; z-index:60; padding:26px 44px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .signin{ display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--cream); padding:13px 20px; border-radius:60px; background:rgba(8,12,8,0.5);
+    backdrop-filter:blur(18px) saturate(160%); border:1px solid rgba(255,255,255,0.18); transition:border-color .25s, background .25s; }
+  .signin:hover{ border-color:var(--acc); background:rgba(255,255,255,0.1); }
+  .menu-wrap{ position:relative; }
+  .menu-trigger{ display:flex; align-items:center; gap:14px; background:rgba(8,12,8,0.55);
+    backdrop-filter:blur(24px) saturate(180%); border:1.5px solid var(--acc); padding:15px 26px 15px 22px;
+    cursor:pointer; border-radius:60px; transition:box-shadow .3s, border-color .5s;
+    box-shadow:0 0 18px var(--acc-dim), 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15); }
+  .menu-trigger .mt-wm{ font-family:'Playfair Display',serif; font-size:26px; letter-spacing:.04em; color:#fff; }
+  .menu-trigger .mt-car{ font-size:13px; color:var(--acc); margin-top:1px; transition:transform .3s, color .5s; display:inline-block; }
+  .menu-wrap.open .mt-car{ transform:rotate(180deg); }
+  .menu-panel{ position:absolute; top:calc(100% + 10px); right:0; width:300px; max-height:82vh; overflow:hidden auto;
+    background:rgba(8,12,8,0.55); backdrop-filter:blur(40px) saturate(200%);
+    border:1px solid rgba(255,255,255,0.12); border-top:1px solid var(--acc-border);
+    box-shadow:0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08); border-radius:12px; z-index:60;
+    opacity:0; visibility:hidden; transform:translateY(-8px); transition:opacity .22s, transform .22s, visibility 0s linear .22s; }
+  .menu-wrap.open .menu-panel{ opacity:1; visibility:visible; transform:translateY(0); transition:opacity .22s, transform .22s; }
+  .menu-shimmer{ height:1px; background:linear-gradient(to right, transparent, var(--acc), transparent); }
+  .menu-group{ border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; }
+  .menu-group:last-of-type{ border-bottom:none; }
+  .menu-head{ padding:16px 22px 8px; font-family:'Playfair Display',serif; font-size:11px; font-style:italic;
+    color:var(--acc); opacity:.7; letter-spacing:.06em; text-transform:uppercase; }
+  .menu-item{ padding:9px 22px; display:flex; align-items:center; gap:14px; cursor:pointer; transition:background .15s; }
+  .menu-item:hover{ background:rgba(255,255,255,0.04); }
+  .menu-item.hl{ background:var(--acc-dim); }
+  .menu-item .mi-n{ font-family:'Playfair Display',serif; font-size:10px; color:var(--acc); opacity:.45; width:18px; flex-shrink:0; }
+  .menu-item.hl .mi-n{ opacity:1; }
+  .menu-item .mi-l{ font-size:14px; color:var(--acc-light); opacity:.65; letter-spacing:.01em; transition:color .5s; }
+  .menu-item.hl .mi-l{ color:var(--acc); opacity:1; font-weight:600; }
+
+  /* hero content */
+  .hero-content{ position:relative; z-index:2; flex:1; display:flex; align-items:center; padding:0 64px; transition:opacity .35s; }
+  .hero-content .inner{ max-width:600px; }
+  .hero-h1{ font-family:'Playfair Display',serif; font-size:clamp(22px,3.4vw,50px); font-weight:400; line-height:1.08;
+    color:#fff; margin:0 0 34px; text-shadow:0 2px 32px rgba(0,0,0,0.4); }
+  .hero-h1 .lead{ display:block; font-size:1.12em; line-height:1.05; white-space:nowrap; }
+  .hero-h1 .sub{ display:block; font-family:'DM Sans',sans-serif; font-size:clamp(12px,1.4vw,16px); font-weight:400;
+    letter-spacing:.02em; color:var(--cream); opacity:.85; white-space:nowrap; margin:14px 0 18px; }
+  .hero-h1 .tagline{ display:block; }
+  .hero-h1 .wm-logo, .hero-h1 .wm-logo .spark{ color:var(--acc); transition:color .5s; }
+  .hero-form{ display:flex; max-width:440px; }
+  .hero-form input{ flex:1; background:rgba(255,255,255,0.07); backdrop-filter:blur(20px) saturate(160%);
+    border:2px solid var(--acc-border); border-right:none; border-radius:10px 0 0 10px; color:var(--cream);
+    padding:16px 20px; font-size:14px; outline:none; font-family:'DM Sans',sans-serif; transition:border-color .5s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px var(--acc-dim); }
+  .hero-form input::placeholder{ color:var(--creamDim); }
+  .hero-form button{ background:var(--acc); color:var(--acc-text); border:2px solid var(--acc); border-radius:0 10px 10px 0;
+    padding:16px 26px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer;
+    transition:all .5s; white-space:nowrap; }
+
+  /* scene picker */
+  .scenes{ position:relative; z-index:3; display:flex; border-top:1px solid rgba(255,255,255,0.08);
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(20px);
+    max-height:0; overflow:hidden; opacity:0; transition:max-height .5s cubic-bezier(.22,.61,.36,1), opacity .4s ease; }
+  .scenes.open{ max-height:150px; opacity:1; }
+  .scenes-toggle{ position:relative; z-index:4; align-self:flex-end; margin:0 18px 16px auto; display:inline-flex; align-items:center; gap:9px;
+    background:rgba(8,12,8,0.55); backdrop-filter:blur(18px) saturate(160%); border:1px solid var(--acc-border); color:var(--cream);
+    padding:9px 16px; border-radius:99px; cursor:pointer; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    font-family:'DM Sans',sans-serif; transition:border-color .25s, background .25s; }
+  .scenes-toggle:hover{ border-color:var(--acc); background:rgba(14,20,14,0.7); }
+  .scenes-toggle .st-dot{ width:7px; height:7px; border-radius:50%; background:var(--acc); transition:background .5s; }
+  .scenes-toggle .st-car{ font-size:10px; color:var(--acc); transition:transform .3s, color .5s; }
+  .scenes-toggle.open .st-car{ transform:rotate(180deg); }
+  .scene-btn{ flex:1; background:transparent; border:none; border-top:3px solid transparent;
+    border-right:1px solid rgba(255,255,255,0.07); padding:0; cursor:pointer; transition:all .25s; overflow:hidden; }
+  .scene-btn:last-child{ border-right:none; }
+  .scene-btn .sb-thumb{ height:72px; overflow:hidden; position:relative; }
+  .scene-btn .sb-thumb img{ width:100%; height:100%; object-fit:cover; filter:saturate(.3) brightness(.45); transition:filter .35s; }
+  .scene-btn .sb-thumb::after{ content:""; position:absolute; inset:0; background:rgba(0,0,0,0.4); }
+  .scene-btn .sb-meta{ padding:9px 14px; text-align:left; }
+  .scene-btn .sb-row{ display:flex; align-items:center; gap:6px; }
+  .scene-btn .sb-name{ font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); transition:color .3s; }
+  .scene-btn .sb-sub{ font-size:9px; color:rgba(255,255,255,0.3); letter-spacing:.06em; margin:2px 0 0; display:none; }
+  .scene-btn.on{ background:rgba(255,255,255,0.07); border-top-color:var(--acc); }
+  .scene-btn.on .sb-thumb img{ filter:none; }
+  .scene-btn.on .sb-thumb::after{ background:transparent; }
+  .scene-btn.on .sb-name{ color:var(--acc); }
+  .scene-btn.on .sb-sub{ display:block; }
+
+  .rule{ height:1px; background:linear-gradient(to right, transparent, var(--acc-thick), transparent); transition:background .5s; }
+
+  /* ── SERVICES ── */
+  .services{ }
+  .services .wash{ background:rgba(10,13,8,0.94); padding:88px 56px; }
+  .svc-grid{ display:grid; grid-template-columns:280px 1fr; gap:80px; max-width:1180px; margin:0 auto; }
+  .svc-eyebrow{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--acc); margin:0 0 32px; transition:color .5s; }
+  .svc-tab{ width:100%; background:none; border:none; border-left:2px solid rgba(255,255,255,0.08); padding:18px 24px;
+    text-align:left; cursor:pointer; display:flex; align-items:center; gap:14px; margin-bottom:4px; transition:border-color .2s; }
+  .svc-tab .st-ico{ font-size:18px; color:var(--moss); transition:color .2s; }
+  .svc-tab .st-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--moss); margin:0 0 4px; transition:color .2s; }
+  .svc-tab .st-title{ font-family:'Playfair Display',serif; font-size:15px; color:var(--creamDim); line-height:1.2; margin:0; transition:color .2s; }
+  .svc-tab.on{ border-left-color:var(--acc); }
+  .svc-tab.on .st-ico{ color:var(--acc); }
+  .svc-tab.on .st-label{ color:var(--acc); }
+  .svc-tab.on .st-title{ color:var(--cream); }
+  .svc-detail{ display:flex; flex-direction:column; justify-content:center; }
+  .svc-detail .sd-eye{ display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+  .svc-detail .sd-eye .ln{ width:40px; height:1px; background:var(--acc); transition:background .5s; }
+  .svc-detail .sd-eye .tx{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--acc); transition:color .5s; }
+  .svc-detail h2{ font-family:'Playfair Display',serif; font-size:clamp(26px,2.8vw,42px); font-weight:400; color:var(--cream); margin:0 0 24px; line-height:1.2; }
+  .svc-detail .sd-body{ font-size:16px; line-height:1.85; color:var(--creamDim); margin:0 0 36px; max-width:520px; }
+  .svc-detail .sd-stat{ display:inline-flex; align-items:center; gap:12px; border:1px solid var(--acc-border);
+    padding:12px 20px; align-self:flex-start; transition:border-color .5s; }
+  .svc-detail .sd-stat .dot{ width:6px; height:6px; border-radius:50%; background:var(--acc); transition:background .5s; }
+  .svc-detail .sd-stat .lbl{ font-size:12px; color:var(--acc); letter-spacing:.08em; transition:color .5s; }
+
+  /* ── TRIPS ── */
+  .section-pad{ padding:88px 56px; max-width:1180px; margin:0 auto; }
+  .trips-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:56px; gap:24px; }
+  .eyebrow{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--acc); margin:0 0 12px; transition:color .5s; }
+  .h2{ font-family:'Playfair Display',serif; font-weight:400; color:var(--cream); line-height:1.1; margin:0; }
+  .trips-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
+  .trip{ position:relative; border:3px solid var(--acc-thick); overflow:hidden; cursor:pointer; transition:border-color .5s; }
+  .trip img{ width:100%; height:360px; object-fit:cover; display:block; }
+  .trip .t-label{ background:var(--card); border-top:3px solid var(--acc-thick); padding:18px 22px; transition:border-color .5s; }
+  .trip .t-row{ display:flex; justify-content:space-between; align-items:flex-end; }
+  .trip .t-tag{ font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc); margin:0 0 6px; transition:color .5s; }
+  .trip .t-type{ font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); line-height:1.1; margin:0; }
+  .trip .t-detail{ font-size:12px; color:var(--creamDim); margin:4px 0 0; }
+  .trip .t-arrow{ width:34px; height:34px; border:2px solid var(--acc-thick); display:flex; align-items:center; justify-content:center;
+    color:var(--acc); font-size:16px; flex-shrink:0; transition:all .5s; }
+  .link-acc{ font-size:12px; color:var(--acc); letter-spacing:.08em; text-transform:uppercase; transition:color .5s; white-space:nowrap; }
+
+  /* ── TESTIMONIAL ── */
+  .testi .wash{ background:rgba(10,13,8,0.95); border-top:1px solid var(--acc-border); border-bottom:1px solid var(--acc-border);
+    padding:88px 56px; transition:border-color .5s; }
+  .testi-grid{ display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; max-width:1180px; margin:0 auto; }
+  .testi-stars{ display:flex; gap:4px; margin-bottom:32px; color:var(--acc); font-size:16px; transition:color .5s; }
+  .testi-quote{ font-family:'Playfair Display',serif; font-size:clamp(19px,2vw,28px); font-style:italic; color:var(--cream); line-height:1.65; margin:0 0 36px; }
+  .testi-who{ display:flex; align-items:center; gap:16px; }
+  .testi-av{ width:44px; height:44px; border-radius:50%; background:var(--cardAlt); border:2px solid var(--acc-thick);
+    display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:16px; color:var(--acc); transition:all .5s; }
+  .testi-name{ font-size:14px; color:var(--cream); font-weight:500; margin:0; }
+  .testi-role{ font-size:12px; color:var(--creamDim); margin:0; }
+  .testi-imgs{ display:flex; flex-direction:column; gap:3px; }
+  .testi-imgs .ti{ border:3px solid var(--acc-thick); overflow:hidden; transition:border-color .5s; }
+  .testi-imgs .ti img{ width:100%; display:block; object-fit:cover; }
+  .testi-imgs .ti.big img{ height:260px; }
+  .testi-imgs .ti-row{ display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+  .testi-imgs .ti.small img{ height:152px; }
+
+  /* ── CTA ── */
+  .cta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; max-width:1180px; margin:0 auto; padding:100px 56px; }
+  .cta-eye{ display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+  .cta-eye .ln{ height:1px; width:40px; background:var(--acc); transition:background .5s; }
+  .cta-eye .tx{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--acc); transition:color .5s; }
+  .cta-copy h2{ font-family:'Playfair Display',serif; font-size:clamp(34px,3.8vw,54px); font-weight:400; line-height:1.15; color:var(--cream); margin:0 0 20px; }
+  .cta-copy p{ font-size:15px; line-height:1.85; color:var(--creamDim); max-width:400px; margin:0; }
+  .cta-card{ background:var(--card); border:3px solid var(--acc-thick); padding:48px 44px; position:relative; transition:border-color .5s; }
+  .cta-card .cc-tile{ position:absolute; inset:0; opacity:.9; }
+  .cta-card .cc-inner{ position:relative; z-index:1; display:flex; flex-direction:column; gap:14px; }
+  .cta-card input{ background:rgba(255,255,255,0.07); backdrop-filter:blur(20px) saturate(160%); border:1px solid var(--acc-border);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.08), 0 0 12px var(--acc-dim); color:var(--cream); padding:14px 18px; font-size:14px;
+    outline:none; font-family:'DM Sans',sans-serif; width:100%; transition:border-color .5s, box-shadow .5s; }
+  .cta-card input::placeholder{ color:var(--creamDim); }
+  .cta-card button{ background:var(--acc); color:var(--acc-text); border:none; padding:16px; font-size:13px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; cursor:pointer; margin-top:4px; transition:all .5s; }
+  .cta-card .fine{ font-size:11px; color:var(--moss); text-align:center; letter-spacing:.04em; margin:0; }
+
+  /* ── FOOTER ── */
+  .footer{ border-top:1px solid var(--acc-border); padding:36px 56px; display:flex; justify-content:space-between;
+    align-items:center; font-size:12px; color:var(--moss); transition:border-color .5s; gap:18px; flex-wrap:wrap; }
+  .footer .f-wm{ font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); }
+  .footer .f-links{ display:flex; gap:28px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:900px){
+    .svc-grid, .testi-grid, .cta-grid{ grid-template-columns:1fr; gap:44px; }
+    .trips-grid{ grid-template-columns:1fr; }
+    .nav{ padding:18px 22px; }
+    .hero-content{ padding:0 28px; }
+    .services .wash, .section-pad, .testi .wash, .cta-grid{ padding-left:24px; padding-right:24px; }
+    .scene-btn .sb-meta{ padding:8px 8px; }
+    .scene-btn .sb-name{ font-size:8px; letter-spacing:.06em; }
+  }
+  @media (max-width:430px){
+    .hero-h1 .lead{ font-size:1em; }
+    .hero-h1 .sub{ letter-spacing:0; font-size:11px; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ════════ HERO ════════ -->
+<section class="hero" id="hero">
+
+  <div class="hero-bg" id="heroBg">
+    <div class="hero-layer on" id="layA"><img src="assets/img/greenhouse/rainforest.jpg" alt="" /></div>
+    <div class="hero-layer" id="layB"><img src="" alt="" /></div>
+    <div class="fade-l"></div>
+    <div class="fade-b"></div>
+  </div>
+
+  <!-- nav -->
+  <div class="nav">
+    <a class="signin" href="auth/login.html">Sign in</a>
+    <div class="menu-wrap" id="menuWrap">
+      <button class="menu-trigger" id="menuTrigger" aria-haspopup="true" aria-label="Contents">
+        <span class="mt-wm">t<span class="spark">✦</span>ures</span>
+        <span class="mt-car">▾</span>
+      </button>
+      <div class="menu-panel" role="menu">
+        <div class="menu-shimmer"></div>
+        <div class="menu-group">
+          <div class="menu-head">The cover</div>
+          <a class="menu-item" href="01-landing.html"><span class="mi-n">1</span><span class="mi-l">What is Tures</span></a>
+          <a class="menu-item hl" href="03-paste-trip.html"><span class="mi-n">2</span><span class="mi-l">Plan a trip</span></a>
+          <a class="menu-item" href="02-taste-engine.html"><span class="mi-n">3</span><span class="mi-l">The Taste Engine</span></a>
+          <a class="menu-item" href="04-connections.html"><span class="mi-n">4</span><span class="mi-l">Tures Vault Setup</span></a>
+          <a class="menu-item" href="05-execution.html"><span class="mi-n">5</span><span class="mi-l">Tures Demo</span></a>
+          <a class="menu-item" href="07-itinerary.html"><span class="mi-n">6</span><span class="mi-l">My Trips</span></a>
+          <a class="menu-item" href="08-concierge.html"><span class="mi-n">7</span><span class="mi-l">The Tures Concierge</span></a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-head">Your concierge</div>
+          <a class="menu-item" href="06-hiccup-handler.html"><span class="mi-n">8</span><span class="mi-l">The Hiccup Handler</span></a>
+          <a class="menu-item" href="been.html"><span class="mi-n">9</span><span class="mi-l">Where you’ve been</span></a>
+          <a class="menu-item" href="pricing.html"><span class="mi-n">10</span><span class="mi-l">Pricing</span></a>
+          <a class="menu-item" href="about.html"><span class="mi-n">11</span><span class="mi-l">About</span></a>
+          <a class="menu-item" href="about.html#contact"><span class="mi-n">12</span><span class="mi-l">Contact</span></a>
+          <a class="menu-item" href="legal/index.html"><span class="mi-n">13</span><span class="mi-l">Privacy &amp; Terms</span></a>
+        </div>
+        <div class="menu-shimmer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- hero content -->
+  <div class="hero-content" id="heroContent">
+    <div class="inner">
+      <h1 class="hero-h1">
+        <span class="lead">Your AI travel concierge.</span>
+        <span class="sub">Proactive. On 24/7. In your pocket.</span>
+        <span class="tagline">Adven<span class="wm-logo">t<span class="spark">✦</span>ures</span>, handled</span>
+      </h1>
+      <form class="hero-form" id="heroForm" onsubmit="return goPlan(event)">
+        <input id="heroDest" placeholder="Where are you going?" aria-label="Where are you going?" />
+        <button type="submit">Plan it →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- scene picker — hidden by default, expandable -->
+  <button class="scenes-toggle" id="scenesToggle" type="button" aria-expanded="false">
+    <span class="st-dot"></span><span>Scene</span><span class="st-car">▾</span>
+  </button>
+  <div class="scenes" id="scenes"></div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ════════ SERVICES ════════ -->
+<section class="services tile-bg">
+  <div class="wash">
+    <div class="svc-grid">
+      <div>
+        <p class="svc-eyebrow">What we handle</p>
+        <div id="svcTabs"></div>
+      </div>
+      <div class="svc-detail">
+        <div class="sd-eye"><span class="ln"></span><span class="tx" id="svcLabel"></span></div>
+        <h2 id="svcTitle"></h2>
+        <p class="sd-body" id="svcBody"></p>
+        <div class="sd-stat"><span class="dot"></span><span class="lbl" id="svcStat"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ TRIP TYPES ════════ -->
+<section class="section-pad" style="border-top:1px solid var(--acc-border);">
+  <div class="trips-head">
+    <div>
+      <p class="eyebrow">For every kind of trip</p>
+      <h2 class="h2" style="font-size:clamp(30px,3.2vw,48px);">Business, family, solo.<br>Tures handles them all.</h2>
+    </div>
+    <a class="link-acc" href="07-itinerary.html">See all →</a>
+  </div>
+  <div class="trips-grid">
+    <a class="trip" href="03-paste-trip.html">
+      <img src="assets/img/greenhouse/trip-business.jpg" alt="Business travel" />
+      <div class="t-label"><div class="t-row">
+        <div><p class="t-tag">3 cities · 6 days</p><p class="t-type">Business</p><p class="t-detail">New York → London → Singapore</p></div>
+        <div class="t-arrow">→</div>
+      </div></div>
+    </a>
+    <a class="trip" href="03-paste-trip.html">
+      <img src="assets/img/greenhouse/trip-family.jpg" alt="Family holiday" />
+      <div class="t-label"><div class="t-row">
+        <div><p class="t-tag">12 days · all ages</p><p class="t-type">Family Holiday</p><p class="t-detail">Costa Rica, two adults, three kids</p></div>
+        <div class="t-arrow">→</div>
+      </div></div>
+    </a>
+    <a class="trip" href="03-paste-trip.html">
+      <img src="assets/img/greenhouse/trip-weekend.jpg" alt="Long weekend" />
+      <div class="t-label"><div class="t-row">
+        <div><p class="t-tag">4 days · solo</p><p class="t-type">Long Weekend</p><p class="t-detail">Lisbon, no plan required</p></div>
+        <div class="t-arrow">→</div>
+      </div></div>
+    </a>
+  </div>
+</section>
+
+<!-- ════════ TESTIMONIAL ════════ -->
+<section class="testi tile-bg">
+  <div class="wash">
+    <div class="testi-grid">
+      <div>
+        <div class="testi-stars">✦ ✦ ✦ ✦ ✦</div>
+        <p class="testi-quote">"I travel 200 days a year for work. Tures is the first service that genuinely handles everything — flights, hotels, rescheduling, expenses. I haven't touched a booking site in eight months."</p>
+        <div class="testi-who">
+          <div class="testi-av">A</div>
+          <div><p class="testi-name">A. Delacroix</p><p class="testi-role">Creative director · Paris</p></div>
+        </div>
+      </div>
+      <div class="testi-imgs">
+        <div class="ti big"><img id="testiHero" src="assets/img/greenhouse/rainforest.jpg" alt="Scene" /></div>
+        <div class="ti-row">
+          <div class="ti small"><img src="assets/img/greenhouse/side-interior.jpg" alt="Interior" /></div>
+          <div class="ti small"><img src="assets/img/greenhouse/side-plants.jpg" alt="Plants" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA ════════ -->
+<section>
+  <div class="cta-grid">
+    <div class="cta-copy">
+      <div class="cta-eye"><span class="ln"></span><span class="tx">Get started</span></div>
+      <h2>Tell us where<br>you're heading.</h2>
+      <p>Business trip, family holiday, or a solo escape — just tell Tures where and when, and we'll handle everything else.</p>
+    </div>
+    <div class="cta-card">
+      <div class="cc-tile tile-bg"></div>
+      <form class="cc-inner" onsubmit="return goPlan(event)">
+        <input placeholder="Where are you going?" aria-label="Where are you going?" />
+        <input placeholder="When are you travelling?" aria-label="When are you travelling?" />
+        <input placeholder="How many people?" aria-label="How many people?" />
+        <button type="submit">Start planning →</button>
+        <p class="fine">Free to start · No credit card required</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="footer">
+  <div class="f-wm">t<span class="spark">✦</span>ures</div>
+  <span>© MMXXVI · Your trip, handled.</span>
+  <div class="f-links">
+    <a href="legal/index.html">Privacy</a>
+    <a href="legal/index.html">Terms</a>
+    <a href="about.html#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ── scene data (biome-driven, accent recolors the whole page) ──
+  var SCENES = [
+    { id:"rainforest", name:"Rainforest", icon:"🌿", sub:"Amazon · Congo · Daintree",
+      img:"assets/img/greenhouse/rainforest.jpg",
+      acc:"#4ADE80", accLight:"#86EFAC", accDim:"rgba(74,222,128,0.12)", accBorder:"rgba(74,222,128,0.24)", accThick:"rgba(74,222,128,0.7)", accText:"#050805" },
+    { id:"arctic", name:"Arctic", icon:"❄", sub:"Iceland · Svalbard · Patagonia",
+      img:"assets/img/greenhouse/arctic.jpg",
+      acc:"#7DD3FC", accLight:"#BAE6FD", accDim:"rgba(125,211,252,0.12)", accBorder:"rgba(125,211,252,0.24)", accThick:"rgba(125,211,252,0.7)", accText:"#02050E" },
+    { id:"savanna", name:"Savanna", icon:"🌾", sub:"Serengeti · Kruger · Okavango",
+      img:"assets/img/greenhouse/savanna.jpg",
+      acc:"#F59E0B", accLight:"#FCD34D", accDim:"rgba(245,158,11,0.12)", accBorder:"rgba(245,158,11,0.24)", accThick:"rgba(245,158,11,0.7)", accText:"#0A0600" },
+    { id:"beach", name:"Beach", icon:"🌊", sub:"Maldives · Seychelles · Bora Bora",
+      img:"assets/img/greenhouse/beach.jpg",
+      acc:"#2DD4BF", accLight:"#5EEAD4", accDim:"rgba(45,212,191,0.12)", accBorder:"rgba(45,212,191,0.24)", accThick:"rgba(45,212,191,0.7)", accText:"#020A0A" },
+    { id:"city", name:"New York", icon:"🌆", sub:"New York · London · Tokyo",
+      img:"assets/img/greenhouse/city.jpg",
+      acc:"#FFE55C", accLight:"#FFF5A0", accDim:"rgba(255,229,92,0.12)", accBorder:"rgba(255,229,92,0.24)", accThick:"rgba(255,229,92,0.7)", accText:"#080400" }
+  ];
+
+  var SERVICES = [
+    { ico:"✦", label:"Before you travel", title:"Every detail handled before you leave.",
+      body:"Flights, hotels, transfers, restaurant bookings, travel insurance, currency, and visas where needed. Whether it's a business trip, a family holiday, or a long-overdue escape — everything is sorted before you pack a bag.",
+      detail:"Avg. 14 hrs saved per trip" },
+    { ico:"◎", label:"While you're away", title:"There when you need us. Invisible when you don't.",
+      body:"Flight running late? Need a better table? Want a last-minute upgrade? Tures handles requests quietly and instantly — so your trip stays smooth whether you're in a boardroom or on a beach.",
+      detail:"24 / 7 · 38 languages" },
+    { ico:"◑", label:"When you're back", title:"The trip wrapped up before you've unpacked.",
+      body:"Expense reports, travel summaries, loyalty point reconciliation, curated memories — all organised and delivered within 48 hours of landing. You bring the stories; we close the loop.",
+      detail:"Within 48 hrs of return" }
+  ];
+
+  var root = document.documentElement;
+  function tileURL(acc){
+    var c = encodeURIComponent(acc + "22");
+    return "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 L20 0 L40 20 L20 40 Z' fill='none' stroke='" + c + "' stroke-width='0.6'/%3E%3C/svg%3E\")";
+  }
+  function applyAccent(s){
+    root.style.setProperty("--acc", s.acc);
+    root.style.setProperty("--acc-light", s.accLight);
+    root.style.setProperty("--acc-dim", s.accDim);
+    root.style.setProperty("--acc-border", s.accBorder);
+    root.style.setProperty("--acc-thick", s.accThick);
+    root.style.setProperty("--acc-text", s.accText);
+    root.style.setProperty("--tile", tileURL(s.acc));
+  }
+
+  // ── hero crossfade layers + scene picker ──
+  var layers = [document.getElementById("layA"), document.getElementById("layB")];
+  var front = 0, active = 0;
+  var scenesEl = document.getElementById("scenes");
+  var testiHero = document.getElementById("testiHero");
+
+  function showScene(i){
+    if (i === active) return;
+    var s = SCENES[i];
+    var back = layers[1 - front];
+    var img = back.querySelector("img");
+    img.src = s.img; img.alt = s.name;
+    back.classList.add("on");
+    layers[front].classList.remove("on");
+    front = 1 - front; active = i;
+    applyAccent(s);
+    if (testiHero) { testiHero.src = s.img; testiHero.alt = s.name; }
+    Array.prototype.forEach.call(scenesEl.children, function(c, ci){ c.className = "scene-btn" + (ci === i ? " on" : ""); });
+  }
+
+  SCENES.forEach(function(s, i){
+    var b = document.createElement("button");
+    b.className = "scene-btn" + (i === 0 ? " on" : "");
+    b.type = "button";
+    b.innerHTML =
+      '<div class="sb-thumb"><img src="' + s.img + '" alt="' + s.name + '"></div>' +
+      '<div class="sb-meta"><div class="sb-row"><span style="font-size:11px">' + s.icon + '</span>' +
+      '<span class="sb-name">' + s.name + '</span></div><p class="sb-sub">' + s.sub + '</p></div>';
+    b.addEventListener("click", function(){ showScene(i); resetRotate(); });
+    scenesEl.appendChild(b);
+  });
+
+  // auto-rotate the scene every 10s (soft crossfade)
+  var rotateTimer = null;
+  var reduceMo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function startRotate(){ if (reduceMo) return; rotateTimer = setInterval(function(){ showScene((active + 1) % SCENES.length); }, 10000); }
+  function resetRotate(){ if (rotateTimer) clearInterval(rotateTimer); startRotate(); }
+
+  // the scene picker is hidden by default; this toggle reveals it
+  var scenesToggle = document.getElementById("scenesToggle");
+  scenesToggle.addEventListener("click", function(){
+    var open = scenesEl.classList.toggle("open");
+    scenesToggle.classList.toggle("open", open);
+    scenesToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  // ── build service tabs ──
+  var svcTabs = document.getElementById("svcTabs");
+  var svcLabel = document.getElementById("svcLabel"), svcTitle = document.getElementById("svcTitle"),
+      svcBody = document.getElementById("svcBody"), svcStat = document.getElementById("svcStat");
+  var activeSvc = 0;
+  SERVICES.forEach(function(s, i){
+    var b = document.createElement("button");
+    b.className = "svc-tab" + (i === 0 ? " on" : "");
+    b.type = "button";
+    b.innerHTML = '<span class="st-ico">' + s.ico + '</span><div><p class="st-label">' + s.label + '</p>' +
+      '<p class="st-title">' + s.title + '</p></div>';
+    b.addEventListener("click", function(){ selectSvc(i); });
+    svcTabs.appendChild(b);
+  });
+  function selectSvc(i){
+    activeSvc = i; var s = SERVICES[i];
+    svcLabel.textContent = s.label; svcTitle.textContent = s.title; svcBody.textContent = s.body; svcStat.textContent = s.detail;
+    Array.prototype.forEach.call(svcTabs.children, function(c, ci){ c.className = "svc-tab" + (ci === i ? " on" : ""); });
+  }
+
+  // ── menu toggle ──
+  var menuWrap = document.getElementById("menuWrap");
+  var menuTrigger = document.getElementById("menuTrigger");
+  menuTrigger.addEventListener("click", function(e){ e.stopPropagation(); menuWrap.classList.toggle("open"); });
+  document.addEventListener("click", function(e){ if (!menuWrap.contains(e.target)) menuWrap.classList.remove("open"); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") menuWrap.classList.remove("open"); });
+
+  // ── init ──
+  applyAccent(SCENES[0]);
+  selectSvc(0);
+  startRotate();
+
+  // ── CTA → planner ──
+  window.goPlan = function(ev){
+    if (ev) ev.preventDefault();
+    location.href = "03-paste-trip.html";
+    return false;
+  };
+})();
+</script>
+</body>
+</html>

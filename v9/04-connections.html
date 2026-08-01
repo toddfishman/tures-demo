@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Grant permissions</title>
+<meta name="description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<link rel="canonical" href="https://toddfishman.github.io/tures-demo/v8/04-connections.html" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tures" />
+<meta property="og:title" content="Tures — Grant permissions" />
+<meta property="og:description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<meta property="og:url" content="https://toddfishman.github.io/tures-demo/v8/04-connections.html" />
+<meta property="og:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tures — the AI travel concierge" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tures — Grant permissions" />
+<meta name="twitter:description" content="Connect your loyalty programs and cards so Tures books with your status and your best card on every charge." />
+<meta name="twitter:image" content="https://toddfishman.github.io/tures-demo/v8/assets/img/og-cover.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  body{ background:var(--obsidian); padding-bottom:84px; }
+  .perm{ transition:border-color .3s ease, box-shadow .3s ease; }
+  .perm.granted{ border-color:rgba(95,125,79,0.5); box-shadow:0 0 0 1px rgba(95,125,79,0.25); }
+  .grant-flash{ animation:flash .6s ease; }
+  @keyframes flash{ 0%{background:rgba(95,125,79,0)} 40%{background:rgba(95,125,79,0.12)} 100%{background:rgba(95,125,79,0)} }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="01-landing.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="02-taste-engine.html">Taste Engine</a>
+      <a href="04-connections.html" class="active">Connections</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="03-paste-trip.html" class="btn-gold px-4 py-2 rounded-sm text-sm quiet">Start free</a>
+    </div>
+    <a href="03-paste-trip.html" class="md:hidden text-gold text-sm quiet">Start free</a>
+  </nav>
+</header>
+
+<section class="leather-surface grain relative overflow-hidden">
+  <div class="ghost-num absolute -top-8 right-2 text-[28vw] sm:text-[18vw] z-0" data-parallax="0.16">IV</div>
+  <div class="relative z-10 max-w-3xl mx-auto px-6 pt-14 pb-9">
+    <div class="caps text-[11px] text-gold/80 mb-3">Tures Vault Setup</div>
+    <h1 id="vHero" class="font-display text-5xl sm:text-6xl leading-[1.0]">Set up your vault.</h1>
+    <p id="vSub" class="mt-4 max-w-md text-canvas/70 leading-relaxed">One step at a time — a card, your documents, your programs. Saved as you go; pick up wherever you left off.</p>
+  </div>
+</section>
+
+<section class="canvas-surface text-ink" style="min-height:60vh">
+ <div class="relative z-10 max-w-3xl mx-auto px-6 py-10">
+   <nav id="vCrumbs" class="flex items-center flex-wrap gap-1.5 text-[12px] text-ink-faint mb-6"></nav>
+   <div id="vView"></div>
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Tures Vault Setup</div>
+</footer>
+
+<!-- sticky CTA -->
+<div class="cta-bar">
+  <div class="max-w-5xl mx-auto w-full flex items-center gap-3">
+    <a href="05-execution.html" id="execCta" class="btn-gold flex-1 text-center px-6 py-3 rounded-xl quiet font-semibold" style="opacity:.55;pointer-events:none">Connect 4 required to begin →</a>
+  </div>
+</div>
+
+<!-- ===== bottom sheets ===== -->
+<div class="sheet" id="sheet-card"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Payment</div>
+  <h3 class="font-display text-2xl text-ink mb-3">How your card is used</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">A per-trip authorization with a ceiling you set. Every charge is itemized and pushed to you the moment it's made. The card is held in a PCI-scope tokenization vault — Tures' agent never sees the raw number. Nothing is charged without an authorization you've approved.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-loyalty"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Loyalty &amp; status</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Applied automatically</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">AAdvantage, Flying Blue, Finnair Plus and your Virtuoso membership are attached to every booking that supports them — credits applied, status chased mid-trip, upgrades requested at check-in. You see exactly which program was used on each leg.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-calendar"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Calendar</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Routes around your life</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">We read availability to avoid booking over what's already on your plate, then write the confirmed trip back in — flights, hotels, dinners — with confirmation numbers attached to each event. Scoped to free/busy and the events we create.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-inbox"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Inbox</div>
+  <h3 class="font-display text-2xl text-ink mb-3">The second source of truth</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Read-only, scoped to travel senders only — never marketing, never your personal mail. We use the confirmation email as an independent check against the provider receipt. We don't mark anything "Booked" until both agree.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<div class="sheet" id="sheet-messaging"><div class="sheet-backdrop"></div><div class="sheet-panel">
+  <div class="sheet-handle"></div>
+  <div class="caps text-[11px] text-ink-faint mb-1">Messaging</div>
+  <h3 class="font-display text-2xl text-ink mb-3">Where the concierge lives</h3>
+  <p class="text-sm text-ink-soft leading-relaxed">Optional, but it's where most of the relationship happens once you're moving. Connect WhatsApp or Telegram and you can brief Tures the way you'd text a fixer. Same agent, same memory, same permissions as the app.</p>
+  <button data-sheet-close class="btn-ink w-full mt-5 px-5 py-3 rounded-xl">Got it</button>
+</div></div>
+
+<script src="assets/engine.js"></script>
+<script>
+/* The Vault — one category at a time. Click a category, add its entries, save, come back
+   any time. Stored locally (tures.vault) so progress persists; sensitive values are masked
+   on display and raw values are never re-rendered. */
+var VCATS = [
+  { k:'payment',  mk:'$',  label:'Payment',              blurb:'Cards Tures charges — best card per spend, capped per trip.' },
+  { k:'identity', mk:'ID', label:'Identity & documents', blurb:'Passport and Known Traveler Number — applied at booking.' },
+  { k:'loyalty',  mk:'✦',  label:'Loyalty & status',     blurb:'Airline, hotel and Virtuoso numbers — credited automatically.' },
+  { k:'access',   mk:'⚙',  label:'Access',               blurb:'Calendar, inbox and messaging — scoped, revocable, logged.' }
+];
+function vLoad(){ try{ return JSON.parse(localStorage.getItem('tures.vault')||'{}'); }catch(e){ return {}; } }
+function vSave(){ try{ localStorage.setItem('tures.vault', JSON.stringify(VAULT)); }catch(e){} }
+var VAULT = vLoad();
+var vView=document.getElementById('vView'), vCrumbs=document.getElementById('vCrumbs'),
+    vHero=document.getElementById('vHero'), vSub=document.getElementById('vSub');
+function vCat(k){ for(var i=0;i<VCATS.length;i++) if(VCATS[i].k===k) return VCATS[i]; return null; }
+function digits(s){ return (s||'').replace(/\D/g,''); }
+function mask4(s){ var d=digits(s); return d? '···· '+d.slice(-4) : ''; }
+function maskDoc(s){ s=(s||'').trim(); return s.length>2 ? '·····'+s.slice(-2).toUpperCase() : (s?'·····':''); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function vMark(mk){ return '<span class="shrink-0 grid place-items-center font-mono text-[13px]" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--canvas-line);color:var(--gold-deep);background:rgba(200,162,74,0.08)">'+mk+'</span>'; }
+function vCrumb(parts){ vCrumbs.innerHTML = parts.map(function(p,i){ return i===parts.length-1 ? '<span class="text-ink">'+p.label+'</span>' : '<a href="'+p.hash+'" class="quiet hover:text-gold-deep" style="color:inherit">'+p.label+'</a><span class="text-ink-faint">/</span>'; }).join(' '); }
+function vFade(){ [].forEach.call(vView.querySelectorAll('.legcard'), function(c){ requestAnimationFrame(function(){ c.classList.add('in'); }); }); }
+
+function catState(k){
+  var v=VAULT[k];
+  if(k==='payment') return (v&&v.length)? v.length+(v.length===1?' card':' cards') : null;
+  if(k==='loyalty') return (v&&v.length)? v.length+(v.length===1?' program':' programs') : null;
+  if(k==='identity') return (v&&(v.passport||v.ktn))? 'On file' : null;
+  if(k==='access'){ if(!v) return null; var n=['calendar','inbox','messaging'].filter(function(x){return v[x];}).length; return n? n+' of 3 on' : null; }
+  return null;
+}
+function updateCta(){
+  var cta=document.getElementById('execCta'); if(!cta) return;
+  var ready = catState('payment') && catState('identity');
+  if(ready){ cta.style.opacity=1; cta.style.pointerEvents='auto'; cta.textContent='Begin execution →'; }
+  else { cta.style.opacity=.55; cta.style.pointerEvents='none'; cta.textContent='Add a card & your documents to begin →'; }
+}
+function renderOverview(){
+  vHero.textContent='Set up your vault.';
+  vSub.textContent='One step at a time — a card, your documents, your programs. Saved as you go; pick up wherever you left off.';
+  vCrumb([{label:'Vault'}]);
+  var done=VCATS.filter(function(c){ return catState(c.k); }).length;
+  var h='<div class="leaf p-5 mb-5"><div class="flex items-center justify-between mb-2"><div class="caps text-[11px] text-ink-faint">Progress</div><span class="text-[12px] text-ink-soft">'+done+' of '+VCATS.length+' set up</span></div>'+
+    '<div class="track"><div class="fill" style="width:'+(done/VCATS.length*100)+'%"></div></div>'+
+    '<div class="text-[12px] text-ink-faint mt-3 flex items-center gap-2"><span class="text-gold-deep">✦</span> Tokenized &amp; encrypted · raw values never shown again · revoke any time.</div></div><div class="space-y-3">';
+  VCATS.forEach(function(c,i){
+    var st=catState(c.k);
+    h+='<a href="#'+c.k+'" class="legcard leaf lift flex items-center gap-3 p-4 quiet" style="transition-delay:'+(i*45)+'ms">'+vMark(c.mk)+
+      '<div class="flex-1 min-w-0"><div class="font-display text-xl text-ink leading-tight">'+c.label+'</div><div class="text-[12px] text-ink-faint mt-0.5">'+c.blurb+'</div></div>'+
+      (st? '<span class="pill pill-confirm shrink-0"><span class="dot dot-green"></span>'+st+'</span>' : '<span class="pill pill-pending shrink-0">Add</span>')+
+      '<span class="exp-chev text-gold-deep text-xl shrink-0">›</span></a>';
+  });
+  vView.innerHTML=h+'</div>'; vFade(); updateCta();
+}
+function fld(id,ph,extra){ return '<input id="'+id+'" placeholder="'+ph+'" '+(extra||'')+' class="w-full rounded-lg border px-3 py-2.5 text-sm" style="border-color:var(--canvas-line);background:rgba(255,253,247,0.7)" />'; }
+function savedRow(title, sub, onRemove){ return '<div class="flex items-center justify-between rounded-lg px-3 py-2.5 mb-2" style="border:1px solid var(--canvas-line);background:rgba(255,253,247,0.6)"><div class="min-w-0"><div class="text-sm text-ink font-mono truncate">'+title+'</div>'+(sub?'<div class="text-[11px] text-ink-faint">'+sub+'</div>':'')+'</div>'+(onRemove?'<button class="text-[12px] text-gold-deep hover:underline shrink-0 ml-3" onclick="'+onRemove+'">remove</button>':'')+'</div>'; }
+function renderCategory(c){
+  vHero.textContent=c.label; vSub.textContent=c.blurb;
+  vCrumb([{label:'Vault', hash:'#'}, {label:c.label}]);
+  var h='';
+  if(c.k==='payment'){
+    var cards=VAULT.payment||[];
+    if(cards.length){ h+='<div class="mb-4">'; cards.forEach(function(x,idx){ h+=savedRow(x.label,'Per-trip cap '+(x.cap?'$'+x.cap:'—'),"vRemove('payment',"+idx+")"); }); h+='</div>'; }
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Add a card</div>'+
+      fld('pCard','Card number','inputmode="numeric"')+'<div class="flex gap-2">'+fld('pName','Name on card')+fld('pCap','Per-trip cap (USD)','inputmode="numeric"')+'</div>'+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="addPayment()">Save card</button></div>';
+  } else if(c.k==='identity'){
+    var id=VAULT.identity||{};
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Travel documents</div>';
+    if(id.passport) h+=savedRow('Passport '+id.passport,'On file');
+    if(id.ktn) h+=savedRow('Known Traveler '+id.ktn,'On file');
+    h+=fld('iPass','Passport number')+fld('iKtn','Known Traveler Number (TSA Pre✓)')+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="saveIdentity()">Save documents</button></div>';
+  } else if(c.k==='loyalty'){
+    var progs=VAULT.loyalty||[];
+    if(progs.length){ h+='<div class="mb-4">'; progs.forEach(function(x,idx){ h+=savedRow(x.program,x.number,"vRemove('loyalty',"+idx+")"); }); h+='</div>'; }
+    h+='<div class="leaf p-5 space-y-2.5"><div class="caps text-[11px] text-ink-faint">Add a program</div>'+
+      '<div class="flex gap-2">'+fld('lProg','Program (e.g. AAdvantage)')+fld('lNum','Number')+'</div>'+
+      '<button class="btn-gold px-5 py-2.5 rounded-lg text-sm w-full sm:w-auto" onclick="addLoyalty()">Save program</button></div>';
+  } else if(c.k==='access'){
+    var a=VAULT.access||{};
+    h+='<div class="leaf p-5"><div class="caps text-[11px] text-ink-faint mb-3">Scoped access · revocable</div><div class="space-y-3">'+
+      accessRow('calendar','Calendar','Route around what’s already booked', a.calendar)+
+      accessRow('inbox','Inbox','Read travel confirmations only', a.inbox)+
+      accessRow('messaging','Messaging','WhatsApp / Telegram · optional', a.messaging)+'</div></div>';
+  }
+  h+='<a href="#" class="inline-flex items-center gap-2 text-gold-deep text-sm quiet mt-5">← Save &amp; back to vault</a>';
+  vView.innerHTML=h;
+}
+function accessRow(key,label,desc,on){
+  return '<div class="flex items-center gap-3"><div class="flex-1 min-w-0"><div class="text-ink text-sm">'+label+'</div><div class="text-[11px] text-ink-faint">'+desc+'</div></div>'+
+    '<div class="switch '+(on?'on':'off')+'" onclick="toggleAccess(\''+key+'\',this)"><span class="knob"></span></div></div>';
+}
+window.addPayment=function(){
+  var card=document.getElementById('pCard').value, cap=digits(document.getElementById('pCap').value);
+  if(!digits(card)){ document.getElementById('pCard').focus(); return; }
+  VAULT.payment=VAULT.payment||[]; VAULT.payment.push({ label:mask4(card), cap:cap||null }); vSave(); renderCategory(vCat('payment'));
+};
+window.saveIdentity=function(){
+  var p=document.getElementById('iPass').value, k=document.getElementById('iKtn').value;
+  VAULT.identity=VAULT.identity||{};
+  if(p) VAULT.identity.passport=maskDoc(p);
+  if(k) VAULT.identity.ktn=mask4(k);
+  vSave(); renderCategory(vCat('identity'));
+};
+window.addLoyalty=function(){
+  var prog=document.getElementById('lProg').value.trim(), num=document.getElementById('lNum').value;
+  if(!prog){ document.getElementById('lProg').focus(); return; }
+  VAULT.loyalty=VAULT.loyalty||[]; VAULT.loyalty.push({ program:esc(prog), number:mask4(num)||'—' }); vSave(); renderCategory(vCat('loyalty'));
+};
+window.toggleAccess=function(key,el){
+  VAULT.access=VAULT.access||{}; VAULT.access[key]=!VAULT.access[key];
+  el.classList.toggle('on', VAULT.access[key]); el.classList.toggle('off', !VAULT.access[key]); vSave();
+};
+window.vRemove=function(kind,idx){ if(VAULT[kind]){ VAULT[kind].splice(idx,1); vSave(); renderCategory(vCat(kind)); } };
+function vRoute(){ var hs=(location.hash||'').replace(/^#/,''); var c=hs?vCat(hs):null; if(c) renderCategory(c); else renderOverview(); window.scrollTo(0,0); }
+window.addEventListener('hashchange', vRoute);
+vRoute();
+</script>
+
+  <script src="assets/ui.js"></script>
+  <script src="assets/pageturn.js"></script>
+  <script src="assets/menu.js"></script>
+</body>
+</html>

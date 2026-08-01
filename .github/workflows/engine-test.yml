@@ -1,0 +1,83 @@
+name: Engine tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "engine/**"
+      - ".github/workflows/engine-test.yml"
+  pull_request:
+    paths:
+      - "engine/**"
+  schedule:
+    # Nightly live LLM golden refresh check
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+    inputs:
+      llm:
+        description: Run live LLM scenarios (Sakana / Anthropic)
+        type: boolean
+        default: true
+
+jobs:
+  smoke-and-scenarios:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: engine/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Smoke (42 checks, mock supplier)
+        run: npm run smoke
+
+      - name: Scenarios — deterministic + replay ($0)
+        run: npm run test:scenarios
+
+  llm-nightly:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.llm)
+    defaults:
+      run:
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: engine/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify LLM secrets
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SAKANA_API_KEY: ${{ secrets.SAKANA_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$SAKANA_API_KEY" ]; then
+            echo "::error::Add ANTHROPIC_API_KEY and/or SAKANA_API_KEY under Settings → Secrets → Actions for this repo."
+            exit 1
+          fi
+
+      - name: Live LLM scenarios (Sakana / Anthropic)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SAKANA_API_KEY: ${{ secrets.SAKANA_API_KEY }}
+          SAKANA_API_URL: https://api.sakana.ai/v1
+          SAKANA_MODEL: fugu
+        run: npm run test:scenarios -- --llm --tag=llm

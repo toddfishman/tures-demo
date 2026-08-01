@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>tures — Your journey, drafted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0B0B0D;
+    --ink:#EDE9E0;
+    --ink-soft:#A9A39A;
+    --ink-faint:#6F6A62;
+    --acc:#C9A24A;
+    --acc-light:#E6C873;
+    --line:rgba(201,162,74,.16);
+    --hair:rgba(255,255,255,.06);
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'DM Sans',system-ui,sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(55% 50% at 72% 18%, rgba(201,162,74,.13), transparent 60%),
+      radial-gradient(50% 45% at 10% 90%, rgba(230,200,115,.06), transparent 60%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(130% 100% at 50% 0%, transparent 58%, rgba(0,0,0,.5));
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(201,162,74,.28);color:#fff}
+  header,main,footer{position:relative;z-index:2}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:30px clamp(20px,5vw,60px);
+  }
+  .wordmark{font-family:var(--serif);font-size:24px;letter-spacing:.5px;color:var(--ink);font-weight:500}
+  .spark{color:var(--acc);font-style:normal}
+  .signin{font-family:var(--sans);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);transition:color .3s}
+  .signin:hover{color:var(--acc-light)}
+  .signin:focus-visible{outline:1px solid var(--acc);outline-offset:6px}
+
+  main{
+    flex:1;
+    width:min(760px,100%);
+    margin:0 auto;
+    padding:clamp(20px,5vh,56px) clamp(20px,6vw,40px) 80px;
+  }
+
+  /* the traveller's own words, echoed quietly */
+  .you{
+    display:flex;gap:14px;align-items:flex-start;
+    margin-bottom:40px;
+    animation:rise .9s ease both;
+  }
+  .you .tag{
+    font-family:var(--sans);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ink-faint);padding-top:6px;flex:none;width:56px;
+  }
+  .you p{
+    font-family:var(--serif);font-style:italic;font-size:clamp(16px,2.3vw,19px);
+    color:var(--ink-soft);line-height:1.6;border-left:1px solid var(--line);padding-left:18px;
+  }
+
+  /* the concierge's gracious line */
+  .reply-eyebrow{
+    font-family:var(--sans);font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--acc);margin-bottom:18px;animation:rise .9s .1s ease both;
+  }
+  .reply{
+    font-family:var(--serif);font-weight:400;
+    font-size:clamp(23px,3.6vw,33px);line-height:1.34;letter-spacing:-.005em;
+    color:var(--ink);max-width:30ch;margin-bottom:8px;
+    animation:rise .9s .16s ease both;
+  }
+  .reply em{font-style:italic;color:var(--acc-light)}
+
+  /* the note / itinerary */
+  .note{
+    margin-top:46px;
+    border:1px solid var(--hair);
+    border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.005));
+    padding:clamp(22px,3.5vw,38px);
+    position:relative;
+    animation:rise 1s .26s ease both;
+  }
+  .note::before{
+    content:"";position:absolute;inset:0;border-radius:16px;padding:1px;
+    background:linear-gradient(160deg, rgba(201,162,74,.35), transparent 40%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+  }
+  .note-head{
+    display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    padding-bottom:20px;margin-bottom:6px;border-bottom:1px solid var(--hair);
+  }
+  .note-title{font-family:var(--serif);font-size:21px;color:var(--ink)}
+  .note-meta{font-family:var(--sans);font-size:12px;letter-spacing:.06em;color:var(--ink-faint)}
+
+  .sample{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--acc);border:1px solid var(--line);border-radius:999px;padding:4px 10px;
+  }
+  .sample::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--acc)}
+
+  .leg{
+    display:grid;
+    grid-template-columns:26px 1fr auto;
+    gap:6px 16px;
+    padding:18px 0;
+    border-bottom:1px solid var(--hair);
+    align-items:start;
+  }
+  .leg:last-of-type{border-bottom:0;padding-bottom:4px}
+  .leg .ico{color:var(--ink-faint);margin-top:3px}
+  .leg .ico svg{width:18px;height:18px;display:block}
+  .leg .primary{font-family:var(--serif);font-size:17px;color:var(--ink);line-height:1.35}
+  .leg .secondary{font-family:var(--sans);font-size:13px;color:var(--ink-soft);margin-top:3px;letter-spacing:.01em}
+  .leg .code{
+    font-family:var(--mono);font-size:12px;color:var(--acc-light);
+    letter-spacing:.04em;text-align:right;white-space:nowrap;margin-top:2px;
+  }
+  .leg .code small{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-faint);margin-bottom:3px}
+
+  .note-foot{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    margin-top:24px;padding-top:20px;border-top:1px solid var(--hair);
+  }
+  .total{font-family:var(--sans);font-size:13px;color:var(--ink-soft);letter-spacing:.02em}
+  .total b{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--ink);margin-left:6px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--sans);font-size:13px;letter-spacing:.04em;
+    padding:11px 20px;border-radius:999px;cursor:pointer;transition:all .3s ease;
+  }
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink-soft)}
+  .btn-ghost:hover{border-color:rgba(201,162,74,.5);color:var(--ink)}
+  .btn-gold{
+    border:1px solid rgba(201,162,74,.5);color:#0B0B0D;
+    background:linear-gradient(180deg,var(--acc-light),var(--acc));font-weight:500;
+  }
+  .btn-gold:hover{box-shadow:0 14px 34px -16px rgba(201,162,74,.8);transform:translateY(-1px)}
+  .btn:focus-visible{outline:1px solid var(--acc);outline-offset:4px}
+
+  .aside{
+    margin-top:22px;font-family:var(--sans);font-size:12.5px;color:var(--ink-faint);
+    letter-spacing:.02em;display:flex;gap:8px;align-items:flex-start;
+    animation:rise 1s .34s ease both;
+  }
+  .aside svg{width:14px;height:14px;flex:none;margin-top:2px;color:var(--acc)}
+
+  footer{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    padding:26px clamp(20px,5vw,60px);border-top:1px solid var(--hair);
+    font-size:12px;letter-spacing:.04em;color:var(--ink-faint);
+  }
+  footer .wordmark{font-size:17px}
+
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+  @media (max-width:480px){
+    .leg{grid-template-columns:22px 1fr;}
+    .leg .code{grid-column:1 / -1;text-align:left;margin-top:8px}
+    .leg .code small{margin-bottom:2px}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <a class="wordmark" href="#" aria-label="tures home">t<span class="spark">&#10022;</span>ures</a>
+    <a class="signin" href="#">Sign in</a>
+  </header>
+
+  <main>
+    <div class="you">
+      <span class="tag">You</span>
+      <p>Five days in Italy with my wife. Food-focused. Under&nbsp;$8k. Business class if possible.</p>
+    </div>
+
+    <p class="reply-eyebrow">Tures</p>
+    <h1 class="reply">With pleasure. I&rsquo;ve drafted five days through <em>Bologna and Modena</em> &mdash; the heart of it. Hold or refine.</h1>
+
+    <section class="note" aria-label="Draft itinerary">
+      <div class="note-head">
+        <div>
+          <div class="note-title">Italy &middot; for two</div>
+          <div class="note-meta">Sep 18 &ndash; 23 &middot; Business class &middot; Within budget</div>
+        </div>
+        <span class="sample">Sample</span>
+      </div>
+
+      <div class="leg">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1L15 22v-1.5L13 19v-5.5z"/></svg></span>
+        <div>
+          <div class="primary">Seattle &rarr; Bologna, via Frankfurt</div>
+          <div class="secondary">Lufthansa &middot; Business &middot; Sep 18, dep 6:20pm &middot; returns Sep 23</div>
+        </div>
+        <div class="code"><small>Confirmation</small>LH&middot;4QK7ZP</div>
+      </div>
+
+      <div class="leg">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5M9 11h0M15 11h0"/></svg></span>
+        <div>
+          <div class="primary">Grand Hotel Majestic &ldquo;già Baglioni&rdquo;</div>
+          <div class="secondary">Bologna &middot; Junior suite &middot; 5 nights &middot; breakfast included</div>
+        </div>
+        <div class="code"><small>Reservation</small>GHM&middot;88213</div>
+      </div>
+
+      <div class="leg">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 3v8a3 3 0 0 0 6 0V3M8 3v18M19 3c-1.5 0-3 1.8-3 5s1.5 4 3 4M19 12v9"/></svg></span>
+        <div>
+          <div class="primary">Dinner &middot; Osteria Francescana</div>
+          <div class="secondary">Modena &middot; Sep 20, 8:00pm &middot; tasting menu, table for two</div>
+        </div>
+        <div class="code"><small>Booking</small>OF&middot;0920T2</div>
+      </div>
+
+      <div class="leg">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 3v8a3 3 0 0 0 6 0V3M8 3v18M19 3c-1.5 0-3 1.8-3 5s1.5 4 3 4M19 12v9"/></svg></span>
+        <div>
+          <div class="primary">Dinner &middot; Trattoria di Via Serra</div>
+          <div class="secondary">Bologna &middot; Sep 21, 8:30pm &middot; tagliatelle al ragù, the real thing</div>
+        </div>
+        <div class="code"><small>Booking</small>VS&middot;0921T2</div>
+      </div>
+
+      <div class="note-foot">
+        <div class="total">Estimated, all in <b>$7,420</b></div>
+        <div class="actions">
+          <button class="btn btn-ghost" type="button">Refine</button>
+          <button class="btn btn-gold" type="button">Hold this for me</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="aside">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h0"/></svg>
+      Nothing is booked until you say so. Once it is, I watch the flights and rebook you if anything moves.
+    </p>
+  </main>
+
+  <footer>
+    <span class="wordmark">t<span class="spark">&#10022;</span>ures</span>
+    <span>A private travel intelligence &middot; On, always</span>
+  </footer>
+<script src="_devkit.js"></script>
+</body>
+</html>

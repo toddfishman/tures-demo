@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Your concierge</title>
+<meta name="description" content="Set up your personal Tures concierge — choose how they look, give them a name, and they'll be with you on every screen." />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<link rel="stylesheet" href="assets/greenhouse.css">
+<style>
+  body{ background:var(--gh-bg); font-family:'DM Sans',sans-serif; }
+
+  .cc-builder{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:clamp(32px,4vw,56px); align-items:start; margin-top:clamp(36px,5vw,56px); }
+  @media(max-width:880px){ .cc-builder{ grid-template-columns:1fr; gap:36px; } }
+
+  /* ---- controls panel ---- */
+  .cc-controls{ padding:clamp(26px,3vw,38px); }
+  .cc-field{ margin-bottom:26px; }
+  .cc-field > label{ display:block; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-bottom:11px; }
+  .cc-name-in{ width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--gold); border-radius:10px; padding:14px 16px;
+    font-family:'Playfair Display',serif; font-size:24px; color:var(--gh-cream); outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.06); transition:border-color .3s ease; }
+  .cc-name-in::placeholder{ color:var(--gh-cream-dim); font-style:italic; }
+  .cc-name-in:focus{ border-color:var(--gold-bright); }
+  .cc-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .cc-chip{ cursor:pointer; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.04); color:var(--gh-cream-dim);
+    border-radius:99px; padding:8px 15px; font-size:12.5px; letter-spacing:.02em; transition:all .16s; font-family:'DM Sans',sans-serif; }
+  .cc-chip:hover{ border-color:var(--gold); color:var(--gh-cream); }
+  .cc-chip.on{ background:var(--gold); color:#06120a; border-color:var(--gold); font-weight:600; }
+  .cc-sw{ display:flex; flex-wrap:wrap; gap:10px; }
+  .cc-swatch{ width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-shadow:0 0 0 1px rgba(0,0,0,0.3) inset; transition:transform .12s, box-shadow .16s; }
+  .cc-swatch:hover{ transform:scale(1.08); }
+  .cc-swatch.on{ box-shadow:0 0 0 2px var(--gold); }
+  .cc-save{ display:inline-flex; align-items:center; justify-content:center; gap:10px; margin-top:6px; padding:16px 30px;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    cursor:pointer; border:none; background:var(--gold); color:#06120a; border-radius:0;
+    transition:filter .3s ease, transform .25s ease, box-shadow .3s ease; }
+  .cc-save:hover{ filter:brightness(1.08); transform:translateY(-2px); box-shadow:0 14px 30px -14px var(--gold); }
+  .cc-note{ font-size:12.5px; color:var(--gh-cream-dim); margin-top:16px; line-height:1.6; }
+
+  /* ---- live preview card ---- */
+  .cc-stage{ position:sticky; top:88px; padding:clamp(30px,3.5vw,44px) clamp(26px,3vw,38px); text-align:center; }
+  .cc-stage .cc-eyebrow{ display:inline-flex; align-items:center; gap:12px; margin-bottom:22px; }
+  .cc-stage .cc-eyebrow .ln{ width:32px; height:1px; background:var(--gold); }
+  .cc-stage .cc-eyebrow span.t{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  .cc-stage .cc-portrait{ border-radius:50%; border:3px solid var(--gold);
+    box-shadow:0 26px 60px -26px rgba(0,0,0,0.7), 0 0 28px -10px var(--gold); }
+  .cc-stage-name{ font-family:'Playfair Display',serif; font-weight:400; font-size:34px; color:#fff; margin-top:22px; line-height:1.05; }
+  .cc-stage-sub{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-top:8px; }
+</style>
+</head>
+<body class="gh antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html#contents" class="text-sm quiet flex items-center gap-2"><span>←</span> Contents</a>
+    <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<section class="gh-wash">
+  <div class="gh-section" style="max-width:1180px;" data-reveal>
+    <div class="gh-eyebrow-rule"><span class="ln"></span><span class="gh-eyebrow">Your concierge</span></div>
+    <h1 class="gh-h1" style="font-size:clamp(34px,4.8vw,66px);">Meet your concierge.</h1>
+    <p class="gh-lead" style="margin-top:18px; max-width:54ch; color:var(--gh-cream);">Make them yours — choose how they look and give them a name. They'll be with you on every screen, ready to help with whatever you're doing.</p>
+
+    <div class="cc-builder">
+      <!-- controls -->
+      <div class="cc-controls gh-card-acc">
+        <div class="cc-field">
+          <label for="ccName">Their name</label>
+          <input id="ccName" class="cc-name-in" type="text" maxlength="22" placeholder="Give them a name…" autocomplete="off">
+          <div class="cc-chips mt-2" id="ccNameIdeas" style="margin-top:12px;"></div>
+        </div>
+        <div class="cc-field">
+          <label>Skin tone</label>
+          <div class="cc-sw" id="ccSkins"></div>
+        </div>
+        <div class="cc-field">
+          <label>Hair</label>
+          <div class="cc-chips" id="ccHair"></div>
+          <div class="cc-sw mt-2" id="ccHairColor" style="margin-top:12px;"></div>
+        </div>
+        <div class="cc-field">
+          <label>Attire</label>
+          <div class="cc-sw" id="ccAttire"></div>
+        </div>
+        <div class="cc-field">
+          <label>How they speak</label>
+          <div class="cc-chips" id="ccTone"></div>
+        </div>
+        <button id="ccSave" class="cc-save">Save my concierge →</button>
+        <p class="cc-note">You can change any of this later. The artwork is a first pass — easy to swap for photorealistic portraits down the line.</p>
+      </div>
+
+      <!-- live preview card -->
+      <div class="cc-stage gh-glass-acc">
+        <div class="cc-eyebrow"><span class="ln"></span><span class="t">Live preview</span><span class="ln"></span></div>
+        <div id="ccPreview"></div>
+        <div class="cc-stage-name" id="ccStageName">Your concierge</div>
+        <div class="cc-stage-sub">your Tures concierge</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="assets/concierge.js"></script>
+<script>
+(function(){
+  var C = window.turesConcierge, O = C.OPTIONS;
+  var state = Object.assign({}, O.DEFAULT, C.get() || {});
+
+  var preview = document.getElementById('ccPreview');
+  var stageName = document.getElementById('ccStageName');
+  var nameIn = document.getElementById('ccName');
+
+  function render(){
+    preview.innerHTML = C.avatar(state, 184);
+    stageName.textContent = (state.name && state.name.trim()) ? state.name.trim() : 'Your concierge';
+  }
+
+  /* swatch row (colors) */
+  function swatches(hostId, items, key){
+    var host = document.getElementById(hostId);
+    host.innerHTML = '';
+    items.forEach(function(it){
+      var b = document.createElement('button'); b.type='button'; b.className='cc-swatch'+(state[key]===it.id?' on':'');
+      b.style.background = it.v; b.title = it.id; b.setAttribute('aria-label', it.id);
+      b.addEventListener('click', function(){ state[key]=it.id; [].forEach.call(host.children,function(c){c.classList.remove('on');}); b.classList.add('on'); render(); });
+      host.appendChild(b);
+    });
+  }
+  /* chip row (labelled) */
+  function chips(hostId, items, key){
+    var host = document.getElementById(hostId);
+    host.innerHTML = '';
+    items.forEach(function(it){
+      var b = document.createElement('button'); b.type='button'; b.className='cc-chip'+(state[key]===it.id?' on':'');
+      b.textContent = it.label;
+      b.addEventListener('click', function(){ state[key]=it.id; [].forEach.call(host.children,function(c){c.classList.remove('on');}); b.classList.add('on'); render(); });
+      host.appendChild(b);
+    });
+  }
+
+  swatches('ccSkins', O.SKINS, 'skin');
+  chips('ccHair', O.HAIR_STYLES, 'hair');
+  swatches('ccHairColor', O.HAIR_COLORS, 'hairColor');
+  swatches('ccAttire', O.ATTIRE, 'attire');
+  chips('ccTone', O.TONES, 'tone');
+
+  /* name + suggestions */
+  nameIn.value = state.name || '';
+  nameIn.addEventListener('input', function(){ state.name = nameIn.value; render(); });
+  var ideas = document.getElementById('ccNameIdeas');
+  O.NAME_IDEAS.forEach(function(n){
+    var b=document.createElement('button'); b.type='button'; b.className='cc-chip'; b.textContent=n;
+    b.addEventListener('click', function(){ state.name=n; nameIn.value=n; render(); });
+    ideas.appendChild(b);
+  });
+
+  /* save */
+  document.getElementById('ccSave').addEventListener('click', function(){
+    if(!state.name || !state.name.trim()){ nameIn.focus(); nameIn.style.borderColor='rgba(181,84,58,0.7)'; nameIn.placeholder='Give them a name first…'; return; }
+    state.name = state.name.trim();
+    C.set(state);
+    // confirmation + onward
+    var btn=this; btn.textContent='Saved ✓ — '+state.name+' is with you'; btn.disabled=true; btn.style.opacity=.85;
+    setTimeout(function(){ location.href='03-paste-trip.html'; }, 1100);
+  });
+
+  render();
+})();
+</script>
+<script src="assets/ui.js"></script>
+<script src="assets/pageturn.js"></script>
+<script src="assets/menu.js"></script>
+</body>
+</html>

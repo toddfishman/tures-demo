@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tures — Your concierge</title>
+<meta name="description" content="Set up your personal Tures concierge — choose how they look, give them a name, and they'll be with you on every screen." />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tures.css">
+<link rel="stylesheet" href="assets/tw.css">
+<style>
+  body{ background:var(--obsidian); }
+  .cc-builder{ display:grid; grid-template-columns:minmax(0,260px) 1fr; gap:34px; align-items:start; margin-top:28px; }
+  @media(max-width:720px){ .cc-builder{ grid-template-columns:1fr; gap:26px; } }
+  .cc-stage{ position:sticky; top:88px; text-align:center; }
+  .cc-stage .cc-portrait{ border-radius:50%; box-shadow:0 26px 60px -26px rgba(0,0,0,0.6), 0 0 0 2px rgba(200,162,74,0.55); }
+  .cc-stage-name{ font-family:'Cormorant Garamond',serif; font-size:30px; color:var(--ink); margin-top:16px; line-height:1.05; }
+  .cc-stage-sub{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-deep); margin-top:4px; }
+  .cc-field{ margin-bottom:20px; }
+  .cc-field > label{ display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:9px; }
+  .cc-name-in{ width:100%; background:rgba(255,255,255,0.6); border:1px solid var(--canvas-line); border-radius:12px; padding:12px 15px;
+    font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink); outline:none; }
+  .cc-name-in:focus{ border-color:rgba(200,162,74,0.6); }
+  .cc-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .cc-chip{ cursor:pointer; border:1px solid var(--canvas-line); background:rgba(255,253,247,0.55); color:var(--ink-soft);
+    border-radius:99px; padding:7px 14px; font-size:13px; transition:all .14s; }
+  .cc-chip:hover{ border-color:rgba(200,162,74,0.5); color:var(--ink); }
+  .cc-chip.on{ background:var(--gold); color:#241a0c; border-color:var(--gold); font-weight:600; }
+  .cc-sw{ display:flex; flex-wrap:wrap; gap:9px; }
+  .cc-swatch{ width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent; box-shadow:0 0 0 1px rgba(0,0,0,0.12) inset; transition:transform .12s, border-color .14s; }
+  .cc-swatch:hover{ transform:scale(1.08); }
+  .cc-swatch.on{ border-color:var(--gold-deep); box-shadow:0 0 0 2px rgba(200,162,74,0.5); }
+  .cc-save{ margin-top:6px; }
+  .cc-note{ font-size:12.5px; color:var(--ink-faint); margin-top:14px; line-height:1.5; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html#contents" class="text-sm quiet flex items-center gap-2"><span>←</span> Contents</a>
+    <a href="01-landing.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  </nav>
+</header>
+
+<section class="canvas-surface text-ink">
+  <div class="relative z-10 max-w-4xl mx-auto px-6 py-12" data-reveal>
+    <div class="caps text-[11px] text-gold-deep mb-3">Your concierge</div>
+    <h1 class="font-display text-4xl sm:text-5xl leading-[1.05]">Meet your concierge.</h1>
+    <p class="text-ink-soft mt-3 max-w-xl leading-relaxed">Make them yours — choose how they look and give them a name. They'll be with you on every screen, ready to help with whatever you're doing.</p>
+
+    <div class="cc-builder">
+      <!-- live preview -->
+      <div class="cc-stage">
+        <div id="ccPreview"></div>
+        <div class="cc-stage-name" id="ccStageName">Your concierge</div>
+        <div class="cc-stage-sub">your Tures concierge</div>
+      </div>
+
+      <!-- controls -->
+      <div class="cc-controls">
+        <div class="cc-field">
+          <label for="ccName">Their name</label>
+          <input id="ccName" class="cc-name-in" type="text" maxlength="22" placeholder="Give them a name…" autocomplete="off">
+          <div class="cc-chips mt-2" id="ccNameIdeas"></div>
+        </div>
+        <div class="cc-field">
+          <label>Skin tone</label>
+          <div class="cc-sw" id="ccSkins"></div>
+        </div>
+        <div class="cc-field">
+          <label>Hair</label>
+          <div class="cc-chips" id="ccHair"></div>
+          <div class="cc-sw mt-2" id="ccHairColor"></div>
+        </div>
+        <div class="cc-field">
+          <label>Attire</label>
+          <div class="cc-sw" id="ccAttire"></div>
+        </div>
+        <div class="cc-field">
+          <label>How they speak</label>
+          <div class="cc-chips" id="ccTone"></div>
+        </div>
+        <button id="ccSave" class="cc-save btn-gold px-7 py-3 rounded-xl quiet font-semibold">Save my concierge →</button>
+        <p class="cc-note">You can change any of this later. The artwork is a first pass — easy to swap for photorealistic portraits down the line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="assets/concierge.js"></script>
+<script>
+(function(){
+  var C = window.turesConcierge, O = C.OPTIONS;
+  var state = Object.assign({}, O.DEFAULT, C.get() || {});
+
+  var preview = document.getElementById('ccPreview');
+  var stageName = document.getElementById('ccStageName');
+  var nameIn = document.getElementById('ccName');
+
+  function render(){
+    preview.innerHTML = C.avatar(state, 184);
+    stageName.textContent = (state.name && state.name.trim()) ? state.name.trim() : 'Your concierge';
+  }
+
+  /* swatch row (colors) */
+  function swatches(hostId, items, key){
+    var host = document.getElementById(hostId);
+    host.innerHTML = '';
+    items.forEach(function(it){
+      var b = document.createElement('button'); b.type='button'; b.className='cc-swatch'+(state[key]===it.id?' on':'');
+      b.style.background = it.v; b.title = it.id; b.setAttribute('aria-label', it.id);
+      b.addEventListener('click', function(){ state[key]=it.id; [].forEach.call(host.children,function(c){c.classList.remove('on');}); b.classList.add('on'); render(); });
+      host.appendChild(b);
+    });
+  }
+  /* chip row (labelled) */
+  function chips(hostId, items, key){
+    var host = document.getElementById(hostId);
+    host.innerHTML = '';
+    items.forEach(function(it){
+      var b = document.createElement('button'); b.type='button'; b.className='cc-chip'+(state[key]===it.id?' on':'');
+      b.textContent = it.label;
+      b.addEventListener('click', function(){ state[key]=it.id; [].forEach.call(host.children,function(c){c.classList.remove('on');}); b.classList.add('on'); render(); });
+      host.appendChild(b);
+    });
+  }
+
+  swatches('ccSkins', O.SKINS, 'skin');
+  chips('ccHair', O.HAIR_STYLES, 'hair');
+  swatches('ccHairColor', O.HAIR_COLORS, 'hairColor');
+  swatches('ccAttire', O.ATTIRE, 'attire');
+  chips('ccTone', O.TONES, 'tone');
+
+  /* name + suggestions */
+  nameIn.value = state.name || '';
+  nameIn.addEventListener('input', function(){ state.name = nameIn.value; render(); });
+  var ideas = document.getElementById('ccNameIdeas');
+  O.NAME_IDEAS.forEach(function(n){
+    var b=document.createElement('button'); b.type='button'; b.className='cc-chip'; b.textContent=n;
+    b.addEventListener('click', function(){ state.name=n; nameIn.value=n; render(); });
+    ideas.appendChild(b);
+  });
+
+  /* save */
+  document.getElementById('ccSave').addEventListener('click', function(){
+    if(!state.name || !state.name.trim()){ nameIn.focus(); nameIn.style.borderColor='rgba(181,84,58,0.7)'; nameIn.placeholder='Give them a name first…'; return; }
+    state.name = state.name.trim();
+    C.set(state);
+    // confirmation + onward
+    var btn=this; btn.textContent='Saved ✓ — '+state.name+' is with you'; btn.disabled=true; btn.style.opacity=.85;
+    setTimeout(function(){ location.href='03-paste-trip.html'; }, 1100);
+  });
+
+  render();
+})();
+</script>
+<script src="assets/ui.js"></script>
+<script src="assets/pageturn.js"></script>
+<script src="assets/menu.js"></script>
+</body>
+</html>

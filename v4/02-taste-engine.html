@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tures — The Taste Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/tures.css">
+<style>
+  body{ background:var(--obsidian); }
+  .choice{
+    position:relative; overflow:hidden; border-radius:8px; cursor:pointer; text-align:left;
+    border:1px solid rgba(200,162,74,0.22); min-height:230px;
+    transition:transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .choice:hover{ transform:translateY(-4px); border-color:var(--gold-bright); box-shadow:0 20px 40px -22px rgba(0,0,0,0.8); }
+  .choice:active{ transform:translateY(-1px) scale(.995); }
+  .choice .veil{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,10,0.15) 0%, rgba(8,8,10,0.82) 100%); }
+  .choice .body{ position:relative; z-index:2; }
+  .picked{ border-color:var(--gold-bright) !important; box-shadow:0 0 0 2px rgba(230,200,115,0.5), 0 24px 50px -24px rgba(0,0,0,.85) !important; }
+  /* dimension bar */
+  .dim-track{ height:6px; border-radius:99px; background:rgba(236,227,208,0.12); position:relative; }
+  .dim-mark{ position:absolute; top:50%; width:14px; height:14px; border-radius:99px;
+    background:linear-gradient(180deg,#e6c873,#c8a24a); border:1px solid #8a6a26;
+    transform:translate(-50%,-50%); left:50%; transition:left 650ms cubic-bezier(.6,.02,.2,1);
+    box-shadow:0 2px 6px rgba(0,0,0,.5); }
+  .tag-chip{ opacity:0; transform:translateY(6px); transition:opacity .4s ease, transform .4s ease; }
+  .tag-chip.in{ opacity:1; transform:none; }
+  .qfade{ transition:opacity .35s ease, transform .35s ease; }
+  .qfade.out{ opacity:0; transform:translateY(8px); pointer-events:none; }
+</style>
+</head>
+<body class="text-canvas antialiased min-h-screen">
+
+<!-- CHROME -->
+<header class="chrome sticky top-0 z-30">
+  <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="wordmark foil text-2xl quiet">t<span class="spark">✦</span>ures</a>
+    <div class="hidden md:flex items-center gap-7 text-sm">
+      <a href="01-landing.html">Pitch</a>
+      <a href="02-taste-engine.html" class="active">Taste Engine</a>
+      <a href="05-execution.html">Live demo</a>
+      <a href="06-hiccup-handler.html">Hiccup Handler</a>
+      <a href="index.html#contents" class="btn-ghost px-4 py-2 rounded-sm quiet">Contents</a>
+    </div>
+    <a href="index.html#contents" class="md:hidden text-gold text-sm quiet">Contents</a>
+  </nav>
+</header>
+
+<!-- INTRO -->
+<section class="leather-surface grain relative">
+  <div class="relative z-10 max-w-6xl mx-auto px-6 pt-16 pb-12">
+    <div class="caps text-[11px] text-gold/80 mb-4">Chapter II · Calibrate</div>
+    <h1 class="font-display text-5xl sm:text-6xl leading-[1.0]">The Taste Engine</h1>
+    <p class="mt-6 max-w-2xl text-canvas/75 leading-relaxed text-lg">
+      Before we book a thing, we learn how you travel. A few quick choices — no forms, no sliders to fuss with — and our model assembles a working <em>Taste Print</em>. It's the difference between "a hotel in Paris" and <span class="text-gold-bright">the room you'd have chosen yourself.</span> It sharpens after every trip.
+    </p>
+  </div>
+</section>
+
+<!-- ENGINE -->
+<section class="canvas-surface text-ink">
+ <div class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8">
+
+  <!-- LEFT — the quiz -->
+  <div class="lg:col-span-7">
+    <div class="flex items-center justify-between mb-4">
+      <div class="caps text-[11px] text-ink-faint">Question <span id="qNum">1</span> of 6</div>
+      <div class="track w-40"><div class="fill" id="qProg" style="width:8%"></div></div>
+    </div>
+
+    <div id="qStage" class="qfade">
+      <h2 class="font-display text-3xl text-ink leading-tight mb-1" id="qTitle">Your first night in a new city.</h2>
+      <p class="text-ink-soft text-sm mb-5" id="qSub">Pick the one that feels more like you. There's no wrong answer — only signal.</p>
+      <div class="grid sm:grid-cols-2 gap-4" id="qChoices"><!-- injected --></div>
+    </div>
+
+    <!-- FINISH -->
+    <div id="finish" class="hidden">
+      <div class="leaf p-7">
+        <div class="caps text-[11px] text-ink-faint mb-2">Calibration complete</div>
+        <h2 class="font-display text-4xl text-ink leading-tight">Your Taste Print is ready.</h2>
+        <p class="mt-3 text-ink-soft leading-relaxed" id="signature">—</p>
+        <div class="rule-gold my-6"></div>
+        <div class="caps text-[11px] text-ink-faint mb-3">So when Tures books for you, it will</div>
+        <ul class="space-y-2.5 text-sm text-ink" id="behaviors"></ul>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="03-paste-trip.html" class="btn-gold px-6 py-3 rounded-sm quiet">Describe a trip →</a>
+          <button onclick="restart()" class="btn-ink px-6 py-3 rounded-sm">Recalibrate</button>
+        </div>
+      </div>
+      <p class="text-xs text-ink-faint mt-4 leading-relaxed">
+        The Taste Engine keeps a private model per traveler. Every booking you keep, swap, or skip becomes a weak label — over a few trips, confidence on the dimensions below typically climbs past 0.9 without you answering another question.
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT — live Taste Print -->
+  <aside class="lg:col-span-5">
+    <div class="leaf p-6 sticky top-24">
+      <div class="flex items-center justify-between mb-1">
+        <div class="font-display text-2xl text-ink">Your Taste Print</div>
+        <span class="pill pill-gold">Live</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-ink-faint mb-5">
+        <span class="caps">Model confidence</span>
+        <span class="font-mono text-ink" id="confLabel">0.18</span>
+        <div class="track flex-1"><div class="fill" id="confBar" style="width:18%"></div></div>
+      </div>
+
+      <div class="space-y-4" id="dims"><!-- injected --></div>
+
+      <div class="rule-ink my-5"></div>
+      <div class="caps text-[11px] text-ink-faint mb-3">Reading you as</div>
+      <div class="flex flex-wrap gap-2" id="tags">
+        <span class="text-xs text-ink-faint italic">tags appear as you choose…</span>
+      </div>
+    </div>
+  </aside>
+
+ </div>
+</section>
+
+<footer class="bg-obsidian border-t border-gold/15 py-10 text-center">
+  <a href="index.html" class="wordmark foil text-xl quiet">t<span class="spark">✦</span>ures</a>
+  <div class="text-canvas/45 text-xs mt-2 caps">Chapter II · The Taste Engine</div>
+</footer>
+
+<script>
+/* ---------- dimension model ---------- */
+const DIMS = [
+  {key:'pace',     left:'Languid',   right:'Packed',      v:50},
+  {key:'register', left:'Hidden gem',right:'Grand',       v:50},
+  {key:'energy',   left:'Solitude',  right:'Social',      v:50},
+  {key:'palate',   left:'Comfort',   right:'Adventurous', v:50},
+  {key:'planning', left:'Spontaneous',right:'Scripted',   v:50},
+  {key:'aesthetic',left:'Heritage',  right:'Modern',      v:50},
+];
+
+/* ---------- questions ---------- */
+const Q = [
+  { t:"Your first night in a new city.",
+    sub:"Pick the one that feels more like you. There's no wrong answer — only signal.",
+    a:{label:"The table everyone talks about",desc:"Booked months ago. You came for this.",grad:"linear-gradient(135deg,#3a2718,#6b4423)",
+       d:{register:+18,planning:+16,palate:+8}, tags:["Books ahead","Destination dining"]},
+    b:{label:"Wherever the night takes you",desc:"Wander until a tiny place with no sign pulls you in.",grad:"linear-gradient(135deg,#1c2a22,#33503f)",
+       d:{register:-16,planning:-18,palate:+10}, tags:["Local over landmark","Improviser"]} },
+
+  { t:"Morning, day three.",
+    sub:"How the day starts tells us how to pace the rest of it.",
+    a:{label:"Up at six",desc:"Three things done before lunch.",grad:"linear-gradient(135deg,#2a2030,#4a3a5c)",
+       d:{pace:+22}, tags:["Early riser","Maximizer"]},
+    b:{label:"A long breakfast",desc:"Nowhere to be until noon.",grad:"linear-gradient(135deg,#2c2415,#5a4a28)",
+       d:{pace:-22}, tags:["Slow mornings","Unhurried"]} },
+
+  { t:"Where you sleep.",
+    sub:"Same budget, two philosophies.",
+    a:{label:"The grand old hotel",desc:"A doorman, a bar that's been there a century.",grad:"linear-gradient(135deg,#241a0e,#544023)",
+       d:{register:+18,aesthetic:-18}, tags:["Heritage properties","Grand register"]},
+    b:{label:"Design-forward & spare",desc:"Ten perfect things and nothing extra.",grad:"linear-gradient(135deg,#101820,#28414f)",
+       d:{aesthetic:+20,register:-8}, tags:["Design-forward","Editorial spaces"]} },
+
+  { t:"The table.",
+    sub:"You've got one great dinner. Spend it on…",
+    a:{label:"The full tasting menu",desc:"All fourteen courses, the wine pairing.",grad:"linear-gradient(135deg,#2e1f12,#63421f)",
+       d:{palate:+16,register:+14}, tags:["Chef's table","Tasting menus"]},
+    b:{label:"Grandmother's recipe",desc:"One perfect dish in a room full of locals.",grad:"linear-gradient(135deg,#1e2a1d,#3c5733)",
+       d:{palate:+14,energy:+10,register:-12}, tags:["Soulful over starred","Rooms of locals"]} },
+
+  { t:"Company.",
+    sub:"By the end of the night, you'd rather be…",
+    a:{label:"A long table of new friends",desc:"You collect people as you go.",grad:"linear-gradient(135deg,#2a1d24,#5a3548)",
+       d:{energy:+22}, tags:["Sociable","Open to strangers"]},
+    b:{label:"One quiet corner",desc:"The person you came with, and no one else.",grad:"linear-gradient(135deg,#15191f,#2c3a44)",
+       d:{energy:-22}, tags:["Quiet corners","Travels close"]} },
+
+  { t:"A day with nothing booked.",
+    sub:"Last question. Then we read you back.",
+    a:{label:"A scripted route",desc:"The best of everything, nothing missed.",grad:"linear-gradient(135deg,#26200f,#544a22)",
+       d:{planning:+20,pace:+10}, tags:["Wants the optimum","Nothing missed"]},
+    b:{label:"One anchor, rest open",desc:"Decide the rest when you get there.",grad:"linear-gradient(135deg,#1b2622,#354d44)",
+       d:{planning:-20,pace:-10}, tags:["Room to drift","One anchor a day"]} },
+];
+
+let qi = 0;
+const picked = [];
+
+/* ---------- render dims ---------- */
+const dimsEl = document.getElementById('dims');
+DIMS.forEach(d=>{
+  dimsEl.insertAdjacentHTML('beforeend', `
+    <div>
+      <div class="flex justify-between text-[11px] caps text-ink-faint mb-1.5">
+        <span>${d.left}</span><span>${d.right}</span>
+      </div>
+      <div class="dim-track"><div class="dim-mark" id="mark-${d.key}"></div></div>
+    </div>`);
+});
+
+function renderQ(){
+  const q = Q[qi];
+  document.getElementById('qNum').textContent = qi+1;
+  document.getElementById('qProg').style.width = ((qi)/6*100+8)+'%';
+  document.getElementById('qTitle').textContent = q.t;
+  document.getElementById('qSub').textContent = q.sub;
+  const wrap = document.getElementById('qChoices');
+  wrap.innerHTML = '';
+  ['a','b'].forEach(side=>{
+    const o = q[side];
+    const el = document.createElement('button');
+    el.className='choice';
+    el.style.background=o.grad;
+    el.innerHTML = `
+      <div class="veil"></div>
+      <div class="grain" style="position:absolute;inset:0;opacity:.4"></div>
+      <div class="body h-full p-5 flex flex-col justify-end">
+        <div class="font-display text-2xl text-canvas leading-tight">${o.label}</div>
+        <div class="text-[13px] text-canvas/75 mt-1.5">${o.desc}</div>
+        <div class="mt-3 caps text-[10px] text-gold-bright opacity-0 group-hover:opacity-100">Choose →</div>
+      </div>`;
+    el.onclick = ()=>choose(side, el);
+    wrap.appendChild(el);
+  });
+}
+
+function choose(side, el){
+  const q = Q[qi];
+  const o = q[side];
+  el.classList.add('picked');
+  picked[qi] = side;
+
+  // apply deltas
+  for(const k in o.d){
+    const dim = DIMS.find(x=>x.key===k);
+    dim.v = Math.max(4, Math.min(96, dim.v + o.d[k]));
+    document.getElementById('mark-'+k).style.left = dim.v+'%';
+  }
+  // tags
+  o.tags.forEach(addTag);
+  // confidence
+  const conf = 0.18 + (qi+1)*0.127;
+  setConf(conf);
+
+  setTimeout(()=>{
+    qi++;
+    if(qi >= Q.length){ finishUp(); return; }
+    const stage = document.getElementById('qStage');
+    stage.classList.add('out');
+    setTimeout(()=>{ renderQ(); stage.classList.remove('out'); }, 340);
+  }, 560);
+}
+
+let firstTag = true;
+function addTag(text){
+  const tagsEl = document.getElementById('tags');
+  if(firstTag){ tagsEl.innerHTML=''; firstTag=false; }
+  const c = document.createElement('span');
+  c.className='pill pill-gold tag-chip';
+  c.textContent = text;
+  tagsEl.appendChild(c);
+  requestAnimationFrame(()=> c.classList.add('in'));
+}
+
+function setConf(v){
+  v = Math.min(0.94, v);
+  document.getElementById('confLabel').textContent = v.toFixed(2);
+  document.getElementById('confBar').style.width = (v*100)+'%';
+}
+
+function pole(key){ return DIMS.find(d=>d.key===key); }
+
+function finishUp(){
+  document.getElementById('qStage').style.display='none';
+  document.getElementById('qProg').style.width='100%';
+  document.getElementById('qNum').textContent='6';
+  const fin = document.getElementById('finish');
+  fin.classList.remove('hidden');
+
+  // build signature
+  const reg = pole('register').v, pace = pole('pace').v, en = pole('energy').v,
+        pal = pole('palate').v, plan = pole('planning').v, aes = pole('aesthetic').v;
+  const bits = [];
+  bits.push(pace<50? "an unhurried traveler" : "a traveler who likes a full day");
+  bits.push(reg>55? "with a taste for the grand register" : (reg<45? "who hunts the hidden over the famous":"comfortable across registers"));
+  bits.push(en>55? "energized by a room full of people" : (en<45? "happiest in the quiet corner":"socially flexible"));
+  const sig = `You read as ${bits[0]}, ${bits[1]}, ${en>55||en<45?bits[2]:'with an adventurous palate'}. ` +
+              (plan>55? "You want the optimum and dislike missing things — so we'll script the spine and leave you room at the edges."
+                      : "You'd rather keep the day open — so we'll set one strong anchor and protect the white space around it.");
+  document.getElementById('signature').textContent = sig;
+
+  // behaviors
+  const bh = [];
+  bh.push(reg>52? "Book suite-tier rooms with a quiet outlook; apply Virtuoso/amenity benefits automatically."
+                : "Favor characterful, well-located rooms over brand-name towers — design and location over square footage.");
+  bh.push(pace<50? "Hold your mornings. No 7am museum slots unless you ask."
+                 : "Stack the day efficiently — earliest sensible reservations, minimal backtracking.");
+  bh.push(pal>52? "Route you to the chef's table and the dish locals queue for; pre-clear dietary notes with the kitchen."
+                : "Default to dependable excellence over experimental — no surprise offal tasting menus.");
+  bh.push(aes>52? "Lean modern & design-forward when choosing between equals."
+                : "Lean heritage — the grand old room, the bar with a history.");
+  bh.push("Watch every booking continuously and pre-stage a fix the moment the world wobbles. (That's the Hiccup Handler.)");
+  const ul = document.getElementById('behaviors');
+  ul.innerHTML='';
+  bh.forEach(t=> ul.insertAdjacentHTML('beforeend', `<li class="flex items-start gap-2.5"><span class="text-gold mt-0.5">✦</span><span>${t}</span></li>`));
+}
+
+function restart(){
+  qi=0; picked.length=0; firstTag=true;
+  DIMS.forEach(d=>{ d.v=50; document.getElementById('mark-'+d.key).style.left='50%'; });
+  document.getElementById('tags').innerHTML='<span class="text-xs text-ink-faint italic">tags appear as you choose…</span>';
+  setConf(0.18);
+  document.getElementById('finish').classList.add('hidden');
+  const stage=document.getElementById('qStage'); stage.style.display=''; stage.classList.remove('out');
+  renderQ();
+}
+
+renderQ();
+</script>
+  <script src="assets/pageturn.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+# Deploying the Tures Engine
+
+The engine runs anywhere that runs a Node container. These notes cover **Fly.io** (the chosen
+host). Render is the same idea: point it at this directory's `Dockerfile`.
+
+## One-time
+
+```bash
+cd engine
+fly launch --no-deploy        # or edit fly.toml's `app` name to one you own
+```
+
+## Secrets (this is the only manual step that needs your accounts)
+
+Everything runs with **no secrets** on the mock supplier + mock payments. Add secrets to go
+live, one at a time — each unlocks the next capability:
+
+```bash
+# Real flight search (Duffel TEST token — books in test mode, no real money)
+fly secrets set DUFFEL_API_TOKEN=duffel_test_xxx
+
+# Real agent loop (Claude tool-use planning instead of the deterministic planner)
+fly secrets set ANTHROPIC_API_KEY=sk-ant-xxx
+
+# Payments (Stripe). Charges a PaymentMethod stored in the vault via POST /connections
+# (kind:"payment", secret:{customerId, paymentMethodId} from your Stripe SetupIntent flow).
+fly secrets set STRIPE_SECRET_KEY=sk_test_xxx
+
+# Vault encryption key (32 bytes). Without it the vault uses an ephemeral key and connected
+# credentials are lost on restart — set this in any real deploy.
+fly secrets set VAULT_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# API key (Chunk 6). When set, all routes except /health require Authorization: Bearer <key>.
+# The demo activates with it via ?key=… (or tures.use(url, key)).
+fly secrets set ENGINE_API_KEY=$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")
+```
+
+### The real-money safety switch
+
+`ALLOW_LIVE_BOOKING` defaults to `false`. While false, the policy gate **refuses any booking
+through a live (non-test) supplier** — so a production Duffel token can't accidentally charge a
+card. Flip it only when you genuinely want real bookings:
+
+```bash
+fly secrets set ALLOW_LIVE_BOOKING=true
+```
+
+## Deploy
+
+```bash
+fly deploy --ha=false   # single machine — in-memory stores aren't shared across machines yet
+fly open /health        # confirm it's up; shows which capabilities are live
+```
+
+> **Single machine for now.** The vault, bookings, and event stream are in-memory per process
+> (Postgres/Redis is Chunk 6). Running more than one machine splits that state. If a deploy adds
+> a second machine, run `fly scale count 1`.
+
+`/health` reports exactly what's active given the secrets present:
+
+```json
+{ "supplier": "duffel", "capabilities": { "agentLoop": true, "paymentProvider": "stripe",
+  "liveBookingAllowed": false } }
+```
+
+## Pointing the demo at the live engine
+
+The demo is already wired (see `v5/assets/engine.js`). It calls the engine when an engine URL is
+configured and falls back to the scripted demo otherwise — so the public Pages site is unaffected
+until you opt in. To activate against your deployed engine:
+
+- **Per visit:** add `?engine=https://<your-app>.fly.dev` to any v5 URL (it's remembered in
+  localStorage), or run `tures.use('https://<your-app>.fly.dev')` in the browser console.
+- **Always-on:** set the default in `engine.js` (replace the empty `url` fallback with your
+  Fly URL) and redeploy Pages.
+
+What lights up once configured:
+- `03-paste-trip.html` — the chat composer POSTs prose to `/parse` → `/plan`, renders the real
+  proposed flight + stay, and streams live `/stream/:tripId` events into the thread.
+- `05-execution.html` — with `?trip=<tripId>`, streams real execution events instead of the
+  hardcoded `QUEUE` (Pause/Resume buffers live events).
+- `04-connections.html` — the permission toggles connect/revoke real vault grants.
+
+CORS for the GitHub Pages origin is already set in `fly.toml`.
