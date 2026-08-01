@@ -114,6 +114,47 @@
     </div>
   </section>
 
+  <!-- ── The math: Tures vs. you ── -->
+  <style>
+    .vs-ledger{max-width:760px;margin:32px auto 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+    .vs-row{display:grid;grid-template-columns:1.05fr 1fr 1.35fr;gap:14px;padding:14px 18px;align-items:center;border-top:1px solid var(--line);font-size:15px}
+    .vs-row:first-child{border-top:none}
+    .vs-cap{background:var(--bg);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+    .vs-item{color:var(--muted)}
+    .vs-you{color:var(--muted)}
+    .vs-tur{color:var(--text);font-weight:600}
+    .vs-tur em{display:block;font-style:normal;font-weight:500;font-size:12.5px;color:var(--acc-deep);margin-top:2px}
+    .vs-total{background:var(--acc-dim)}
+    .vs-total .vs-tur{font-weight:500}
+    .vs-total .vs-tur b{color:var(--acc-deep)}
+    .vs-sub{max-width:56ch;margin:12px auto 0;color:var(--muted)}
+    .vs-foot{text-align:center;margin-top:16px;font-size:13px;color:var(--faint)}
+    @media(max-width:640px){
+      .vs-row{grid-template-columns:1fr 1.2fr;font-size:14px;row-gap:4px}
+      .vs-item{grid-column:1/-1;color:var(--faint);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding-bottom:2px}
+      .vs-cap{display:none}
+    }
+  </style>
+  <section class="px-panel px-panel--how">
+    <div class="wrap px-reveal">
+      <div class="px-head">
+        <span class="eyebrow"><span class="dot"></span> The math</span>
+        <h2>What Tures actually saved. <em>Line by line.</em></h2>
+        <p class="vs-sub">A number only means something next to the one you'd have hit on your own. So here's the same Maui trip, both ways.</p>
+      </div>
+      <div class="vs-ledger" role="table" aria-label="Tures versus booking it yourself">
+        <div class="vs-row vs-cap" role="row"><span class="vs-item" role="columnheader"></span><span class="vs-you" role="columnheader">Booked yourself</span><span class="vs-tur" role="columnheader">With Tures</span></div>
+        <div class="vs-row" role="row"><span class="vs-item" role="cell">Flights + hotel</span><span class="vs-you" role="cell">$3,180</span><span class="vs-tur" role="cell">$2,568 <em>−$612 vs published</em></span></div>
+        <div class="vs-row" role="row"><span class="vs-item" role="cell">Miles &amp; points</span><span class="vs-you" role="cell">whatever the fare gave</span><span class="vs-tur" role="cell">42,000 <em>+12k over the default fare</em></span></div>
+        <div class="vs-row" role="row"><span class="vs-item" role="cell">Card protection</span><span class="vs-you" role="cell">maybe</span><span class="vs-tur" role="cell">best card, auto-chosen per charge</span></div>
+        <div class="vs-row" role="row"><span class="vs-item" role="cell">Your time</span><span class="vs-you" role="cell">~14 hrs planning</span><span class="vs-tur" role="cell">0 — you never spent them</span></div>
+        <div class="vs-row" role="row"><span class="vs-item" role="cell">The delay home</span><span class="vs-you" role="cell">your problem</span><span class="vs-tur" role="cell">caught + rebooked, $0 change fee</span></div>
+        <div class="vs-row vs-total" role="row"><span class="vs-item" role="cell">Bottom line</span><span class="vs-you" role="cell"></span><span class="vs-tur" role="cell">You come out <b>≈ $900 ahead</b> — and 14 hours richer.</span></div>
+      </div>
+      <p class="vs-foot"><span class="demo-tag">Sample</span> &nbsp;Illustrative from one watched itinerary — every real trip shows its own ledger when you land.</p>
+    </div>
+  </section>
+
   <!-- ── Panel 3: trust strip ── -->
   <section class="px-panel px-panel--trust">
     <div class="wrap px-reveal">
