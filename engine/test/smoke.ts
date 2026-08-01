@@ -193,6 +193,25 @@ let bookingId = "";
   ok("re-confirming a booked trip is idempotent (no double charge)");
 }
 
+// 8.5 expense export: a booked trip exports structured line items (JSON + CSV, owner only)
+{
+  const json = (await app.inject({ method: "GET", url: `/book/${bookingId}/export` })).json();
+  assert.ok(Array.isArray(json.lineItems) && json.lineItems.length >= 2, "one line item per component (+ fee)");
+  assert.ok(json.lineItems.some((l: any) => l.category === "Airfare"), "flight → Airfare category");
+  const sum = json.lineItems.reduce((s: number, l: any) => s + l.amount, 0);
+  assert.ok(Math.abs(sum - json.total) < 0.011, "total equals the sum of line items");
+  const csvRes = await app.inject({ method: "GET", url: `/book/${bookingId}/export?format=csv` });
+  assert.match(String(csvRes.headers["content-type"]), /text\/csv/, "csv content-type");
+  const csv = csvRes.body;
+  assert.ok(csv.split("\r\n")[0] === "date,category,merchant,description,amount,currency,confirmation,card,simulated", "csv header row");
+  assert.ok(csv.split("\r\n").length >= json.lineItems.length + 1, "csv has header + a row per line item");
+  // ownership: a different account can't export this booking
+  const other = (await app.inject({ method: "POST", url: "/auth/signup", payload: { email: `exp_${Date.now()}@b.com`, password: "password123" } })).json();
+  const forbidden = await app.inject({ method: "GET", url: `/book/${bookingId}/export`, headers: { authorization: "Bearer " + other.token } });
+  assert.equal(forbidden.statusCode, 404, "another account cannot export someone else's trip");
+  ok("expense export: structured CSV + JSON line items, owner-gated");
+}
+
 // 9. policy gate: over-budget booking is refused with 409, nothing charged
 {
   const tinyBudget = { ...brief, budgetUsd: 100 };

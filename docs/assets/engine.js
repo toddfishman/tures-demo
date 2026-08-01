@@ -192,6 +192,27 @@
     book: function (body) { body = body || {}; if (!body.accountId) body.accountId = acctId(); return api("/book", { method: "POST", body: JSON.stringify(body) }); },
     confirm: function (id) { return api("/book/" + id + "/confirm", { method: "POST" }); },
     bookings: function () { return api("/bookings?accountId=" + acctId()); },
+    // Expense export. format "json" resolves the data; "csv" (default) also triggers a file download.
+    // Raw fetch (not api()) because the CSV body isn't JSON; still sends the session token for ownership.
+    exportTrip: function (bookingId, format) {
+      format = format || "csv";
+      return fetch(url + "/book/" + encodeURIComponent(bookingId) + "/export?format=" + encodeURIComponent(format), {
+        headers: token ? { Authorization: "Bearer " + token } : {},
+      }).then(function (r) {
+        if (!r.ok) throw Object.assign(new Error(String(r.status)), { status: r.status });
+        if (format === "json") return r.json();
+        return r.text().then(function (csv) {
+          try {
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+            a.download = "tures-" + bookingId + ".csv";
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+          } catch (_) {}
+          return csv;
+        });
+      });
+    },
     importTrip: function (body) { return api("/trips/import", { method: "POST", body: JSON.stringify(body || {}) }); },
     getImport: function (id) { return api("/trips/import/" + id); },
     updateImport: function (id, body) { return api("/trips/import/" + id, { method: "PATCH", body: JSON.stringify(body || {}) }); },
