@@ -26,7 +26,7 @@ Strategy docs (BRIEF, ARCHITECTURE, etc.) live **outside this repo** — ask Tod
 
 ## Live engine (check `/health`)
 
-Typical prod: `durable:true`, `auth:true`, `agentLoop:true`, `voice:true`, `tripWatch:true`, `stagehand:true`, `chatBrain:sakana-fugu`, `realInventorySearch:true`, **`bookingSimulated:true`**, `paymentProvider:mock`, `billingLive:true` (Stripe test).
+Typical prod: `durable:true`, `auth:true`, `agentLoop:true`, `voice:true`, `tripWatch:true`, `stagehand:true`, `chatBrain:anthropic (fugu fallback)`, `realInventorySearch:true`, **`bookingSimulated:true`**, `paymentProvider:mock`, `billingLive:true` (Stripe test).
 
 **P6 real money** (`ALLOW_LIVE_BOOKING`, `STRIPE_CHARGE_CARDS`, live Duffel orders) — **Todd explicit only**. Never flip without him.
 
@@ -36,7 +36,7 @@ Typical prod: `durable:true`, `auth:true`, `agentLoop:true`, `voice:true`, `trip
 converse → parse → plan → hold → confirm → prove
 ```
 
-- **Chat** (`/converse`) — guided brief, Fugu primary + Anthropic fallback, mem0 personalization
+- **Chat** (`/converse`) — guided brief, Anthropic primary + Fugu fallback, mem0 personalization
 - **Planner** (`/plan`) — Claude agent loop + deterministic fallback, SSE stream
 - **Booking** (`/book` → `/confirm`) — human-confirm gate; Duffel search (real); orders simulated until P6
 - **Vault** — Stripe card tokens + encrypted PII (VGS optional); scopes server-derived

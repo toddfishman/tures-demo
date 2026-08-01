@@ -58,9 +58,9 @@ const Env = z.object({
   // Hard safety switch: real-money bookings (live supplier/payment) are refused unless this
   // is explicitly "true". Default false so dev/test can never charge a real card.
   ALLOW_LIVE_BOOKING: z.enum(["true", "false"]).default("false"),
-  // ── Sakana Fugu — experimental primary brain for Tures' conversational chats ──────────────
-  // When SAKANA_API_KEY is set, /converse routes through Fugu first and falls back to Anthropic
-  // on any error. OpenAI-compatible /chat/completions — confirmed 2026-06-25 against Sakana's docs:
+  // ── Sakana Fugu — experimental FALLBACK brain for Tures' conversational chats ──────────────
+  // Anthropic is the primary /converse brain. When SAKANA_API_KEY is set, Fugu is tried only if
+  // Anthropic errors. OpenAI-compatible /chat/completions — confirmed 2026-06-25 against Sakana's docs:
   // base https://api.sakana.ai/v1, Bearer auth, models "fugu" (standard) / "fugu-ultra-20260615".
   SAKANA_API_KEY: z.string().optional(),
   SAKANA_API_URL: z.string().url().default("https://api.sakana.ai/v1"),
@@ -164,7 +164,7 @@ export const config = {
     return process.env.ENGINE_API_KEY || undefined;
   },
   allowLiveBooking: parsed.ALLOW_LIVE_BOOKING === "true",
-  /** Sakana Fugu — primary chat brain when keyed (OpenAI-compatible). Falls back to Anthropic. */
+  /** Sakana Fugu — experimental FALLBACK chat brain (OpenAI-compatible). Anthropic is primary. */
   sakana: {
     apiKey: parsed.SAKANA_API_KEY,
     apiUrl: parsed.SAKANA_API_URL,

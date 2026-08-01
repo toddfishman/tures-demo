@@ -19,7 +19,8 @@ export async function healthRoutes(app: FastifyInstance) {
       agentLoop: !!config.anthropicKey, // Chunk 2 — Claude tool-use loop
       // Conversational chat brain: Sakana Fugu when keyed (experimental primary), else Anthropic.
       // Fugu auto-falls-back to Anthropic on any error, so chat works as long as either is set.
-      chatBrain: config.sakana.enabled ? "sakana-fugu" : (config.anthropicKey ? "anthropic" : "none"),
+      // Anthropic is the primary chat brain; Fugu (when keyed) is an optional experimental fallback.
+      chatBrain: config.anthropicKey ? (config.sakana.enabled ? "anthropic (fugu fallback)" : "anthropic") : (config.sakana.enabled ? "sakana-fugu" : "none"),
       chatFallback: config.sakana.enabled ? (config.anthropicKey ? "anthropic" : "none") : undefined,
       booking: true, // Chunk 3 — gate + mock/simulated execution always available
       paymentProvider: config.payments, // "mock" until a Stripe key is set
