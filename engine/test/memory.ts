@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { build } from "../src/server.ts";
 import { extractHousehold } from "../src/agent/household-extract.ts";
 import { assembleContext } from "../src/agent/context.ts";
+import { crewLine } from "../src/routes/converse.ts";
 
 let passed = 0;
 const ok = (n: string) => { passed++; console.log(`  ✓ ${n}`); };
@@ -88,6 +89,23 @@ const accountId: string = su.user.id;
   assert.equal(child.meta.age, 10, "age is exposed for planning");
   assert.equal(child.secretCipher, undefined, "the encrypted secret (exact DOB/PII) is never returned");
   ok("redaction: planner sees age, never the raw secret");
+}
+
+// ── 6. crewLine (the "same crew?" phrasing) ──
+{
+  const named = crewLine({
+    adults: 2, children: 2, childAges: [10, 8], dietary: [], travelingAs: "family",
+    members: [{ relationship: "self" }, { relationship: "spouse", name: "Alex" }, { relationship: "child", age: 10, name: "Sam" }, { relationship: "child", age: 8, name: "Ben" }],
+  });
+  assert.ok(/2 adults \+ 2 children \(ages 10, 8\)/.test(named), "composition line");
+  assert.ok(/Alex, Sam, Ben/.test(named), "uses real names when present");
+
+  const placeholder = crewLine({
+    adults: 2, children: 1, childAges: [8], dietary: [], travelingAs: "family",
+    members: [{ relationship: "self" }, { relationship: "spouse", name: "Spouse" }, { relationship: "child", age: 8, name: "Child (8)" }],
+  });
+  assert.ok(/your spouse/.test(placeholder) && /8-year-old/.test(placeholder), "falls back to relationship + age for placeholder names");
+  ok("crewLine: real names → names; placeholders → relationship + age");
 }
 
 console.log(`\n${passed} Memory 2.0 checks passed.`);

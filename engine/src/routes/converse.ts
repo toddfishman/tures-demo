@@ -7,6 +7,26 @@ import { logTurn } from "../conversation-log.ts";
 import { compactConversation, capContext, recallQueryFromMessages } from "../agent/history.ts";
 import { fuguChat } from "../agent/fugu.ts";
 import { loadPlaybook } from "../agent/playbooks.ts";
+import { resolveAccountId } from "../auth/index.ts";
+import { partySummary, type PartySummary } from "../profile/index.ts";
+
+/** A natural-language description of the saved crew for the system prompt / "same crew?" nudge.
+ *  Prefers real names; falls back to relationship + age. Exported for testing. */
+export function crewLine(party: PartySummary): string {
+  const others = party.members.filter((m) => m.relationship !== "self");
+  const names = others.map((m) => {
+    const placeholder = !m.name || /^child \(\d+\)$/i.test(m.name) || /^(spouse|partner|parent|companion)$/i.test(m.name);
+    if (!placeholder) return m.name as string;
+    if (m.relationship === "child") return m.age != null ? `a ${m.age}-year-old` : "a child";
+    return `your ${m.relationship}`;
+  });
+  const composition =
+    `${party.adults} adult${party.adults > 1 ? "s" : ""}` +
+    (party.children
+      ? ` + ${party.children} child${party.children > 1 ? "ren" : ""}${party.childAges.length ? ` (ages ${party.childAges.join(", ")})` : ""}`
+      : "");
+  return names.length ? `${composition} — ${names.join(", ")}` : composition;
+}
 
 // Conversational Tures — a guided back-and-forth that gathers a complete trip brief and hands it
 // to the planner. Not scripted: a strong identity (the system prompt) plus a hard checklist (the
@@ -87,6 +107,13 @@ export async function converseRoutes(app: FastifyInstance) {
       const memories = await recall(p.data.userId, recallQuery);
       if (memories.length) {
         system += `\n\nWHAT YOU REMEMBER about this traveler (from past trips and chats — use it to personalize and to reference what they've loved before, but confirm before assuming):\n- ${memories.join("\n- ")}`;
+      }
+
+      // Household on file — so when the traveler doesn't say who's coming, Tures confirms the usual
+      // crew ("Same crew — you and Sam & Ben?") instead of asking cold, and plans kid-friendly.
+      const party = partySummary(resolveAccountId(req));
+      if (party.members.length > 1) {
+        system += `\n\nWHO USUALLY TRAVELS (household on file): ${crewLine(party)}. When this trip's travelers aren't stated, do NOT ask cold — confirm this crew ("Same crew this time?") and count them for the brief's travelers. Plan kid-friendly when children are along. If they mention someone new, offer to remember them; if this trip is clearly just them, that's fine — don't force the crew on.`;
       }
 
       let text = "";
