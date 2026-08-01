@@ -108,4 +108,24 @@ const accountId: string = su.user.id;
   ok("crewLine: real names → names; placeholders → relationship + age");
 }
 
+// ── 7. Phase 2: booking manifest pre-fills the party + flags DOB to collect just-in-time ──
+{
+  const man = (await app.inject({ method: "GET", url: "/household/manifest", headers: auth })).json();
+  assert.equal(man.party.length, 4, "manifest = self + spouse + 2 kids");
+  assert.equal(man.lead.relationship, "self", "lead is the account holder");
+  // companions were saved with age only (no exact DOB), and this account has no traveler_profile,
+  // so everyone still needs an exact DOB gathered at booking (matches the minors'-data advisory).
+  assert.ok(man.needsAtBooking.length >= 3, "flags travelers whose exact DOB must be collected just-in-time");
+  ok("GET /household/manifest pre-fills the party and flags DOB-to-collect");
+}
+
+// ── 8. Phase 2: dates-to-avoid (school calendar) reach the planner ──
+{
+  await app.inject({ method: "POST", url: "/prefs", headers: auth, payload: { prefs: { datesToAvoid: [{ label: "School year", start: "2026-09-01", end: "2027-06-15" }] } } });
+  const parsed = (await app.inject({ method: "POST", url: "/parse", payload: { text: "a week somewhere warm" } })).json();
+  const { context } = assembleContext(accountId, parsed.brief);
+  assert.ok(/dates to plan around/i.test(context.prose) && /school year/i.test(context.prose), "planner told to plan around the school year");
+  ok("dates-to-avoid (school calendar) reach the planner context");
+}
+
 console.log(`\n${passed} Memory 2.0 checks passed.`);
