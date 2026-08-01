@@ -88,6 +88,7 @@ export async function addTraveler(accountId: string, c: Companion): Promise<Reda
     relationship: c.relationship,
     age: c.age ?? ageFromDob(c.dateOfBirth), // exact DOB (in secret) preferred; else the stated age
     dietary: c.dietary ?? [],
+    dobOnFile: !!c.dateOfBirth, // whether an exact DOB is stored (else collected just-in-time at booking)
     hasPassport: !!c.passport,
     passportMasked: mask(c.passport?.number),
     ktnOnFile: !!c.knownTravelerNumber,
@@ -131,6 +132,46 @@ export function partySummary(accountId: string): PartySummary {
   const total = adults + children;
   const travelingAs = children > 0 ? "family" : total <= 1 ? "solo" : total === 2 ? "couple" : "group";
   return { adults, children, childAges: childAges.sort((a, b) => b - a), dietary: [...dietary], travelingAs, members };
+}
+
+// ---- booking manifest (Phase 2): the passenger list a real order needs, pre-filled from memory ----
+export interface ManifestPassenger {
+  relationship: string; // "self" | spouse | child | ...
+  name?: string;
+  approxAge?: number; // planner-safe age from the household (children)
+  dobOnFile: boolean; // exact DOB available for the manifest?
+  ktnOnFile: boolean;
+}
+
+/** Pre-fill a passenger manifest from what Tures already knows: the account holder plus saved
+ *  companions. Per the minors'-data advisory the standing household keeps only APPROX age for kids,
+ *  so `needsAtBooking` lists everyone whose exact DOB must still be gathered just-in-time before a
+ *  real order. This turns "who's on this trip + their details" from a form into a confirmation. */
+export async function bookingManifest(accountId: string): Promise<{
+  lead: ManifestPassenger;
+  party: ManifestPassenger[];
+  needsAtBooking: string[];
+}> {
+  const p = await getTravelerProfile(accountId);
+  const lead: ManifestPassenger = {
+    relationship: "self",
+    name: p?.fullName,
+    dobOnFile: !!p?.dateOfBirth,
+    ktnOnFile: !!p?.knownTravelerNumber,
+  };
+  const party: ManifestPassenger[] = [lead];
+  for (const t of listTravelers(accountId)) {
+    const m = ((t as unknown as { meta?: Record<string, unknown> }).meta ?? {}) as Record<string, any>;
+    party.push({
+      relationship: String(m.relationship ?? "companion"),
+      name: typeof m.fullName === "string" ? m.fullName : undefined,
+      approxAge: typeof m.age === "number" ? m.age : undefined,
+      dobOnFile: !!m.dobOnFile,
+      ktnOnFile: !!m.ktnOnFile,
+    });
+  }
+  const needsAtBooking = party.filter((x) => !x.dobOnFile).map((x) => x.name || x.relationship);
+  return { lead, party, needsAtBooking };
 }
 
 /** List the account's additional travelers (redacted/masked). */

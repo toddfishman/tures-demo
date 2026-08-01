@@ -83,6 +83,10 @@ export function assembleContext(accountId: string, brief: Brief, lensId?: string
   }
   const dietary = [...new Set([...(prefs?.dietary ?? []), ...party.dietary])];
   if (dietary.length) lines.push(`Dietary needs across the party: ${dietary.join(", ")}.`);
+  if (prefs?.datesToAvoid?.length) {
+    const windows = prefs.datesToAvoid.map((d) => `${d.label} (${d.start}–${d.end})`).join("; ");
+    lines.push(`Dates to plan around (avoid unless the trip says otherwise): ${windows}.`);
+  }
 
   const context: TravelerContext = { placeTypes, tasteTags, avoid, cabin, priceSensitivity, loyalty, taste, party, prose: lines.join(" ") };
 

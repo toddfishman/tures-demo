@@ -6,7 +6,7 @@
 // flow into planning (assembleContext) and, later, the booking manifest.
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { addTraveler, partySummary, type Companion } from "../profile/index.ts";
+import { addTraveler, partySummary, bookingManifest, type Companion } from "../profile/index.ts";
 import { extractHousehold } from "../agent/household-extract.ts";
 import { resolveAccountId } from "../auth/index.ts";
 
@@ -59,4 +59,8 @@ export async function householdRoutes(app: FastifyInstance) {
 
   // The redacted party the planner reasons on (also powers the "same crew?" prompt).
   app.get("/household/summary", async (req) => ({ party: partySummary(resolveAccountId(req)) }));
+
+  // Pre-filled passenger manifest for the booking step — who's traveling + what Tures already has,
+  // and (per the minors'-data advisory) whose exact DOB still needs collecting just-in-time.
+  app.get("/household/manifest", async (req) => bookingManifest(resolveAccountId(req)));
 }

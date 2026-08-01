@@ -38,6 +38,10 @@ export const PrefsSchema = z.object({
   priceSensitivityDefault: z.enum(["thrifty", "balanced", "premium", "no_limit"]).optional(),
   avoid: z.array(z.string()).default([]), // standing dislikes ("US Marriott", "long layovers")
   dietary: z.array(z.string()).default([]),
+  // Standing windows to plan around — e.g. school terms, blackout dates. Non-PII (labels + dates).
+  datesToAvoid: z
+    .array(z.object({ label: z.string(), start: z.string(), end: z.string() }))
+    .default([]),
 });
 export type Prefs = z.infer<typeof PrefsSchema>;
 
@@ -57,7 +61,7 @@ export function getPrefs(accountId: string): Prefs | null {
 
 /** Merge a partial update into the account's prefs (arrays replace when provided). */
 export function setPrefs(accountId: string, patch: Partial<Prefs>): Prefs {
-  const existing: Prefs = getPrefs(accountId) ?? { avoid: [], dietary: [] };
+  const existing: Prefs = getPrefs(accountId) ?? { avoid: [], dietary: [], datesToAvoid: [] };
   const merged: PrefsRow = {
     ...existing,
     ...patch,
@@ -65,6 +69,7 @@ export function setPrefs(accountId: string, patch: Partial<Prefs>): Prefs {
     tastePrint: patch.tastePrint ? { ...(existing.tastePrint ?? {}), ...patch.tastePrint } : existing.tastePrint,
     avoid: patch.avoid ?? existing.avoid ?? [],
     dietary: patch.dietary ?? existing.dietary ?? [],
+    datesToAvoid: patch.datesToAvoid ?? existing.datesToAvoid ?? [],
     accountId,
     updatedAt: new Date().toISOString(),
   } as PrefsRow;
