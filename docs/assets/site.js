@@ -32,7 +32,7 @@
       { href: "taste.html",     label: "The Taste Engine",  page: "taste" },
       { href: "vault.html",     label: "The Vault",         page: "vault" },
       { href: "trips.html",     label: "My Trips",          page: "trips" },
-      { href: "proactive.html", label: "The Concierge",     page: "concierge" },
+      { href: "proactive.html", label: "Your Concierge",    page: "concierge" },
       { href: "hiccup.html",    label: "The Hiccup Handler", page: "hiccup" }
     ]},
     { title: "More", items: [
