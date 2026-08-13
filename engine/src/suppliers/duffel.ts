@@ -11,6 +11,7 @@ import { config } from "../config.ts";
 import { log } from "../logger.ts";
 import { MockSupplier } from "./mock.ts";
 import { geocode } from "../geo/index.ts";
+import { toUsd } from "./fx.ts";
 
 /** Add N nights to a YYYY-MM-DD date (used when the brief has no explicit return date). */
 function addNights(date: string, nights: number): string {
@@ -65,32 +66,44 @@ export class DuffelSupplier implements SupplierAdapter {
     });
 
     const offers: any[] = json?.data?.offers ?? [];
-    return offers.slice(0, 8).map((o, i) => {
-      const carriers: string[] = (o.slices ?? [])
-        .flatMap((s: any) => s.segments ?? [])
-        .map((seg: any) => seg.marketing_carrier?.name)
-        .filter(Boolean);
-      const carrier = carriers[0] ?? o.owner?.name ?? "Carrier";
-      const maxStops = Math.max(
-        0,
-        ...(o.slices ?? []).map((s: any) => Math.max(0, (s.segments?.length ?? 1) - 1)),
-      );
-      const amount = Number(o.total_amount ?? 0);
-      return {
-        id: o.id ?? `duffel-fl-${i}`,
-        kind: "flight",
-        supplier: this.name,
-        title: `${carrier} ${brief.origin}→${brief.destination}`,
-        priceUsd: amount, // FX normalization to USD is a Chunk-3 item; currency tracked below.
-        currency: o.total_currency ?? "USD",
-        raw: { offerId: o.id, owner: o.owner?.name, cabin: brief.cabin, expiresAt: o.expires_at },
-        summary: [
-          `${carrier} · ${brief.cabin}`,
-          maxStops === 0 ? "nonstop" : `${maxStops} stop${maxStops > 1 ? "s" : ""}`,
-          `${o.total_currency ?? ""} ${amount.toLocaleString()}`.trim(),
-        ],
-      } satisfies Offer;
-    });
+    return offers
+      .flatMap((o, i): Offer[] => {
+        const carriers: string[] = (o.slices ?? [])
+          .flatMap((s: any) => s.segments ?? [])
+          .map((seg: any) => seg.marketing_carrier?.name)
+          .filter(Boolean);
+        const carrier = carriers[0] ?? o.owner?.name ?? "Carrier";
+        const maxStops = Math.max(
+          0,
+          ...(o.slices ?? []).map((s: any) => Math.max(0, (s.segments?.length ?? 1) - 1)),
+        );
+        const amount = Number(o.total_amount ?? 0);
+        const currency = o.total_currency ?? "USD";
+        // The budget gate compares priceUsd against brief.budgetUsd, so it must really be USD.
+        // An offer in a currency we can't convert is dropped — better no offer than a mispriced one.
+        const usd = toUsd(amount, currency);
+        if (usd === null) {
+          log.warn("duffel flights: skipping offer in unconvertible currency", { currency, offerId: o.id });
+          return [];
+        }
+        return [{
+          id: o.id ?? `duffel-fl-${i}`,
+          kind: "flight",
+          supplier: this.name,
+          title: `${carrier} ${brief.origin}→${brief.destination}`,
+          priceUsd: usd,
+          currency,
+          raw: { offerId: o.id, owner: o.owner?.name, cabin: brief.cabin, expiresAt: o.expires_at, nativeAmount: amount },
+          summary: [
+            `${carrier} · ${brief.cabin}`,
+            maxStops === 0 ? "nonstop" : `${maxStops} stop${maxStops > 1 ? "s" : ""}`,
+            currency === "USD"
+              ? `USD ${amount.toLocaleString()}`
+              : `${currency} ${amount.toLocaleString()} (≈ $${usd.toLocaleString()})`,
+          ],
+        } satisfies Offer];
+      })
+      .slice(0, 8);
   }
 
   async searchStays(brief: Brief): Promise<Offer[]> {
@@ -120,32 +133,45 @@ export class DuffelSupplier implements SupplierAdapter {
         guests,
       });
       const results: any[] = json?.data?.results ?? [];
-      const offers = results.slice(0, 8).map((r, i) => {
-        const acc = r.accommodation ?? {};
-        const amount = Number(r.cheapest_rate_total_amount ?? 0);
-        const currency = r.cheapest_rate_currency ?? "USD";
-        const photo = Array.isArray(acc.photos) && acc.photos[0]?.url ? acc.photos[0].url : undefined;
-        const stars = acc.rating ? `${acc.rating}-star` : null;
-        const review = acc.review_score ? `${acc.review_score}/10 guests` : null;
-        return {
-          id: r.id ?? `duffel-st-${i}`,
-          kind: "stay",
-          supplier: this.name,
-          title: acc.name ?? `Stay in ${geo.label}`,
-          priceUsd: amount, // in `currency`; FX→USD normalization is a known follow-up.
-          currency,
-          raw: {
-            searchResultId: r.id,
-            address: acc.location?.address,
-            photo,
-            rating: acc.rating,
-            reviewScore: acc.review_score,
-            nights,
-            expiresAt: r.expires_at,
-          },
-          summary: [stars, review, `${currency} ${amount.toLocaleString()} · ${nights} nights`].filter(Boolean) as string[],
-        } satisfies Offer;
-      });
+      const offers = results
+        .flatMap((r, i): Offer[] => {
+          const acc = r.accommodation ?? {};
+          const amount = Number(r.cheapest_rate_total_amount ?? 0);
+          const currency = r.cheapest_rate_currency ?? "USD";
+          // Same rule as flights: priceUsd feeds the budget gate, so unconvertible currencies are
+          // dropped rather than passed through as if USD.
+          const usd = toUsd(amount, currency);
+          if (usd === null) {
+            log.warn("duffel stays: skipping result in unconvertible currency", { currency, resultId: r.id });
+            return [];
+          }
+          const photo = Array.isArray(acc.photos) && acc.photos[0]?.url ? acc.photos[0].url : undefined;
+          const stars = acc.rating ? `${acc.rating}-star` : null;
+          const review = acc.review_score ? `${acc.review_score}/10 guests` : null;
+          const priceLine = currency === "USD"
+            ? `USD ${amount.toLocaleString()} · ${nights} nights`
+            : `${currency} ${amount.toLocaleString()} (≈ $${usd.toLocaleString()}) · ${nights} nights`;
+          return [{
+            id: r.id ?? `duffel-st-${i}`,
+            kind: "stay",
+            supplier: this.name,
+            title: acc.name ?? `Stay in ${geo.label}`,
+            priceUsd: usd,
+            currency,
+            raw: {
+              searchResultId: r.id,
+              address: acc.location?.address,
+              photo,
+              rating: acc.rating,
+              reviewScore: acc.review_score,
+              nights,
+              expiresAt: r.expires_at,
+              nativeAmount: amount,
+            },
+            summary: [stars, review, priceLine].filter(Boolean) as string[],
+          } satisfies Offer];
+        })
+        .slice(0, 8);
       if (offers.length) return offers;
       log.warn("duffel stays: no results — using mock", { destination: brief.destination, label: geo.label });
       return this.stayFallback.searchStays(brief);

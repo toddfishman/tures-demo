@@ -57,8 +57,10 @@ export interface Offer {
   kind: OfferKind;
   supplier: string;
   title: string;
-  /** Total price for the brief's party, in the currency below. */
+  /** Total price for the brief's party, ALWAYS in USD — the budget gate and planners compare this
+   *  straight against brief.budgetUsd. Adapters must convert (suppliers/fx.ts) before setting it. */
   priceUsd: number;
+  /** The supplier's native currency for this offer (display/audit; priceUsd is already USD). */
   currency: string;
   /** Adapter-specific detail kept for booking (Duffel offer id, rate token, etc.). */
   raw: Record<string, unknown>;
